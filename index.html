@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Chord - Director</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="page-transition"></div>
+    
+    <div class="loading-screen">
+        <div class="loader-content">
+            <img src="photos/CineChord.png" alt="CineChord" class="loader-logo">
+            <div class="loader-bar-bg">
+                <div class="loader-bar-fill"></div>
+            </div>
+            <div class="loader-percentage">0%</div>
+        </div>
+        <div class="loader-author">
+            <img src="photos/Khlogo.png" alt="Kh" class="author-icon">
+            <span>Designed By Harunov</span>
+        </div>
+    </div>
+
+    <div class="grain-overlay"></div>
+    
+    <div class="hero-section" style="opacity: 0; visibility: hidden;">
+        
+        <div id="videoContainer">
+            <video autoplay muted loop playsinline class="hero-bg" id="heroBgVideo">
+                <source src="videos/Showreel.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+        </div>
+
+        <div class="header">
+            <div class="nav-left">
+                <a href="index.html" class="nav-btn active" data-text="HOME"><span class="nav-text">HOME</span></a>
+                <a href="works/works.html" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
+                <a href="services/service.html" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+            </div>
+            <div class="nav-right">
+                <a href="archive/archive.html" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+                <a href="about/about.html" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+                <a href="contact/contact.html" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+            </div>
+        </div>
+
+        <div class="center-logo">
+            <img src="photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+        </div>
+
+        <div class="split-name">
+            <div class="name-left">CINE</div>
+            <div class="name-right">CHORD</div>
+        </div>
+
+        <div class="play-button-container" id="mainPlayBtnContainer" onclick="openMainVideo()">
+            <button class="play-button">
+                <span class="play-text" data-text="PLAY">PLAY</span>
+            </button>
+        </div>
+
+        <div class="right-floating-nav">
+            <div class="nav-info-row">
+                <span class="project-name-outline" id="projectName">KONTAKT</span>
+                <span class="counter-text" id="projectCounter">01 — 05</span>
+            </div>
+            <div class="nav-arrows">
+                <button class="arrow-btn prev" id="prevVideoBtn">←</button>
+                <button class="arrow-btn next" id="nextVideoBtn">→</button>
+            </div>
+        </div>
+
+        <div class="bottom-right-socials">
+            <div class="social-icons-home">
+                <a href="#" class="social-link-home"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="social-link-home"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#" class="social-link-home"><i class="fa-brands fa-vimeo-v"></i></a>
+                <a href="#" class="social-link-home"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+        </div>
+        
+        <div class="bottom-left-copyright">
+            <span>© 2025 CINE CHORD</span>
+        </div>
+    </div>
+
+    <div class="preview-container is-paused" id="previewContainer">
+        <button class="close-preview" id="closePreview">×</button>
+        
+        <div class="preview-info" id="previewInfo">
+            <div class="text-mask">
+                <div class="preview-title" id="previewTitle"></div>
+            </div>
+        </div>
+
+        <div class="video-wrapper" id="videoWrapper">
+            <div class="video-loading"></div>
+            
+            <div class="play-button-container modal-play-btn" id="modalPlayBtnContainer">
+                <button class="play-button">
+                    <span class="play-text" data-text="PLAY">PLAY</span>
+                </button>
+            </div>
+
+            <video id="previewVideo" class="preview-video" playsinline preload="metadata"></video>
+            
+            <div class="custom-controls" id="customControls">
+                <div class="progress-bar-container" id="progressBarContainer">
+                    <div class="progress-played" id="progressPlayed"></div>
+                    <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
+                </div>
+                
+                <div class="controls-buttons">
+                    <button class="ctrl-btn skip-btn" id="rewindBtn"><i class="fa-solid fa-rotate-left"></i></button>
+                    
+                    <button class="ctrl-btn main-play-btn" id="playPauseBtn">
+                        <i class="fa-solid fa-play" id="playIcon"></i>
+                        <i class="fa-solid fa-pause" id="pauseIcon" style="display:none;"></i>
+                    </button>
+                    
+                    <button class="ctrl-btn skip-btn" id="forwardBtn"><i class="fa-solid fa-rotate-right"></i></button>
+                    
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span> / <span id="durationTime">0:00</span>
+                    </div>
+
+                    <div class="right-controls-group">
+                        <div class="volume-wrapper">
+                            <input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100">
+                        </div>
+                        <button class="ctrl-btn" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

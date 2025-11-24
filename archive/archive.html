@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rauf Gurbanaliyev - Archive</title>
+    <link rel="stylesheet" href="archive.css">
+</head>
+<body>
+  <!-- TV Noise Canvas -->
+    <div class="page-transition"></div>
+    <div class="grain-overlay"></div>
+    <div class="progress-bar-top"></div>
+
+
+    <!-- Video Preview Container -->
+    <div class="preview-container" id="previewContainer">
+        <button class="close-preview" id="closePreview">×</button>
+        <div class="video-wrapper" id="videoWrapper">
+            <div class="video-loading"></div>
+            <video 
+                id="previewVideo" 
+                class="preview-video" 
+                playsinline
+                preload="metadata">
+            </video>
+            
+            <!-- Custom Video Controls -->
+            <div class="custom-controls" id="customControls">
+                <div class="controls-progress">
+                    <div class="progress-bar-container" id="progressBarContainer">
+                        <div class="progress-buffered" id="progressBuffered"></div>
+                        <div class="progress-played" id="progressPlayed"></div>
+                        <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
+                    </div>
+                </div>
+                <div class="controls-buttons">
+                    <button class="ctrl-btn" id="playPauseBtn">
+                        <svg id="playIcon" viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg id="pauseIcon" viewBox="0 0 24 24" width="24" height="24" style="display:none;">
+                            <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </button>
+                    <button class="ctrl-btn" id="skipBackBtn" title="10s geri">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+                        </svg>
+                    </button>
+                    <button class="ctrl-btn" id="skipForwardBtn" title="10s irəli">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
+                        </svg>
+                    </button>
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span class="time-separator">/</span>
+                        <span id="durationTime">0:00</span>
+                    </div>
+                    <div class="volume-wrapper">
+                        <button class="ctrl-btn" id="muteBtn">
+                            <svg id="volumeIcon" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                            </svg>
+                            <svg id="muteIcon" viewBox="0 0 24 24" width="20" height="20" style="display:none;">
+                                <path fill="currentColor" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                            </svg>
+                        </button>
+                        <input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100">
+                    </div>
+                    <button class="ctrl-btn speed-btn" id="speedBtn">1x</button>
+                    <button class="ctrl-btn" id="fullscreenBtn">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="preview-info" id="previewInfo">
+            <div class="preview-title" id="previewTitle"></div>
+            <div class="preview-meta" id="previewMeta"></div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
+            <a href="../works/works.html" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
+            <a href="../services/service.html" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+        </div>
+        <div class="nav-right">
+            <a href="archive.html" class="nav-btn active" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+            <a href="../about/about.html" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+            <a href="../contact/contact.html" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+        </div>
+    </div>
+
+    <div class="center-logo">
+        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    </div>
+
+    <section class="archive-section" id="archiveSection">
+        <div class="split-titles">
+            <div class="video-title">
+                <span class="video-word">FILM</span>
+                <span class="video-word">COMMERCIAL</span>
+                <span class="video-word">CLIPS</span>
+            </div>
+            <div class="archive-title-container">
+                <div class="archive-title">ARCHIVE</div>
+                <div class="archive-subtitle">
+                    FULL FILM AVAILABLE ON REQUEST, <a href="../contact/contact.html">SHOOT A MESSAGE</a>
+                </div>
+            </div>
+        </div>
+
+        <table class="archive-table">
+            <thead>
+                <tr>
+                    <th class="number-col"></th>
+                    <th class="client-col">CLIENT</th>
+                    <th class="title-col">TITLE</th>
+                    <th class="type-col">TYPE</th>
+                    <th class="location-col">LOCATION</th>
+                    <th class="agency-col">AGENCY</th>
+                    <th class="year-col">YEAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-video="/videos/Restoran.mp4">
+                    <td class="number-col">01</td>
+                    <td class="client-col">NFC</td>
+                    <td class="title-col">PAYMENT</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Uç Esre Shahid.mp4">
+                    <td class="number-col">02</td>
+                    <td class="client-col">ÜÇ ƏSRƏ ŞAHİD</td>
+                    <td class="title-col">FİLM</td>
+                    <td class="type-col">DOCUMENTARY</td>
+                    <td class="location-col">Azerbaijan</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Yaz Kampaniyasi.mp4">
+                    <td class="number-col">03</td>
+                    <td class="client-col">ABB</td>
+                    <td class="title-col">YAZ FÜRSƏTİ KAMPANİYASI</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/8Mart.mp4">
+                    <td class="number-col">04</td>
+                    <td class="client-col">Kontakt Home</td>
+                    <td class="title-col">BEYNƏLXALQ QADINLAR GÜNÜ</td>
+                    <td class="type-col">SOCIAL</td>
+                    <td class="location-col">Azerbaijan</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/ABB.mp4">
+                    <td class="number-col">05</td>
+                    <td class="client-col">ABB</td>
+                    <td class="title-col">TAM CARD</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Azercell.mp4">
+                    <td class="number-col">06</td>
+                    <td class="client-col">AZERCELL</td>
+                    <td class="title-col">JUDO FEDERATION</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Bakcell 099.mp4">
+                    <td class="number-col">07</td>
+                    <td class="client-col">BAKCELL</td>
+                    <td class="title-col">099 PREFİKS</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Bakcell.mp4">
+                    <td class="number-col">08</td>
+                    <td class="client-col">BAKCELL</td>
+                    <td class="title-col">MOBIL</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Bank Respublika Digital Card.mp4">
+                    <td class="number-col">09</td>
+                    <td class="client-col">BANK RESPUBLİKA</td>
+                    <td class="title-col">DIGITAL CARD</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Birbank.mp4">
+                    <td class="number-col">10</td>
+                    <td class="client-col">BIRBANK</td>
+                    <td class="title-col">Taksit Kart</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Find_us.mp4">
+                    <td class="number-col">11</td>
+                    <td class="client-col">FIND US</td>
+                    <td class="title-col">FIND US</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Irshad.mp4">
+                    <td class="number-col">12</td>
+                    <td class="client-col">İRŞAD</td>
+                    <td class="title-col">İRŞAD</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Kontakt.mp4">
+                    <td class="number-col">13</td>
+                    <td class="client-col">KONTAKT</td>
+                    <td class="title-col">LOVE</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/KontaktHome.mp4">
+                    <td class="number-col">14</td>
+                    <td class="client-col">KONTAKT HOME</td>
+                    <td class="title-col">YENI DERS ILI</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Neokart.mp4">
+                    <td class="number-col">15</td>
+                    <td class="client-col">BANK RESPUBLIKA</td>
+                    <td class="title-col">NEOKART</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/New_Class.mp4">
+                    <td class="number-col">16</td>
+                    <td class="client-col">NEW CLASS</td>
+                    <td class="title-col">NEW CLASS</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Novruz.mp4">
+                    <td class="number-col">17</td>
+                    <td class="client-col">KONTAKT HOME</td>
+                    <td class="title-col">NOVRUZ BAYRAMI</td>
+                    <td class="type-col">SOCIAL</td>
+                    <td class="location-col">Azerbaijan</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Pasha Bank 10 Year.mp4">
+                    <td class="number-col">18</td>
+                    <td class="client-col">PASHA BANK</td>
+                    <td class="title-col">10 YEAR ANNIVERSARY</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Pasha Buisiness.mp4">
+                    <td class="number-col">19</td>
+                    <td class="client-col">PASHA BANK</td>
+                    <td class="title-col">PASHA BUSINESS</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/RedHearts.mp4">
+                    <td class="number-col">20</td>
+                    <td class="client-col">RED HEARTS</td>
+                    <td class="title-col">RED HEARTS</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Showreel.mp4">
+                    <td class="number-col">21</td>
+                    <td class="client-col">RAUF G</td>
+                    <td class="title-col">SHOWREEL</td>
+                    <td class="type-col">REEL</td>
+                    <td class="location-col">GLOBAL</td>
+                    <td class="agency-col">CINE CHORD</td>
+                    <td class="year-col">2025</td>
+                </tr>
+        
+                <tr data-video="/videos/Yeni dovr.mp4">
+                    <td class="number-col">26</td>
+                    <td class="client-col">BAKCELL</td>
+                    <td class="title-col">YENİ BİR DÖVR BAŞLAYIR</td>
+                    <td class="type-col">COMMERCIAL</td>
+                    <td class="location-col">Baku</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+                <tr data-video="/videos/Zefer.mp4">
+                    <td class="number-col">27</td>
+                    <td class="client-col">KONTAKT HOME</td>
+                    <td class="title-col">ZƏFƏR</td>
+                    <td class="type-col">SOCIAL</td>
+                    <td class="location-col">Azerbaijan</td>
+                    <td class="agency-col">INDEPENDENT</td>
+                    <td class="year-col">2024</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <script src="archive.js"></script>
+</body>
+</html>
