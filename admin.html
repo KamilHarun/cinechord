@@ -3,151 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineChord Admin Panel</title>
-    <!-- CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>CineChord Admin</title>
     
-    <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-        
-        /* LOGIN EKRANI */
-        #login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #1e1e2f; z-index: 9999; display: flex; align-items: center; justify-content: center;
-        }
-        .login-box { background: white; padding: 40px; border-radius: 10px; width: 350px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        /* ADMIN PANEL */
-        .wrapper { display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 260px; background: #212529; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid #3d4146; }
-        .nav-link { color: #babbbc; padding: 15px 20px; cursor: pointer; display: block; text-decoration: none; border-left: 4px solid transparent; }
-        .nav-link:hover, .nav-link.active { background: #343a40; color: white; border-left-color: #0d6efd; }
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-bg: #111827;
+            --sidebar-text: #9ca3af;
+            --sidebar-active: #3b82f6;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); overflow-x: hidden; }
+
+        /* Login Ekranı */
+        #login-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #111827;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .login-box {
+            background: white; padding: 2.5rem; border-radius: 1rem; width: 100%; max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Layout */
+        .wrapper { display: flex; min-height: 100vh; }
         
-        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; display: none; }
-        .main-content.active { display: block; animation: fadeEffect 0.3s; }
+        .sidebar {
+            width: var(--sidebar-width); background: var(--sidebar-bg); color: var(--sidebar-text);
+            position: fixed; height: 100vh; display: flex; flex-direction: column;
+        }
+        .sidebar-header { padding: 1.5rem; font-size: 1.25rem; font-weight: 700; color: white; border-bottom: 1px solid #1f2937; }
+        .menu-item {
+            padding: 0.75rem 1.5rem; cursor: pointer; display: flex; align-items: center; gap: 0.75rem;
+            transition: all 0.2s; font-weight: 500;
+        }
+        .menu-item:hover, .menu-item.active { background: #1f2937; color: white; border-right: 3px solid var(--sidebar-active); }
+        .menu-item i { width: 20px; text-align: center; }
+
+        .main-content {
+            margin-left: var(--sidebar-width); flex: 1; padding: 2rem;
+            display: none;
+        }
+        .main-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        /* Komponentlər */
+        .card-custom {
+            background: var(--card-bg); border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); padding: 1.5rem;
+        }
+        .table img.thumb {
+            width: 48px; height: 48px; object-fit: cover; border-radius: 0.5rem;
+        }
+        .badge-custom {
+            padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 700; border-radius: 0.375rem;
+        }
         
-        @keyframes fadeEffect { from {opacity: 0;} to {opacity: 1;} }
+        /* About Section Styles */
+        .about-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
         
-        img.thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; }
-        .badge-read { background-color: #d1fae5; color: #065f46; }
-        .badge-unread { background-color: #fee2e2; color: #991b1b; }
+        .about-section-title i {
+            margin-right: 0.5rem;
+            color: #3b82f6;
+        }
+        
+        .video-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            background: #000;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- 1. LOGIN EKRANI -->
     <div id="login-overlay">
-        <div class="login-box text-center">
-            <h3 class="mb-4"><i class="fas fa-lock me-2"></i>Admin Giriş</h3>
+        <div class="login-box">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold">Admin Panel</h3>
+                <p class="text-muted small">CineChord İdarəetmə Mərkəzi</p>
+            </div>
             <form id="loginForm">
-                <div class="mb-3 text-start">
-                    <label>İstifadəçi adı</label>
-                    <input type="text" id="loginUser" class="form-control" placeholder="admin" required>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">İstifadəçi adı</label>
+                    <input type="text" id="loginUser" class="form-control py-2" placeholder="admin" required>
                 </div>
-                <div class="mb-3 text-start">
-                    <label>Şifrə</label>
-                    <input type="password" id="loginPass" class="form-control" placeholder="******" required>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Şifrə</label>
+                    <input type="password" id="loginPass" class="form-control py-2" placeholder="••••••" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Daxil ol</button>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Giriş et</button>
             </form>
         </div>
     </div>
 
-    <!-- 2. ƏSAS PANEL -->
     <div class="wrapper" id="admin-wrapper" style="display: none;">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header"><i class="fas fa-video me-2"></i>CineChord</div>
-            <a onclick="nav('works')" class="nav-link active" id="link-works"><i class="fas fa-film me-2"></i> İşlər (Works)</a>
-            <a onclick="nav('services')" class="nav-link" id="link-services"><i class="fas fa-tools me-2"></i> Xidmətlər</a>
-            <a onclick="nav('messages')" class="nav-link" id="link-messages"><i class="fas fa-envelope me-2"></i> Mesajlar</a>
-            <a onclick="nav('about')" class="nav-link" id="link-about"><i class="fas fa-info-circle me-2"></i> About</a>
-            <div class="mt-auto p-3">
-                <button onclick="logout()" class="btn btn-outline-danger w-100 btn-sm">Çıxış</button>
+        
+        <aside class="sidebar">
+            <div class="sidebar-header"><i class="fas fa-clapperboard me-2 text-primary"></i>CineChord</div>
+            <nav class="mt-4 flex-grow-1">
+                <div class="menu-item active" onclick="nav('works')" id="nav-works"><i class="fas fa-film"></i> İşlər (Portfolio)</div>
+                <div class="menu-item" onclick="nav('services')" id="nav-services"><i class="fas fa-magic"></i> Xidmətlər</div>
+                <div class="menu-item" onclick="nav('messages')" id="nav-messages"><i class="fas fa-envelope"></i> Mesajlar</div>
+                <div class="menu-item" onclick="nav('about')" id="nav-about"><i class="fas fa-info-circle"></i> Haqqımızda</div>
+            </nav>
+            <div class="p-3 border-top border-secondary">
+                <button onclick="logout()" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt me-2"></i> Çıxış</button>
             </div>
-        </div>
+        </aside>
 
-        <!-- Məzmun -->
-        <div style="flex-grow: 1; display: flex; flex-direction: column;">
+        <main style="flex: 1; background: #f9fafb;">
             
-            <!-- WORKS BÖLMƏSİ -->
             <div id="view-works" class="main-content active">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Portfolio İşləri</h2>
-                    <button class="btn btn-primary" onclick="openWorkModal()"><i class="fas fa-plus"></i> Yeni İş</button>
+                    <h2 class="fw-bold m-0">Portfolio İşləri</h2>
+                    <button class="btn btn-primary" onclick="openWorkModal()"><i class="fas fa-plus me-2"></i>Yeni İş</button>
                 </div>
-                <div class="card shadow-sm">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark"><tr><th class="ps-4">Şəkil</th><th>Başlıq</th><th>Müştəri</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
+                <div class="card-custom">
+                    <table class="table align-middle">
+                        <thead class="bg-light"><tr><th>Poster</th><th>Başlıq</th><th>Müştəri</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
                         <tbody id="worksTable"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- SERVICES BÖLMƏSİ -->
             <div id="view-services" class="main-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Xidmətlər</h2>
-                    <button class="btn btn-primary" onclick="openServiceModal()"><i class="fas fa-plus"></i> Yeni Xidmət</button>
+                    <h2 class="fw-bold m-0">Xidmətlər</h2>
+                    <button class="btn btn-primary" onclick="openServiceModal()"><i class="fas fa-plus me-2"></i>Yeni Xidmət</button>
                 </div>
-                <div class="row" id="servicesGrid"></div>
+                <div class="row g-4" id="servicesGrid"></div>
             </div>
 
-            <!-- MESSAGES BÖLMƏSİ -->
             <div id="view-messages" class="main-content">
-                <h2 class="mb-4">Gələn Mesajlar</h2>
-                <div class="card shadow-sm">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-dark"><tr><th>Status</th><th>Ad</th><th>Email</th><th>Mesaj</th><th>Əməliyyat</th></tr></thead>
+                <h2 class="fw-bold mb-4">Gələn Mesajlar</h2>
+                <div class="card-custom">
+                    <table class="table align-middle">
+                        <thead><tr><th>Status</th><th>Ad</th><th>Email</th><th>Mesaj</th><th>Əməliyyat</th></tr></thead>
                         <tbody id="messagesTable"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- ABOUT BÖLMƏSİ -->
             <div id="view-about" class="main-content">
-                <h2 class="mb-4">Haqqımızda Məlumatları</h2>
-                <div class="card shadow-sm p-4">
-                    <form id="aboutForm">
+                <h2 class="fw-bold mb-4">Haqqımızda Səhifəsi</h2>
+                
+                <form id="aboutForm">
+                    <div class="card-custom mb-4">
+                        <h5 class="about-section-title"><i class="fas fa-video"></i>Video və Başlıqlar</h5>
                         <div class="row g-3">
-                            <div class="col-md-6"><label>Main Title</label><input type="text" id="aboutTitle" class="form-control"></div>
-                            <div class="col-md-6"><label>Sub Title</label><input type="text" id="aboutSubtitle" class="form-control"></div>
-                            <div class="col-12"><label>Who We Are Text</label><textarea id="aboutWho" class="form-control" rows="3"></textarea></div>
-                            <div class="col-12"><label>Our Mission Text</label><textarea id="aboutMission" class="form-control" rows="3"></textarea></div>
-                            <div class="col-md-4"><label>Email</label><input type="text" id="aboutEmail" class="form-control"></div>
-                            <div class="col-md-4"><label>Phone</label><input type="text" id="aboutPhone" class="form-control"></div>
-                            <div class="col-md-4"><label>Address</label><input type="text" id="aboutAddress" class="form-control"></div>
-                            <div class="col-12"><button type="button" onclick="saveAbout()" class="btn btn-success">Yadda Saxla</button></div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Əsas Başlıq</label>
+                                <input type="text" id="aMainTitle" class="form-control" placeholder="OUR STORY">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Video Faylı</label>
+                                <input type="file" id="aVideoFile" class="form-control" accept="video/mp4">
+                                <small class="text-muted">Mövcud video dəyişdirmək üçün yeni fayl seçin</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Alt Başlıq (Subtitle)</label>
+                                <textarea id="aSubTitle" class="form-control" rows="2" placeholder="We are a story-first creative studio..."></textarea>
+                            </div>
+                            <div class="col-12" id="videoPreviewContainer" style="display: none;">
+                                <label class="form-label fw-bold">Mövcud Video</label>
+                                <video id="aVideoPreview" class="video-preview" controls muted>
+                                    <source src="" type="video/mp4">
+                                </video>
+                            </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <div class="card-custom mb-4">
+                        <h5 class="about-section-title"><i class="fas fa-align-left"></i>Məzmun Bölmələri</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Biz Kimik (Who We Are)</label>
+                                <textarea id="aWho" class="form-control" rows="3" placeholder="Founded in 2015, CINE CHORD has been..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Missiyamız (Our Mission)</label>
+                                <textarea id="aMission" class="form-control" rows="3" placeholder="To create meaningful digital experiences..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Yanaşmamız (Our Approach)</label>
+                                <textarea id="aApproach" class="form-control" rows="3" placeholder="We believe in collaboration, innovation..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-custom mb-4">
+                        <h5 class="about-section-title"><i class="fas fa-address-card"></i>Əlaqə Məlumatları</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" id="aEmail" class="form-control" placeholder="hello@cinechord.com">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Telefon</label>
+                                <input type="text" id="aPhone" class="form-control" placeholder="+44 (0) 7495 718055">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Ünvan</label>
+                                <input type="text" id="aAddress" class="form-control" placeholder="London, UK">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="button" id="saveAboutBtn" class="btn btn-success btn-lg px-5">
+                            <i class="fas fa-save me-2"></i>Yadda Saxla
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- WORK MODAL -->
     <div class="modal fade" id="workModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white"><h5 class="modal-title">İş Formu</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-primary text-white"><h5 class="modal-title fw-bold">İş Formu</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
                     <form id="workForm">
                         <input type="hidden" id="workId">
-                        <div class="mb-2"><label>Başlıq</label><input type="text" id="wTitle" class="form-control" required></div>
-                        <div class="mb-2"><label>Müştəri</label><input type="text" id="wClient" class="form-control"></div>
-                        <div class="mb-2"><label>Kateqoriya</label>
-                            <select id="wCategory" class="form-select" required>
-                                <option value="FILM">FILM</option><option value="COMMERCIAL">COMMERCIAL</option><option value="CLIP">CLIP</option>
-                            </select>
+                        <div class="row g-3">
+                            <div class="col-md-6"><label class="form-label">Başlıq</label><input type="text" id="wTitle" class="form-control" required></div>
+                            <div class="col-md-6"><label class="form-label">Müştəri</label><input type="text" id="wClient" class="form-control"></div>
+                            <div class="col-md-6"><label class="form-label">Kateqoriya</label>
+                                <select id="wCategory" class="form-select" required>
+                                    <option value="FILM">FILM</option>
+                                    <option value="COMMERCIAL">COMMERCIAL</option>
+                                    <option value="CLIP">CLIP</option>
+                                    <option value="MUSIC_VIDEO">MUSIC VIDEO</option>
+                                    <option value="DOCUMENTARY">DOCUMENTARY</option>
+                                    <option value="SOCIAL">SOCIAL</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6"><label class="form-label">Video Link (YouTube/Vimeo URL)</label><input type="url" id="wVideoUrl" class="form-control"></div>
+                            
+                            <div class="col-md-6"><label class="form-label">Poster Şəkli</label><input type="file" id="wImage" class="form-control"></div>
+                            <div class="col-md-6"><label class="form-label">Preview Video (Fayl)</label><input type="file" id="wPreview" class="form-control"></div>
+
+                            <div class="col-12">
+                                <label class="form-label">Ətraflı Açıqlama (Description)</label>
+                                <textarea id="wDescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Məkan (Location)</label>
+                                <input type="text" id="wLocation" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Agentlik (Agency)</label>
+                                <input type="text" id="wAgency" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">İstehsal İli (Production Year)</label>
+                                <input type="number" id="wProductionYear" class="form-control" placeholder="YYYY" min="1900" max="2100">
+                            </div>
+                            <div class="col-12 mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="wIsFeatured">
+                                    <label class="form-check-label fw-bold" for="wIsFeatured">Əsas Səhifədə Göstər (Featured)</label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-2"><label>Video Link</label><input type="text" id="wVideoUrl" class="form-control"></div>
-                        <div class="mb-2"><label>Şəkil</label><input type="file" id="wImage" class="form-control"></div>
-                        <div class="mb-2"><label>Preview Video (Fayl)</label><input type="file" id="wPreview" class="form-control"></div>
                     </form>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-primary" onclick="submitWork()">Təsdiqlə</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-primary w-100" onclick="submitWork()">Təsdiqlə</button></div>
             </div>
         </div>
     </div>
@@ -155,39 +299,67 @@
     <!-- SERVICE MODAL -->
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white"><h5 class="modal-title">Xidmət Formu</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-content border-0">
+                <div class="modal-header bg-success text-white"><h5 class="modal-title fw-bold">Xidmət Formu</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId">
-                        <div class="mb-2"><label>Başlıq</label><input type="text" id="sTitle" class="form-control" required></div>
-                        <div class="mb-2"><label>Icon Class</label><input type="text" id="sIcon" class="form-control" placeholder="fa-video"></div>
-                        <div class="mb-2"><label>Təsvir</label><textarea id="sDesc" class="form-control"></textarea></div>
-                        <div class="mb-2"><label>Bullet Points (Hər sətir 1 ədəd)</label><textarea id="sBullets" class="form-control" rows="3"></textarea></div>
-                        <div class="mb-2"><label>Steps (Hər sətir 1 ədəd)</label><textarea id="sSteps" class="form-control" rows="3"></textarea></div>
+                        <div class="mb-3"><label class="form-label">Başlıq</label><input type="text" id="sTitle" class="form-control" required></div>
+                        <div class="mb-3"><label class="form-label">Icon Class</label><input type="text" id="sIcon" class="form-control" placeholder="fa-video"></div>
+                        <div class="mb-3"><label class="form-label">Təsvir</label><textarea id="sDesc" class="form-control"></textarea></div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Video Faylı (MP4)</label>
+                            <input type="file" id="sVideoFile" name="videoFile" class="form-control" accept="video/mp4">
+                        </div>
+                        
+                        <div class="mb-3"><label class="form-label text-muted small">Bullet Points (Hər maddə yeni sətirdə)</label><textarea id="sBullets" class="form-control" rows="3"></textarea></div>
+                        <div class="mb-3"><label class="form-label text-muted small">Steps (Hər addım yeni sətirdə)</label><textarea id="sSteps" class="form-control" rows="3"></textarea></div>
                     </form>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-success" onclick="submitService()">Təsdiqlə</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-success w-100" onclick="submitService()">Yadda Saxla</button></div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // ======= KONFİQURASİYA =======
+        // ======= API CONFIGURATION =======
         const BASE_URL = "http://localhost:8080";
-        // Sizin atdığınız controllerlərə uyğun dəqiq URL-lər:
         const API = {
             LOGIN: `${BASE_URL}/api/auth/login`,
-            WORKS: `${BASE_URL}/admin`, // getAllWorks, createWork...
+            WORKS: `${BASE_URL}/admin/works`,
             SERVICES: `${BASE_URL}/admin/services`,
             CONTACTS: `${BASE_URL}/admin/contacts`,
-            ABOUT: `${BASE_URL}/about` // Diqqət: /admin/about deyil, /about
+            ABOUT: `${BASE_URL}/api/about`
         };
+        const UPLOADS_URL = `${BASE_URL}/uploads/`;
 
         let token = localStorage.getItem('jwt_token');
 
-        // ======= AUTH & INIT =======
+        // --- Helper: Clean URL Path ---
+        function cleanUrlPath(url) {
+            if (!url || typeof url !== 'string') return url;
+            return url.replace(/^\/uploads\//, ''); 
+        }
+
+        // --- Helper: Get Full Video URL ---
+        function getFullVideoUrl(videoUrl) {
+            if (!videoUrl) return null;
+            let url = videoUrl.trim();
+            if (url.startsWith('/uploads/')) {
+                return BASE_URL + url;
+            } else if (url.startsWith('uploads/')) {
+                return BASE_URL + '/' + url;
+            } else if (!url.startsWith('http')) {
+                return UPLOADS_URL + url;
+            }
+            return url;
+        }
+
+
+        // ======= AUTH =======
         function checkAuth() {
             if(!token) {
                 document.getElementById('login-overlay').style.display = 'flex';
@@ -195,7 +367,7 @@
             } else {
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('admin-wrapper').style.display = 'flex';
-                nav('works'); // İlk açılışda işləri yüklə
+                nav('works');
             }
         }
 
@@ -213,41 +385,35 @@
 
                 if(res.ok) {
                     const data = await res.json();
-                    token = data.token || data.accessToken; // Tokeni götürürük
+                    token = data.token || data.accessToken;
                     localStorage.setItem('jwt_token', token);
+                    Swal.fire({icon: 'success', title: 'Xoş Gəldiniz', timer: 1500, showConfirmButton: false});
                     checkAuth();
-                } else {
-                    alert("Giriş uğursuz oldu! İstifadəçi adı və ya şifrə səhvdir.");
-                }
-            } catch(err) { console.error(err); alert("Server xətası!"); }
+                } else { Swal.fire('Xəta', 'Giriş məlumatları yanlışdır', 'error'); }
+            } catch(err) { console.error(err); Swal.fire('Xəta', 'Server xətası', 'error'); }
         });
 
-        function logout() {
-            localStorage.removeItem('jwt_token');
-            location.reload();
-        }
+        function logout() { localStorage.removeItem('jwt_token'); location.reload(); }
 
-        // Fetch köməkçisi (Token avtomatik əlavə olunur)
+        // ======= AUTH FETCH =======
         async function authFetch(url, options = {}) {
             if(!options.headers) options.headers = {};
-            // FormData göndərərkən Content-Type 'multipart/form-data' avtomatik qoyulur, əl ilə yazmırıq
-            if(!(options.body instanceof FormData)) {
-                options.headers['Content-Type'] = 'application/json';
-            }
+            
+            if(!(options.body instanceof FormData)) options.headers['Content-Type'] = 'application/json';
+            
             options.headers['Authorization'] = `Bearer ${token}`;
 
             const res = await fetch(url, options);
-            if(res.status === 401) { logout(); return; } // Token vaxtı bitibsə atır
+            if(res.status === 401) { logout(); return; }
             return res;
         }
 
-        // ======= NAVIGATION =======
+        // ======= NAV =======
         function nav(page) {
             document.querySelectorAll('.main-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
-            
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + page).classList.add('active');
-            document.getElementById('link-' + page).classList.add('active');
+            document.getElementById('nav-' + page).classList.add('active');
 
             if(page === 'works') loadWorks();
             if(page === 'services') loadServices();
@@ -255,34 +421,34 @@
             if(page === 'about') loadAbout();
         }
 
-        // ======= WORKS (FormData ilə) =======
+        // ======= WORKS =======
         async function loadWorks() {
             try {
-                // Sizin kod: getAllWorks (Pageable)
                 const res = await authFetch(`${API.WORKS}/getAllWorks`);
+                if(!res.ok) throw new Error();
                 const data = await res.json();
                 const list = data.content ? data.content : data;
                 
                 const tbody = document.getElementById('worksTable');
                 tbody.innerHTML = '';
                 list.forEach(w => {
-                    // Şəkil URL-i tam deyilsə, /uploads əlavə edirik
-                    let imgUrl = w.imageUrl;
-                    if(imgUrl && !imgUrl.startsWith('http')) imgUrl = `${BASE_URL}/uploads/${imgUrl}`;
+                    let imgUrl = w.imageUrl || '';
+                    imgUrl = cleanUrlPath(imgUrl);
+                    if(imgUrl && !imgUrl.startsWith('http')) imgUrl = `${UPLOADS_URL}${imgUrl}`;
                     
                     tbody.innerHTML += `
                         <tr>
-                            <td class="ps-4"><img src="${imgUrl || '#'}" class="thumb"></td>
-                            <td>${w.title}</td>
+                            <td><img src="${imgUrl || 'https://via.placeholder.com/50'}" class="thumb"></td>
+                            <td class="fw-bold">${w.title}</td>
                             <td>${w.clientName || '-'}</td>
-                            <td><span class="badge bg-secondary">${w.category}</span></td>
+                            <td><span class="badge bg-primary">${w.category}</span></td>
                             <td>
-                                <button class="btn btn-sm btn-info" onclick='editWork(${JSON.stringify(w)})'><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteWork(${w.id})"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-sm btn-light text-primary" onclick='editWork(${JSON.stringify(w).replace(/'/g, "&apos;")})'><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-light text-danger" onclick="deleteWork(${w.id})"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>`;
                 });
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error('loadWorks error:', e); }
         }
 
         async function submitWork() {
@@ -293,21 +459,34 @@
             formData.append('clientName', document.getElementById('wClient').value);
             formData.append('category', document.getElementById('wCategory').value);
             formData.append('videoUrl', document.getElementById('wVideoUrl').value);
-            
+            formData.append('description', document.getElementById('wDescription').value);
+            formData.append('location', document.getElementById('wLocation').value);
+            formData.append('agency', document.getElementById('wAgency').value);
+            formData.append('productionYear', document.getElementById('wProductionYear').value);
+            formData.append('isFeatured', document.getElementById('wIsFeatured').checked);
+
             const img = document.getElementById('wImage').files[0];
             if(img) formData.append('imageFile', img);
-            
             const vid = document.getElementById('wPreview').files[0];
             if(vid) formData.append('previewVideoFile', vid);
 
             let url = id ? `${API.WORKS}/${id}` : `${API.WORKS}/createWork`;
             let method = id ? 'PUT' : 'POST';
 
-            const res = await authFetch(url, { method, body: formData });
-            if(res.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('workModal')).hide();
-                loadWorks();
-            } else { alert("Xəta baş verdi!"); }
+            Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
+            
+            try {
+                const res = await authFetch(url, { method, body: formData });
+                if(res.ok) {
+                    Swal.fire('Uğurlu', 'İş yadda saxlanıldı', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('workModal')).hide();
+                    loadWorks();
+                } else { 
+                    const errorText = await res.text();
+                    console.error('Server error:', errorText);
+                    Swal.fire('Xəta', `Yükləmə zamanı xəta oldu: ${errorText}`, 'error');
+                }
+            } catch(e) { Swal.fire('Xəta', 'Gözlənilməyən xəta baş verdi', 'error'); }
         }
 
         function editWork(w) {
@@ -317,73 +496,121 @@
             document.getElementById('wClient').value = w.clientName || '';
             document.getElementById('wCategory').value = w.category;
             document.getElementById('wVideoUrl').value = w.videoUrl || '';
+            document.getElementById('wDescription').value = w.description || '';
+            document.getElementById('wLocation').value = w.location || '';
+            document.getElementById('wAgency').value = w.agency || '';
+            document.getElementById('wProductionYear').value = w.productionYear || '';
+            document.getElementById('wIsFeatured').checked = w.featured || false;
+
+            document.getElementById('wImage').value = null; 
+            document.getElementById('wPreview').value = null; 
+            
             new bootstrap.Modal(document.getElementById('workModal')).show();
         }
 
         function openWorkModal() {
             document.getElementById('workForm').reset();
             document.getElementById('workId').value = '';
+            document.getElementById('wIsFeatured').checked = false;
             new bootstrap.Modal(document.getElementById('workModal')).show();
         }
 
         async function deleteWork(id) {
-            if(confirm('Silmək istədiyinizə əminsiniz?')) {
-                // Sizin kodda: /deleteWork{id} yazılıb, slash-a diqqət edin
+            const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
+            if(r.isConfirmed) {
                 await authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' });
                 loadWorks();
+                Swal.fire('Silindi', '', 'success');
             }
         }
 
-        // ======= SERVICES (JSON ilə) =======
+        // ======= SERVICES =======
         async function loadServices() {
-            const res = await authFetch(API.SERVICES); // GET /admin/services
-            const list = await res.json();
-            const grid = document.getElementById('servicesGrid');
-            grid.innerHTML = '';
-            list.forEach(s => {
-                grid.innerHTML += `
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 p-3 shadow-sm">
-                            <h5><i class="${s.iconClass} text-primary me-2"></i>${s.title}</h5>
-                            <p class="small text-muted">${s.description}</p>
-                            <div class="mt-auto">
-                                <button class="btn btn-sm btn-outline-primary" onclick='editService(${JSON.stringify(s)})'>Düzəlt</button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteService(${s.id})">Sil</button>
+            try {
+                const res = await authFetch(`${API.SERVICES}/getAll`);
+                if(!res.ok) throw new Error('Services yüklənmədi');
+                
+                const list = await res.json();
+                const grid = document.getElementById('servicesGrid');
+                grid.innerHTML = '';
+                
+                list.forEach(s => {
+                    const videoInfo = s.videoUrl ? `(Video: ${s.videoUrl.substring(0, 15)}...)` : '(Video yoxdur)';
+                    
+                    grid.innerHTML += `
+                        <div class="col-md-4">
+                            <div class="card-custom h-100 d-flex flex-column">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="${s.iconClass || 'fas fa-star'} text-primary fs-3 me-3"></i>
+                                    <h5 class="fw-bold mb-0">${s.title}</h5>
+                                </div>
+                                <p class="text-muted small flex-grow-1">${(s.description || '').substring(0, 100)}...</p>
+                                <p class="small text-success">${videoInfo}</p>
+                                <div class="pt-3 border-top mt-2">
+                                    <button class="btn btn-sm btn-link ps-0 text-decoration-none" onclick='editService(${JSON.stringify(s).replace(/'/g, "&apos;")})'>Redaktə</button>
+                                    <button class="btn btn-sm btn-link text-danger text-decoration-none float-end pe-0" onclick="deleteService(${s.id})">Sil</button>
+                                </div>
                             </div>
-                        </div>
-                    </div>`;
-            });
+                        </div>`;
+                });
+            } catch(e) {
+                console.error('loadServices error:', e);
+                Swal.fire('Xəta', 'Xidmətlər yüklənmədi', 'error');
+            }
         }
 
         async function submitService() {
             const id = document.getElementById('serviceId').value;
-            const data = {
-                title: document.getElementById('sTitle').value,
-                iconClass: document.getElementById('sIcon').value,
-                description: document.getElementById('sDesc').value,
-                // Textarea-nı sətirlərə bölüb array edirik
-                bulletPoints: document.getElementById('sBullets').value.split('\n').filter(x=>x.trim()),
-                processSteps: document.getElementById('sSteps').value.split('\n').filter(x=>x.trim())
-            };
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('sTitle').value);
+            formData.append('iconClass', document.getElementById('sIcon').value);
+            formData.append('description', document.getElementById('sDesc').value);
+            
+            document.getElementById('sBullets').value.split('\n').filter(x=>x.trim()).forEach(item => {
+                formData.append('bulletPoints', item); 
+            });
+            
+            document.getElementById('sSteps').value.split('\n').filter(x=>x.trim()).forEach(item => {
+                formData.append('processSteps', item); 
+            });
 
+            const videoFile = document.getElementById('sVideoFile').files[0];
+            if (videoFile) {
+                formData.append('videoFile', videoFile); 
+            }
+            
             let url = id ? `${API.SERVICES}/${id}` : API.SERVICES;
             let method = id ? 'PUT' : 'POST';
+            
+            Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
 
-            const res = await authFetch(url, { method, body: JSON.stringify(data) });
-            if(res.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
-                loadServices();
+            try {
+                const res = await authFetch(url, { method, body: formData }); 
+                
+                if(res.ok) {
+                    Swal.fire('Uğurlu', 'Xidmət yadda saxlanıldı', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
+                    loadServices();
+                } else { 
+                    const errorText = await res.text();
+                    console.error('Server error:', errorText);
+                    throw new Error(`Server xətası: ${errorText}`);
+                }
+            } catch(e) { 
+                Swal.fire('Xəta', `Yükləmə zamanı xəta: ${e.message}`, 'error'); 
             }
         }
 
         function editService(s) {
             document.getElementById('serviceId').value = s.id;
             document.getElementById('sTitle').value = s.title;
-            document.getElementById('sIcon').value = s.iconClass;
-            document.getElementById('sDesc').value = s.description;
-            // Array-i textarea üçün stringə çeviririk
-            document.getElementById('sBullets').value = s.bulletPoints ? s.bulletPoints.join('\n') : '';
-            document.getElementById('sSteps').value = s.processSteps ? s.processSteps.join('\n') : '';
+            document.getElementById('sIcon').value = s.iconClass || '';
+            document.getElementById('sDesc').value = s.description || '';
+            document.getElementById('sBullets').value = (s.bulletPoints || []).join('\n');
+            document.getElementById('sSteps').value = (s.processSteps || []).join('\n');
+            document.getElementById('sVideoFile').value = null;
+
             new bootstrap.Modal(document.getElementById('serviceModal')).show();
         }
 
@@ -394,82 +621,223 @@
         }
 
         async function deleteService(id) {
-            if(confirm('Silinsin?')) {
-                await authFetch(`${API.SERVICES}/${id}`, { method: 'DELETE' });
+            const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
+            if(r.isConfirmed) {
+                await authFetch(`${API.SERVICES}/delete/${id}`, { method: 'DELETE' });
                 loadServices();
+                Swal.fire('Silindi', '', 'success');
             }
         }
 
         // ======= MESSAGES =======
         async function loadMessages() {
-            const res = await authFetch(`${API.CONTACTS}/allMessages`);
-            const list = await res.json();
-            const tbody = document.getElementById('messagesTable');
-            tbody.innerHTML = '';
-            list.forEach(m => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><span class="badge ${m.isRead ? 'badge-read' : 'badge-unread'}">${m.isRead ? 'Oxundu' : 'Yeni'}</span></td>
-                        <td>${m.name}</td>
-                        <td>${m.email}</td>
-                        <td title="${m.message}">${m.message.substring(0, 40)}...</td>
-                        <td>
-                            ${!m.isRead ? `<button class="btn btn-sm btn-success me-1" onclick="markRead(${m.id})"><i class="fas fa-check"></i></button>` : ''}
-                            <button class="btn btn-sm btn-danger" onclick="deleteMessage(${m.id})"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
+            try {
+                const res = await authFetch(`${API.CONTACTS}/getAll`);
+                if(!res.ok) throw new Error('Mesajlar yüklənmədi');
+                
+                const list = await res.json();
+                const tbody = document.getElementById('messagesTable');
+                tbody.innerHTML = '';
+                
+                list.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+                
+                list.forEach(m => {
+                    const statusBadge = m.isRead 
+                        ? '<span class="badge bg-success badge-custom"><i class="fas fa-check me-1"></i>Oxunub</span>'
+                        : '<span class="badge bg-danger badge-custom"><i class="fas fa-exclamation-circle me-1"></i>Yeni</span>';
+                    
+                    tbody.innerHTML += `
+                        <tr class="${m.isRead ? 'text-muted' : 'fw-bold'}">
+                            <td>${statusBadge}</td>
+                            <td>${m.name}</td>
+                            <td>${m.email}</td>
+                            <td>${(m.message || '').substring(0, 50)}...</td>
+                            <td>
+                                <button class="btn btn-sm btn-light text-primary" onclick="viewMessage(${m.id}, '${m.name}', '${m.email}', '${m.message.replace(/'/g, "\\'")}')"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-sm btn-light text-danger" onclick="deleteMessage(${m.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+            } catch(e) { console.error('loadMessages error:', e); }
         }
 
-        async function markRead(id) {
-            await authFetch(`${API.CONTACTS}/${id}/read`, { method: 'PATCH' });
-            loadMessages();
+        async function viewMessage(id, name, email, message) {
+            Swal.fire({
+                title: `**Mesaj: ${name}**`,
+                html: `<p class="text-start">**Email:** ${email}</p><hr><p class="text-start">${message}</p>`,
+                icon: 'info',
+                confirmButtonText: 'Bağla'
+            });
+            
+            try {
+                const res = await authFetch(`${API.CONTACTS}/markAsRead/${id}`, { method: 'PUT' });
+                if (res.ok) loadMessages();
+            } catch (e) { console.error('Mark as read error:', e); }
         }
 
         async function deleteMessage(id) {
-            if(confirm('Mesaj silinsin?')) {
-                await authFetch(`${API.CONTACTS}/${id}`, { method: 'DELETE' });
+            const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
+            if(r.isConfirmed) {
+                await authFetch(`${API.CONTACTS}/delete/${id}`, { method: 'DELETE' });
                 loadMessages();
+                Swal.fire('Silindi', '', 'success');
             }
         }
 
-        // ======= ABOUT =======
+        // ======= ABOUT US =======
         async function loadAbout() {
-            const res = await authFetch(`${API.ABOUT}/getAbout`);
-            const data = await res.json();
-            if(data) {
-                document.getElementById('aboutTitle').value = data.mainTitle;
-                document.getElementById('aboutSubtitle').value = data.subTitle;
-                document.getElementById('aboutWho').value = data.whoWeAreText;
-                document.getElementById('aboutMission').value = data.ourMissionText;
-                document.getElementById('aboutEmail').value = data.email;
-                document.getElementById('aboutPhone').value = data.phone;
-                document.getElementById('aboutAddress').value = data.address;
+            console.log('🔄 loadAbout çağırıldı');
+            try {
+                const res = await authFetch(`${API.ABOUT}/getAbout`);
+                if(!res.ok) throw new Error('Haqqımızda məlumatları yüklənmədi');
+                
+                const data = await res.json();
+                console.log('✅ About data yükləndi:', data);
+
+                document.getElementById('aMainTitle').value = data.mainTitle || '';
+                document.getElementById('aSubTitle').value = data.subTitle || '';
+                document.getElementById('aWho').value = data.whoWeAreText || '';
+                document.getElementById('aMission').value = data.ourMissionText || '';
+                document.getElementById('aApproach').value = data.ourApproachText || '';
+                document.getElementById('aEmail').value = data.email || '';
+                document.getElementById('aPhone').value = data.phone || '';
+                document.getElementById('aAddress').value = data.address || '';
+                
+                const videoUrl = getFullVideoUrl(data.videoUrl);
+                const videoPreview = document.getElementById('aVideoPreview');
+                const videoContainer = document.getElementById('videoPreviewContainer');
+                
+                if (videoUrl) {
+                    videoPreview.querySelector('source').src = videoUrl;
+                    videoPreview.load();
+                    videoContainer.style.display = 'block';
+                    console.log('✅ Video preview yükləndi:', videoUrl);
+                } else {
+                    videoContainer.style.display = 'none';
+                    console.log('⚠️ Video URL mövcud deyil');
+                }
+
+            } catch(e) {
+                console.error('❌ loadAbout error:', e);
+                Swal.fire('Xəta', e.message || 'Haqqımızda məlumatlarını yükləyərkən xəta baş verdi.', 'error');
             }
         }
 
-        async function saveAbout() {
-            const data = {
-                mainTitle: document.getElementById('aboutTitle').value,
-                subTitle: document.getElementById('aboutSubtitle').value,
-                whoWeAreText: document.getElementById('aboutWho').value,
-                ourMissionText: document.getElementById('aboutMission').value,
-                email: document.getElementById('aboutEmail').value,
-                phone: document.getElementById('aboutPhone').value,
-                address: document.getElementById('aboutAddress').value
-            };
+        // ======= SAVE ABOUT - ƏSAS FUNKSİYA =======
+        async function saveAboutData() {
+            console.log('🔥 === SAVE ABOUT BAŞLADI ===');
             
-            // Backend updateAbout metoduna birbaşa yönləndiririk
-            const res = await authFetch(`${API.ABOUT}/updateAbout`, {
-                method: 'PUT',
-                body: JSON.stringify(data)
-            });
-            if(res.ok) alert("Haqqımızda məlumatı yeniləndi!");
+            const formData = new FormData();
+
+            const mainTitle = document.getElementById('aMainTitle').value;
+            const subTitle = document.getElementById('aSubTitle').value;
+            const whoWeAre = document.getElementById('aWho').value;
+            const mission = document.getElementById('aMission').value;
+            const approach = document.getElementById('aApproach').value;
+            const email = document.getElementById('aEmail').value;
+            const phone = document.getElementById('aPhone').value;
+            const address = document.getElementById('aAddress').value;
+            
+            console.log('📝 Form məlumatları:');
+            console.log('  Main Title:', mainTitle);
+            console.log('  Sub Title:', subTitle);
+            console.log('  Email:', email);
+            
+            formData.append('mainTitle', mainTitle);
+            formData.append('subTitle', subTitle);
+            formData.append('whoWeAreText', whoWeAre);
+            formData.append('ourMissionText', mission);
+            formData.append('ourApproachText', approach);
+            formData.append('email', email);
+            formData.append('phone', phone);
+            formData.append('address', address);
+            
+            const videoFileInput = document.getElementById('aVideoFile');
+            const videoFile = videoFileInput ? videoFileInput.files[0] : null;
+            
+            console.log('📹 Video input element:', videoFileInput);
+            console.log('📹 Video file:', videoFile);
+            
+            if (videoFile) {
+                console.log('✅ Video seçildi:');
+                console.log('  Ad:', videoFile.name);
+                console.log('  Ölçü:', videoFile.size, 'bytes');
+                console.log('  Tip:', videoFile.type);
+                formData.append('videoFile', videoFile);
+            } else {
+                console.log('⚠️ Video seçilməyib!');
+            }
+
+            console.log('📦 FormData məzmunu:');
+            for (let pair of formData.entries()) {
+                if (pair[1] instanceof File) {
+                    console.log(`  ${pair[0]}: [File] ${pair[1].name} (${pair[1].size} bytes)`);
+                } else {
+                    console.log(`  ${pair[0]}:`, pair[1]);
+                }
+            }
+
+            Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
+            
+            try {
+                const url = `${API.ABOUT}/updateAbout`;
+                console.log('🌐 Request URL:', url);
+                console.log('🌐 Request Method: PUT');
+                
+                const res = await authFetch(url, { 
+                    method: 'PUT', 
+                    body: formData 
+                });
+                
+                console.log('📡 Response Status:', res.status);
+                console.log('📡 Response OK:', res.ok);
+                
+                if(res.ok) {
+                    const responseData = await res.json();
+                    console.log('✅ Response Data:', responseData);
+                    Swal.fire('Uğurlu!', 'Haqqımızda məlumatları yadda saxlanıldı', 'success');
+                    
+                    // Video input-u təmizlə
+                    if (videoFileInput) videoFileInput.value = '';
+                    
+                    // Məlumatları yenilə
+                    loadAbout();
+                } else { 
+                    const errorText = await res.text();
+                    console.error('❌ Server error:', errorText);
+                    Swal.fire('Xəta', `Yükləmə zamanı xəta oldu: ${errorText}`, 'error');
+                }
+            } catch(e) { 
+                console.error('❌ Catch error:', e);
+                Swal.fire('Xəta', `Gözlənilməyən xəta: ${e.message}`, 'error'); 
+            }
+            
+            console.log('=== SAVE ABOUT BİTDİ ===');
         }
 
-        // Başlanğıc
-        checkAuth();
 
+        // ======= INITIALIZATION =======
+        checkAuth();
+        
+        // ABOUT DÜYMƏSINI BAĞLA
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📌 DOMContentLoaded - Event Listener qurulur...');
+            
+            const saveAboutBtn = document.getElementById('saveAboutBtn');
+            
+            if (saveAboutBtn) {
+                console.log('✅ Save About Button tapıldı!');
+                
+                saveAboutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🚀 SAVE ABOUT DÜYMƏSINƏ BASILDI!');
+                    saveAboutData();
+                });
+            } else {
+                console.error('❌ Save About Button tapılmadı!');
+            }
+        });
     </script>
+
 </body>
 </html>

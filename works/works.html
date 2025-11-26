@@ -4,14 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WORKS — Cine Chord</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="works.css">
+    
     <style>
-        /* Yüklənmə zamanı görünüşü qorumaq üçün */
+        /* Yüklənmə zamanı görünüşü qorumaq üçün in-line stillər */
         .projects-grid { min-height: 300px; }
+        
+        /* Modalın ilkin vəziyyəti (works.css-də var, lakin display/opacity ilkin vəziyyəti) */
+        .preview-container {
+            display: none; 
+            opacity: 0; 
+            /* works.css-dəki bütün digər stillər modalın görünüşünü təmin edir */
+        }
     </style>
 </head>
 <body>
+    
     <div class="page-transition"></div>
     <div class="grain-overlay"></div>
     <div class="progress-bar-top"></div>
@@ -156,166 +167,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     
-    <script>
-        const API_BASE_URL = "http://localhost:8080"; 
-        const API_WORKS = `${API_BASE_URL}/api/works`; 
-        const UPLOADS_URL = `${API_BASE_URL}/uploads/`; 
-
-        // Backend Enum-larını Frontend Class-larına çevirmək üçün
-        const categoryMap = {
-            'FILM': 'films',
-            'COMMERCIAL': 'commercial',
-            'CLIP': 'clips'
-        };
-
-        // 1. İŞLƏRİ YÜKLƏMƏK
-        async function loadDynamicWorks() {
-            try {
-                const response = await fetch(API_WORKS);
-                const data = await response.json();
-                
-                // Backend-dən asılı olaraq Pageable (content) və ya List gələ bilər
-                const works = data.content ? data.content : data;
-                
-                const container = document.getElementById('dynamic-projects-grid');
-                container.innerHTML = ''; 
-
-                if(works.length === 0) {
-                    container.innerHTML = '<p style="color: white; text-align: center; width: 100%;">Hələ ki, iş əlavə olunmayıb.</p>';
-                    return;
-                }
-
-                works.forEach(work => {
-                    // Video URL məntiqi: Əgər Preview (qısa) video varsa onu götür, yoxdursa əsas videonu
-                    let videoSrc = work.previewVideoUrl || work.videoUrl;
-                    
-                    // Tam link deyilsə (http ilə başlamırsa), qarşısına upload yolunu qoy
-                    if (videoSrc && !videoSrc.startsWith('http')) {
-                        videoSrc = UPLOADS_URL + videoSrc;
-                    }
-
-                    // Şəkil URL məntiqi
-                    let imageSrc = work.imageUrl;
-                    if (imageSrc && !imageSrc.startsWith('http')) {
-                        imageSrc = UPLOADS_URL + imageSrc;
-                    }
-
-                    // Kateqoriya sinifini təyin et
-                    const categoryClass = categoryMap[work.category] || 'other';
-
-                    // HTML Şablonu (Sizin orijinal dizaynınızla eyni)
-                    // Qeyd: works.js-in videonu aça bilməsi üçün data-video-src atributu əlavə etdim
-                    const workHTML = `
-                        <div class="project-card" data-category="${categoryClass}" data-video-src="${work.videoUrl || videoSrc}">
-                            <div class="project-image-container">
-                                <video muted loop playsinline class="project-video" preload="metadata" poster="${imageSrc || ''}">
-                                    <source src="${videoSrc}" type="video/mp4">
-                                </video>
-                                <div class="card-overlay"></div>
-                                <div class="card-info">
-                                    <h3 class="card-title">${work.title}</h3>
-                                    <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">${work.clientName || ''}</p>
-                                </div>
-                                <button class="fullscreen-btn" onclick="playMainVideo('${work.videoUrl}', '${work.title}')"></button>
-                            </div>
-                        </div>
-                    `;
-
-                    container.innerHTML += workHTML;
-                });
-                
-                // Məlumat yüklənəndən sonra videolara hover effektini aktivləşdir
-                attachHoverEffects();
-
-            } catch (error) {
-                console.error("İşlər yüklənmədi:", error);
-                document.getElementById('dynamic-projects-grid').innerHTML = '<p style="color:white; text-align:center;">Serverlə əlaqə xətası.</p>';
-            }
-        }
-
-        // 2. FİLTRASİYA (JavaScript)
-        function filterWorks(category, btn) {
-            // Düymələrin aktivliyini dəyiş
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const cards = document.querySelectorAll('.project-card');
-            
-            cards.forEach(card => {
-                const cardCat = card.getAttribute('data-category');
-                
-                if (category === 'all' || cardCat === category) {
-                    // Göstər (GSAP və ya sadə CSS ilə)
-                    card.style.display = 'block';
-                    setTimeout(() => card.style.opacity = '1', 50);
-                } else {
-                    // Gizlət
-                    card.style.opacity = '0';
-                    setTimeout(() => card.style.display = 'none', 300);
-                }
-            });
-        }
-
-        // 3. VİDEO HOVER EFFEKTLƏRİ (Dinamik elementlər üçün)
-        function attachHoverEffects() {
-            const cards = document.querySelectorAll('.project-card');
-            cards.forEach(card => {
-                const video = card.querySelector('video');
-                
-                card.addEventListener('mouseenter', () => {
-                    if(video) video.play().catch(() => {}); // Autoplay siyasətinə görə xəta verməsin
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    if(video) {
-                        video.pause();
-                        video.currentTime = 0;
-                    }
-                });
-            });
-        }
-
-        // 4. MODALDA VİDEO AÇMAQ (Sizin works.js məntiqinizə alternativ)
-        function playMainVideo(url, title) {
-            const modal = document.getElementById('previewContainer');
-            const videoEl = document.getElementById('previewVideo');
-            const titleEl = document.getElementById('previewTitle');
-
-            if(!url) return;
-
-            // URL düzəltmə
-            if(!url.startsWith('http')) url = UPLOADS_URL + url;
-
-            titleEl.innerText = title;
-            videoEl.src = url;
-            
-            modal.style.display = 'flex';
-            // GSAP varsa animasiya ilə aç
-            if(typeof gsap !== 'undefined') {
-                gsap.to(modal, { opacity: 1, duration: 0.5 });
-            } else {
-                modal.style.opacity = 1;
-            }
-            
-            videoEl.play();
-        }
-
-        // Modal bağlamaq üçün
-        document.getElementById('closePreview').addEventListener('click', () => {
-            const modal = document.getElementById('previewContainer');
-            const videoEl = document.getElementById('previewVideo');
-            
-            videoEl.pause();
-            modal.style.display = 'none';
-        });
-
-        // Başlat
-        loadDynamicWorks();
-
-    </script>
-    
     <script src="works.js"></script>
-
-    
 </body>
 </html>
