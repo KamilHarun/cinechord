@@ -88,17 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function runLoadingAnimation() {
         if (typeof gsap !== 'undefined') {
             const tl = gsap.timeline();
-            tl.fromTo(loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1.2, ease: "power2.out" }, 0)
-              .to(loaderAuthor, { opacity: 1, duration: 0.5 }, "-=1")
+            tl.fromTo(loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1, ease: "power2.out" }, 0)
+              .to(loaderAuthor, { opacity: 1, duration: 0.4 }, "-=0.8")
               .to(loaderFill, {
-                width: "100%", duration: 2.5, ease: "power2.inOut",
+                width: "100%", duration: 1.8, ease: "power2.inOut",
                 onUpdate: function() {
                     let prog = Math.round(this.progress() * 100);
                     if(loaderText) loaderText.textContent = prog + "%";
                 },
                 onComplete: () => {
                     gsap.to(loadingScreen, {
-                        y: "-100%", duration: 1.4, ease: "power4.inOut",
+                        y: "-100%", duration: 1, ease: "power4.inOut",
                         onComplete: () => {
                             if(loadingScreen) loadingScreen.style.display = "none";
                             revealSite();
@@ -111,19 +111,58 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 4. REVEAL SITE
+    // 4. REVEAL SITE - SMOOTH ANIMATIONS
     function revealSite(isPageTransition = false) {
+        if (typeof gsap === 'undefined') return;
+        
         const mainTl = gsap.timeline();
+        
         if (isPageTransition && loadingScreen) {
             mainTl.to(loadingScreen, {
-                y: "100%", duration: 1.1, ease: "expo.inOut",
-                onComplete: () => { loadingScreen.style.display = "none"; }
-            });
+                y: "100%", duration: 0.9, ease: "expo.inOut"
+            }, 0);
         }
-        const uiDelay = isPageTransition ? "-=0.9" : "-=0.5";
-        mainTl.to(uiElements, {
-            y: 0, autoAlpha: 1, duration: 1.0, stagger: 0.05, ease: "power2.out"
-        }, uiDelay);
+        
+        const startDelay = isPageTransition ? "-=0.7" : 0;
+
+        // Header
+        mainTl.to(".header", {
+            y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out"
+        }, startDelay);
+
+        // Center Logo
+        mainTl.to(".center-logo", {
+            y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out"
+        }, startDelay);
+
+        // Split Name (CINE & CHORD)
+        mainTl.to(".name-left", {
+            y: 0, autoAlpha: 1, duration: 1, ease: "power2.out"
+        }, startDelay + 0.05);
+
+        mainTl.to(".name-right", {
+            y: 0, autoAlpha: 1, duration: 1, ease: "power2.out"
+        }, startDelay + 0.1);
+
+        // Play Button
+        mainTl.to(".play-button-container", {
+            y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out"
+        }, startDelay + 0.1);
+
+        // Right Nav
+        mainTl.to(".right-floating-nav", {
+            y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out"
+        }, startDelay + 0.15);
+
+        // Socials
+        mainTl.to(".bottom-right-socials", {
+            y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out"
+        }, startDelay + 0.2);
+
+        // Copyright
+        mainTl.to(".bottom-left-copyright", {
+            y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out"
+        }, startDelay + 0.25);
     }
 
     // 5. EXIT
@@ -147,10 +186,11 @@ document.addEventListener('DOMContentLoaded', function() {
     internalLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
-            if (href && !href.includes(window.location.pathname.split('/').pop())) {
-                e.preventDefault();
-                navigateWithTransition(href);
-            }
+            const linkPath = href.split('/').pop();
+            const currentPath = window.location.pathname.split('/').pop();
+            if (!href || href === '#' || linkPath === currentPath) return;
+            e.preventDefault();
+            navigateWithTransition(href);
         });
     });
 
@@ -246,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 7. MODAL CONTROLS (Play button is handled via global function now)
+    // 7. MODAL CONTROLS
     const previewContainer = document.getElementById('previewContainer');
     const previewVideo = document.getElementById('previewVideo');
     const closePreview = document.getElementById('closePreview');

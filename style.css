@@ -106,14 +106,14 @@ body {
 .hero-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
-    z-index: 1; pointer-events: none; /* CLICK THROUGH */
+    z-index: 1; pointer-events: none;
 }
 
 /* Header */
 .header {
     position: fixed; top: 0; left: 0; right: 0; padding: 20px 40px;
     display: flex; justify-content: space-between; align-items: center;
-    z-index: 1000; background: transparent; pointer-events: none; /* Logo altda qalmasin deye */
+    z-index: 1000; background: transparent; pointer-events: none;
 }
 .nav-left, .nav-right { display: flex; gap: 15px; pointer-events: auto; }
 .nav-btn {
@@ -136,14 +136,14 @@ body {
 .nav-btn.active::before { opacity: 1; transform: translateY(0); }
 .nav-text { display: inline-block; transition: opacity 0.3s, transform 0.3s; }
 
-/* Center Logo - CLICK THROUGH */
+/* Center Logo */
 .center-logo {
     position: absolute; top: 30px; left: 50%; transform: translateX(-50%); 
     z-index: 100; pointer-events: none;
 }
 .logo-img { width: 110px; height: 110px; object-fit: contain; filter: brightness(0) invert(1); }
 
-/* Split Name - CLICK THROUGH */
+/* Split Name */
 .split-name {
     position: absolute; width: 100%; top: 50%; transform: translateY(-50%); 
     z-index: 10; pointer-events: none;
@@ -156,19 +156,19 @@ body {
 .name-left { left: 40px; -webkit-text-stroke: 1.5px #fff; color: transparent; }
 .name-right { right: 40px; font-family: 'NeueMetanaSolid', sans-serif; letter-spacing: -16px; color: #fff; }
 
-/* Play Button - SUPER HIGH Z-INDEX & POINTER EVENTS */
+/* Play Button */
 .play-button-container {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    z-index: 10000 !important; /* VERY HIGH */
+    z-index: 10000 !important;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; width: 250px; height: 120px;
-    pointer-events: auto !important; /* FORCE CLICK */
+    pointer-events: auto !important;
 }
 .play-button {
     position: relative; width: 90px; height: 34px; background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 100px;
     display: flex; align-items: center; justify-content: center; transition: all 0.4s ease;
-    pointer-events: none; /* Container clicks take precedence */
+    pointer-events: none;
 }
 .play-button::before {
     content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -277,7 +277,7 @@ body {
     position: absolute; top: 50%; left: 50%; z-index: 1002; transform: translate(-50%, -50%); 
     visibility: hidden; opacity: 0; clip-path: inset(100% 0 0 0);
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: auto !important; /* Modal icindeki button islesin */
+    pointer-events: auto !important;
 }
 .preview-container.active .modal-play-btn,
 .preview-container.user-active .modal-play-btn,
