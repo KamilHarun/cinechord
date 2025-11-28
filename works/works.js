@@ -3,11 +3,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     // 0. API & GLOBAL VARS
     // ============================================================
+    // DİQQƏT: localhost Netlify-da işləməyəcək. Deploy edəndə bura əsl API linki lazımdır.
     const API_BASE_URL = "http://localhost:8080"; 
     const API_WORKS = `${API_BASE_URL}/admin/works/getAllWorks`; 
     const UPLOADS_URL = `${API_BASE_URL}/uploads/`; 
     const container = document.getElementById('dynamic-projects-grid');
     const pageTransition = document.querySelector('.page-transition');
+    const loadingScreen = document.querySelector('.loading-screen'); // Loader elementini tapırıq
     
     const categoryMap = { 
         'FILM': 'films', 'COMMERCIAL': 'commercial', 'CLIP': 'clips',
@@ -35,34 +37,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // **Mouse Hərəkətsizliyi (Inactivity Timer)**
     let activityTimeout = null;
-    const INACTIVITY_DELAY = 2000; // 2 saniyə
+    const INACTIVITY_DELAY = 2000; 
 
-    // Aktiv Navigasiyanı Təyin Etmək (Orijinal Məntiq)
-    const currentPath = window.location.pathname.split('/').pop();
-    const navLinks = document.querySelectorAll('.nav-btn');
-    navLinks.forEach(link => {
-        const linkPath = link.getAttribute('href').split('/').pop();
-        
-        if (linkPath === currentPath) {
-             link.classList.add('active');
-        } else {
-             if (currentPath === "" && linkPath === "index.html") {
-                 link.classList.add('active');
-             }
-        }
-    });
+    // --- NAVIGASIYA XƏTASINI DÜZƏLTMƏK ÜÇÜN KÖHNƏ KODU SİLDİM ---
+    // Artıq aktiv klassı HTML-də statik olaraq verilib.
 
     // ============================================================
-    // 1. FLASH FIX & PAGE TRANSITION (Orijinal Məntiq)
+    // 1. FLASH FIX & PAGE TRANSITION & LOADING SCREEN
     // ============================================================
+    
+    // Page Transition
     if (pageTransition) {
         setTimeout(() => {
             pageTransition.classList.add('page-loaded'); 
         }, 100);
     }
 
+    // Loading Screen - Ən vacib hissə: Səhifə açılan kimi loaderi gizlədirik
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }, 500); // 0.5 saniyə sonra gizlənir
+    }
+
     // ============================================================
-    // 2. NAVBAR & LOGO SCROLL LOGIC (Orijinal Məntiq)
+    // 2. NAVBAR & LOGO SCROLL LOGIC
     // ============================================================
     let lastScroll = 0;
     const navbar = document.querySelector('.header');
@@ -87,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     // ============================================================
-    // 3. SCROLL REVEAL (OBSERVER) (Orijinal Məntiq)
+    // 3. SCROLL REVEAL (OBSERVER)
     // ============================================================
     const observerOptions = {
         threshold: 0.1, 
@@ -109,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 4. PAGE TRANSITION LOGIC & SCRAMBLE (NAVIGASYON) (Orijinal Məntiq)
+    // 4. PAGE TRANSITION LOGIC & SCRAMBLE (NAVIGASYON)
     // ============================================================
     
     function navigateWithTransition(href) {
@@ -124,9 +126,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-btn, .footer-link').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const href = btn.getAttribute('href');
+            // href="#" və ya boşdursa heç nə etmə
+            if (!href || href === '#') {
+                e.preventDefault();
+                return;
+            }
+            
             const linkPath = href.split('/').pop();
             const currentPath = window.location.pathname.split('/').pop();
-            if (!href || href === '#' || linkPath === currentPath) return;
+            if (linkPath === currentPath) return; // Eyni səhifədirsə yükləmə
+
             e.preventDefault();
             navigateWithTransition(href);
         });
@@ -164,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 5. LOAD WORKS (Dynamic Grid) (Orijinal Məntiq)
+    // 5. LOAD WORKS (Dynamic Grid)
     // ============================================================
     
     function cleanUrlPath(url) {
@@ -178,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadDynamicWorks() {
         if(!container) return;
         try {
+            // DİQQƏT: Netlify-da localhost API-yə qoşula bilməz!
             const response = await fetch(API_WORKS);
             if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
@@ -236,6 +246,9 @@ document.addEventListener('DOMContentLoaded', function() {
             attachHoverEffects();
         } catch (error) {
             console.error("Error loading works:", error);
+            // Xəta olsa belə manual olaraq bir neçə kart göstər (Demo məqsədli)
+            // Bu hissəni API işləyəndə silə bilərsən
+            container.innerHTML += '<p style="color:gray; text-align:center;">API connection failed (Localhost on Netlify)</p>';
         }
     }
 
@@ -270,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================================
-    // 6. VIDEO MODAL LOGIC (YENİLƏNMİŞ VƏ DÜZGÜN MƏNTİQ)
+    // 6. VIDEO MODAL LOGIC
     // ============================================================
     
     function formatTime(seconds) {
@@ -281,12 +294,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleUserActivity() {
-        // Hərəkət olanda user-inactive sinifini sil (Kontrollar görünür)
+        if(!previewContainer) return;
         previewContainer.classList.remove('user-inactive');
         clearTimeout(activityTimeout);
         
-        if (!previewVideo.paused) {
-            // Video oynayırsa 2 saniyəlik timer başlat
+        if (previewVideo && !previewVideo.paused) {
             activityTimeout = setTimeout(() => {
                 previewContainer.classList.add('user-inactive');
             }, INACTIVITY_DELAY);
@@ -294,14 +306,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function openModal(videoSrc, title) {
-        if (!videoSrc) {
-            console.warn("Video URL is missing for this project.");
-            return;
-        }
+        if (!videoSrc) return;
         
-        // Başlıq Mask/Reveal effekti üçün data-text əlavə et
-        previewTitleEl.textContent = title;
-        previewTitleEl.setAttribute('data-text', title);
+        if(previewTitleEl) {
+            previewTitleEl.textContent = title;
+            previewTitleEl.setAttribute('data-text', title);
+        }
         
         previewVideo.src = videoSrc;
         
@@ -313,8 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.style.overflow = 'hidden';
                 
                 previewVideo.onloadedmetadata = function() {
-                    durationTimeEl.textContent = formatTime(previewVideo.duration);
-                    // Mərkəzi düymənin UI-ni modal açıldıqda ilkinləşdir
+                    if(durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
                     if (modalPlayContainer) {
                          const modalPlayText = modalPlayContainer.querySelector('.play-text');
                          if(modalPlayText) {
@@ -328,20 +337,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function closeVideoPreview() {
+        if(!previewContainer) return;
         previewContainer.classList.remove('active');
         previewContainer.classList.add('is-paused');
         previewContainer.classList.remove('user-inactive'); 
         clearTimeout(activityTimeout);
         document.body.style.overflow = 'auto';
         
-        // Mask/Reveal üçün data-text silinir
         if(previewTitleEl) previewTitleEl.removeAttribute('data-text');
 
         setTimeout(() => {
             previewVideo.pause();
             previewVideo.currentTime = 0;
             previewVideo.src = '';
-            durationTimeEl.textContent = '0:00'; // Reset time display
+            if(durationTimeEl) durationTimeEl.textContent = '0:00';
         }, 500);
     }
 
@@ -349,12 +358,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
         
         if (previewVideo.paused) {
-            // PAUSE VƏZİYYƏTİ
             if(playIcon) playIcon.style.display = 'block';
             if(pauseIcon) pauseIcon.style.display = 'none';
             previewContainer.classList.add('is-paused');
-            
-            // Pause olanda kontrol elementləri görünməlidir
             previewContainer.classList.remove('user-inactive'); 
             clearTimeout(activityTimeout);
             
@@ -363,12 +369,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(modalPlayText.innerText !== "PLAY") applyScrambleEffect(modalPlayContainer, modalPlayText, "PLAY");
             }
         } else {
-            // PLAY VƏZİYYƏTİ
             if(playIcon) playIcon.style.display = 'none';
             if(pauseIcon) pauseIcon.style.display = 'block';
             previewContainer.classList.remove('is-paused');
-            
-            // Play başlayanda dərhal activity handler-i başlat
             handleUserActivity(); 
             
             if(modalPlayText) {
@@ -390,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ** Event Listenerlər **
     document.addEventListener('click', (e) => {
-        // Kart üzərindəki fullscreen düyməsi
         if (e.target.classList.contains('fullscreen-btn')) {
             const videoSrc = e.target.getAttribute('data-video-src');
             const title = e.target.getAttribute('data-title');
@@ -398,20 +400,17 @@ document.addEventListener('DOMContentLoaded', function() {
             openModal(videoSrc, title);
         }
         
-        // Kiçik Play/Pause düyməsi
         if (e.target.closest('#playPauseBtn')) {
             togglePlay(e);
         }
     });
 
-    // Mouse hərəkəti/Interaksiya eventləri
     if (previewContainer) {
         previewContainer.addEventListener('mousemove', handleUserActivity);
         previewContainer.addEventListener('click', handleUserActivity);
         previewContainer.addEventListener('touchstart', handleUserActivity);
     }
     
-    // Modalın daxili kontrol eventləri
     if (previewVideo) {
         previewVideo.onclick = togglePlay;
         previewVideo.addEventListener('play', updatePlayButtonUI);
@@ -432,7 +431,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if(closePreview) closePreview.onclick = closeVideoPreview;
 
-    // Mərkəzi Play/Pause Düyməsi
     if (modalPlayContainer) {
         modalPlayContainer.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -440,12 +438,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         const modalPlayTextSpan = modalPlayContainer.querySelector('.play-text');
         modalPlayContainer.addEventListener("mouseenter", () => {
+            if(!previewVideo) return;
             const currentText = previewVideo.paused ? "PLAY" : "PAUSE";
             applyScrambleEffect(modalPlayContainer, modalPlayTextSpan, currentText);
         });
     }
     
-    // Nəzarət düymələrinin funksiyaları
     if(progressBarContainer) progressBarContainer.addEventListener('click', (e) => {
         const rect = progressBarContainer.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
@@ -479,9 +477,8 @@ document.addEventListener('DOMContentLoaded', function() {
         handleUserActivity();
     });
 
-    // Klaviatura qısayolları
-     document.addEventListener('keydown', (e) => {
-        if(previewContainer.classList.contains('active')) {
+    document.addEventListener('keydown', (e) => {
+        if(previewContainer && previewContainer.classList.contains('active')) {
             if(e.key === 'Escape') closeVideoPreview();
             if(e.key === ' ') { e.preventDefault(); togglePlay(); }
             if(e.key === 'ArrowLeft') { previewVideo.currentTime -= 5; handleUserActivity(); }

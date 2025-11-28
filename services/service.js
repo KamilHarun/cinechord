@@ -1,28 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. FLASH FIX & ACTIVE NAV
+    // 0. FLASH FIX
     // ============================================================
     const pageTransition = document.querySelector('.page-transition');
     
-    // Aktiv Navigasiyanı Təyin Etmək
-    const currentPath = window.location.pathname.split('/').pop();
-    const navLinks = document.querySelectorAll('.nav-btn');
-    navLinks.forEach(link => {
-        const linkPath = link.getAttribute('href').split('/').pop();
-        
-        if (linkPath === currentPath) {
-             link.classList.add('active');
-        } else {
-             if (currentPath === "" && linkPath === "index.html") {
-                 link.classList.add('active');
-             }
-        }
-    });
+    // DİQQƏT: "Active Navigasiya" kodunu sildim. 
+    // Artıq HTML-də əllə verdiyin 'active' klassı işləyəcək.
 
     if (pageTransition) {
-        // DÜZƏLİŞ 2: Səhifə yüklənəndə pərdəni yuxarı çəkmək (Flash Fix üçün Wipe Up)
-        // CSS-də pərdə tam ekranı örtür. Biz onu yuxarı çəkirik.
+        // Səhifə yüklənəndə pərdəni yuxarı çəkmək
         setTimeout(() => {
              pageTransition.classList.add('page-loaded'); 
         }, 100);
@@ -54,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     // ============================================================
-    // 2. SCROLL REVEAL (OBSERVER) - "Our Service" Motion üçün
+    // 2. SCROLL REVEAL (OBSERVER)
     // ============================================================
     const observerOptions = {
         threshold: 0.15, 
@@ -70,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
 
-    // Statik elementləri (Başlıq, Chat, Footer) seç və animasiya ver
     const staticReveals = document.querySelectorAll('.services-title-container, .chat-section, .main-footer');
     staticReveals.forEach(el => {
         el.classList.add('reveal-item');
@@ -78,14 +64,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 3. PAGE TRANSITION & NAV (Çıxış Effekti)
+    // 3. PAGE TRANSITION & NAV
     // ============================================================
     function navigateWithTransition(href) {
         if (pageTransition) {
-            // Səhifəni açan sinfi ləğv edirik ki, animasiya tətbiq olunsun
              pageTransition.classList.remove('page-loaded'); 
              pageTransition.style.transition = 'none';
-             pageTransition.classList.add('active'); // CSS @keyframes işə salır (Wipe Down)
+             pageTransition.classList.add('active'); 
         }
         setTimeout(() => { window.location.href = href; }, 600); 
     }
@@ -93,18 +78,19 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-btn, .footer-link, .cta-button, .chat-cta-button').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const href = btn.getAttribute('href');
-            const linkPath = href.split('/').pop();
-            const currentPath = window.location.pathname.split('/').pop();
-
-            // Eyni səhifəyə və ya hashtag linklərə keçidi əngəllə
-            if (!href || href === '#' || linkPath === currentPath) return;
             
+            // Link yoxdursa və ya eyni səhifədirsə heç nə etmə
+            if (!href || href === '#') return;
+
+            // Əgər sadəcə ID-yə keçiddirsə (scroll), transition etmə
+            if (href.startsWith('#')) return;
+
             e.preventDefault();
             navigateWithTransition(href);
         });
     });
 
-    // Nav Scramble
+    // Nav Scramble Effect
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     document.querySelectorAll('.nav-btn').forEach(btn => {
         const originalText = btn.getAttribute('data-text');
@@ -167,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const steps = service.processSteps || service.steps || [];
 
                 const section = document.createElement('section');
-                section.className = 'page-wrapper reveal-item'; // Scroll reveal üçün
+                section.className = 'page-wrapper reveal-item'; 
                 
                 const leftVideo = (index % 2 === 0 && videoUrl) ? `
                     <div class="media-column"><div class="media-container"><div class="media-frame">
@@ -190,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <ul class="bullet-list">${bulletPoints.map(item => `<li>${item}</li>`).join("")}</ul>
                         <div class="divider"></div>
                         <ol class="numbered-list">${steps.map(step => `<li>${step}</li>`).join("")}</ol>
-                        <a href="../contact/contact.html" class="cta-button">CONTACT <i class="fas fa-long-arrow-alt-right"></i></a>
+                        
+                        <a href="../contact/" class="cta-button">CONTACT <i class="fas fa-long-arrow-alt-right"></i></a>
                     </div></div>
                     ${rightVideo}
                 `;
@@ -199,16 +186,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             container.appendChild(fragment);
             
-            // Yeni yaranan elementləri observerə qoş
             requestAnimationFrame(() => {
                 const newSections = container.querySelectorAll('.page-wrapper.reveal-item');
                 newSections.forEach(el => observer.observe(el));
                 
-                // CTA Button Transition Listener
                 document.querySelectorAll('.cta-button').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const href = btn.getAttribute('href');
-                        if (!href || href === window.location.pathname.split('/').pop()) return;
+                        if (!href) return;
                         e.preventDefault();
                         navigateWithTransition(href);
                     });
