@@ -3,255 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineChord Admin</title>
+    <title>CineChord Admin Pro</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-        :root {
-            --sidebar-width: 280px;
-            --sidebar-bg: #111827;
-            --sidebar-text: #9ca3af;
-            --sidebar-active: #3b82f6;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-        }
-
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); overflow-x: hidden; }
-
-        /* Login Ekranı */
-        #login-overlay {
-            position: fixed; inset: 0; z-index: 9999;
-            background: #111827;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .login-box {
-            background: white; padding: 2.5rem; border-radius: 1rem; width: 100%; max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Layout */
-        .wrapper { display: flex; min-height: 100vh; }
-        
-        .sidebar {
-            width: var(--sidebar-width); background: var(--sidebar-bg); color: var(--sidebar-text);
-            position: fixed; height: 100vh; display: flex; flex-direction: column;
-        }
-        .sidebar-header { padding: 1.5rem; font-size: 1.25rem; font-weight: 700; color: white; border-bottom: 1px solid #1f2937; }
-        .menu-item {
-            padding: 0.75rem 1.5rem; cursor: pointer; display: flex; align-items: center; gap: 0.75rem;
-            transition: all 0.2s; font-weight: 500;
-        }
-        .menu-item:hover, .menu-item.active { background: #1f2937; color: white; border-right: 3px solid var(--sidebar-active); }
-        .menu-item i { width: 20px; text-align: center; }
-
-        .main-content {
-            margin-left: var(--sidebar-width); flex: 1; padding: 2rem;
-            display: none;
-        }
-        .main-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-
-        /* Komponentlər */
-        .card-custom {
-            background: var(--card-bg); border-radius: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); padding: 1.5rem;
-        }
-        .table img.thumb {
-            width: 48px; height: 48px; object-fit: cover; border-radius: 0.5rem;
-        }
-        .badge-custom {
-            padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 700; border-radius: 0.375rem;
-        }
-        
-        /* About Section Styles */
-        .about-section-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e5e7eb;
-        }
-        
-        .about-section-title i {
-            margin-right: 0.5rem;
-            color: #3b82f6;
-        }
-        
-        .video-preview {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 0.5rem;
-            margin-top: 0.5rem;
-            background: #000;
-        }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-    <div id="login-overlay">
-        <div class="login-box">
-            <div class="text-center mb-4">
-                <h3 class="fw-bold">Admin Panel</h3>
-                <p class="text-muted small">CineChord İdarəetmə Mərkəzi</p>
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay" style="display: flex;">
+        <div class="login-container">
+            <div class="login-left">
+                <div class="brand-logo">
+                    <i class="fas fa-clapperboard"></i>
+                    <span>CineChord</span>
+                </div>
+                <h2>Admin Panel</h2>
+                <p>Professional Content Management System</p>
             </div>
-            <form id="loginForm">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">İstifadəçi adı</label>
-                    <input type="text" id="loginUser" class="form-control py-2" placeholder="admin" required>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Şifrə</label>
-                    <input type="password" id="loginPass" class="form-control py-2" placeholder="••••••" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Giriş et</button>
-            </form>
+            <div class="login-right">
+                <form id="loginForm" class="login-form">
+                    <h3>Xoş Gəldiniz</h3>
+                    <p class="subtitle">Davam etmək üçün giriş edin</p>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> İstifadəçi adı</label>
+                        <input type="text" id="loginUser" placeholder="admin" required autocomplete="username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Şifrə</label>
+                        <input type="password" id="loginPass" placeholder="••••••" required autocomplete="current-password">
+                    </div>
+                    
+                    <button type="submit" class="btn-login">
+                        <span>Giriş et</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
-    <div class="wrapper" id="admin-wrapper" style="display: none;">
+    <!-- ADMIN WRAPPER -->
+    <div class="admin-wrapper" id="admin-wrapper" style="display: none;">
         
+        <!-- SIDEBAR -->
         <aside class="sidebar">
-            <div class="sidebar-header"><i class="fas fa-clapperboard me-2 text-primary"></i>CineChord</div>
-            <nav class="mt-4 flex-grow-1">
-                <div class="menu-item active" onclick="nav('works')" id="nav-works"><i class="fas fa-film"></i> İşlər (Portfolio)</div>
-                <div class="menu-item" onclick="nav('services')" id="nav-services"><i class="fas fa-magic"></i> Xidmətlər</div>
-                <div class="menu-item" onclick="nav('messages')" id="nav-messages"><i class="fas fa-envelope"></i> Mesajlar</div>
-                <div class="menu-item" onclick="nav('about')" id="nav-about"><i class="fas fa-info-circle"></i> Haqqımızda</div>
+            <div class="sidebar-header">
+                <div class="brand">
+                    <i class="fas fa-clapperboard"></i>
+                    <span>CineChord</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-title">ƏSAS</div>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">İDARƏETMƏ</div>
+                    <a href="#" class="nav-item" data-page="works">
+                        <i class="fas fa-film"></i>
+                        <span>Portfolio</span>
+                        <span class="badge" id="worksCount">0</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="services">
+                        <i class="fas fa-magic"></i>
+                        <span>Xidmətlər</span>
+                        <span class="badge" id="servicesCount">0</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="messages">
+                        <i class="fas fa-envelope"></i>
+                        <span>Mesajlar</span>
+                        <span class="badge badge-danger" id="messagesCount">0</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="about">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Haqqımızda</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">SİSTEM</div>
+                    <a href="#" class="nav-item" id="themeToggleNav">
+                        <i class="fas fa-moon"></i>
+                        <span>Dark Mode</span>
+                        <div class="theme-switch">
+                            <input type="checkbox" id="themeCheckbox">
+                            <label for="themeCheckbox"></label>
+                        </div>
+                    </a>
+                </div>
             </nav>
-            <div class="p-3 border-top border-secondary">
-                <button onclick="logout()" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt me-2"></i> Çıxış</button>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="info">
+                        <div class="name">Admin</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </aside>
 
-        <main style="flex: 1; background: #f9fafb;">
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
             
-            <div id="view-works" class="main-content active">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold m-0">Portfolio İşləri</h2>
-                    <button class="btn btn-primary" onclick="openWorkModal()"><i class="fas fa-plus me-2"></i>Yeni İş</button>
+            <!-- DASHBOARD VIEW -->
+            <div class="page-view active" id="view-dashboard">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Dashboard</h1>
+                        <p class="page-subtitle">Xoş gəldiniz! Statistikanıza baxın</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn-primary" onclick="loadDashboard()">
+                            <i class="fas fa-sync"></i> Yenilə
+                        </button>
+                    </div>
                 </div>
-                <div class="card-custom">
-                    <table class="table align-middle">
-                        <thead class="bg-light"><tr><th>Poster</th><th>Başlıq</th><th>Müştəri</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
-                        <tbody id="worksTable"></tbody>
-                    </table>
+
+                <!-- STATS CARDS -->
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-film"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-label">Toplam İşlər</div>
+                                <div class="stat-value" id="totalWorks">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-label">Aktiv Xidmətlər</div>
+                                <div class="stat-value" id="totalServices">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon pink">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-label">Yeni Mesajlar</div>
+                                <div class="stat-value" id="totalMessages">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHARTS SECTION -->
+                <div class="dashboard-grid">
+                    <!-- Line Chart -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Son 7 Günün Statistikası
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="worksChart" style="max-height: 300px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Doughnut Chart -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Kateqoriya Bölgüsü
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIVITY SECTION -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-clock"></i>
+                            Son Aktivliklər
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="activityList" class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <div class="activity-title">Yüklənir...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div id="view-services" class="main-content">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold m-0">Xidmətlər</h2>
-                    <button class="btn btn-primary" onclick="openServiceModal()"><i class="fas fa-plus me-2"></i>Yeni Xidmət</button>
+            <!-- WORKS VIEW -->
+            <div class="page-view" id="view-works">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Portfolio İşləri</h1>
+                        <p class="page-subtitle">Video işlərinizi idarə edin</p>
+                    </div>
+                    <button class="btn-primary" onclick="openWorkModal()">
+                        <i class="fas fa-plus"></i>
+                        Yeni İş
+                    </button>
                 </div>
-                <div class="row g-4" id="servicesGrid"></div>
-            </div>
-
-            <div id="view-messages" class="main-content">
-                <h2 class="fw-bold mb-4">Gələn Mesajlar</h2>
-                <div class="card-custom">
-                    <table class="table align-middle">
-                        <thead><tr><th>Status</th><th>Ad</th><th>Email</th><th>Mesaj</th><th>Əməliyyat</th></tr></thead>
-                        <tbody id="messagesTable"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="view-about" class="main-content">
-                <h2 class="fw-bold mb-4">Haqqımızda Səhifəsi</h2>
                 
-                <form id="aboutForm">
-                    <div class="card-custom mb-4">
-                        <h5 class="about-section-title"><i class="fas fa-video"></i>Video və Başlıqlar</h5>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Əsas Başlıq</label>
-                                <input type="text" id="aMainTitle" class="form-control" placeholder="OUR STORY">
+                <!-- FILTERS -->
+                <div class="filters-bar">
+                    <div class="search-box-inline">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="workSearch" placeholder="İşlərdə axtar..." onkeyup="searchWorks()">
+                    </div>
+                    
+                    <select id="categoryFilter" class="category-select" onchange="filterWorks()">
+                        <option value="">Bütün Kateqoriyalar</option>
+                        <option value="FILM">Film</option>
+                        <option value="COMMERCIAL">Commercial</option>
+                        <option value="CLIP">Clip</option>
+                        <option value="MUSIC_VIDEO">Music Video</option>
+                        <option value="DOCUMENTARY">Documentary</option>
+                        <option value="SOCIAL">Social</option>
+                    </select>
+                    
+                    <div class="view-switcher">
+                        <button class="view-btn active" data-view="grid" onclick="switchView('grid')">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list" onclick="switchView('list')">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- WORKS GRID -->
+                <div class="works-container" id="worksGrid">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Yüklənir...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SERVICES VIEW -->
+            <div class="page-view" id="view-services">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Xidmətlər</h1>
+                        <p class="page-subtitle">Şirkət xidmətlərinizi idarə edin</p>
+                    </div>
+                    <button class="btn-primary" onclick="openServiceModal()">
+                        <i class="fas fa-plus"></i>
+                        Yeni Xidmət
+                    </button>
+                </div>
+                
+                <div class="services-grid" id="servicesGrid">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p>Yüklənir...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MESSAGES VIEW -->
+            <div class="page-view" id="view-messages">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Mesajlar</h1>
+                        <p class="page-subtitle">Müştəri mesajlarını idarə edin</p>
+                    </div>
+                </div>
+                
+                <div class="content-card">
+                    <div class="messages-list" id="messagesList">
+                        <div style="text-align: center; padding: 4rem; color: var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p>Yüklənir...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABOUT VIEW -->
+            <div class="page-view" id="view-about">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Haqqımızda</h1>
+                        <p class="page-subtitle">Şirkət məlumatlarınızı yeniləyin</p>
+                    </div>
+                </div>
+                
+                <form id="aboutForm" class="about-form">
+                    <div class="content-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-video"></i>
+                            Video və Başlıqlar
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Əsas Başlıq</label>
+                                <input type="text" id="aMainTitle" placeholder="OUR STORY">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Video Faylı</label>
-                                <input type="file" id="aVideoFile" class="form-control" accept="video/mp4">
-                                <small class="text-muted">Mövcud video dəyişdirmək üçün yeni fayl seçin</small>
+                            <div class="form-group">
+                                <label>Video Faylı</label>
+                                <input type="file" id="aVideoFile" accept="video/mp4">
                             </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Alt Başlıq (Subtitle)</label>
-                                <textarea id="aSubTitle" class="form-control" rows="2" placeholder="We are a story-first creative studio..."></textarea>
-                            </div>
-                            <div class="col-12" id="videoPreviewContainer" style="display: none;">
-                                <label class="form-label fw-bold">Mövcud Video</label>
-                                <video id="aVideoPreview" class="video-preview" controls muted>
-                                    <source src="" type="video/mp4">
-                                </video>
+                            <div class="form-group full-width">
+                                <label>Alt Başlıq</label>
+                                <textarea id="aSubTitle" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card-custom mb-4">
-                        <h5 class="about-section-title"><i class="fas fa-align-left"></i>Məzmun Bölmələri</h5>
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Biz Kimik (Who We Are)</label>
-                                <textarea id="aWho" class="form-control" rows="3" placeholder="Founded in 2015, CINE CHORD has been..."></textarea>
+                    <div class="content-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-align-left"></i>
+                            Məzmun Bölmələri
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>Biz Kimik</label>
+                                <textarea id="aWho" rows="3"></textarea>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Missiyamız (Our Mission)</label>
-                                <textarea id="aMission" class="form-control" rows="3" placeholder="To create meaningful digital experiences..."></textarea>
+                            <div class="form-group full-width">
+                                <label>Missiyamız</label>
+                                <textarea id="aMission" rows="3"></textarea>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Yanaşmamız (Our Approach)</label>
-                                <textarea id="aApproach" class="form-control" rows="3" placeholder="We believe in collaboration, innovation..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-custom mb-4">
-                        <h5 class="about-section-title"><i class="fas fa-address-card"></i>Əlaqə Məlumatları</h5>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Email</label>
-                                <input type="email" id="aEmail" class="form-control" placeholder="hello@cinechord.com">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Telefon</label>
-                                <input type="text" id="aPhone" class="form-control" placeholder="+44 (0) 7495 718055">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Ünvan</label>
-                                <input type="text" id="aAddress" class="form-control" placeholder="London, UK">
+                            <div class="form-group full-width">
+                                <label>Yanaşmamız</label>
+                                <textarea id="aApproach" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div class="text-end">
-                        <button type="button" id="saveAboutBtn" class="btn btn-success btn-lg px-5">
-                            <i class="fas fa-save me-2"></i>Yadda Saxla
+                    <div class="content-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-address-card"></i>
+                            Əlaqə Məlumatları
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="aEmail">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon</label>
+                                <input type="text" id="aPhone">
+                            </div>
+                            <div class="form-group">
+                                <label>Ünvan</label>
+                                <input type="text" id="aAddress">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary">Ləğv et</button>
+                        <button type="button" id="saveAboutBtn" class="btn-primary">
+                            <i class="fas fa-save"></i>
+                            Yadda Saxla
                         </button>
                     </div>
                 </form>
             </div>
+
         </main>
     </div>
 
     <!-- WORK MODAL -->
     <div class="modal fade" id="workModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content border-0">
-                <div class="modal-header bg-primary text-white"><h5 class="modal-title fw-bold">İş Formu</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">İş Formu</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <form id="workForm">
                         <input type="hidden" id="workId">
                         <div class="row g-3">
-                            <div class="col-md-6"><label class="form-label">Başlıq</label><input type="text" id="wTitle" class="form-control" required></div>
-                            <div class="col-md-6"><label class="form-label">Müştəri</label><input type="text" id="wClient" class="form-control"></div>
-                            <div class="col-md-6"><label class="form-label">Kateqoriya</label>
+                            <div class="col-md-6">
+                                <label class="form-label">Başlıq</label>
+                                <input type="text" id="wTitle" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Müştəri</label>
+                                <input type="text" id="wClient" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Kateqoriya</label>
                                 <select id="wCategory" class="form-select" required>
                                     <option value="FILM">FILM</option>
                                     <option value="COMMERCIAL">COMMERCIAL</option>
@@ -261,37 +440,28 @@
                                     <option value="SOCIAL">SOCIAL</option>
                                 </select>
                             </div>
-                            <div class="col-md-6"><label class="form-label">Video Link (YouTube/Vimeo URL)</label><input type="url" id="wVideoUrl" class="form-control"></div>
-                            
-                            <div class="col-md-6"><label class="form-label">Poster Şəkli</label><input type="file" id="wImage" class="form-control"></div>
-                            <div class="col-md-6"><label class="form-label">Preview Video (Fayl)</label><input type="file" id="wPreview" class="form-control"></div>
-
+                            <div class="col-md-6">
+                                <label class="form-label">Video Link</label>
+                                <input type="url" id="wVideoUrl" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Poster Şəkli</label>
+                                <input type="file" id="wImage" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Preview Video</label>
+                                <input type="file" id="wPreview" class="form-control">
+                            </div>
                             <div class="col-12">
-                                <label class="form-label">Ətraflı Açıqlama (Description)</label>
+                                <label class="form-label">Açıqlama</label>
                                 <textarea id="wDescription" class="form-control" rows="3"></textarea>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Məkan (Location)</label>
-                                <input type="text" id="wLocation" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Agentlik (Agency)</label>
-                                <input type="text" id="wAgency" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">İstehsal İli (Production Year)</label>
-                                <input type="number" id="wProductionYear" class="form-control" placeholder="YYYY" min="1900" max="2100">
-                            </div>
-                            <div class="col-12 mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="wIsFeatured">
-                                    <label class="form-check-label fw-bold" for="wIsFeatured">Əsas Səhifədə Göstər (Featured)</label>
-                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-primary w-100" onclick="submitWork()">Təsdiqlə</button></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary w-100" onclick="submitWork()">Təsdiqlə</button>
+                </div>
             </div>
         </div>
     </div>
@@ -299,545 +469,41 @@
     <!-- SERVICE MODAL -->
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content border-0">
-                <div class="modal-header bg-success text-white"><h5 class="modal-title fw-bold">Xidmət Formu</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xidmət Formu</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId">
-                        <div class="mb-3"><label class="form-label">Başlıq</label><input type="text" id="sTitle" class="form-control" required></div>
-                        <div class="mb-3"><label class="form-label">Icon Class</label><input type="text" id="sIcon" class="form-control" placeholder="fa-video"></div>
-                        <div class="mb-3"><label class="form-label">Təsvir</label><textarea id="sDesc" class="form-control"></textarea></div>
-                        
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Video Faylı (MP4)</label>
-                            <input type="file" id="sVideoFile" name="videoFile" class="form-control" accept="video/mp4">
+                            <label class="form-label">Başlıq</label>
+                            <input type="text" id="sTitle" class="form-control" required>
                         </div>
-                        
-                        <div class="mb-3"><label class="form-label text-muted small">Bullet Points (Hər maddə yeni sətirdə)</label><textarea id="sBullets" class="form-control" rows="3"></textarea></div>
-                        <div class="mb-3"><label class="form-label text-muted small">Steps (Hər addım yeni sətirdə)</label><textarea id="sSteps" class="form-control" rows="3"></textarea></div>
+                        <div class="mb-3">
+                            <label class="form-label">Icon Class</label>
+                            <input type="text" id="sIcon" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Təsvir</label>
+                            <textarea id="sDesc" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Video Faylı</label>
+                            <input type="file" id="sVideoFile" class="form-control">
+                        </div>
                     </form>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-success w-100" onclick="submitService()">Yadda Saxla</button></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary w-100" onclick="submitService()">Yadda Saxla</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // ======= API CONFIGURATION =======
-        const BASE_URL = "http://localhost:8080";
-        const API = {
-            LOGIN: `${BASE_URL}/api/auth/login`,
-            WORKS: `${BASE_URL}/admin/works`,
-            SERVICES: `${BASE_URL}/admin/services`,
-            CONTACTS: `${BASE_URL}/admin/contacts`,
-            ABOUT: `${BASE_URL}/api/about`
-        };
-        const UPLOADS_URL = `${BASE_URL}/uploads/`;
-
-        let token = localStorage.getItem('jwt_token');
-
-        // --- Helper: Clean URL Path ---
-        function cleanUrlPath(url) {
-            if (!url || typeof url !== 'string') return url;
-            return url.replace(/^\/uploads\//, ''); 
-        }
-
-        // --- Helper: Get Full Video URL ---
-        function getFullVideoUrl(videoUrl) {
-            if (!videoUrl) return null;
-            let url = videoUrl.trim();
-            if (url.startsWith('/uploads/')) {
-                return BASE_URL + url;
-            } else if (url.startsWith('uploads/')) {
-                return BASE_URL + '/' + url;
-            } else if (!url.startsWith('http')) {
-                return UPLOADS_URL + url;
-            }
-            return url;
-        }
-
-
-        // ======= AUTH =======
-        function checkAuth() {
-            if(!token) {
-                document.getElementById('login-overlay').style.display = 'flex';
-                document.getElementById('admin-wrapper').style.display = 'none';
-            } else {
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('admin-wrapper').style.display = 'flex';
-                nav('works');
-            }
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('loginUser').value;
-            const password = document.getElementById('loginPass').value;
-
-            try {
-                const res = await fetch(API.LOGIN, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username, password})
-                });
-
-                if(res.ok) {
-                    const data = await res.json();
-                    token = data.token || data.accessToken;
-                    localStorage.setItem('jwt_token', token);
-                    Swal.fire({icon: 'success', title: 'Xoş Gəldiniz', timer: 1500, showConfirmButton: false});
-                    checkAuth();
-                } else { Swal.fire('Xəta', 'Giriş məlumatları yanlışdır', 'error'); }
-            } catch(err) { console.error(err); Swal.fire('Xəta', 'Server xətası', 'error'); }
-        });
-
-        function logout() { localStorage.removeItem('jwt_token'); location.reload(); }
-
-        // ======= AUTH FETCH =======
-        async function authFetch(url, options = {}) {
-            if(!options.headers) options.headers = {};
-            
-            if(!(options.body instanceof FormData)) options.headers['Content-Type'] = 'application/json';
-            
-            options.headers['Authorization'] = `Bearer ${token}`;
-
-            const res = await fetch(url, options);
-            if(res.status === 401) { logout(); return; }
-            return res;
-        }
-
-        // ======= NAV =======
-        function nav(page) {
-            document.querySelectorAll('.main-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + page).classList.add('active');
-            document.getElementById('nav-' + page).classList.add('active');
-
-            if(page === 'works') loadWorks();
-            if(page === 'services') loadServices();
-            if(page === 'messages') loadMessages();
-            if(page === 'about') loadAbout();
-        }
-
-        // ======= WORKS =======
-        async function loadWorks() {
-            try {
-                const res = await authFetch(`${API.WORKS}/getAllWorks`);
-                if(!res.ok) throw new Error();
-                const data = await res.json();
-                const list = data.content ? data.content : data;
-                
-                const tbody = document.getElementById('worksTable');
-                tbody.innerHTML = '';
-                list.forEach(w => {
-                    let imgUrl = w.imageUrl || '';
-                    imgUrl = cleanUrlPath(imgUrl);
-                    if(imgUrl && !imgUrl.startsWith('http')) imgUrl = `${UPLOADS_URL}${imgUrl}`;
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><img src="${imgUrl || 'https://via.placeholder.com/50'}" class="thumb"></td>
-                            <td class="fw-bold">${w.title}</td>
-                            <td>${w.clientName || '-'}</td>
-                            <td><span class="badge bg-primary">${w.category}</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-light text-primary" onclick='editWork(${JSON.stringify(w).replace(/'/g, "&apos;")})'><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-light text-danger" onclick="deleteWork(${w.id})"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>`;
-                });
-            } catch(e) { console.error('loadWorks error:', e); }
-        }
-
-        async function submitWork() {
-            const id = document.getElementById('workId').value;
-            const formData = new FormData();
-            
-            formData.append('title', document.getElementById('wTitle').value);
-            formData.append('clientName', document.getElementById('wClient').value);
-            formData.append('category', document.getElementById('wCategory').value);
-            formData.append('videoUrl', document.getElementById('wVideoUrl').value);
-            formData.append('description', document.getElementById('wDescription').value);
-            formData.append('location', document.getElementById('wLocation').value);
-            formData.append('agency', document.getElementById('wAgency').value);
-            formData.append('productionYear', document.getElementById('wProductionYear').value);
-            formData.append('isFeatured', document.getElementById('wIsFeatured').checked);
-
-            const img = document.getElementById('wImage').files[0];
-            if(img) formData.append('imageFile', img);
-            const vid = document.getElementById('wPreview').files[0];
-            if(vid) formData.append('previewVideoFile', vid);
-
-            let url = id ? `${API.WORKS}/${id}` : `${API.WORKS}/createWork`;
-            let method = id ? 'PUT' : 'POST';
-
-            Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
-            
-            try {
-                const res = await authFetch(url, { method, body: formData });
-                if(res.ok) {
-                    Swal.fire('Uğurlu', 'İş yadda saxlanıldı', 'success');
-                    bootstrap.Modal.getInstance(document.getElementById('workModal')).hide();
-                    loadWorks();
-                } else { 
-                    const errorText = await res.text();
-                    console.error('Server error:', errorText);
-                    Swal.fire('Xəta', `Yükləmə zamanı xəta oldu: ${errorText}`, 'error');
-                }
-            } catch(e) { Swal.fire('Xəta', 'Gözlənilməyən xəta baş verdi', 'error'); }
-        }
-
-        function editWork(w) {
-            document.getElementById('workForm').reset();
-            document.getElementById('workId').value = w.id;
-            document.getElementById('wTitle').value = w.title;
-            document.getElementById('wClient').value = w.clientName || '';
-            document.getElementById('wCategory').value = w.category;
-            document.getElementById('wVideoUrl').value = w.videoUrl || '';
-            document.getElementById('wDescription').value = w.description || '';
-            document.getElementById('wLocation').value = w.location || '';
-            document.getElementById('wAgency').value = w.agency || '';
-            document.getElementById('wProductionYear').value = w.productionYear || '';
-            document.getElementById('wIsFeatured').checked = w.featured || false;
-
-            document.getElementById('wImage').value = null; 
-            document.getElementById('wPreview').value = null; 
-            
-            new bootstrap.Modal(document.getElementById('workModal')).show();
-        }
-
-        function openWorkModal() {
-            document.getElementById('workForm').reset();
-            document.getElementById('workId').value = '';
-            document.getElementById('wIsFeatured').checked = false;
-            new bootstrap.Modal(document.getElementById('workModal')).show();
-        }
-
-        async function deleteWork(id) {
-            const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
-            if(r.isConfirmed) {
-                await authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' });
-                loadWorks();
-                Swal.fire('Silindi', '', 'success');
-            }
-        }
-
-        // ======= SERVICES =======
-        async function loadServices() {
-            try {
-                const res = await authFetch(`${API.SERVICES}/getAll`);
-                if(!res.ok) throw new Error('Services yüklənmədi');
-                
-                const list = await res.json();
-                const grid = document.getElementById('servicesGrid');
-                grid.innerHTML = '';
-                
-                list.forEach(s => {
-                    const videoInfo = s.videoUrl ? `(Video: ${s.videoUrl.substring(0, 15)}...)` : '(Video yoxdur)';
-                    
-                    grid.innerHTML += `
-                        <div class="col-md-4">
-                            <div class="card-custom h-100 d-flex flex-column">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="${s.iconClass || 'fas fa-star'} text-primary fs-3 me-3"></i>
-                                    <h5 class="fw-bold mb-0">${s.title}</h5>
-                                </div>
-                                <p class="text-muted small flex-grow-1">${(s.description || '').substring(0, 100)}...</p>
-                                <p class="small text-success">${videoInfo}</p>
-                                <div class="pt-3 border-top mt-2">
-                                    <button class="btn btn-sm btn-link ps-0 text-decoration-none" onclick='editService(${JSON.stringify(s).replace(/'/g, "&apos;")})'>Redaktə</button>
-                                    <button class="btn btn-sm btn-link text-danger text-decoration-none float-end pe-0" onclick="deleteService(${s.id})">Sil</button>
-                                </div>
-                            </div>
-                        </div>`;
-                });
-            } catch(e) {
-                console.error('loadServices error:', e);
-                Swal.fire('Xəta', 'Xidmətlər yüklənmədi', 'error');
-            }
-        }
-
-        async function submitService() {
-            const id = document.getElementById('serviceId').value;
-            
-            const formData = new FormData();
-            formData.append('title', document.getElementById('sTitle').value);
-            formData.append('iconClass', document.getElementById('sIcon').value);
-            formData.append('description', document.getElementById('sDesc').value);
-            
-            document.getElementById('sBullets').value.split('\n').filter(x=>x.trim()).forEach(item => {
-                formData.append('bulletPoints', item); 
-            });
-            
-            document.getElementById('sSteps').value.split('\n').filter(x=>x.trim()).forEach(item => {
-                formData.append('processSteps', item); 
-            });
-
-            const videoFile = document.getElementById('sVideoFile').files[0];
-            if (videoFile) {
-                formData.append('videoFile', videoFile); 
-            }
-            
-            let url = id ? `${API.SERVICES}/${id}` : API.SERVICES;
-            let method = id ? 'PUT' : 'POST';
-            
-            Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
-
-            try {
-                const res = await authFetch(url, { method, body: formData }); 
-                
-                if(res.ok) {
-                    Swal.fire('Uğurlu', 'Xidmət yadda saxlanıldı', 'success');
-                    bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
-                    loadServices();
-                } else { 
-                    const errorText = await res.text();
-                    console.error('Server error:', errorText);
-                    throw new Error(`Server xətası: ${errorText}`);
-                }
-            } catch(e) { 
-                Swal.fire('Xəta', `Yükləmə zamanı xəta: ${e.message}`, 'error'); 
-            }
-        }
-
-        function editService(s) {
-            document.getElementById('serviceId').value = s.id;
-            document.getElementById('sTitle').value = s.title;
-            document.getElementById('sIcon').value = s.iconClass || '';
-            document.getElementById('sDesc').value = s.description || '';
-            document.getElementById('sBullets').value = (s.bulletPoints || []).join('\n');
-            document.getElementById('sSteps').value = (s.processSteps || []).join('\n');
-            document.getElementById('sVideoFile').value = null;
-
-            new bootstrap.Modal(document.getElementById('serviceModal')).show();
-        }
-
-        function openServiceModal() {
-            document.getElementById('serviceForm').reset();
-            document.getElementById('serviceId').value = '';
-            new bootstrap.Modal(document.getElementById('serviceModal')).show();
-        }
-
-        async function deleteService(id) {
-            const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
-            if(r.isConfirmed) {
-                await authFetch(`${API.SERVICES}/delete/${id}`, { method: 'DELETE' });
-                loadServices();
-                Swal.fire('Silindi', '', 'success');
-            }
-        }
-
-        // ======= MESSAGES =======
-        async function loadMessages() {
-            try {
-                const res = await authFetch(`${API.CONTACTS}/getAll`);
-                if(!res.ok) throw new Error('Mesajlar yüklənmədi');
-                
-                const list = await res.json();
-                const tbody = document.getElementById('messagesTable');
-                tbody.innerHTML = '';
-                
-                list.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
-                
-                list.forEach(m => {
-                    const statusBadge = m.isRead 
-                        ? '<span class="badge bg-success badge-custom"><i class="fas fa-check me-1"></i>Oxunub</span>'
-                        : '<span class="badge bg-danger badge-custom"><i class="fas fa-exclamation-circle me-1"></i>Yeni</span>';
-                    
-                    tbody.innerHTML += `
-                        <tr class="${m.isRead ? 'text-muted' : 'fw-bold'}">
-                            <td>${statusBadge}</td>
-                            <td>${m.name}</td>
-                            <td>${m.email}</td>
-                            <td>${(m.message || '').substring(0, 50)}...</td>
-                            <td>
-                                <button class="btn btn-sm btn-light text-primary" onclick="viewMessage(${m.id}, '${m.name}', '${m.email}', '${m.message.replace(/'/g, "\\'")}')"><i class="fas fa-eye"></i></button>
-                                <button class="btn btn-sm btn-light text-danger" onclick="deleteMessage(${m.id})"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>`;
-                });
-            } catch(e) { console.error('loadMessages error:', e); }
-        }
-
-        async function viewMessage(id, name, email, message) {
-            Swal.fire({
-                title: `**Mesaj: ${name}**`,
-                html: `<p class="text-start">**Email:** ${email}</p><hr><p class="text-start">${message}</p>`,
-                icon: 'info',
-                confirmButtonText: 'Bağla'
-            });
-            
-            try {
-                const res = await authFetch(`${API.CONTACTS}/markAsRead/${id}`, { method: 'PUT' });
-                if (res.ok) loadMessages();
-            } catch (e) { console.error('Mark as read error:', e); }
-        }
-
-        async function deleteMessage(id) {
-            const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
-            if(r.isConfirmed) {
-                await authFetch(`${API.CONTACTS}/delete/${id}`, { method: 'DELETE' });
-                loadMessages();
-                Swal.fire('Silindi', '', 'success');
-            }
-        }
-
-        // ======= ABOUT US =======
-        async function loadAbout() {
-            console.log('🔄 loadAbout çağırıldı');
-            try {
-                const res = await authFetch(`${API.ABOUT}/getAbout`);
-                if(!res.ok) throw new Error('Haqqımızda məlumatları yüklənmədi');
-                
-                const data = await res.json();
-                console.log('✅ About data yükləndi:', data);
-
-                document.getElementById('aMainTitle').value = data.mainTitle || '';
-                document.getElementById('aSubTitle').value = data.subTitle || '';
-                document.getElementById('aWho').value = data.whoWeAreText || '';
-                document.getElementById('aMission').value = data.ourMissionText || '';
-                document.getElementById('aApproach').value = data.ourApproachText || '';
-                document.getElementById('aEmail').value = data.email || '';
-                document.getElementById('aPhone').value = data.phone || '';
-                document.getElementById('aAddress').value = data.address || '';
-                
-                const videoUrl = getFullVideoUrl(data.videoUrl);
-                const videoPreview = document.getElementById('aVideoPreview');
-                const videoContainer = document.getElementById('videoPreviewContainer');
-                
-                if (videoUrl) {
-                    videoPreview.querySelector('source').src = videoUrl;
-                    videoPreview.load();
-                    videoContainer.style.display = 'block';
-                    console.log('✅ Video preview yükləndi:', videoUrl);
-                } else {
-                    videoContainer.style.display = 'none';
-                    console.log('⚠️ Video URL mövcud deyil');
-                }
-
-            } catch(e) {
-                console.error('❌ loadAbout error:', e);
-                Swal.fire('Xəta', e.message || 'Haqqımızda məlumatlarını yükləyərkən xəta baş verdi.', 'error');
-            }
-        }
-
-        // ======= SAVE ABOUT - ƏSAS FUNKSİYA =======
-        async function saveAboutData() {
-            console.log('🔥 === SAVE ABOUT BAŞLADI ===');
-            
-            const formData = new FormData();
-
-            const mainTitle = document.getElementById('aMainTitle').value;
-            const subTitle = document.getElementById('aSubTitle').value;
-            const whoWeAre = document.getElementById('aWho').value;
-            const mission = document.getElementById('aMission').value;
-            const approach = document.getElementById('aApproach').value;
-            const email = document.getElementById('aEmail').value;
-            const phone = document.getElementById('aPhone').value;
-            const address = document.getElementById('aAddress').value;
-            
-            console.log('📝 Form məlumatları:');
-            console.log('  Main Title:', mainTitle);
-            console.log('  Sub Title:', subTitle);
-            console.log('  Email:', email);
-            
-            formData.append('mainTitle', mainTitle);
-            formData.append('subTitle', subTitle);
-            formData.append('whoWeAreText', whoWeAre);
-            formData.append('ourMissionText', mission);
-            formData.append('ourApproachText', approach);
-            formData.append('email', email);
-            formData.append('phone', phone);
-            formData.append('address', address);
-            
-            const videoFileInput = document.getElementById('aVideoFile');
-            const videoFile = videoFileInput ? videoFileInput.files[0] : null;
-            
-            console.log('📹 Video input element:', videoFileInput);
-            console.log('📹 Video file:', videoFile);
-            
-            if (videoFile) {
-                console.log('✅ Video seçildi:');
-                console.log('  Ad:', videoFile.name);
-                console.log('  Ölçü:', videoFile.size, 'bytes');
-                console.log('  Tip:', videoFile.type);
-                formData.append('videoFile', videoFile);
-            } else {
-                console.log('⚠️ Video seçilməyib!');
-            }
-
-            console.log('📦 FormData məzmunu:');
-            for (let pair of formData.entries()) {
-                if (pair[1] instanceof File) {
-                    console.log(`  ${pair[0]}: [File] ${pair[1].name} (${pair[1].size} bytes)`);
-                } else {
-                    console.log(`  ${pair[0]}:`, pair[1]);
-                }
-            }
-
-            Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
-            
-            try {
-                const url = `${API.ABOUT}/updateAbout`;
-                console.log('🌐 Request URL:', url);
-                console.log('🌐 Request Method: PUT');
-                
-                const res = await authFetch(url, { 
-                    method: 'PUT', 
-                    body: formData 
-                });
-                
-                console.log('📡 Response Status:', res.status);
-                console.log('📡 Response OK:', res.ok);
-                
-                if(res.ok) {
-                    const responseData = await res.json();
-                    console.log('✅ Response Data:', responseData);
-                    Swal.fire('Uğurlu!', 'Haqqımızda məlumatları yadda saxlanıldı', 'success');
-                    
-                    // Video input-u təmizlə
-                    if (videoFileInput) videoFileInput.value = '';
-                    
-                    // Məlumatları yenilə
-                    loadAbout();
-                } else { 
-                    const errorText = await res.text();
-                    console.error('❌ Server error:', errorText);
-                    Swal.fire('Xəta', `Yükləmə zamanı xəta oldu: ${errorText}`, 'error');
-                }
-            } catch(e) { 
-                console.error('❌ Catch error:', e);
-                Swal.fire('Xəta', `Gözlənilməyən xəta: ${e.message}`, 'error'); 
-            }
-            
-            console.log('=== SAVE ABOUT BİTDİ ===');
-        }
-
-
-        // ======= INITIALIZATION =======
-        checkAuth();
-        
-        // ABOUT DÜYMƏSINI BAĞLA
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📌 DOMContentLoaded - Event Listener qurulur...');
-            
-            const saveAboutBtn = document.getElementById('saveAboutBtn');
-            
-            if (saveAboutBtn) {
-                console.log('✅ Save About Button tapıldı!');
-                
-                saveAboutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('🚀 SAVE ABOUT DÜYMƏSINƏ BASILDI!');
-                    saveAboutData();
-                });
-            } else {
-                console.error('❌ Save About Button tapılmadı!');
-            }
-        });
-    </script>
+    <script src="admin.js"></script>
 
 </body>
 </html>
