@@ -2,8 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+    <meta name="description" content="Learn about CINE CHORD - Our story, mission, and approach to cinematic storytelling">
+    <meta name="theme-color" content="#050505">
+    
+    <!-- iOS Specific -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <title>About - CINE CHORD</title>
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="../fonts/NeueMetanaNextOutline-Black.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="../fonts/NeueMetanaNext-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+    
     <link rel="stylesheet" href="about.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -23,6 +35,7 @@
             <a href="#" class="nav-btn active" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
             <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
         </div>
+        <!-- Hamburger will be added by JS for mobile -->
     </header>
 
     <div class="center-logo">
@@ -32,7 +45,7 @@
     <div class="container">
         <section class="video-section">
             <div class="video-container">
-                <video id="about-video" class="fullscreen-video" autoplay muted loop playsinline>
+                <video id="about-video" class="fullscreen-video" autoplay muted loop playsinline preload="auto">
                     <source id="about-video-source" src="" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
@@ -89,14 +102,24 @@
                 </div>
 
                 <div class="social-links reveal-item">
-                    <a href="#" class="social-link" title="INSTAGRAM"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-link" title="LINKEDIN"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" class="social-link" title="VIMEO"><i class="fab fa-vimeo"></i></a>
-                    <a href="#" class="social-link" title="BEHANCE"><i class="fab fa-behance"></i></a>
+                    <a href="#" class="social-link" title="INSTAGRAM" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link" title="LINKEDIN" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="social-link" title="VIMEO" aria-label="Vimeo">
+                        <i class="fab fa-vimeo"></i>
+                    </a>
+                    <a href="#" class="social-link" title="BEHANCE" aria-label="Behance">
+                        <i class="fab fa-behance"></i>
+                    </a>
                 </div>
             </div>
         </section>
     </div>
+
+    <!-- Mobile menu will be added by JS -->
 
     <script src="about.js"></script>
 </body>

@@ -121,6 +121,7 @@ body {
     position: relative; overflow: hidden;
     animation: fadeInUp 0.8s ease both; text-decoration: none; display: inline-block;
 }
+
 /* Nav delays */
 .nav-left .nav-btn:nth-child(1) { animation-delay: 0.1s; }
 .nav-left .nav-btn:nth-child(2) { animation-delay: 0.2s; }
@@ -153,6 +154,96 @@ body {
 .nav-btn.active::before { opacity: 0; transform: translateY(10px); }
 
 /* =========================================
+   HAMBURGER MENU (MOBILE)
+   ========================================= */
+.hamburger {
+    display: none; /* Desktop-da gizli */
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 1002;
+    position: relative;
+    padding: 10px;
+    background: transparent;
+    border: none;
+}
+
+.hamburger span {
+    width: 28px;
+    height: 2.5px;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 2px;
+    display: block;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+    background: #FFA500;
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+    background: #FFA500;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.98);
+    backdrop-filter: blur(20px);
+    z-index: 1001;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 100px 30px 30px;
+    display: none; /* Desktop-da gizli */
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255, 165, 0, 0.1);
+}
+
+.mobile-menu.active {
+    right: 0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-menu .nav-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 14px;
+    animation: none; /* Mobil menuda animation yoxdur */
+}
+
+/* Mobil menu overlay */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* =========================================
    LAYOUT & CONTAINER
    ========================================= */
 .container { display: flex; height: 100vh; position: relative; z-index: 1; }
@@ -179,7 +270,7 @@ body {
 /* Main Content Spacing */
 .main-content {
     max-width: 650px;
-    margin-top: 180px; /* Fixed Spacing */
+    margin-top: 180px;
     margin-bottom: 100px;
 }
 
@@ -204,7 +295,7 @@ body {
 
 .rolling-title {
     font-family: 'NeueMetanaOutline', sans-serif;
-    font-size: 3.5rem; /* Compact Size */
+    font-size: 3.5rem;
     font-weight: 900; line-height: 1.1;
     margin: 0; text-transform: uppercase; letter-spacing: 2px;
     position: relative; display: inline-block; cursor: pointer;
@@ -237,7 +328,7 @@ body {
 }
 
 /* =========================================
-   CONTACT INFO (FINAL FIX)
+   CONTACT INFO
    ========================================= */
 .contact-info { 
     margin-top: 60px; 
@@ -246,11 +337,10 @@ body {
 
 .contact-item {
     display: grid; 
-    grid-template-columns: 120px 1fr; /* 120px Label üçün yer */
+    grid-template-columns: 120px 1fr;
     align-items: baseline; gap: 10px;
 }
 
-/* Label - BÖYÜK (13px) */
 .contact-label {
     font-family: 'Courier New', monospace; 
     font-size: 13px; 
@@ -259,14 +349,12 @@ body {
     font-weight: 600;
 }
 
-/* Address - KİÇİK (15px) & NeueMetana */
 .static-value {
     font-family: 'NeueMetanaSolid', sans-serif; 
     font-size: 15px; 
     color: #fff; line-height: 1.5; text-transform: uppercase;
 }
 
-/* Email/Phone - KİÇİK (15px) & NeueMetana + Rolling Effect */
 .rolling-link {
     font-family: 'NeueMetanaSolid', sans-serif;
     font-size: 15px; 
@@ -297,22 +385,268 @@ body {
 .social-link:hover i { color: #FFA500; transform: scale(1.1); }
 
 /* =========================================
-   RESPONSIVE
+   RESPONSIVE - TABLET
    ========================================= */
 @media (max-width: 1024px) {
-    .container { flex-direction: column; }
-    .video-section { flex: 0 0 40%; height: 40vh; }
-    .content-section { flex: 0 0 60%; height: 60vh; padding: 40px; }
+    .container { flex-direction: column; height: auto; }
+    
+    .video-section { 
+        flex: none;
+        height: 50vh;
+        min-height: 300px;
+    }
+    
+    .content-section { 
+        flex: none;
+        height: auto;
+        padding: 40px;
+        min-height: 50vh;
+    }
+    
     .header { padding: 15px 30px; }
-    .main-content { margin-top: 100px; }
+    
+    .main-content { 
+        margin-top: 100px;
+        max-width: 100%;
+    }
+    
+    .rolling-title { font-size: 2.8rem; }
+    
+    .center-logo {
+        top: 20px;
+    }
+    
+    .logo-img {
+        width: 90px;
+        height: 90px;
+    }
 }
+
+/* =========================================
+   RESPONSIVE - MOBILE
+   ========================================= */
 @media (max-width: 768px) {
-    .header { padding: 15px 20px; }
-    .nav-left, .nav-right { gap: 10px; }
-    .nav-btn { font-size: 11px; padding: 10px 20px; }
-    .rolling-title { font-size: 2rem; }
-    .content-section { padding: 30px; }
-    .contact-item { grid-template-columns: 1fr; gap: 5px; } 
-    .rolling-link { font-size: 14px; }
-    .static-value { font-size: 14px; }
+    /* Header & Navigation */
+    .header { 
+        padding: 15px 20px;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(10px);
+        justify-content: flex-end; /* Hamburger sağda */
+    }
+    
+    /* DESKTOP NAVBAR GİZLƏT */
+    .nav-left, 
+    .nav-right { 
+        display: none !important;
+    }
+    
+    /* HAMBURGER GÖSTƏR */
+    .hamburger {
+        display: flex !important;
+    }
+    
+    /* MOBILE MENU GÖSTƏR */
+    .mobile-menu {
+        display: flex !important;
+    }
+    
+    /* Logo */
+    .center-logo {
+        top: 15px;
+        left: 20px; /* Sol tərəfə köçür */
+        transform: translateX(0) scale(0.5) rotate(-180deg);
+    }
+    
+    .center-logo.entry-done {
+        transform: translateX(0) scale(1) rotate(0deg);
+    }
+    
+    .center-logo.scroll-hidden {
+        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+    }
+    
+    .logo-img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* Layout */
+    .container {
+        flex-direction: column;
+    }
+    
+    .video-section {
+        height: 40vh;
+        min-height: 250px;
+    }
+    
+    .content-section {
+        padding: 25px 20px;
+        min-height: 60vh;
+    }
+    
+    .main-content {
+        margin-top: 80px;
+        margin-bottom: 50px;
+    }
+    
+    /* Typography */
+    .rolling-title { 
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 35px;
+    }
+    
+    .section-title {
+        font-size: 0.8rem;
+    }
+    
+    .section-text {
+        font-size: 0.875rem;
+    }
+    
+    /* Contact Info */
+    .contact-info {
+        margin-top: 40px;
+        gap: 20px;
+    }
+    
+    .contact-item { 
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+    
+    .contact-label {
+        font-size: 11px;
+    }
+    
+    .rolling-link { 
+        font-size: 14px;
+    }
+    
+    .static-value { 
+        font-size: 14px;
+    }
+    
+    /* Social Links */
+    .social-links {
+        margin-top: 40px;
+        gap: 15px;
+    }
+    
+    .social-link {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .social-link i {
+        font-size: 20px;
+    }
+    
+    /* About Sections */
+    .about-section {
+        margin-bottom: 30px;
+    }
+    
+    .title-wrapper {
+        margin-bottom: 30px;
+    }
+}
+
+/* =========================================
+   RESPONSIVE - SMALL MOBILE
+   ========================================= */
+@media (max-width: 480px) {
+    .video-section {
+        height: 35vh;
+        min-height: 200px;
+    }
+    
+    .content-section {
+        padding: 20px 15px;
+    }
+    
+    .main-content {
+        margin-top: 60px;
+        margin-bottom: 40px;
+    }
+    
+    .rolling-title {
+        font-size: 1.6rem;
+    }
+    
+    .subtitle {
+        font-size: 0.85rem;
+    }
+    
+    .section-text {
+        font-size: 0.85rem;
+    }
+    
+    .contact-label {
+        font-size: 10px;
+    }
+    
+    .rolling-link,
+    .static-value {
+        font-size: 13px;
+    }
+    
+    .mobile-menu {
+        width: 85%;
+        padding: 70px 25px 25px;
+    }
+    
+    .social-link {
+        width: 42px;
+        height: 42px;
+    }
+}
+
+/* =========================================
+   LANDSCAPE MOBILE
+   ========================================= */
+@media (max-width: 768px) and (orientation: landscape) {
+    .video-section {
+        height: 100vh;
+        min-height: auto;
+    }
+    
+    .content-section {
+        min-height: 100vh;
+    }
+    
+    .main-content {
+        margin-top: 100px;
+    }
+}
+
+/* =========================================
+   TOUCH IMPROVEMENTS
+   ========================================= */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn {
+        padding: 14px 25px;
+        font-size: 14px;
+    }
+    
+    .social-link {
+        width: 48px;
+        height: 48px;
+    }
+    
+    /* Disable hover effects on touch */
+    .rolling-title:hover span,
+    .rolling-link:hover span {
+        transform: none;
+    }
+    
+    .rolling-title:hover::after,
+    .rolling-link:hover::after {
+        transform: none;
+    }
 }
