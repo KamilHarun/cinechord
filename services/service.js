@@ -5,11 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     const pageTransition = document.querySelector('.page-transition');
     
-    // DİQQƏT: "Active Navigasiya" kodunu sildim. 
-    // Artıq HTML-də əllə verdiyin 'active' klassı işləyəcək.
-
     if (pageTransition) {
-        // Səhifə yüklənəndə pərdəni yuxarı çəkmək
         setTimeout(() => {
              pageTransition.classList.add('page-loaded'); 
         }, 100);
@@ -79,10 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', (e) => {
             const href = btn.getAttribute('href');
             
-            // Link yoxdursa və ya eyni səhifədirsə heç nə etmə
             if (!href || href === '#') return;
-
-            // Əgər sadəcə ID-yə keçiddirsə (scroll), transition etmə
             if (href.startsWith('#')) return;
 
             e.preventDefault();
@@ -121,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     // 4. LOAD SERVICES (Dynamic Sections)
     // ============================================================
-    const BACKEND_URL = "http://localhost:8080";
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     const SERVICES_API = BACKEND_URL + "/admin/services/getAll"; 
     const UPLOADS_BASE = BACKEND_URL + "/uploads/";
     const ICONS = { "COMMERCIAL SHOOTING": "fa-shopping-cart", "FILM SHOOTING": "fa-film", "DOCUMENTARY": "fa-video", "MUSIC VIDEOS": "fa-clapperboard" };

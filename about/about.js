@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 
-    const BACKEND_URL = "http://localhost:8080";
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     const ABOUT_API = BACKEND_URL + "/api/about/getAbout";
     const UPLOADS_BASE = BACKEND_URL + "/uploads/";
 

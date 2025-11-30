@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. FLASH FIX
+    // 0. FLASH FIX & CONFIG
     // ============================================================
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     const pageTransition = document.querySelector('.page-transition');
     if (pageTransition) {
         setTimeout(() => {
@@ -167,8 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             try {
-                // Backend URL
-                const response = await fetch('http://localhost:8080/api/createMessage', {
+                // ✅ DÜZƏLİŞ: Localhost silindi, Railway yazıldı
+                const response = await fetch(`${BACKEND_URL}/api/createMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)

@@ -1,9 +1,10 @@
 // ============================================
-// CINECHORD ADMIN PANEL - REAL WORKING VERSION
-// Backend endpoints düzgün işləyir!
+// CINECHORD ADMIN PANEL - PRODUCTION READY
 // ============================================
 
-const BASE_URL = "http://localhost:8080";
+// ✅ Railway Backend Linki
+const BASE_URL = "https://cinechord-admin-production.up.railway.app";
+
 const API = {
     LOGIN: `${BASE_URL}/api/auth/login`,
     WORKS: `${BASE_URL}/admin/works`,
@@ -146,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // About save button
     const saveAboutBtn = document.getElementById('saveAboutBtn');
     if (saveAboutBtn) {
         saveAboutBtn.addEventListener('click', saveAboutData);
@@ -167,7 +167,6 @@ async function loadDashboard() {
         const servicesData = await servicesRes.json();
         const services = Array.isArray(servicesData) ? servicesData : [];
 
-        // ✅ Messages - use correct backend URL
         let messages = [];
         try {
             const messagesRes = await authFetch(`${API.CONTACTS}/allMessages`);
@@ -175,9 +174,7 @@ async function loadDashboard() {
                 const messagesData = await messagesRes.json();
                 messages = Array.isArray(messagesData) ? messagesData : [];
             }
-        } catch (e) {
-            // Silent fail
-        }
+        } catch (e) { }
 
         updateStats(works, services, messages);
         initCharts(works);
@@ -190,22 +187,17 @@ async function loadDashboard() {
 function updateStats(works, services, messages) {
     document.getElementById('totalWorks').textContent = works.length;
     document.getElementById('totalServices').textContent = services.length;
-    
-    // ✅ Count unread messages properly
     const unreadCount = messages.filter(m => !(m.isRead || m.read)).length;
     document.getElementById('totalMessages').textContent = unreadCount;
-    
     document.getElementById('worksCount').textContent = works.length;
     document.getElementById('servicesCount').textContent = services.length;
     document.getElementById('messagesCount').textContent = unreadCount;
 }
 
 function initCharts(works) {
-    // LINE CHART - Real data
     const worksCtx = document.getElementById('worksChart');
     if (worksCtx) {
         if (worksChart) worksChart.destroy();
-        
         const last7Days = [];
         const workCounts = [];
         const today = new Date();
@@ -221,7 +213,6 @@ function initCharts(works) {
                 const workDate = new Date(w.createdAt);
                 return workDate.toDateString() === date.toDateString();
             }).length;
-            
             workCounts.push(dayCount);
         }
         
@@ -235,39 +226,27 @@ function initCharts(works) {
                     borderColor: '#6366f1',
                     backgroundColor: 'rgba(99, 102, 241, 0.1)',
                     tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#6366f1',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4
+                    fill: true
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                    x: { grid: { display: false } }
-                }
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } }
             }
         });
     }
 
-    // DOUGHNUT CHART - Real data
     const categoryCtx = document.getElementById('categoryChart');
     if (categoryCtx) {
         if (categoryChart) categoryChart.destroy();
-        
         const categories = {};
         works.forEach(w => {
             const cat = w.category || 'OTHER';
             categories[cat] = (categories[cat] || 0) + 1;
         });
-        
-        if (Object.keys(categories).length === 0) {
-            categories['Məlumat yoxdur'] = 1;
-        }
+        if (Object.keys(categories).length === 0) categories['Məlumat yoxdur'] = 1;
         
         categoryChart = new Chart(categoryCtx, {
             type: 'doughnut',
@@ -281,12 +260,7 @@ function initCharts(works) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { padding: 15, usePointStyle: true }
-                    }
-                }
+                plugins: { legend: { position: 'bottom', labels: { padding: 15, usePointStyle: true } } }
             }
         });
     }
@@ -295,35 +269,25 @@ function initCharts(works) {
 function loadActivity(works, services, messages) {
     const list = document.getElementById('activityList');
     if (!list) return;
-    
     const activities = [];
     works.slice(0, 3).forEach(w => activities.push({
-        icon: 'fa-film',
-        color: '#6366f1',
-        title: `"${w.title}" əlavə edildi`,
-        time: formatDate(w.createdAt || new Date())
+        icon: 'fa-film', color: '#6366f1', title: `"${w.title}" əlavə edildi`, time: formatDate(w.createdAt || new Date())
     }));
     
     if (activities.length === 0) {
         list.innerHTML = '<div class="activity-item"><div class="activity-info"><div class="activity-title">Hələ aktivlik yoxdur</div></div></div>';
         return;
     }
-    
     list.innerHTML = activities.map(a => `
         <div class="activity-item">
-            <div class="activity-icon" style="background: ${a.color}">
-                <i class="fas ${a.icon}"></i>
-            </div>
-            <div class="activity-info">
-                <div class="activity-title">${a.title}</div>
-                <div class="activity-time">${a.time}</div>
-            </div>
+            <div class="activity-icon" style="background: ${a.color}"><i class="fas ${a.icon}"></i></div>
+            <div class="activity-info"><div class="activity-title">${a.title}</div><div class="activity-time">${a.time}</div></div>
         </div>
     `).join('');
 }
 
 // ============================================
-// WORKS - ORIJINAL KODUN DÜZ İŞLƏYƏN VERSİYASI
+// WORKS
 // ============================================
 
 async function loadWorks() {
@@ -336,49 +300,28 @@ async function loadWorks() {
         if (!grid) return;
         
         if (!works || works.length === 0) {
-            grid.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-film"></i>
-                    <h3>Hələ heç bir iş yoxdur</h3>
-                    <p>Yeni iş əlavə etmək üçün "Yeni İş" düyməsinə klikləyin</p>
-                </div>
-            `;
+            grid.innerHTML = `<div class="empty-state"><i class="fas fa-film"></i><h3>Hələ heç bir iş yoxdur</h3><p>Yeni iş əlavə etmək üçün "Yeni İş" düyməsinə klikləyin</p></div>`;
             return;
         }
         
         grid.innerHTML = '';
-        
         works.forEach(w => {
             let imgUrl = cleanUrlPath(w.imageUrl || '');
-            if(imgUrl && !imgUrl.startsWith('http')) {
-                imgUrl = `${UPLOADS_URL}${imgUrl}`;
-            }
+            if(imgUrl && !imgUrl.startsWith('http')) imgUrl = `${UPLOADS_URL}${imgUrl}`;
             
             const card = document.createElement('div');
             card.className = 'work-card';
             card.innerHTML = `
-                <img src="${imgUrl || 'https://via.placeholder.com/400x225/6366f1/ffffff?text=No+Image'}" 
-                     class="work-image" 
-                     alt="${w.title}"
-                     onerror="this.src='https://via.placeholder.com/400x225/6366f1/ffffff?text=${encodeURIComponent(w.title)}'">
+                <img src="${imgUrl || 'https://via.placeholder.com/400x225/6366f1/ffffff?text=No+Image'}" class="work-image" alt="${w.title}" onerror="this.src='https://via.placeholder.com/400x225/6366f1/ffffff?text=${encodeURIComponent(w.title)}'">
                 <div class="work-body">
                     <h3 class="work-title">${w.title}</h3>
                     <div class="work-meta">
-                        <div class="work-client">
-                            <i class="fas fa-user"></i>
-                            ${w.clientName || 'N/A'}
-                        </div>
+                        <div class="work-client"><i class="fas fa-user"></i> ${w.clientName || 'N/A'}</div>
                         <span class="work-category">${w.category}</span>
                     </div>
                     <div class="work-actions">
-                        <button class="btn-edit" onclick='editWork(${JSON.stringify(w).replace(/'/g, "&apos;")})'>
-                            <i class="fas fa-edit"></i>
-                            Redaktə
-                        </button>
-                        <button class="btn-delete" onclick="deleteWork(${w.id})">
-                            <i class="fas fa-trash"></i>
-                            Sil
-                        </button>
+                        <button class="btn-edit" onclick='editWork(${JSON.stringify(w).replace(/'/g, "&apos;")})'><i class="fas fa-edit"></i> Redaktə</button>
+                        <button class="btn-delete" onclick="deleteWork(${w.id})"><i class="fas fa-trash"></i> Sil</button>
                     </div>
                 </div>
             `;
@@ -386,68 +329,33 @@ async function loadWorks() {
         });
     } catch(e) { 
         console.error('loadWorks error:', e);
-        const grid = document.getElementById('worksGrid');
-        if (grid) {
-            grid.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-                    <h3>Xəta baş verdi</h3>
-                    <p>İşlər yüklənə bilmədi</p>
-                </div>
-            `;
-        }
     }
 }
 
-// View switcher
 function switchView(view) {
     const grid = document.getElementById('worksGrid');
-    const btns = document.querySelectorAll('.view-btn');
-    
-    btns.forEach(btn => {
+    document.querySelectorAll('.view-btn').forEach(btn => {
         btn.classList.remove('active');
-        if (btn.dataset.view === view) {
-            btn.classList.add('active');
-        }
+        if (btn.dataset.view === view) btn.classList.add('active');
     });
-    
-    if (view === 'list') {
-        grid.classList.add('list-view');
-    } else {
-        grid.classList.remove('list-view');
-    }
+    if (view === 'list') grid.classList.add('list-view');
+    else grid.classList.remove('list-view');
 }
 
-// Search works
 function searchWorks() {
     const searchTerm = document.getElementById('workSearch').value.toLowerCase();
-    const cards = document.querySelectorAll('.work-card');
-    
-    cards.forEach(card => {
+    document.querySelectorAll('.work-card').forEach(card => {
         const title = card.querySelector('.work-title').textContent.toLowerCase();
         const client = card.querySelector('.work-client').textContent.toLowerCase();
-        
-        if (title.includes(searchTerm) || client.includes(searchTerm)) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
+        card.style.display = (title.includes(searchTerm) || client.includes(searchTerm)) ? '' : 'none';
     });
 }
 
-// Filter by category
 function filterWorks() {
     const category = document.getElementById('categoryFilter').value;
-    const cards = document.querySelectorAll('.work-card');
-    
-    cards.forEach(card => {
+    document.querySelectorAll('.work-card').forEach(card => {
         const workCategory = card.querySelector('.work-category').textContent;
-        
-        if (!category || workCategory === category) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
+        card.style.display = (!category || workCategory === category) ? '' : 'none';
     });
 }
 
@@ -470,7 +378,6 @@ function editWork(w) {
 async function submitWork() {
     const id = document.getElementById('workId').value;
     const fd = new FormData();
-    
     fd.append('title', document.getElementById('wTitle').value);
     fd.append('clientName', document.getElementById('wClient').value);
     fd.append('category', document.getElementById('wCategory').value);
@@ -484,40 +391,24 @@ async function submitWork() {
     if(vid) fd.append('previewVideoFile', vid);
 
     Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
-    
     try {
         const res = await authFetch(id ? `${API.WORKS}/${id}` : `${API.WORKS}/createWork`, { 
-            method: id ? 'PUT' : 'POST', 
-            body: fd 
+            method: id ? 'PUT' : 'POST', body: fd 
         });
-        
         if(res.ok) {
             Swal.fire('Uğurlu!', 'İş yadda saxlanıldı', 'success');
             bootstrap.Modal.getInstance(document.getElementById('workModal')).hide();
-            loadWorks();
-            loadDashboard();
-        } else { 
-            Swal.fire('Xəta', await res.text(), 'error');
-        }
-    } catch(e) { 
-        Swal.fire('Xəta', e.message, 'error'); 
-    }
+            loadWorks(); loadDashboard();
+        } else { Swal.fire('Xəta', await res.text(), 'error'); }
+    } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
 }
 
 async function deleteWork(id) {
-    const r = await Swal.fire({
-        title: 'Silinsin?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sil',
-        cancelButtonText: 'Ləğv'
-    });
-    
+    const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil', cancelButtonText: 'Ləğv'});
     if(r.isConfirmed) {
         await authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' });
         Swal.fire('Silindi', '', 'success');
-        loadWorks();
-        loadDashboard();
+        loadWorks(); loadDashboard();
     }
 }
 
@@ -543,9 +434,7 @@ async function loadServices() {
                     </div>
                     <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem">${s.title}</h3>
                     <p style="color:#64748b;margin-bottom:1rem;flex:1">${(s.description || '').substring(0,120)}...</p>
-                    <div style="display:inline-flex;padding:0.5rem 0.875rem;border-radius:8px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;background:${hasVideo?'rgba(16,185,129,0.1)':'rgba(148,163,184,0.1)'};color:${hasVideo?'#10b981':'#94a3b8'}">
-                        ${hasVideo ? '✅ Video var' : '📹 Video yoxdur'}
-                    </div>
+                    <div style="display:inline-flex;padding:0.5rem 0.875rem;border-radius:8px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;background:${hasVideo?'rgba(16,185,129,0.1)':'rgba(148,163,184,0.1)'};color:${hasVideo?'#10b981':'#94a3b8'}">${hasVideo ? '✅ Video var' : '📹 Video yoxdur'}</div>
                     <div style="display:flex;gap:0.75rem;padding-top:1rem;border-top:1px solid #e2e8f0">
                         <button onclick='editService(${JSON.stringify(s).replace(/'/g,"&apos;")})' style="flex:1;background:rgba(99,102,241,0.1);color:#6366f1;padding:0.625rem;border:none;border-radius:8px;cursor:pointer;font-weight:600">Redaktə</button>
                         <button onclick="deleteService(${s.id})" style="flex:1;background:rgba(239,68,68,0.1);color:#ef4444;padding:0.625rem;border:none;border-radius:8px;cursor:pointer;font-weight:600">Sil</button>
@@ -573,7 +462,6 @@ function editService(s) {
 async function submitService() {
     const id = document.getElementById('serviceId').value;
     const fd = new FormData();
-    
     fd.append('title', document.getElementById('sTitle').value);
     fd.append('iconClass', document.getElementById('sIcon').value);
     fd.append('description', document.getElementById('sDesc').value);
@@ -582,86 +470,50 @@ async function submitService() {
     if(video) fd.append('videoFile', video);
     
     Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
-    
     try {
         const res = await authFetch(id ? `${API.SERVICES}/${id}` : API.SERVICES, { 
-            method: id ? 'PUT' : 'POST', 
-            body: fd 
+            method: id ? 'PUT' : 'POST', body: fd 
         });
-        
         if(res.ok) {
             Swal.fire('Uğurlu!', 'Xidmət yadda saxlanıldı', 'success');
             bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
-            loadServices();
-            loadDashboard();
-        } else { 
-            Swal.fire('Xəta', await res.text(), 'error');
-        }
-    } catch(e) { 
-        Swal.fire('Xəta', e.message, 'error'); 
-    }
+            loadServices(); loadDashboard();
+        } else { Swal.fire('Xəta', await res.text(), 'error'); }
+    } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
 }
 
 async function deleteService(id) {
-    const r = await Swal.fire({
-        title: 'Silinsin?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sil'
-    });
-    
+    const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
     if(r.isConfirmed) {
         await authFetch(`${API.SERVICES}/delete/${id}`, { method: 'DELETE' });
         Swal.fire('Silindi', '', 'success');
-        loadServices();
-        loadDashboard();
+        loadServices(); loadDashboard();
     }
 }
 
 // ============================================
-// MESSAGES - Backend hazır deyil, skip olunur
+// MESSAGES
 // ============================================
 
 async function loadMessages() {
     const list = document.getElementById('messagesList');
     if (!list) return;
-    
-    // Show loading first
     list.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b"><i class="fas fa-spinner fa-spin" style="font-size:2rem"></i><p style="margin-top:1rem">Yüklənir...</p></div>';
     
     try {
-        // ✅ BACKEND URL: /admin/contacts/allMessages
         const res = await authFetch(`${API.CONTACTS}/allMessages`);
-        
         if(!res || !res.ok) {
-            list.innerHTML = `
-                <div style="text-align:center;padding:3rem">
-                    <i class="fas fa-server" style="font-size:3rem;color:#94a3b8;margin-bottom:1rem"></i>
-                    <h4 style="color:#475569;margin-bottom:0.5rem">Mesajlar Yüklənmədi</h4>
-                    <p style="color:#94a3b8;font-size:0.9rem;margin-bottom:1.5rem">Backend xətası: ${res?.status || 'Network error'}</p>
-                    <button onclick="loadMessages()" style="background:#6366f1;color:white;padding:0.75rem 1.5rem;border:none;border-radius:8px;cursor:pointer;font-weight:600">
-                        <i class="fas fa-sync"></i> Yenidən Yoxla
-                    </button>
-                </div>
-            `;
+            list.innerHTML = `<div style="text-align:center;padding:3rem"><h4>Mesajlar Yüklənmədi</h4><button onclick="loadMessages()">Yenidən Yoxla</button></div>`;
             return;
         }
         
         const messages = await res.json();
-        
         if (!Array.isArray(messages) || messages.length === 0) {
-            list.innerHTML = `
-                <div style="text-align:center;padding:4rem">
-                    <i class="fas fa-envelope-open" style="font-size:4rem;opacity:0.2;margin-bottom:1rem"></i>
-                    <h4 style="color:#475569">Hələ heç bir mesaj yoxdur</h4>
-                    <p style="color:#94a3b8">Müştəri mesajları burada görünəcək</p>
-                </div>
-            `;
+            list.innerHTML = `<div style="text-align:center;padding:4rem"><h4>Hələ heç bir mesaj yoxdur</h4></div>`;
             return;
         }
         
         messages.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
-        
         list.innerHTML = '';
         messages.forEach(m => {
             const isRead = m.isRead || m.read || false;
@@ -670,96 +522,38 @@ async function loadMessages() {
             const statusText = isRead ? 'Oxunub' : 'Yeni';
             
             list.innerHTML += `
-                <div style="padding:1.25rem;background:#f8fafc;border-radius:12px;margin-bottom:0.75rem;display:flex;align-items:center;gap:1rem;transition:all 0.2s;cursor:pointer" 
-                     onmouseover="this.style.background='#f1f5f9'" 
-                     onmouseout="this.style.background='#f8fafc'"
-                     onclick="viewMessage(${m.id}, '${(m.name || '').replace(/'/g, "\\'")}', '${(m.email || '').replace(/'/g, "\\'")}', '${(m.message || '').replace(/'/g, "\\'").replace(/\n/g, ' ')}')">
-                    <div style="width:48px;height:48px;background:${statusBg};border-radius:12px;display:flex;align-items:center;justify-content:center;color:${statusColor}">
-                        <i class="fas fa-envelope"></i>
-                    </div>
+                <div style="padding:1.25rem;background:#f8fafc;border-radius:12px;margin-bottom:0.75rem;display:flex;align-items:center;gap:1rem;cursor:pointer" onclick="viewMessage(${m.id}, '${(m.name || '').replace(/'/g, "\\'")}', '${(m.email || '').replace(/'/g, "\\'")}', '${(m.message || '').replace(/'/g, "\\'").replace(/\n/g, ' ')}')">
+                    <div style="width:48px;height:48px;background:${statusBg};border-radius:12px;display:flex;align-items:center;justify-content:center;color:${statusColor}"><i class="fas fa-envelope"></i></div>
                     <div style="flex:1;min-width:0">
                         <div style="font-weight:700;color:#0f172a;margin-bottom:0.25rem">${m.name || 'Anonim'}</div>
                         <div style="font-size:0.875rem;color:#64748b;margin-bottom:0.25rem">${m.email || 'email yoxdur'}</div>
-                        <div style="font-size:0.875rem;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(m.message || '').substring(0,80)}${m.message && m.message.length > 80 ? '...' : ''}</div>
+                        <div style="font-size:0.875rem;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(m.message || '').substring(0,80)}</div>
                     </div>
                     <div style="text-align:right;flex-shrink:0">
                         <span style="padding:0.375rem 0.75rem;background:${statusBg};color:${statusColor};border-radius:8px;font-size:0.75rem;font-weight:600;display:inline-block;margin-bottom:0.5rem">${statusText}</span>
                         <div style="font-size:0.75rem;color:#94a3b8">${formatDate(m.sentAt)}</div>
                     </div>
-                    <button onclick="event.stopPropagation();deleteMessage(${m.id})" style="background:rgba(239,68,68,0.1);color:#ef4444;padding:0.5rem 1rem;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s" onmouseover="this.style.background='#ef4444';this.style.color='white'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='#ef4444'">
-                        <i class="fas fa-trash"></i> Sil
-                    </button>
+                    <button onclick="event.stopPropagation();deleteMessage(${m.id})" style="background:rgba(239,68,68,0.1);color:#ef4444;padding:0.5rem 1rem;border:none;border-radius:8px;cursor:pointer;font-weight:600;"><i class="fas fa-trash"></i> Sil</button>
                 </div>
             `;
         });
-    } catch(e) {
-        list.innerHTML = `
-            <div style="text-align:center;padding:3rem">
-                <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:#f59e0b;margin-bottom:1rem;opacity:0.5"></i>
-                <h4 style="color:#475569;margin-bottom:0.5rem">Backend Əlaqə Xətası</h4>
-                <p style="color:#94a3b8;font-size:0.9rem;margin-bottom:1.5rem">${e.message}</p>
-                <button onclick="loadMessages()" style="background:#6366f1;color:white;padding:0.75rem 1.5rem;border:none;border-radius:8px;cursor:pointer;font-weight:600">
-                    <i class="fas fa-sync"></i> Yenidən Yoxla
-                </button>
-            </div>
-        `;
-    }
+    } catch(e) { console.error(e); }
 }
 
 async function viewMessage(id, name, email, message) {
     await Swal.fire({
         title: `<strong>Mesaj: ${name}</strong>`,
-        html: `
-            <div style="text-align:left;padding:1rem">
-                <p style="margin-bottom:1rem"><strong>Email:</strong> ${email}</p>
-                <hr style="margin:1rem 0">
-                <p style="line-height:1.6;color:#475569">${message}</p>
-            </div>
-        `,
-        icon: 'info',
-        confirmButtonText: 'Bağla',
-        width: 600,
-        confirmButtonColor: '#6366f1'
+        html: `<div style="text-align:left;padding:1rem"><p><strong>Email:</strong> ${email}</p><hr><p>${message}</p></div>`,
+        icon: 'info', confirmButtonText: 'Bağla'
     });
-    
-    try {
-        // ✅ BACKEND URL: PATCH /admin/contacts/{id}/read
-        const res = await authFetch(`${API.CONTACTS}/${id}/read`, { method: 'PATCH' });
-        if (res && res.ok) {
-            loadMessages();
-            loadDashboard();
-        }
-    } catch (e) {
-        // Silent fail
-    }
+    try { await authFetch(`${API.CONTACTS}/${id}/read`, { method: 'PATCH' }); loadMessages(); loadDashboard(); } catch (e) {}
 }
 
 async function deleteMessage(id) {
-    const r = await Swal.fire({
-        title: 'Mesaj silinsin?',
-        text: 'Bu əməliyyatı geri qaytara bilməzsiniz',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Bəli, sil',
-        cancelButtonText: 'Xeyr',
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280'
-    });
-    
+    const r = await Swal.fire({title: 'Mesaj silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
     if(r.isConfirmed) {
-        try {
-            // ✅ BACKEND URL: DELETE /admin/contacts/{id}
-            const res = await authFetch(`${API.CONTACTS}/${id}`, { method: 'DELETE' });
-            if (res && res.ok) {
-                Swal.fire('Silindi!', 'Mesaj uğurla silindi', 'success');
-                loadMessages();
-                loadDashboard();
-            } else {
-                Swal.fire('Xəta', 'Silinmə zamanı xəta baş verdi', 'error');
-            }
-        } catch(e) {
-            Swal.fire('Xəta', 'Backend əlaqə xətası', 'error');
-        }
+        await authFetch(`${API.CONTACTS}/${id}`, { method: 'DELETE' });
+        loadMessages(); loadDashboard();
     }
 }
 
@@ -771,7 +565,6 @@ async function loadAbout() {
     try {
         const res = await authFetch(`${API.ABOUT}/getAbout`);
         if(!res.ok) return;
-        
         const data = await res.json();
         document.getElementById('aMainTitle').value = data.mainTitle || '';
         document.getElementById('aSubTitle').value = data.subTitle || '';
@@ -799,23 +592,18 @@ async function saveAboutData() {
     if(video) fd.append('videoFile', video);
     
     Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
-    
     try {
         const res = await authFetch(`${API.ABOUT}/updateAbout`, { method: 'PUT', body: fd });
         if(res.ok) {
             Swal.fire('Uğurlu!', 'Məlumatlar yadda saxlanıldı', 'success');
             document.getElementById('aVideoFile').value = '';
             loadAbout();
-        } else {
-            Swal.fire('Xəta', await res.text(), 'error');
-        }
-    } catch(e) {
-        Swal.fire('Xəta', e.message, 'error');
-    }
+        } else { Swal.fire('Xəta', await res.text(), 'error'); }
+    } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
 }
 
 // ============================================
-// THEME TOGGLE
+// THEME & INIT
 // ============================================
 
 const themeCheckbox = document.getElementById('themeCheckbox');
@@ -826,13 +614,7 @@ if (localStorage.getItem('theme') === 'dark') {
 
 document.getElementById('themeToggleNav')?.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    if (themeCheckbox) themeCheckbox.checked = isDark;
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 });
-
-// ============================================
-// INIT
-// ============================================
 
 checkAuth();

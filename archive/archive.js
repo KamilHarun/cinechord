@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     // 0. API KONFİQURASİYASI
     // ============================================================
-    const API_BASE_URL = "http://localhost:8080"; 
-    const API_WORKS = `${API_BASE_URL}/admin/works/getAllWorks`; 
-    const UPLOADS_URL = `${API_BASE_URL}/uploads/`; 
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
+    const API_WORKS = `${BACKEND_URL}/admin/works/getAllWorks`; 
+    const UPLOADS_URL = `${BACKEND_URL}/uploads/`; 
     
     // Backend Enum-larını Frontend-ə çevirmək
     const categoryTypeMap = { 
@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!videoUrl) return null;
         let url = videoUrl.trim();
         if (url.startsWith('/uploads/')) {
-            return API_BASE_URL + url;
+            return BACKEND_URL + url;
         } else if (url.startsWith('uploads/')) {
-            return API_BASE_URL + '/' + url;
+            return BACKEND_URL + '/' + url;
         } else if (!url.startsWith('http')) {
             return UPLOADS_URL + url;
         }
@@ -123,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         } catch (error) {
             console.error('❌ Archive yüklənmə xətası:', error);
-            // API xətası olsa belə statik datanı silməyə bilərsən, və ya xəta mesajı verərsən
         }
     }
 
@@ -268,15 +267,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================================
-    // 7. VİDEO KONTROLLARI (Qısaldılmış)
+    // 7. VİDEO KONTROLLARI
     // ============================================================
     function initVideoControls() {
         const playPauseBtn = document.getElementById('playPauseBtn');
         const playIcon = document.getElementById('playIcon');
         const pauseIcon = document.getElementById('pauseIcon');
-        // ... Digər dəyişənlər ...
-
-        // Play/Pause UI Update
+        
         function updatePlayPauseButton() {
             if (videoEl.paused) {
                 if(playIcon) playIcon.style.display = 'block';
@@ -289,13 +286,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         videoEl.addEventListener('play', updatePlayPauseButton);
         videoEl.addEventListener('pause', updatePlayPauseButton);
-        
-        // Bu hissə çox uzun olduğu üçün qısaldıldı, əvvəlki kodunda olduğu kimidir,
-        // sadəcə konflikt yaratmaması üçün event listenerlərin təkrar yüklənmədiyinə əmin oluruq.
     }
-    initVideoControls(); // Kontrolları başlat
+    initVideoControls();
 
-    // Close Button
     if (closeBtn) closeBtn.addEventListener('click', closeVideoPreview);
     if (previewContainer) {
         previewContainer.addEventListener('click', function(e) {
@@ -310,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 8. NAVİGASİYA MƏNTİQİ (SADƏLƏŞDİRİLMİŞ)
+    // 8. NAVİGASİYA MƏNTİQİ
     // ============================================================
     function navigateWithTransition(href) {
         if (pageTransition) {
@@ -326,7 +319,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const href = btn.getAttribute('href');
             if (!href || href === '#') return;
             
-            // Sadə scroll linki deyilsə, keçid et
             if (!href.startsWith('#')) {
                 e.preventDefault();
                 navigateWithTransition(href);
@@ -343,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const navText = btn.querySelector('.nav-text');
         if (!navText) return;
         
-        // Əvvəlcədən spanlara böl ki, scramble işləsin
         navText.innerHTML = originalText.split('').map(char => `<span>${char}</span>`).join('');
         
         let interval = null;

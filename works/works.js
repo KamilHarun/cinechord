@@ -3,13 +3,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     // 0. API & GLOBAL VARS
     // ============================================================
-    // DİQQƏT: localhost Netlify-da işləməyəcək. Deploy edəndə bura əsl API linki lazımdır.
-    const API_BASE_URL = "http://localhost:8080"; 
-    const API_WORKS = `${API_BASE_URL}/admin/works/getAllWorks`; 
-    const UPLOADS_URL = `${API_BASE_URL}/uploads/`; 
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
+
+    const API_WORKS = `${BACKEND_URL}/admin/works/getAllWorks`; 
+    const UPLOADS_URL = `${BACKEND_URL}/uploads/`; 
+    
     const container = document.getElementById('dynamic-projects-grid');
     const pageTransition = document.querySelector('.page-transition');
-    const loadingScreen = document.querySelector('.loading-screen'); // Loader elementini tapırıq
+    const loadingScreen = document.querySelector('.loading-screen');
     
     const categoryMap = { 
         'FILM': 'films', 'COMMERCIAL': 'commercial', 'CLIP': 'clips',
@@ -39,28 +40,23 @@ document.addEventListener('DOMContentLoaded', function() {
     let activityTimeout = null;
     const INACTIVITY_DELAY = 2000; 
 
-    // --- NAVIGASIYA XƏTASINI DÜZƏLTMƏK ÜÇÜN KÖHNƏ KODU SİLDİM ---
-    // Artıq aktiv klassı HTML-də statik olaraq verilib.
-
     // ============================================================
     // 1. FLASH FIX & PAGE TRANSITION & LOADING SCREEN
     // ============================================================
     
-    // Page Transition
     if (pageTransition) {
         setTimeout(() => {
             pageTransition.classList.add('page-loaded'); 
         }, 100);
     }
 
-    // Loading Screen - Ən vacib hissə: Səhifə açılan kimi loaderi gizlədirik
     if (loadingScreen) {
         setTimeout(() => {
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
             }, 500);
-        }, 500); // 0.5 saniyə sonra gizlənir
+        }, 500);
     }
 
     // ============================================================
@@ -126,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-btn, .footer-link').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const href = btn.getAttribute('href');
-            // href="#" və ya boşdursa heç nə etmə
             if (!href || href === '#') {
                 e.preventDefault();
                 return;
@@ -134,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const linkPath = href.split('/').pop();
             const currentPath = window.location.pathname.split('/').pop();
-            if (linkPath === currentPath) return; // Eyni səhifədirsə yükləmə
+            if (linkPath === currentPath) return; 
 
             e.preventDefault();
             navigateWithTransition(href);
@@ -187,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadDynamicWorks() {
         if(!container) return;
         try {
-            // DİQQƏT: Netlify-da localhost API-yə qoşula bilməz!
             const response = await fetch(API_WORKS);
             if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
@@ -234,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             data-title="${work.title}" 
                             title="Fullscreen Preview">
                         </button>
-                        
                     </div>
                 `;
                 container.innerHTML += workHTML;
@@ -246,9 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
             attachHoverEffects();
         } catch (error) {
             console.error("Error loading works:", error);
-            // Xəta olsa belə manual olaraq bir neçə kart göstər (Demo məqsədli)
-            // Bu hissəni API işləyəndə silə bilərsən
-            container.innerHTML += '<p style="color:gray; text-align:center;">API connection failed (Localhost on Netlify)</p>';
+            container.innerHTML += '<p style="color:gray; text-align:center;">API connection failed</p>';
         }
     }
 
