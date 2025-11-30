@@ -1,11 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. API KONFİQURASİYASI
+    // 0. API KONFİQURASİYASI (PROXY UPDATED)
     // ============================================================
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
-    const API_WORKS = `${BACKEND_URL}/admin/works/getAllWorks`; 
-    const UPLOADS_URL = `${BACKEND_URL}/uploads/`; 
+    
+    // BACKEND_URL artıq lazım deyil (Proxy istifadə olunur)
+    const BACKEND_URL = ""; 
+    
+    // API birbaşa eyni domaindən çağırılır (/api/...)
+    // Diqqət: Sizin kodunuzda '/admin/works/getAllWorks' idi, amma Proxy '/api' ilə başlayır.
+    // Ona görə '/api/admin/works/getAllWorks' olmalıdır.
+    const API_WORKS = "/api/admin/works/getAllWorks"; 
+    
+    // Uploads qovluğu da eyni domaindən
+    const UPLOADS_URL = "/uploads/"; 
     
     // Backend Enum-larını Frontend-ə çevirmək
     const categoryTypeMap = { 
@@ -46,14 +54,16 @@ document.addEventListener('DOMContentLoaded', function() {
         return url.replace(/^\/uploads\//, ''); 
     }
 
-    // Tam video URL-i əldə etmək
+    // Tam video URL-i əldə etmək (PROXY UYĞUNLAŞDIRILDI)
     function getFullVideoUrl(videoUrl) {
         if (!videoUrl) return null;
         let url = videoUrl.trim();
+        
+        // Artıq BACKEND_URL yoxdur, birbaşa '/' istifadə edirik
         if (url.startsWith('/uploads/')) {
-            return BACKEND_URL + url;
+            return url; // Eyni domaindədir
         } else if (url.startsWith('uploads/')) {
-            return BACKEND_URL + '/' + url;
+            return '/' + url;
         } else if (!url.startsWith('http')) {
             return UPLOADS_URL + url;
         }
@@ -67,7 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!tableBody) return;
 
         try {
+            // Proxy vasitəsilə sorğu göndərilir
             const response = await fetch(API_WORKS);
+            
             if (!response.ok) throw new Error('Network response was not ok');
             
             const data = await response.json();

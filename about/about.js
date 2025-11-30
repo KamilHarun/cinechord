@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. FLASH FIX & CONFIG
+    // 0. FLASH FIX & CONFIG (PROXY UPDATED)
     // ============================================================
     const pageTransition = document.querySelector('.page-transition');
     if (pageTransition) {
@@ -10,9 +10,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
-    const ABOUT_API = BACKEND_URL + "/api/about/getAbout";
-    const UPLOADS_BASE = BACKEND_URL + "/uploads/";
+    // [DƏYİŞDİRİLDİ] Artıq uzun Railway URL-i yoxdur!
+    // Netlify _redirects faylı bütün '/api' sorğularını yönləndirəcək.
+    
+    // BACKEND_URL artıq lazım deyil, boş qoyuruq ki, kod xəta verməsin (əgər aşağıda istifadə olunubsa).
+    const BACKEND_URL = ""; 
+    
+    // API birbaşa eyni domaindən çağırılır
+    const ABOUT_API = "/api/about/getAbout";
+    
+    // Uploads qovluğu da eyni domaindən (proxy ilə)
+    const UPLOADS_BASE = "/uploads/";
 
     // ============================================================
     // 1. HAMBURGER MENU (MOBILE)
@@ -219,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     async function loadAboutData() {
         try {
+            // BACKEND_URL olmadan, nisbi yol ilə çağırırıq:
             const res = await fetch(ABOUT_API);
             if (!res.ok) {
                 console.error(`HTTP Error! Status: ${res.status}`);
@@ -231,13 +240,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const video = document.getElementById('about-video');
             if (video && data.videoUrl) {
                 let videoUrl = data.videoUrl.trim();
+                
+                // Video yollarını təmizləyirik
                 if (videoUrl.startsWith('/uploads/')) {
-                    videoUrl = BACKEND_URL + videoUrl;
+                    videoUrl = videoUrl; // Artıq eyni domaindir, dəyişməyə ehtiyac yoxdur
                 } else if (videoUrl.startsWith('uploads/')) {
-                    videoUrl = BACKEND_URL + '/' + videoUrl;
+                    videoUrl = '/' + videoUrl;
                 } else if (!videoUrl.startsWith('http')) {
                     videoUrl = UPLOADS_BASE + data.videoUrl;
                 }
+                
                 video.querySelector('source').src = videoUrl;
                 video.load();
                 video.play().catch(err => console.log('Video autoplay error:', err));

@@ -1,9 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. FLASH FIX & CONFIG
+    // 0. FLASH FIX & CONFIG (PROXY UPDATED)
     // ============================================================
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
+    
+    // BACKEND_URL artıq lazım deyil (Proxy istifadə olunur)
+    const BACKEND_URL = ""; 
+    
     const pageTransition = document.querySelector('.page-transition');
     if (pageTransition) {
         setTimeout(() => {
@@ -144,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 7. FORM SUBMISSION
+    // 7. FORM SUBMISSION (PROXY UPDATED)
     // ============================================================
     const form = document.getElementById('contactForm');
     if (form) {
@@ -168,8 +171,8 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             try {
-                // ✅ DÜZƏLİŞ: Localhost silindi, Railway yazıldı
-                const response = await fetch(`${BACKEND_URL}/api/createMessage`, {
+                // [DÜZƏLİŞ] Birbaşa nisbi (relative) yol istifadə olunur
+                const response = await fetch('/api/createMessage', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)

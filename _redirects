@@ -1,0 +1,4 @@
+# Netlify Proxy Ayarları
+# Frontend-dən gələn /api/ istəklərini Railway-ə yönləndirir (Status 200 = Proxy)
+
+/api/* https://cinechord-admin-production.up.railway.app/api/:splat  200

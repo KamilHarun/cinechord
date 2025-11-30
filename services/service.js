@@ -112,11 +112,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // ============================================================
-    // 4. LOAD SERVICES (Dynamic Sections)
+    // 4. LOAD SERVICES (Dynamic Sections - PROXY UPDATED)
     // ============================================================
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
-    const SERVICES_API = BACKEND_URL + "/admin/services/getAll"; 
-    const UPLOADS_BASE = BACKEND_URL + "/uploads/";
+    
+    // BACKEND_URL artıq lazım deyil (Proxy istifadə olunur)
+    const BACKEND_URL = ""; 
+    
+    const SERVICES_API = "/api/admin/services/getAll"; 
+    const UPLOADS_BASE = "/uploads/";
+    
     const ICONS = { "COMMERCIAL SHOOTING": "fa-shopping-cart", "FILM SHOOTING": "fa-film", "DOCUMENTARY": "fa-video", "MUSIC VIDEOS": "fa-clapperboard" };
 
     async function loadServices() {
@@ -136,8 +140,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 let videoUrl = null;
                 if (service.videoUrl && service.videoUrl.trim() !== "") {
                     let rawUrl = service.videoUrl.trim();
-                    if (rawUrl.startsWith('/uploads/')) videoUrl = BACKEND_URL + rawUrl;
-                    else if (rawUrl.startsWith('uploads/')) videoUrl = BACKEND_URL + '/' + rawUrl;
+                    if (rawUrl.startsWith('/uploads/')) videoUrl = rawUrl; // Proxy
+                    else if (rawUrl.startsWith('uploads/')) videoUrl = '/' + rawUrl;
                     else videoUrl = UPLOADS_BASE + rawUrl;
                 }
 
