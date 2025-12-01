@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ============================================================
-    // 4. SERVİSİ SİL (DÜZƏLDILMIŞ)
+    // 4. SERVİSİ SİL
     // ============================================================
     window.deleteService = async function(id) {
         if (!confirm('Bu xidməti silmək istədiyinizdən əminsiniz?')) {
@@ -109,14 +109,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (response.ok || response.status === 204) {
                 alert('Xidmət silindi!');
-                // DOM-dan elementi sil
                 const element = document.getElementById(`service-${id}`);
                 if (element) {
                     element.remove();
                 }
             } else {
-                const error = await response.text();
-                alert(`Xəta: ${error}`);
+                alert('Xəta baş verdi!');
             }
         } catch (error) {
             console.error('Silmə xətası:', error);
@@ -159,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // 6. SERVİS YENİLƏMƏ
     // ============================================================
     window.editService = async function(id) {
-        // Əvvəlcə servisi yüklə
         try {
             const response = await fetch(`${API_BASE}/admin/services/getAll`, {
                 headers: { 'Authorization': `Bearer ${getToken()}` }
@@ -172,8 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // Modal və ya edit formu aç (sizin HTML strukturunuza görə)
-            // Burada sadə prompt istifadə edirəm
             const newTitle = prompt('Yeni başlıq:', service.title);
             if (!newTitle) return;
 
@@ -201,14 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================================================
     // 7. İLKİN YÜKLƏMƏ
     // ============================================================
-    // Əgər dashboard səhifəsindəsə, servislər yüklənsin
     if (document.getElementById('servicesList')) {
         loadServices();
-    }
-
-    // Token yoxlaması - əgər yoxdursa login səhifəsinə yönləndir
-    const currentPage = window.location.pathname;
-    if (!getToken() && !currentPage.includes('index.html') && currentPage !== '/') {
-        window.location.href = 'index.html';
     }
 });
