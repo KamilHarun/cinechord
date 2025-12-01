@@ -1,13 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. FLASH FIX & CONFIG (PROXY UPDATED)
+    // 0. GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU)
     // ============================================================
     
-    // BACKEND_URL artıq lazım deyil (Proxy istifadə olunur)
-    const BACKEND_URL = ""; 
+    // Backend URL-i birbaşa Railway-ə yönləndirilir
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     
+    // Contact mesajı yaratmaq üçün API yolu (PublicApiController-dədir)
+    const CONTACT_API = `${BACKEND_URL}/api/createMessage`; 
+    
+    // Yerdə qalan DOM elementləri
     const pageTransition = document.querySelector('.page-transition');
+    
     if (pageTransition) {
         setTimeout(() => {
              pageTransition.classList.add('page-loaded'); 
@@ -99,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!href || href === '#' || href.startsWith('#')) return;
             
             // Eyni səhifə
-            if (href === window.location.pathname.split('/').pop()) return;
+            if (href.split('/').pop() === window.location.pathname.split('/').pop()) return;
             
             e.preventDefault();
             navigateWithTransition(href);
@@ -147,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 7. FORM SUBMISSION (PROXY UPDATED)
+    // 7. FORM SUBMISSION (BİRBAŞA SORĞU İLƏ YENİLƏNDİ)
     // ============================================================
     const form = document.getElementById('contactForm');
     if (form) {
@@ -171,8 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             try {
-                // [DÜZƏLİŞ] Birbaşa nisbi (relative) yol istifadə olunur
-                const response = await fetch('/api/createMessage', {
+                // FETCH API-ni birbaşa tam URL ilə çağırırıq:
+                const response = await fetch(CONTACT_API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
@@ -183,12 +188,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     visibleSpan.textContent = 'MESSAGE SENT!';
                     btnTextContainer.setAttribute('data-text', 'MESSAGE SENT!');
                     form.reset(); 
+                    
                     setTimeout(() => {
                         visibleSpan.textContent = originalText;
                         btnTextContainer.setAttribute('data-text', originalText);
                     }, 3000);
                 } else {
-                    throw new Error('Server cavabı uğursuz oldu');
+                    // Əgər 400 və ya 500 gələrsə
+                    const errorData = await response.text();
+                    console.error('Server Xətası:', response.status, errorData);
+                    throw new Error(`Server cavabı uğursuz oldu: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Fetch Xətası:', error);

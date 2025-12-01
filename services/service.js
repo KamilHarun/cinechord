@@ -1,16 +1,25 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. FLASH FIX
+    // 0. GLOBAL VARS (YENİ QOŞULMA STRUKTURU)
     // ============================================================
+    
+    // Backend URL-i birbaşa Railway-ə yönləndirilir
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app"; 
+    
+    // API Public Controller-ə yönləndirilir: /api/service (PublicApiController)
+    const SERVICES_API = `${BACKEND_URL}/api/service`; 
+    
+    // Uploads qovluğu da eyni backend-dən
+    const UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
+    
+    // Yerdə qalan DOM elementləri
     const pageTransition = document.querySelector('.page-transition');
     
-    if (pageTransition) {
-        setTimeout(() => {
-             pageTransition.classList.add('page-loaded'); 
-        }, 100);
-    }
-    
+    // ICONS (dəyişmədi)
+    const ICONS = { "COMMERCIAL SHOOTING": "fa-shopping-cart", "FILM SHOOTING": "fa-film", "DOCUMENTARY": "fa-video", "MUSIC VIDEOS": "fa-clapperboard" };
+
+
     // ============================================================
     // 1. NAVBAR & LOGO SCROLL LOGIC
     // ============================================================
@@ -83,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Nav Scramble Effect
+    // Nav Scramble Effect (Mətn Dəyişmə)
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     document.querySelectorAll('.nav-btn').forEach(btn => {
         const originalText = btn.getAttribute('data-text');
@@ -112,27 +121,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // ============================================================
-    // 4. LOAD SERVICES (Dynamic Sections - PROXY UPDATED)
+    // 4. LOAD SERVICES (Dynamic Sections)
     // ============================================================
     
-    // BACKEND_URL artıq lazım deyil (Proxy istifadə olunur)
-    const BACKEND_URL = ""; 
-    
-    const SERVICES_API = "/api/admin/services/getAll"; 
-    const UPLOADS_BASE = "/uploads/";
-    
-    const ICONS = { "COMMERCIAL SHOOTING": "fa-shopping-cart", "FILM SHOOTING": "fa-film", "DOCUMENTARY": "fa-video", "MUSIC VIDEOS": "fa-clapperboard" };
+    // URL-i təmizləyən funksiya (ehtiyac varsa)
+    function cleanUrlPath(url) {
+        if (url && typeof url === 'string') {
+            // Əgər URL tam yoldursa, onu olduğu kimi qaytarırıq (artıq BACKEND_URL-i özündə saxlayır)
+            if (url.startsWith('http')) return url; 
+            
+            // Əgər sadəcə fayl adı və ya uploads yolu varsa, onu təmizləyirik
+            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length); 
+            if (url.startsWith('uploads/')) return url.substring('uploads/'.length);
+            
+        }
+        return url;
+    }
 
     async function loadServices() {
         const container = document.getElementById("services-dynamic");
         if (!container) return;
 
         try {
-            const res = await fetch(SERVICES_API);
-            if (!res.ok) { console.error(`HTTP Error! Status: ${res.status}`); return; }
+            // API çağırışı indi tam URL-ə gedir: https://...railway.app/api/service
+            const res = await fetch(SERVICES_API); 
+            
+            if (!res.ok) { 
+                console.error(`HTTP Error! Status: ${res.status}`); 
+                container.innerHTML = '<p style="color:red; text-align:center;">Xidmətlər yüklənə bilmədi.</p>';
+                return; 
+            }
 
-            const services = await res.json();
-            if (!Array.isArray(services)) { console.error("Fetched data is not an array:", services); return; }
+            const pageData = await res.json();
+            const services = pageData.content ? pageData.content : pageData; // Pageable və ya List?
+
+            if (!Array.isArray(services)) { 
+                console.error("Fetched data is not an array:", services); 
+                return; 
+            }
 
             const fragment = document.createDocumentFragment();
 
@@ -140,9 +166,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 let videoUrl = null;
                 if (service.videoUrl && service.videoUrl.trim() !== "") {
                     let rawUrl = service.videoUrl.trim();
-                    if (rawUrl.startsWith('/uploads/')) videoUrl = rawUrl; // Proxy
-                    else if (rawUrl.startsWith('uploads/')) videoUrl = '/' + rawUrl;
-                    else videoUrl = UPLOADS_BASE + rawUrl;
+                    let cleanedUrl = cleanUrlPath(rawUrl); // Düzgün yolu təmizləyirik
+                    
+                    // Tam URL-i qururuq
+                    videoUrl = UPLOADS_BASE + cleanedUrl; 
                 }
 
                 const iconClass = ICONS[service.title] || "fa-star";
@@ -154,12 +181,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const leftVideo = (index % 2 === 0 && videoUrl) ? `
                     <div class="media-column"><div class="media-container"><div class="media-frame">
-                    <video class="media-content" autoplay muted loop playsinline><source src="${videoUrl}" type="video/mp4"></video>
+                    <video class="media-content" autoplay muted loop playsinline src="${videoUrl}" type="video/mp4"></video>
                     </div></div></div>` : "";
 
                 const rightVideo = (index % 2 === 1 && videoUrl) ? `
                     <div class="media-column"><div class="media-container"><div class="media-frame">
-                    <video class="media-content" autoplay muted loop playsinline><source src="${videoUrl}" type="video/mp4"></video>
+                    <video class="media-content" autoplay muted loop playsinline src="${videoUrl}" type="video/mp4"></video>
                     </div></div></div>` : "";
 
                 section.innerHTML = `
@@ -183,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             container.appendChild(fragment);
             
+            // Scroll Reveal və Navigasiyanı yeni elementlərə tətbiq etmək
             requestAnimationFrame(() => {
                 const newSections = container.querySelectorAll('.page-wrapper.reveal-item');
                 newSections.forEach(el => observer.observe(el));
@@ -197,7 +225,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
-        } catch (err) { console.error("Failed to load services:", err); }
+        } catch (err) { 
+            console.error("Failed to load services:", err);
+            container.innerHTML = `<p style="color:red; text-align:center;">Servislər yüklənərkən xəta baş verdi: ${err.message}</p>`; 
+        }
     }
 
     loadServices();

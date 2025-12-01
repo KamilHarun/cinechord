@@ -1,27 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. FLASH FIX & CONFIG (PROXY UPDATED)
+    // 0. GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU)
     // ============================================================
+    
+    // Backend URL-i birbaşa Railway-ə yönləndirilir
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app"; 
+    
+    // API Public Controller-ə yönləndirilir: /api/about/getAbout
+    const ABOUT_API = `${BACKEND_URL}/api/about/getAbout`;
+    
+    // Uploads qovluğu da eyni backend-dən
+    const UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
+
+    // Yerdə qalan DOM elementləri
     const pageTransition = document.querySelector('.page-transition');
     if (pageTransition) {
         setTimeout(() => {
              pageTransition.classList.add('page-loaded'); 
         }, 100);
     }
-
-    // [DƏYİŞDİRİLDİ] Artıq uzun Railway URL-i yoxdur!
-    // Netlify _redirects faylı bütün '/api' sorğularını yönləndirəcək.
     
-    // BACKEND_URL artıq lazım deyil, boş qoyuruq ki, kod xəta verməsin (əgər aşağıda istifadə olunubsa).
-    const BACKEND_URL = ""; 
-    
-    // API birbaşa eyni domaindən çağırılır
-    const ABOUT_API = "/api/about/getAbout";
-    
-    // Uploads qovluğu da eyni domaindən (proxy ilə)
-    const UPLOADS_BASE = "/uploads/";
-
     // ============================================================
     // 1. HAMBURGER MENU (MOBILE)
     // ============================================================
@@ -94,9 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. NAVBAR & LOGO SCROLL LOGIC
     // ============================================================
     let lastScroll = 0;
-    const navbar = document.querySelector('.header');
-    const logo = document.querySelector('.center-logo');
-    
+    // Header və logo elementlərini yuxarıda təyin etmişik.
     const scrollContainer = document.querySelector('.content-section') || window; 
 
     setTimeout(() => { if (logo) logo.classList.add('entry-done'); }, 500);
@@ -106,9 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Hide navbar on scroll down, show on scroll up
         if (currentScroll > lastScroll && currentScroll > 50) {
-            if (navbar) navbar.style.transform = 'translateY(-100%)';
+            if (header) header.style.transform = 'translateY(-100%)'; // header (navbar) istifadə olunur
         } else {
-            if (navbar) navbar.style.transform = 'translateY(0)';
+            if (header) header.style.transform = 'translateY(0)';
         }
 
         // Hide logo on scroll
@@ -162,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const href = btn.getAttribute('href');
                 if (!href || href === '#' || href.startsWith('#')) return;
                 
+                // Eyni səhifə
                 if (href === window.location.pathname.split('/').pop()) return;
                 
                 e.preventDefault();
@@ -223,12 +221,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================================
-    // 7. LOAD ABOUT DATA (BACKEND)
+    // 7. LOAD ABOUT DATA (BACKEND - YENİLƏNDİ)
     // ============================================================
     async function loadAboutData() {
         try {
-            // BACKEND_URL olmadan, nisbi yol ilə çağırırıq:
-            const res = await fetch(ABOUT_API);
+            // BACKEND_URL ilə tam yolu çağırırıq:
+            const res = await fetch(ABOUT_API); 
+            
             if (!res.ok) {
                 console.error(`HTTP Error! Status: ${res.status}`);
                 return;
@@ -242,12 +241,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 let videoUrl = data.videoUrl.trim();
                 
                 // Video yollarını təmizləyirik
-                if (videoUrl.startsWith('/uploads/')) {
-                    videoUrl = videoUrl; // Artıq eyni domaindir, dəyişməyə ehtiyac yoxdur
-                } else if (videoUrl.startsWith('uploads/')) {
-                    videoUrl = '/' + videoUrl;
-                } else if (!videoUrl.startsWith('http')) {
-                    videoUrl = UPLOADS_BASE + data.videoUrl;
+                if (!videoUrl.startsWith('http')) {
+                    // Yolu təmizləmək lazımdırsa, UPLOADS_BASE istifadə edirik
+                    let cleanedUrl = videoUrl.replace(/^\/uploads\//, '').replace(/^uploads\//, '');
+                    videoUrl = UPLOADS_BASE + cleanedUrl;
                 }
                 
                 video.querySelector('source').src = videoUrl;

@@ -1,19 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. API KONFİQURASİYASI (PROXY UPDATED)
+    // 0. API KONFİQURASİYASI (BİRBAŞA BACKEND-Ə SORĞU)
     // ============================================================
     
-    // BACKEND_URL artıq lazım deyil (Proxy istifadə olunur)
-    const BACKEND_URL = ""; 
+    // Backend URL-i birbaşa Railway-ə yönləndirilir
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     
-    // API birbaşa eyni domaindən çağırılır (/api/...)
-    // Diqqət: Sizin kodunuzda '/admin/works/getAllWorks' idi, amma Proxy '/api' ilə başlayır.
-    // Ona görə '/api/admin/works/getAllWorks' olmalıdır.
-    const API_WORKS = "/api/admin/works/getAllWorks"; 
+    // API Public Controller-ə yönləndirilir: /api/archive (PublicApiController)
+    const API_WORKS = `${BACKEND_URL}/api/archive`; 
     
-    // Uploads qovluğu da eyni domaindən
-    const UPLOADS_URL = "/uploads/"; 
+    // Uploads qovluğu da eyni backend-dən
+    const UPLOADS_URL = `${BACKEND_URL}/uploads/`; 
     
     // Backend Enum-larını Frontend-ə çevirmək
     const categoryTypeMap = { 
@@ -51,23 +49,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // URL-i təmizləmək
     function cleanUrlPath(url) {
         if (!url || typeof url !== 'string') return url;
-        return url.replace(/^\/uploads\//, ''); 
+        
+        // Əgər tam URL-dirsə, olduğu kimi saxla
+        if (url.startsWith('http')) return url;
+        
+        // Əgər /uploads/ ilə başlayırsa, təmizlə
+        return url.replace(/^\/uploads\//, '').replace(/^uploads\//, '');
     }
 
-    // Tam video URL-i əldə etmək (PROXY UYĞUNLAŞDIRILDI)
+    // Tam video URL-i əldə etmək
     function getFullVideoUrl(videoUrl) {
         if (!videoUrl) return null;
         let url = videoUrl.trim();
         
-        // Artıq BACKEND_URL yoxdur, birbaşa '/' istifadə edirik
-        if (url.startsWith('/uploads/')) {
-            return url; // Eyni domaindədir
-        } else if (url.startsWith('uploads/')) {
-            return '/' + url;
-        } else if (!url.startsWith('http')) {
-            return UPLOADS_URL + url;
-        }
-        return url;
+        // Əgər tam URL-dirsə, geri qaytar
+        if (url.startsWith('http')) return url;
+
+        // Təmizlə, sonra Uploads URL ilə birləşdir
+        let cleanedUrl = cleanUrlPath(url);
+        return UPLOADS_URL + cleanedUrl;
     }
 
     // ============================================================
@@ -77,10 +77,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!tableBody) return;
 
         try {
-            // Proxy vasitəsilə sorğu göndərilir
+            // API sorğusu göndərilir: https://...railway.app/api/archive
             const response = await fetch(API_WORKS);
             
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) {
+                console.error(`HTTP Error! Status: ${response.status}`);
+                throw new Error('Archive data API response was not ok');
+            }
             
             const data = await response.json();
             const works = data.content ? data.content : data;
@@ -135,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         } catch (error) {
             console.error('❌ Archive yüklənmə xətası:', error);
+            tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 60px 20px; color: red;">Verilənlər bazasına qoşulma uğursuz oldu.</td></tr>`;
         }
     }
 
@@ -211,6 +215,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 30);
                 });
             });
+
+            // MOUSELEAVE: Scramble effekti dayandırmaq
+            row.addEventListener('mouseleave', function() {
+                const cells = this.querySelectorAll('td:not(.number-col)');
+                cells.forEach(cell => {
+                    // Timeout-ları təmizləmək lazımdır, lakin JS-də bu çətindir, ona görə dərhal təmizləyirik.
+                    // Sadəcə mətnin orijinal halına qayıtmasını təmin edirik.
+                    const originalText = cell.getAttribute('data-original') || '';
+                    const spans = cell.querySelectorAll('span');
+                    spans.forEach((span, index) => {
+                        span.textContent = originalText[index] || '';
+                    });
+                });
+            });
+
 
             // CLICK: Video açmaq
             row.addEventListener('click', function() {
@@ -338,8 +357,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Nav Scramble
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-@#$%&*';
+    // Nav Scramble (Mətn Dəyişmə)
+    const letters_scramble = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-@#$%&*'; // Yeni dəyişən adı
     document.querySelectorAll('.nav-btn').forEach(btn => {
         const originalText = btn.getAttribute('data-text');
         if (!originalText) return;
@@ -362,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (index < iteration) {
                         span.textContent = originalText[index];
                     } else {
-                        span.textContent = letters[Math.floor(Math.random() * letters.length)];
+                        span.textContent = letters_scramble[Math.floor(Math.random() * letters_scramble.length)];
                     }
                 });
                 iteration += 0.33;
