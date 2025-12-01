@@ -1,27 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU VƏ LOCAL DƏSTƏYİ)
+    // 0. GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU)
     // ============================================================
     
-    let BACKEND_URL;
-    let UPLOADS_BASE;
-    
-    // Əgər kod localda (localhost, 127.0.0.1) işləyirsə, local serveri istifadə et
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        BACKEND_URL = "http://localhost:8080"; // Local Spring Boot default portu
-    } else {
-        // Əks halda, deploy olunmuş serveri istifadə et
-        BACKEND_URL = "https://cinechord-admin-production.up.railway.app"; 
-    }
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     
     // API Public Controller-ə yönləndirilir
     const SERVICES_API = `${BACKEND_URL}/api/service`; 
     
     // Uploads qovluğu da eyni backend-dən
-    UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
+    const UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
     
-    // Yerdə qalan DOM elementləri
+    // DOM elementləri
     const pageTransition = document.querySelector('.page-transition');
     
     // ICONS (dəyişmədi)
@@ -155,30 +146,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
+            console.log('API sorğusu göndərilir:', SERVICES_API);
+            
             // API çağırışı
             const res = await fetch(SERVICES_API); 
             
+            console.log('Response status:', res.status);
+            
             if (!res.ok) { 
-                console.error(`HTTP Error! Status: ${res.status}`); 
-                container.innerHTML = `<p style="color:red; text-align:center;">API-dən xəta alındı: Status ${res.status}</p>`;
-                return; 
+                throw new Error(`HTTP Error! Status: ${res.status}`); 
             }
 
             const responseData = await res.json();
-            console.log("API cavabı:", responseData); // Debug üçün
+            console.log("API cavabı:", responseData);
             
             // ✅ Paginated struktur handle edilməsi (Spring Data Page)
             let services;
             if (responseData.content && Array.isArray(responseData.content)) {
-                // Backend Page<ServiceResponseDto> qaytarır
                 services = responseData.content;
             } else if (Array.isArray(responseData)) {
-                // Əgər sadə array göndərilsə
                 services = responseData;
             } else {
-                console.error("Gözlənilməz data strukturu:", responseData); 
-                container.innerHTML = '<p style="color:red; text-align:center;">API-dən səhv format gəldi.</p>';
-                return; 
+                throw new Error("Gözlənilməz data strukturu"); 
             }
 
             // Əgər heç bir servis yoxdursa
@@ -188,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return; 
             }
 
-            console.log(`${services.length} servis yükləndi`); // Debug
+            console.log(`${services.length} servis yükləndi`);
 
             const fragment = document.createDocumentFragment();
 
@@ -200,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Tam URL-i qururuq
                     videoUrl = UPLOADS_BASE + cleanedUrl; 
-                    console.log(`Video URL [${service.title}]:`, videoUrl); // Debug
+                    console.log(`Video URL [${service.title}]:`, videoUrl);
                 }
 
                 const iconClass = ICONS[service.title] || "fa-star";
@@ -212,12 +201,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const leftVideo = (index % 2 === 0 && videoUrl) ? `
                     <div class="media-column"><div class="media-container"><div class="media-frame">
-                    <video class="media-content" autoplay muted loop playsinline src="${videoUrl}" type="video/mp4"></video>
+                    <video class="media-content" autoplay muted loop playsinline crossorigin="anonymous" src="${videoUrl}" type="video/mp4"></video>
                     </div></div></div>` : "";
 
                 const rightVideo = (index % 2 === 1 && videoUrl) ? `
                     <div class="media-column"><div class="media-container"><div class="media-frame">
-                    <video class="media-content" autoplay muted loop playsinline src="${videoUrl}" type="video/mp4"></video>
+                    <video class="media-content" autoplay muted loop playsinline crossorigin="anonymous" src="${videoUrl}" type="video/mp4"></video>
                     </div></div></div>` : "";
 
                 section.innerHTML = `
@@ -258,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (err) { 
             console.error("Servislər yüklənərkən xəta:", err);
-            container.innerHTML = `<p style="color:red; text-align:center;">Servislər yüklənərkən xəta baş verdi: ${err.message}</p>`; 
+            container.innerHTML = `<p style="color:red; text-align:center;">Servislər yüklənərkən xəta baş verdi: ${err.message}<br><small>URL: ${SERVICES_API}</small></p>`; 
         }
     }
 
@@ -270,5 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Servislər yüklənsin
+    console.log('Servislər yüklənməyə başlayır...');
     loadServices();
 });
