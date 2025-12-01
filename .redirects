@@ -1,4 +1,8 @@
-# Netlify Proxy Ayarları
-# Frontend-dən gələn /api/ istəklərini Railway-ə yönləndirir (Status 200 = Proxy)
+# API sorğuları – /api/... olduğu kimi göndərilir
+/api/*   https://cinechord-admin-production.up.railway.app/api/:splat   200
 
-/api/* https://cinechord-admin-production.up.railway.app/api/:splat  200
+# Uploads – eynilə saxlanır
+/uploads/*   https://cinechord-admin-production.up.railway.app/uploads/:splat   200
+
+# SPA router – sonuncu rule
+/*    /index.html   200

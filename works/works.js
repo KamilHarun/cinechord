@@ -1,12 +1,18 @@
+// works.js - Tam Yenilənmiş Versiya (Backend-ə birbaşa sorğu)
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. API & GLOBAL VARS
+    // 0. API & GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU)
     // ============================================================
+    
+    // Backend URL-i birbaşa Railway-ə yönləndirilir
     const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
 
-    const API_WORKS = `${BACKEND_URL}/admin/works/getAllWorks`; 
-    const UPLOADS_URL = `${BACKEND_URL}/uploads/`; 
+    // API yolları tam URL ilə
+    const API_WORKS = `${BACKEND_URL}/api/works`;
+    
+    // Uploads qovluğu da eyni backend-dən
+    const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
     
     const container = document.getElementById('dynamic-projects-grid');
     const pageTransition = document.querySelector('.page-transition');
@@ -173,18 +179,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function cleanUrlPath(url) {
         if (url && typeof url === 'string') {
-            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length); 
-            if (!url.startsWith('http') && url.includes('.')) return url;
+            // Əgər URL tam yolsa (http ilə başlayırsa), onu olduğu kimi qaytarırıq
+            if (url.startsWith('http')) return url;
+            
+            // Əgər /uploads/ ilə başlayırsa, onu təmizləyirik
+            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
+            
+            // Əgər sadəcə fayl adıdırsa, olduğu kimi qaytarırıq
+            if (!url.startsWith('/') && url.includes('.')) return url;
         }
         return url;
     }
 
     async function loadDynamicWorks() {
         if(!container) return;
+        
         try {
+            console.log('API sorğusu göndərilir:', API_WORKS);
+            
             const response = await fetch(API_WORKS);
-            if (!response.ok) throw new Error('Network response was not ok');
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+            }
+            
             const data = await response.json();
+            console.log('API cavabı alındı:', data);
+            
             const works = data.content ? data.content : data;
             container.innerHTML = ''; 
 
@@ -196,14 +219,25 @@ document.addEventListener('DOMContentLoaded', function() {
             works.forEach((work, index) => {
                 let videoSrc = work.previewVideoUrl || work.videoUrl;
                 let imageSrc = work.imageUrl;
+                
+                // Video URL-ini düzəldirik
                 if (videoSrc) {
                     videoSrc = cleanUrlPath(videoSrc);
-                    if (!videoSrc.startsWith('http')) videoSrc = UPLOADS_URL + videoSrc;
+                    if (!videoSrc.startsWith('http')) {
+                        videoSrc = UPLOADS_URL + videoSrc;
+                    }
                 }
+                
+                // Şəkil URL-ini düzəldirik
                 if (imageSrc) {
                     imageSrc = cleanUrlPath(imageSrc);
-                    if (!imageSrc.startsWith('http')) imageSrc = UPLOADS_URL + imageSrc;
+                    if (!imageSrc.startsWith('http')) {
+                        imageSrc = UPLOADS_URL + imageSrc;
+                    }
                 }
+                
+                console.log('Work yüklənir:', work.title, 'Video:', videoSrc, 'Image:', imageSrc);
+                
                 const categoryClass = categoryMap[work.category] || 'other';
                 
                 const workHTML = `
@@ -233,13 +267,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 container.innerHTML += workHTML;
             });
             
+            console.log(`${works.length} work yükləndi`);
+            
             const newCards = container.querySelectorAll('.project-card');
             newCards.forEach(card => observer.observe(card));
 
             attachHoverEffects();
+            
         } catch (error) {
             console.error("Error loading works:", error);
-            container.innerHTML += '<p style="color:gray; text-align:center;">API connection failed</p>';
+            container.innerHTML = `
+                <p style="color:red; text-align:center; margin-top:50px;">
+                    API connection failed: ${error.message}<br>
+                    <small>Trying to connect to: ${API_WORKS}</small>
+                </p>
+            `;
         }
     }
 
@@ -298,6 +340,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function openModal(videoSrc, title) {
         if (!videoSrc) return;
+        
+        console.log('Modal açılır:', title, videoSrc);
         
         if(previewTitleEl) {
             previewTitleEl.textContent = title;
@@ -478,5 +522,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Yükləməni başlat
+    console.log('Works yüklənməyə başlayır...');
     loadDynamicWorks();
 });
