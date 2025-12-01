@@ -1,17 +1,25 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. GLOBAL VARS (YENİ QOŞULMA STRUKTURU)
+    // 0. GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU VƏ LOCAL DƏSTƏYİ)
     // ============================================================
     
-    // Backend URL-i birbaşa Railway-ə yönləndirilir
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app"; 
+    let BACKEND_URL;
+    let UPLOADS_BASE;
     
-    // API Public Controller-ə yönləndirilir: /api/service (PublicApiController)
+    // Əgər kod localda (localhost, 127.0.0.1) işləyirsə, local serveri istifadə et
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        BACKEND_URL = "http://localhost:8080"; // Local Spring Boot default portu
+    } else {
+        // Əks halda, deploy olunmuş serveri istifadə et
+        BACKEND_URL = "https://cinechord-admin-production.up.railway.app"; 
+    }
+    
+    // API Public Controller-ə yönləndirilir
     const SERVICES_API = `${BACKEND_URL}/api/service`; 
     
     // Uploads qovluğu da eyni backend-dən
-    const UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
+    UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
     
     // Yerdə qalan DOM elementləri
     const pageTransition = document.querySelector('.page-transition');
@@ -22,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
     // 1. NAVBAR & LOGO SCROLL LOGIC
+    // ... (Qalan kod dəyişmir) ...
     // ============================================================
     let lastScroll = 0;
     const navbar = document.querySelector('.header');
@@ -127,13 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // URL-i təmizləyən funksiya (ehtiyac varsa)
     function cleanUrlPath(url) {
         if (url && typeof url === 'string') {
-            // Əgər URL tam yoldursa, onu olduğu kimi qaytarırıq (artıq BACKEND_URL-i özündə saxlayır)
             if (url.startsWith('http')) return url; 
-            
-            // Əgər sadəcə fayl adı və ya uploads yolu varsa, onu təmizləyirik
             if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length); 
             if (url.startsWith('uploads/')) return url.substring('uploads/'.length);
-            
         }
         return url;
     }
@@ -143,20 +148,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!container) return;
 
         try {
-            // API çağırışı indi tam URL-ə gedir: https://...railway.app/api/service
+            // API çağırışı tam URL-ə gedir
             const res = await fetch(SERVICES_API); 
             
             if (!res.ok) { 
                 console.error(`HTTP Error! Status: ${res.status}`); 
-                container.innerHTML = '<p style="color:red; text-align:center;">Xidmətlər yüklənə bilmədi.</p>';
+                container.innerHTML = `<p style="color:red; text-align:center;">API-dən xəta alındı: Status ${res.status}</p>`;
                 return; 
             }
 
             const pageData = await res.json();
-            const services = pageData.content ? pageData.content : pageData; // Pageable və ya List?
+            
+            // Düzəliş: Yalnız 'content' arrayini götürün
+            const services = pageData.content; 
 
-            if (!Array.isArray(services)) { 
-                console.error("Fetched data is not an array:", services); 
+            if (!services || !Array.isArray(services)) { 
+                console.error("Fetched data is not an array:", pageData); 
+                container.innerHTML = '<p style="color:red; text-align:center;">API-dən boş və ya səhv data formatı gəldi.</p>';
                 return; 
             }
 
@@ -166,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let videoUrl = null;
                 if (service.videoUrl && service.videoUrl.trim() !== "") {
                     let rawUrl = service.videoUrl.trim();
-                    let cleanedUrl = cleanUrlPath(rawUrl); // Düzgün yolu təmizləyirik
+                    let cleanedUrl = cleanUrlPath(rawUrl);
                     
                     // Tam URL-i qururuq
                     videoUrl = UPLOADS_BASE + cleanedUrl; 
@@ -231,5 +239,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    if (pageTransition) {
+        setTimeout(() => {
+             pageTransition.classList.add('page-loaded'); 
+        }, 100);
+    }
+    
     loadServices();
 });
