@@ -25,12 +25,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageTransition = document.querySelector('.page-transition');
     
     // ICONS (dəyişmədi)
-    const ICONS = { "COMMERCIAL SHOOTING": "fa-shopping-cart", "FILM SHOOTING": "fa-film", "DOCUMENTARY": "fa-video", "MUSIC VIDEOS": "fa-clapperboard" };
+    const ICONS = { 
+        "COMMERCIAL SHOOTING": "fa-shopping-cart", 
+        "FILM SHOOTING": "fa-film", 
+        "DOCUMENTARY": "fa-video", 
+        "MUSIC VIDEOS": "fa-clapperboard" 
+    };
 
 
     // ============================================================
     // 1. NAVBAR & LOGO SCROLL LOGIC
-    // ... (Qalan kod dəyişmir) ...
     // ============================================================
     let lastScroll = 0;
     const navbar = document.querySelector('.header');
@@ -133,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 4. LOAD SERVICES (Dynamic Sections)
     // ============================================================
     
-    // URL-i təmizləyən funksiya (ehtiyac varsa)
+    // URL-i təmizləyən funksiya
     function cleanUrlPath(url) {
         if (url && typeof url === 'string') {
             if (url.startsWith('http')) return url; 
@@ -145,10 +149,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadServices() {
         const container = document.getElementById("services-dynamic");
-        if (!container) return;
+        if (!container) {
+            console.warn("services-dynamic container tapılmadı!");
+            return;
+        }
 
         try {
-            // API çağırışı tam URL-ə gedir
+            // API çağırışı
             const res = await fetch(SERVICES_API); 
             
             if (!res.ok) { 
@@ -157,16 +164,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 return; 
             }
 
-            const pageData = await res.json();
+            const responseData = await res.json();
+            console.log("API cavabı:", responseData); // Debug üçün
             
-            // Düzəliş: Yalnız 'content' arrayini götürün
-            const services = pageData.content; 
-
-            if (!services || !Array.isArray(services)) { 
-                console.error("Fetched data is not an array:", pageData); 
-                container.innerHTML = '<p style="color:red; text-align:center;">API-dən boş və ya səhv data formatı gəldi.</p>';
+            // ✅ Paginated struktur handle edilməsi (Spring Data Page)
+            let services;
+            if (responseData.content && Array.isArray(responseData.content)) {
+                // Backend Page<ServiceResponseDto> qaytarır
+                services = responseData.content;
+            } else if (Array.isArray(responseData)) {
+                // Əgər sadə array göndərilsə
+                services = responseData;
+            } else {
+                console.error("Gözlənilməz data strukturu:", responseData); 
+                container.innerHTML = '<p style="color:red; text-align:center;">API-dən səhv format gəldi.</p>';
                 return; 
             }
+
+            // Əgər heç bir servis yoxdursa
+            if (!services || services.length === 0) { 
+                console.warn("Heç bir servis tapılmadı!");
+                container.innerHTML = '<p style="text-align:center; color: #999;">Heç bir servis mövcud deyil.</p>';
+                return; 
+            }
+
+            console.log(`${services.length} servis yükləndi`); // Debug
 
             const fragment = document.createDocumentFragment();
 
@@ -178,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Tam URL-i qururuq
                     videoUrl = UPLOADS_BASE + cleanedUrl; 
+                    console.log(`Video URL [${service.title}]:`, videoUrl); // Debug
                 }
 
                 const iconClass = ICONS[service.title] || "fa-star";
@@ -204,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="icon-container"><i class="fas ${iconClass}"></i></div>
                             <h2 class="service-title" data-text="${service.title}"><span>${service.title}</span></h2>
                         </div>
-                        <p class="description">${service.description}</p>
+                        <p class="description">${service.description || ''}</p>
                         <ul class="bullet-list">${bulletPoints.map(item => `<li>${item}</li>`).join("")}</ul>
                         <div class="divider"></div>
                         <ol class="numbered-list">${steps.map(step => `<li>${step}</li>`).join("")}</ol>
@@ -226,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.cta-button').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const href = btn.getAttribute('href');
-                        if (!href) return;
+                        if (!href || href === '#' || href.startsWith('#')) return;
                         e.preventDefault();
                         navigateWithTransition(href);
                     });
@@ -234,16 +257,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
         } catch (err) { 
-            console.error("Failed to load services:", err);
+            console.error("Servislər yüklənərkən xəta:", err);
             container.innerHTML = `<p style="color:red; text-align:center;">Servislər yüklənərkən xəta baş verdi: ${err.message}</p>`; 
         }
     }
 
+    // Page transition ilkin yükləmə
     if (pageTransition) {
         setTimeout(() => {
              pageTransition.classList.add('page-loaded'); 
         }, 100);
     }
     
+    // Servislər yüklənsin
     loadServices();
 });
