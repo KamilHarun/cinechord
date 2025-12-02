@@ -17,6 +17,7 @@ const API = {
 
 // Qlobal dəyişənlər (Chart.js üçün)
 let worksChart, categoryChart;
+let isAuthChecking = false; // Təkrar yoxlama problemini həll edir
 
 // ============================================
 // 1. KÖMƏKÇİ FUNKSİYALAR (UTILS)
@@ -53,19 +54,20 @@ function formatDate(dateString) {
 
 // Login olub-olmadığını yoxlayır
 function checkAuth() {
+    if (isAuthChecking) return false; // Təkrar çağırılmanın qarşısını alır
+    
     const token = localStorage.getItem('jwt_token');
     
     if(!token) {
         // Token yoxdursa Login ekranını göstər
         document.getElementById('login-overlay').style.display = 'flex';
         document.getElementById('admin-wrapper').style.display = 'none';
+        return false;
     } else {
         // Token varsa Admin panelini aç
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('admin-wrapper').style.display = 'flex';
-        
-        // İlk açılışda Dashboard-a yönləndir (əgər hash yoxdursa)
-        if (!location.hash) navigateTo('dashboard');
+        return true;
     }
 }
 
@@ -126,12 +128,17 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
                 await Swal.fire({
                     icon: 'success', 
                     title: 'Xoş Gəldiniz!', 
-                    timer: 1000, 
+                    timer: 1500, 
                     showConfirmButton: false
                 });
 
-                // ✅ Səhifəni tam yeniləyirik (Clean State)
-                location.reload(); 
+                // ✅ Səhifəni reload etmək əvəzinə, UI-ı dəyişirik
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('admin-wrapper').style.display = 'flex';
+                
+                // Dashboard-a yönləndir və yüklə
+                navigateTo('dashboard');
+                loadDashboard();
             }
         } else { 
             Swal.fire('Giriş Xətası', 'İstifadəçi adı və ya şifrə yanlışdır', 'error'); 
@@ -145,7 +152,15 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
 // LOGOUT
 function logout() { 
     localStorage.removeItem('jwt_token');
-    location.reload();
+    
+    // UI-ı dəyişirik (reload etmirik)
+    document.getElementById('login-overlay').style.display = 'flex';
+    document.getElementById('admin-wrapper').style.display = 'none';
+    
+    // Formu təmizləyirik
+    if (document.getElementById('loginForm')) {
+        document.getElementById('loginForm').reset();
+    }
 }
 
 // ============================================
@@ -373,7 +388,6 @@ async function loadWorks() {
 function openWorkModal() {
     document.getElementById('workForm').reset();
     document.getElementById('workId').value = ''; 
-    document.getElementById('workModalTitle').innerText = 'Yeni İş Əlavə Et';
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
@@ -386,7 +400,6 @@ function editWork(w) {
     document.getElementById('wVideoUrl').value = w.videoUrl || '';
     document.getElementById('wDescription').value = w.description || '';
     
-    document.getElementById('workModalTitle').innerText = 'İşi Redaktə Et';
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
@@ -719,4 +732,14 @@ document.getElementById('themeToggleNav')?.addEventListener('click', () => {
 });
 
 // Auth Yoxla və Başla
-checkAuth();
+window.addEventListener('DOMContentLoaded', () => {
+    isAuthChecking = true;
+    const isAuthenticated = checkAuth();
+    
+    if (isAuthenticated) {
+        // Login olubsa Dashboard-a yönləndir
+        navigateTo('dashboard');
+    }
+    
+    isAuthChecking = false;
+});

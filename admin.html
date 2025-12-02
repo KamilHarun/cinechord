@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineChord Admin</title>
+    <title>CineChord Admin Pro</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -19,32 +20,75 @@
     <div id="login-overlay" style="display: flex;">
         <div class="login-container">
             <div class="login-left">
-                <div class="brand-logo">
-                    <i class="fas fa-clapperboard"></i>
-                    <span>CineChord</span>
+                <div class="login-brand-section">
+                    <div class="login-logo-wrapper">
+                        <img src="photos/CineChord.png" alt="CineChord Logo" class="login-logo-img">
+                    </div>
+                    <div class="login-brand-text">
+                        <div class="brand-name">
+                            <span class="brand-cine">CINE</span>
+                            <span class="brand-chord">CHORD</span>
+                        </div>
+                        <div class="brand-tagline">Admin Panel</div>
+                    </div>
                 </div>
-                <h2>Admin Panel</h2>
-                <p>Professional Content Management System</p>
+                <div class="login-description">
+                    <h2>Content Management</h2>
+                    <p>Professional video portfolio system with advanced analytics and real-time management</p>
+                </div>
+                <div class="login-features">
+                    <div class="feature-item">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>Secure Authentication</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-bolt"></i>
+                        <span>Real-time Updates</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Advanced Analytics</span>
+                    </div>
+                </div>
             </div>
             <div class="login-right">
                 <form id="loginForm" class="login-form">
-                    <h3>Xoş Gəldiniz</h3>
-                    <p class="subtitle">Davam etmək üçün giriş edin</p>
+                    <div class="form-header">
+                        <h3>Xoş Gəldiniz</h3>
+                        <p class="subtitle">Davam etmək üçün hesabınıza daxil olun</p>
+                    </div>
                     
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> İstifadəçi adı</label>
-                        <input type="text" id="loginUser" placeholder="admin" required autocomplete="username">
+                        <input type="text" id="loginUser" placeholder="İstifadəçi adınızı daxil edin" required autocomplete="username">
                     </div>
                     
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Şifrə</label>
-                        <input type="password" id="loginPass" placeholder="••••••" required autocomplete="current-password">
+                        <div class="password-wrapper">
+                            <input type="password" id="loginPass" placeholder="Şifrənizi daxil edin" required autocomplete="current-password">
+                            <button type="button" class="toggle-password" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>Məni xatırla</span>
+                        </label>
                     </div>
                     
                     <button type="submit" class="btn-login">
-                        <span>Giriş et</span>
+                        <span>Daxil ol</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
+
+                    <div class="login-footer-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Sistem adminlər üçün nəzərdə tutulub</span>
+                    </div>
                 </form>
             </div>
         </div>
@@ -57,7 +101,7 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="brand">
-                    <i class="fas fa-clapperboard"></i>
+                    <img src="photos/CineChord.png" alt="CineChord" class="sidebar-logo">
                     <span>CineChord</span>
                 </div>
                 <button class="sidebar-toggle" id="sidebarToggle">
@@ -504,6 +548,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="admin.js"></script>
+    <script>
+        function togglePassword() {
+            const passInput = document.getElementById('loginPass');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 
 </body>
 </html>
