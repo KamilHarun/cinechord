@@ -1,8 +1,12 @@
 // ============================================
-// CINECHORD ADMIN JS - FULL VERSION
+// CINECHORD ADMIN PANEL - ENHANCED VERSION
 // ============================================
 
+// ✅ Backend Linki
 const BASE_URL = "https://cinechord-admin-production.up.railway.app";
+const UPLOADS_URL = `${BASE_URL}/uploads/`;
+
+// ✅ API Endpoints
 const API = {
     LOGIN: `${BASE_URL}/api/auth/login`,
     WORKS: `${BASE_URL}/admin/works`,
@@ -11,378 +15,734 @@ const API = {
     ABOUT: `${BASE_URL}/api/about`
 };
 
-// ============================================
-// 1. AUTHENTICATION
-// ============================================
-function checkAuth() {
-    const token = localStorage.getItem('jwt_token');
-    const overlay = document.getElementById('login-overlay');
-    const wrapper = document.getElementById('admin-wrapper');
+// Qlobal dəyişənlər
+let worksChart, categoryChart;
+let currentPage = 0;
+const pageSize = 20;
+let searchTimeout;
+let selectedItems = [];
 
-    if (!token) {
-        overlay.style.display = 'flex';
-        wrapper.style.display = 'none';
-        return false;
-    } else {
-        overlay.style.display = 'none';
-        wrapper.style.display = 'flex';
-        return true;
+// ============================================
+// 1. KÖMƏKÇİ FUNKSİYALAR (UTILS)
+// ============================================
+
+// Şəkil URL-ni düzgün formata salır
+function getImageUrl(url) {
+    if (!url) return 'https://via.placeholder.com/400x225/6366f1/ffffff?text=No+Image';
+    if (url.startsWith('http')) return url;
+    return url.startsWith('/') ? `${BASE_URL}${url}` : `${UPLOADS_URL}${url}`;
+}
+
+// Tarixi formatlayır
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'İndi';
+    if (minutes < 60) return `${minutes} dəqiqə əvvəl`;
+    if (hours < 24) return `${hours} saat əvvəl`;
+    if (days < 7) return `${days} gün əvvəl`;
+    return date.toLocaleDateString('az-AZ');
+}
+
+// ============================================
+// 2. TOKEN EXPIRY CHECK
+// ============================================
+
+function checkTokenExpiry() {
+    const token = localStorage.getItem('jwt_token');
+    if(!token) return;
+    
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const exp = payload.exp * 1000; // milliseconds
+        const now = Date.now();
+        const timeLeft = exp - now;
+        
+        // 5 dəqiqə qalıbsa xəbərdarlıq
+        if(timeLeft < 5 * 60 * 1000 && timeLeft > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sessiya Bitir',
+                text: 'Zəhmət olmasa yenidən giriş edin',
+                timer: 3000,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false
+            });
+        }
+    } catch(e) {
+        console.warn('Token parse error:', e);
     }
 }
 
-async function authFetch(url, options = {}) {
+// Hər 1 dəqiqədə yoxla
+setInterval(checkTokenExpiry, 60000);
+
+// ============================================
+// 3. AUTHENTICATION & FETCH
+// ============================================
+
+function checkAuth() {
     const token = localStorage.getItem('jwt_token');
-    if (!options.headers) options.headers = {};
-    if (token) options.headers['Authorization'] = `Bearer ${token}`;
     
-    // FormData üçün Content-Type avtomatik təyin olunmalıdır
-    if (!(options.body instanceof FormData)) {
+    if(!token) {
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('admin-wrapper').style.display = 'none';
+    } else {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('admin-wrapper').style.display = 'flex';
+        
+        if (!location.hash) navigateTo('dashboard');
+        
+        // Token expiry check başlat
+        checkTokenExpiry();
+    }
+}
+
+// ✅ TƏKMİLLƏŞDİRİLMİŞ FETCH
+async function authFetch(url, options = {}) {
+    if(!options.headers) options.headers = {};
+    
+    if(!(options.body instanceof FormData)) {
         options.headers['Content-Type'] = 'application/json';
+    }
+    
+    const currentToken = localStorage.getItem('jwt_token');
+    if (currentToken) {
+        options.headers['Authorization'] = `Bearer ${currentToken}`;
     }
 
     try {
         const res = await fetch(url, options);
-        if (res.status === 401 || res.status === 403) {
+
+        // 404 - Tapılmadı
+        if(res.status === 404) {
+            Swal.fire('Tapılmadı', 'Axtardığınız məlumat mövcud deyil', 'error');
+            return null;
+        }
+
+        // 500 - Server Xətası
+        if(res.status === 500) {
+            Swal.fire('Server Xətası', 'Daha sonra yenidən cəhd edin', 'error');
+            return null;
+        }
+
+        // 401/403 - Auth xətası
+        if(res.status === 401 || res.status === 403) { 
+            console.warn(`Auth Xətası: ${res.status} - ${url}`);
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sessiya Bitdi',
+                text: 'Zəhmət olmasa yenidən giriş edin',
+                timer: 2000,
+                showConfirmButton: false
+            });
             logout();
             return null;
         }
+
         return res;
-    } catch (err) {
-        console.error("API Error:", err);
-        Swal.fire('Xəta', 'Server ilə əlaqə xətası', 'error');
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        Swal.fire('Əlaqə Xətası', 'İnternet bağlantınızı yoxlayın', 'error');
         return null;
     }
 }
 
-// LOGIN
+// LOGIN FORM SUBMIT
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const u = document.getElementById('loginUser').value;
-    const p = document.getElementById('loginPass').value;
+    const username = document.getElementById('loginUser').value;
+    const password = document.getElementById('loginPass').value;
 
     try {
         const res = await fetch(API.LOGIN, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username: u, password: p})
+            body: JSON.stringify({username, password})
         });
 
-        if (res.ok) {
+        if(res.ok) {
             const data = await res.json();
-            if (data.token || data.accessToken) {
-                localStorage.setItem('jwt_token', data.token || data.accessToken);
-                Swal.fire({
+            const token = data.token || data.accessToken;
+            
+            if(token) {
+                localStorage.setItem('jwt_token', token);
+                
+                await Swal.fire({
                     icon: 'success', 
-                    title: 'Xoş Gəldiniz', 
+                    title: 'Xoş Gəldiniz!', 
                     timer: 1000, 
                     showConfirmButton: false
                 });
-                checkAuth();
-                loadDashboard();
+
+                location.reload(); 
             }
-        } else {
-            Swal.fire('Xəta', 'İstifadəçi adı və ya şifrə yanlışdır', 'error');
+        } else { 
+            Swal.fire('Giriş Xətası', 'İstifadəçi adı və ya şifrə yanlışdır', 'error'); 
         }
-    } catch (e) {
-        console.error(e);
-        Swal.fire('Xəta', 'Server xətası', 'error');
+    } catch(err) { 
+        console.error(err);
+        Swal.fire('Xəta', 'Serverlə əlaqə qurmaq mümkün olmadı', 'error'); 
     }
 });
 
-function logout() {
+// LOGOUT
+function logout() { 
     localStorage.removeItem('jwt_token');
-    Swal.fire({
-        icon: 'info',
-        title: 'Çıxış edildi',
-        timer: 1000,
-        showConfirmButton: false
-    });
-    checkAuth();
+    location.reload();
 }
 
 // ============================================
-// 2. NAVIGATION (DÜZƏLDİLMİŞ)
+// 4. NAVIGATION
 // ============================================
-function switchView(page) {
-    // Bütün səhifələri gizlət
+
+function navigateTo(page) {
     document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
-    
-    // Bütün nav itemlərdən active-i sil
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     
-    // Seçilmiş səhifəni göstər
-    const viewElement = document.getElementById(`view-${page}`);
-    if (viewElement) {
-        viewElement.classList.add('active');
-    }
+    const pageView = document.getElementById(`view-${page}`);
+    const navItem = document.querySelector(`[data-page="${page}"]`);
     
-    // Nav itemə active əlavə et
-    const navItem = document.querySelector(`[onclick="switchView('${page}')"]`);
-    if (navItem) {
-        navItem.classList.add('active');
-    }
+    if (pageView) pageView.classList.add('active');
+    if (navItem) navItem.classList.add('active');
 
-    // Səhifəyə görə data yüklə
-    if (page === 'dashboard') loadDashboard();
-    if (page === 'works') loadWorks();
-    if (page === 'services') loadServices();
-    if (page === 'messages') loadMessages();
-    if (page === 'about') loadAbout();
+    if(page === 'dashboard') loadDashboard();
+    if(page === 'works') loadWorks();
+    if(page === 'services') loadServices();
+    if(page === 'messages') loadMessages();
+    if(page === 'about') loadAbout();
 }
 
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const page = item.getAttribute('data-page');
+        if (page) navigateTo(page);
+    });
+});
+
 // ============================================
-// 3. DASHBOARD & CHARTS
+// 5. DASHBOARD
 // ============================================
-let worksChart, categoryChart;
 
 async function loadDashboard() {
     try {
-        // Works
-        const res = await authFetch(`${API.WORKS}/getAllWorks?size=100`);
-        const worksData = res && res.ok ? await res.json() : {content: []};
+        // İşlər
+        const worksRes = await authFetch(`${API.WORKS}/getAllWorks?size=100`);
+        const worksData = (worksRes && worksRes.ok) ? await worksRes.json() : { content: [] };
         const works = worksData.content || [];
 
-        // Services
-        const sRes = await authFetch(`${API.SERVICES}/getAll`);
-        const services = sRes && sRes.ok ? await sRes.json() : [];
+        // Xidmətlər
+        const servicesRes = await authFetch(`${API.SERVICES}/getAll`);
+        const services = (servicesRes && servicesRes.ok) ? await servicesRes.json() : [];
 
-        // Messages
-        const mRes = await authFetch(`${API.CONTACTS}/allMessages`);
-        const msgs = mRes && mRes.ok ? await mRes.json() : [];
+        // Mesajlar
+        let messages = [];
+        const messagesRes = await authFetch(`${API.CONTACTS}/allMessages`);
+        if (messagesRes && messagesRes.ok) {
+            messages = await messagesRes.json();
+        }
 
-        // Update stat cards
-        document.getElementById('totalWorks').innerText = works.length;
-        document.getElementById('totalServices').innerText = services.length;
-        document.getElementById('totalMessages').innerText = msgs.length;
-
-        // Init charts
+        updateStats(works.length, services.length, messages);
         initCharts(works);
-    } catch (err) {
-        console.error('Dashboard yüklənə bilmədi:', err);
+        loadActivity(works);
+
+    } catch (error) {
+        console.error('Dashboard Load Error:', error);
+        Swal.fire('Xəta', 'Dashboard yüklənmədi', 'error');
     }
 }
 
+function updateStats(worksCount, servicesCount, messages) {
+    if(document.getElementById('totalWorks')) document.getElementById('totalWorks').textContent = worksCount;
+    if(document.getElementById('totalServices')) document.getElementById('totalServices').textContent = servicesCount;
+    
+    const unreadCount = Array.isArray(messages) ? messages.filter(m => !(m.isRead || m.read)).length : 0;
+    if(document.getElementById('totalMessages')) document.getElementById('totalMessages').textContent = unreadCount;
+    
+    if(document.getElementById('worksCount')) document.getElementById('worksCount').textContent = worksCount;
+    if(document.getElementById('servicesCount')) document.getElementById('servicesCount').textContent = servicesCount;
+    if(document.getElementById('messagesCount')) document.getElementById('messagesCount').textContent = unreadCount;
+}
+
 function initCharts(works) {
-    // Works Chart
-    const ctx1 = document.getElementById('worksChart');
-    if (ctx1) {
+    const worksCtx = document.getElementById('worksChart');
+    if (worksCtx) {
         if (worksChart) worksChart.destroy();
         
-        worksChart = new Chart(ctx1, {
+        const last7Days = [];
+        const workCounts = [];
+        const today = new Date();
+        
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            last7Days.push(date.toLocaleDateString('az-AZ', { weekday: 'short' }));
+            
+            const count = works.filter(w => {
+                if (!w.createdAt) return false;
+                return new Date(w.createdAt).toDateString() === date.toDateString();
+            }).length;
+            workCounts.push(count);
+        }
+        
+        worksChart = new Chart(worksCtx, {
             type: 'line',
             data: {
-                labels: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyn', 'İyl', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'],
+                labels: last7Days,
                 datasets: [{
-                    label: 'İşlər',
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, works.length],
+                    label: 'Yeni İşlər',
+                    data: workCounts,
                     borderColor: '#6366f1',
                     backgroundColor: 'rgba(99, 102, 241, 0.1)',
                     tension: 0.4,
                     fill: true
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {display: true}
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } } }
         });
     }
-    
-    // Category Chart
-    const ctx2 = document.getElementById('categoryChart');
-    if (ctx2) {
+
+    const categoryCtx = document.getElementById('categoryChart');
+    if (categoryCtx) {
         if (categoryChart) categoryChart.destroy();
+        const categories = {};
+        works.forEach(w => {
+            const cat = w.category || 'Digər';
+            categories[cat] = (categories[cat] || 0) + 1;
+        });
         
-        const categories = {
-            'FILM': works.filter(w => w.category === 'FILM').length,
-            'COMMERCIAL': works.filter(w => w.category === 'COMMERCIAL').length,
-            'CLIP': works.filter(w => w.category === 'CLIP').length,
-            'MUSIC_VIDEO': works.filter(w => w.category === 'MUSIC_VIDEO').length,
-            'DOCUMENTARY': works.filter(w => w.category === 'DOCUMENTARY').length,
-            'SOCIAL': works.filter(w => w.category === 'SOCIAL').length
-        };
-        
-        categoryChart = new Chart(ctx2, {
+        categoryChart = new Chart(categoryCtx, {
             type: 'doughnut',
             data: {
                 labels: Object.keys(categories),
                 datasets: [{
                     data: Object.values(categories),
-                    backgroundColor: ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#06b6d4']
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {position: 'bottom'}
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
     }
 }
 
+function loadActivity(works) {
+    const list = document.getElementById('activityList');
+    if (!list) return;
+    
+    const recentWorks = works.sort((a,b) => b.id - a.id).slice(0, 5);
+    
+    if (recentWorks.length === 0) {
+        list.innerHTML = '<div class="activity-item">Hələ aktivlik yoxdur</div>';
+        return;
+    }
+
+    list.innerHTML = recentWorks.map(w => `
+        <div class="activity-item">
+            <div class="activity-icon" style="background: #6366f1"><i class="fas fa-film"></i></div>
+            <div class="activity-info">
+                <div class="activity-title">"${w.title}" işi əlavə edildi</div>
+                <div class="activity-time">${formatDate(w.createdAt)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
 // ============================================
-// 4. WORKS FUNCTIONS
+// 6. WORKS - WITH PAGINATION
 // ============================================
-async function loadWorks() {
+
+async function loadWorks(page = 0) {
     const grid = document.getElementById('worksGrid');
-    grid.innerHTML = '<div class="col-12 text-center"><p>Yüklənir...</p></div>';
-    
-    const res = await authFetch(`${API.WORKS}/getAllWorks?size=100&sort=id,desc`);
-    if (!res || !res.ok) {
-        grid.innerHTML = '<div class="col-12"><p class="text-danger">Xəta baş verdi</p></div>';
-        return;
-    }
-    
-    const data = await res.json();
-    const works = data.content || [];
+    if (!grid) return;
 
-    if (works.length === 0) {
-        grid.innerHTML = '<div class="col-12 text-center"><p>Hələ iş əlavə edilməyib</p></div>';
-        return;
-    }
+    grid.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Yüklənir...</p></div>';
 
-    grid.innerHTML = '';
-    works.forEach(w => {
-        const card = `
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <img src="${w.imageUrl || 'https://via.placeholder.com/400x300'}" 
-                         class="card-img-top" 
-                         style="height:200px;object-fit:cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">${w.title}</h5>
-                        <span class="badge bg-primary">${w.category}</span>
-                        <div class="d-flex gap-2 mt-3">
-                            <button class="btn btn-sm btn-outline-primary flex-fill" 
-                                    onclick='editWork(${JSON.stringify(w)})'>
-                                <i class="fas fa-edit"></i> Redaktə
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" 
-                                    onclick="deleteWork(${w.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+    try {
+        const res = await authFetch(`${API.WORKS}/getAllWorks?page=${page}&size=${pageSize}&sort=id,desc`);
+        
+        if(!res || !res.ok) {
+            grid.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Yükləmə xətası</h3><p>Məlumatları yükləmək mümkün olmadı</p></div>`;
+            return;
+        }
+        
+        const data = await res.json();
+        const works = data.content || []; 
+        currentPage = page;
+        
+        if (works.length === 0) {
+            grid.innerHTML = `<div class="empty-state"><i class="fas fa-film"></i><h3>Hələ heç bir iş yoxdur</h3><p>Yeni iş əlavə etmək üçün düyməni sıxın</p></div>`;
+            return;
+        }
+        
+        grid.innerHTML = '';
+        works.forEach(w => {
+            const card = document.createElement('div');
+            card.className = 'work-card';
+            card.innerHTML = `
+                <div class="work-select">
+                    <input type="checkbox" class="bulk-checkbox" data-id="${w.id}" onchange="toggleBulkSelect(${w.id})">
+                </div>
+                <img src="${getImageUrl(w.imageUrl)}" class="work-image" alt="${w.title}">
+                <div class="work-body">
+                    <h3 class="work-title">${w.title}</h3>
+                    <div class="work-meta">
+                        <div class="work-client"><i class="fas fa-user"></i> ${w.clientName || 'Müştəri yoxdur'}</div>
+                        <span class="work-category">${w.category}</span>
+                    </div>
+                    <div class="work-actions">
+                        <button class="btn-edit" onclick='editWork(${JSON.stringify(w).replace(/'/g, "&apos;")})'><i class="fas fa-edit"></i> Redaktə</button>
+                        <button class="btn-delete" onclick="deleteWork(${w.id})"><i class="fas fa-trash"></i> Sil</button>
                     </div>
                 </div>
-            </div>`;
-        grid.innerHTML += card;
-    });
+            `;
+            grid.appendChild(card);
+        });
+
+        // Pagination əlavə et
+        renderPagination(data.totalPages || 1, page);
+
+    } catch(e) { 
+        console.error('Works Load Error:', e);
+        grid.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Xəta baş verdi</h3></div>`;
+        Swal.fire('Xəta', 'İşlər yüklənmədi: ' + e.message, 'error');
+    }
 }
 
+// PAGINATION
+function renderPagination(totalPages, currentPage) {
+    let paginationContainer = document.getElementById('pagination');
+    
+    if (!paginationContainer) {
+        paginationContainer = document.createElement('div');
+        paginationContainer.id = 'pagination';
+        paginationContainer.className = 'pagination-container';
+        document.getElementById('worksGrid').after(paginationContainer);
+    }
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    let html = '<div class="pagination">';
+    
+    // Previous button
+    if (currentPage > 0) {
+        html += `<button class="page-btn" onclick="loadWorks(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
+    }
+    
+    // Page numbers
+    for (let i = 0; i < totalPages; i++) {
+        if (i === currentPage) {
+            html += `<button class="page-btn active">${i + 1}</button>`;
+        } else if (i === 0 || i === totalPages - 1 || Math.abs(i - currentPage) <= 1) {
+            html += `<button class="page-btn" onclick="loadWorks(${i})">${i + 1}</button>`;
+        } else if (Math.abs(i - currentPage) === 2) {
+            html += `<span class="page-dots">...</span>`;
+        }
+    }
+    
+    // Next button
+    if (currentPage < totalPages - 1) {
+        html += `<button class="page-btn" onclick="loadWorks(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
+    }
+    
+    html += '</div>';
+    paginationContainer.innerHTML = html;
+}
+
+// BULK SELECTION
+function toggleBulkSelect(id) {
+    const checkbox = document.querySelector(`.bulk-checkbox[data-id="${id}"]`);
+    
+    if (checkbox.checked) {
+        selectedItems.push(id);
+    } else {
+        selectedItems = selectedItems.filter(item => item !== id);
+    }
+    
+    updateBulkActions();
+}
+
+function updateBulkActions() {
+    let bulkBar = document.getElementById('bulkActionsBar');
+    
+    if (!bulkBar) {
+        bulkBar = document.createElement('div');
+        bulkBar.id = 'bulkActionsBar';
+        bulkBar.className = 'bulk-actions-bar';
+        document.querySelector('.filters-bar').after(bulkBar);
+    }
+    
+    if (selectedItems.length > 0) {
+        bulkBar.style.display = 'flex';
+        bulkBar.innerHTML = `
+            <span class="bulk-count">${selectedItems.length} iş seçildi</span>
+            <button class="btn-danger" onclick="bulkDelete()">
+                <i class="fas fa-trash"></i> Hamısını Sil
+            </button>
+            <button class="btn-secondary" onclick="clearBulkSelection()">
+                <i class="fas fa-times"></i> Ləğv et
+            </button>
+        `;
+    } else {
+        bulkBar.style.display = 'none';
+    }
+}
+
+function clearBulkSelection() {
+    selectedItems = [];
+    document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = false);
+    updateBulkActions();
+}
+
+async function bulkDelete() {
+    const result = await Swal.fire({
+        title: `${selectedItems.length} iş silinsin?`,
+        text: "Bu əməliyyat geri qaytarıla bilməz!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Bəli, Sil',
+        cancelButtonText: 'Ləğv et'
+    });
+    
+    if (result.isConfirmed) {
+        Swal.fire({title: 'Silinir...', didOpen: () => Swal.showLoading()});
+        
+        try {
+            await Promise.all(selectedItems.map(id => 
+                authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' })
+            ));
+            
+            Swal.fire('Uğurlu!', `${selectedItems.length} iş silindi`, 'success');
+            selectedItems = [];
+            loadWorks(currentPage);
+            loadDashboard();
+        } catch(e) {
+            Swal.fire('Xəta', 'Toplu silmə zamanı xəta baş verdi', 'error');
+        }
+    }
+}
+
+// MODAL
 function openWorkModal() {
     document.getElementById('workForm').reset();
-    document.getElementById('workId').value = '';
+    document.getElementById('workId').value = ''; 
+    
+    // Preview təmizlə
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    if (previewContainer) previewContainer.remove();
+    
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
-function editWork(work) {
-    document.getElementById('workId').value = work.id;
-    document.getElementById('wTitle').value = work.title;
-    document.getElementById('wCategory').value = work.category;
-    document.getElementById('wVideoUrl').value = work.videoUrl || '';
-    document.getElementById('wDescription').value = work.description || '';
+function editWork(w) {
+    document.getElementById('workId').value = w.id;
+    document.getElementById('wTitle').value = w.title;
+    document.getElementById('wClient').value = w.clientName || '';
+    document.getElementById('wCategory').value = w.category;
+    document.getElementById('wVideoUrl').value = w.videoUrl || '';
+    document.getElementById('wDescription').value = w.description || '';
+    
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
+// IMAGE PREVIEW
+document.getElementById('wImage')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Köhnə preview sil
+        const oldPreview = document.getElementById('imagePreviewContainer');
+        if (oldPreview) oldPreview.remove();
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const container = document.createElement('div');
+            container.id = 'imagePreviewContainer';
+            container.style.cssText = 'margin-top: 10px; position: relative;';
+            
+            const preview = document.createElement('img');
+            preview.src = e.target.result;
+            preview.style.cssText = 'max-width: 200px; border-radius: 8px; border: 2px solid var(--border-color);';
+            
+            container.appendChild(preview);
+            document.getElementById('wImage').parentElement.appendChild(container);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// SUBMIT WITH PROGRESS
 async function submitWork() {
     const id = document.getElementById('workId').value;
     const fd = new FormData();
     
     fd.append('title', document.getElementById('wTitle').value);
+    fd.append('clientName', document.getElementById('wClient').value);
     fd.append('category', document.getElementById('wCategory').value);
     fd.append('videoUrl', document.getElementById('wVideoUrl').value);
     fd.append('description', document.getElementById('wDescription').value);
-    
+    fd.append('isFeatured', false); 
+
     const img = document.getElementById('wImage').files[0];
-    if (img) fd.append('imageFile', img);
-
-    const url = id ? `${API.WORKS}/${id}` : `${API.WORKS}/createWork`;
-    const method = id ? 'PUT' : 'POST';
-
-    const res = await authFetch(url, {method, body: fd});
+    if(img) fd.append('imageFile', img); 
     
-    if (res && res.ok) {
-        bootstrap.Modal.getInstance(document.getElementById('workModal')).hide();
-        loadWorks();
-        Swal.fire('Uğurlu!', 'İş yadda saxlanıldı', 'success');
-    } else {
-        Swal.fire('Xəta', 'Yadda saxlanılmadı', 'error');
+    const vid = document.getElementById('wPreview').files[0];
+    if(vid) fd.append('previewVideoFile', vid); 
+
+    // Progress bar ilə Swal
+    Swal.fire({
+        title: 'Yüklənir...',
+        html: '<div class="upload-progress"><div class="progress-bar" id="uploadProgressBar" style="width: 0%; height: 4px; background: #6366f1; border-radius: 4px; transition: width 0.3s;"></div></div>',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+    
+    try {
+        let url, method;
+        if (id) {
+            url = `${API.WORKS}/${id}`;
+            method = 'PUT';
+        } else {
+            url = `${API.WORKS}/createWork`;
+            method = 'POST';
+        }
+
+        // XMLHttpRequest ilə progress tracking
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                const progressBar = document.getElementById('uploadProgressBar');
+                if (progressBar) {
+                    progressBar.style.width = percent + '%';
+                }
+            }
+        });
+
+        const token = localStorage.getItem('jwt_token');
+        xhr.open(method, url);
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                Swal.fire('Uğurlu!', 'Əməliyyat tamamlandı', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('workModal')).hide();
+                loadWorks(currentPage); 
+                loadDashboard(); 
+            } else {
+                Swal.fire('Xəta', 'Əməliyyat uğursuz oldu', 'error');
+            }
+        };
+
+        xhr.onerror = function() {
+            Swal.fire('Xəta', 'Şəbəkə xətası baş verdi', 'error');
+        };
+
+        xhr.send(fd);
+
+    } catch(e) { 
+        Swal.fire('Xəta', e.message, 'error'); 
     }
 }
 
 async function deleteWork(id) {
-    const result = await Swal.fire({
-        title: 'Əminsiniz?',
-        text: 'Bu işi silmək istədiyinizə əminsiniz?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Bəli, sil',
-        cancelButtonText: 'Xeyr'
+    const r = await Swal.fire({
+        title: 'Silinsin?', 
+        text: "Bu əməliyyat geri qaytarıla bilməz!", 
+        icon: 'warning', 
+        showCancelButton: true, 
+        confirmButtonText: 'Bəli, Sil', 
+        cancelButtonText: 'Ləğv'
     });
-
-    if (result.isConfirmed) {
-        const res = await authFetch(`${API.WORKS}/deleteWork/${id}`, {method: 'DELETE'});
+    
+    if(r.isConfirmed) {
+        const res = await authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' });
+        
         if (res && res.ok) {
-            loadWorks();
-            Swal.fire('Silindi!', 'İş uğurla silindi', 'success');
+            Swal.fire('Silindi', '', 'success');
+            loadWorks(currentPage);
+            loadDashboard();
+        } else {
+            Swal.fire('Xəta', 'Silmək mümkün olmadı', 'error');
         }
     }
 }
 
+// SEARCH WITH DEBOUNCE
+function searchWorks() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const term = document.getElementById('workSearch').value.toLowerCase();
+        document.querySelectorAll('.work-card').forEach(card => {
+            const title = card.querySelector('.work-title')?.textContent.toLowerCase() || '';
+            const client = card.querySelector('.work-client')?.textContent.toLowerCase() || '';
+            card.style.display = (title.includes(term) || client.includes(term)) ? '' : 'none';
+        });
+    }, 300);
+}
+
+function filterWorks() {
+    const category = document.getElementById('categoryFilter').value;
+    document.querySelectorAll('.work-card').forEach(card => {
+        const workCategory = card.querySelector('.work-category')?.textContent || '';
+        card.style.display = (!category || workCategory === category) ? '' : 'none';
+    });
+}
+
 // ============================================
-// 5. SERVICES FUNCTIONS
+// 7. SERVICES
 // ============================================
+
 async function loadServices() {
     const grid = document.getElementById('servicesGrid');
-    grid.innerHTML = '<div class="col-12 text-center"><p>Yüklənir...</p></div>';
-    
-    const res = await authFetch(`${API.SERVICES}/getAll`);
-    if (!res || !res.ok) {
-        grid.innerHTML = '<div class="col-12"><p class="text-danger">Xəta baş verdi</p></div>';
-        return;
-    }
-    
-    const services = await res.json();
+    if (!grid) return;
 
-    if (services.length === 0) {
-        grid.innerHTML = '<div class="col-12 text-center"><p>Hələ xidmət əlavə edilməyib</p></div>';
-        return;
-    }
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem;"><i class="fas fa-spinner fa-spin" style="font-size: 3rem;"></i></div>';
 
-    grid.innerHTML = '';
-    services.forEach(s => {
-        const card = `
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="${s.icon || 'fas fa-star'} fa-2x text-primary me-3"></i>
-                            <h5 class="card-title mb-0">${s.title}</h5>
-                        </div>
-                        <p class="card-text text-muted">${s.description || 'Təsvir yoxdur'}</p>
-                        ${s.videoUrl ? `<small class="text-success"><i class="fas fa-video"></i> Video var</small>` : ''}
-                        <div class="d-flex gap-2 mt-3">
-                            <button class="btn btn-sm btn-outline-primary flex-fill" 
-                                    onclick='editService(${JSON.stringify(s)})'>
-                                <i class="fas fa-edit"></i> Redaktə
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" 
-                                    onclick="deleteService(${s.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+    try {
+        const res = await authFetch(`${API.SERVICES}/getAll`);
+        if(!res || !res.ok) {
+            grid.innerHTML = '<div class="empty-state">Xidmətlər yüklənmədi</div>';
+            return;
+        }
+
+        const services = await res.json();
+        
+        grid.innerHTML = services.length === 0 ? '<div class="empty-state">Xidmət yoxdur</div>' : '';
+        
+        services.forEach(s => {
+            const hasVideo = s.videoUrl && s.videoUrl.trim();
+            grid.innerHTML += `
+                <div class="service-card">
+                    <div style="width:56px;height:56px;background:rgba(99,102,241,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem">
+                        <i class="${s.iconClass || 'fas fa-star'}" style="font-size:1.5rem;color:#6366f1"></i>
+                    </div>
+                    <h3>${s.title}</h3>
+                    <p class="text-muted">${(s.description || '').substring(0,100)}...</p>
+                    <div style="margin-bottom:1rem">
+                        ${hasVideo ? '<span class="badge bg-success-light text-success">Video var</span>' : '<span class="badge bg-secondary-light text-secondary">Video yoxdur</span>'}
+                    </div>
+                    <div class="service-actions" style="display:flex;gap:10px">
+                        <button class="btn btn-sm btn-light text-primary" onclick='editService(${JSON.stringify(s).replace(/'/g,"&apos;")})' style="flex:1">Redaktə</button>
+                        <button class="btn btn-sm btn-light text-danger" onclick="deleteService(${s.id})" style="flex:1">Sil</button>
                     </div>
                 </div>
-            </div>`;
-        grid.innerHTML += card;
-    });
+            `;
+        });
+    } catch(e) { 
+        console.error(e);
+        Swal.fire('Xəta', 'Xidmətlər yüklənmədi', 'error');
+    }
 }
 
 function openServiceModal() {
@@ -391,171 +751,201 @@ function openServiceModal() {
     new bootstrap.Modal(document.getElementById('serviceModal')).show();
 }
 
-function editService(service) {
-    document.getElementById('serviceId').value = service.id;
-    document.getElementById('sTitle').value = service.title;
-    document.getElementById('sIcon').value = service.icon || '';
-    document.getElementById('sDescription').value = service.description || '';
+function editService(s) {
+    document.getElementById('serviceId').value = s.id;
+    document.getElementById('sTitle').value = s.title;
+    document.getElementById('sIcon').value = s.iconClass || '';
+    document.getElementById('sDesc').value = s.description || '';
     new bootstrap.Modal(document.getElementById('serviceModal')).show();
 }
 
 async function submitService() {
     const id = document.getElementById('serviceId').value;
     const fd = new FormData();
-    
     fd.append('title', document.getElementById('sTitle').value);
-    fd.append('icon', document.getElementById('sIcon').value);
-    fd.append('description', document.getElementById('sDescription').value);
+    fd.append('iconClass', document.getElementById('sIcon').value);
+    fd.append('description', document.getElementById('sDesc').value);
     
     const video = document.getElementById('sVideoFile').files[0];
-    if (video) fd.append('videoFile', video);
-
-    const url = id ? `${API.SERVICES}/${id}` : `${API.SERVICES}`;
-    const method = id ? 'PUT' : 'POST';
-
-    const res = await authFetch(url, {method, body: fd});
+    if(video) fd.append('videoFile', video);
     
-    if (res && res.ok) {
-        bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
-        loadServices();
-        Swal.fire('Uğurlu!', 'Xidmət yadda saxlanıldı', 'success');
-    } else {
-        Swal.fire('Xəta', 'Yadda saxlanılmadı', 'error');
-    }
+    Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
+    try {
+        const url = id ? `${API.SERVICES}/${id}` : API.SERVICES; 
+        const method = id ? 'PUT' : 'POST';
+        
+        const res = await authFetch(url, { method: method, body: fd });
+        
+        if(res && res.ok) {
+            Swal.fire('Uğurlu!', 'Xidmət yadda saxlanıldı', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
+            loadServices(); loadDashboard();
+        } else { Swal.fire('Xəta', 'Xəta baş verdi', 'error'); }
+    } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
 }
 
 async function deleteService(id) {
-    const result = await Swal.fire({
-        title: 'Əminsiniz?',
-        text: 'Bu xidməti silmək istədiyinizə əminsiniz?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Bəli, sil',
-        cancelButtonText: 'Xeyr'
-    });
-
-    if (result.isConfirmed) {
-        const res = await authFetch(`${API.SERVICES}/${id}`, {method: 'DELETE'});
-        if (res && res.ok) {
+    const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
+    if(r.isConfirmed) {
+        const res = await authFetch(`${API.SERVICES}/${id}`, { method: 'DELETE' });
+        if(res && res.ok) {
+            Swal.fire('Silindi!', '', 'success');
             loadServices();
-            Swal.fire('Silindi!', 'Xidmət uğurla silindi', 'success');
+            loadDashboard();
+        } else {
+             Swal.fire('Xəta', 'Silmək mümkün olmadı', 'error');
         }
     }
 }
 
 // ============================================
-// 6. MESSAGES FUNCTIONS
+// 8. MESSAGES
 // ============================================
+
 async function loadMessages() {
     const list = document.getElementById('messagesList');
-    list.innerHTML = '<p class="text-center">Yüklənir...</p>';
+    if (!list) return;
+    list.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin"></i> Yüklənir...</div>';
     
-    const res = await authFetch(`${API.CONTACTS}/allMessages`);
-    if (!res || !res.ok) {
-        list.innerHTML = '<p class="text-danger">Mesajlar yüklənə bilmədi</p>';
-        return;
-    }
-    
-    const messages = await res.json();
-
-    if (messages.length === 0) {
-        list.innerHTML = '<p class="text-center">Mesaj yoxdur</p>';
-        return;
-    }
-
-    list.innerHTML = '';
-    messages.forEach(msg => {
-        const item = `
-            <div class="list-group-item ${msg.isRead ? '' : 'border-start border-primary border-3'}">
-                <div class="d-flex w-100 justify-content-between align-items-start">
-                    <div>
-                        <h6 class="mb-1">${msg.name}</h6>
-                        <p class="mb-1 text-muted small">${msg.email} • ${msg.phone || 'Telefon yoxdur'}</p>
-                        <p class="mb-0">${msg.message}</p>
+    try {
+        const res = await authFetch(`${API.CONTACTS}/allMessages`);
+        if(!res || !res.ok) {
+            list.innerHTML = `<div class="text-center p-4">Yüklənmə Xətası</div>`;
+            return;
+        }
+        
+        const messages = await res.json();
+        if (!Array.isArray(messages) || messages.length === 0) {
+            list.innerHTML = `<div class="text-center p-4 text-muted">Heç bir mesaj yoxdur</div>`;
+            return;
+        }
+        
+        messages.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+        
+        list.innerHTML = '';
+        messages.forEach(m => {
+            const isRead = m.isRead || m.read || false;
+            const bgClass = isRead ? 'bg-light' : 'bg-white border-primary';
+            
+            list.innerHTML += `
+                <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded shadow-sm ${bgClass}" style="cursor:pointer; ${!isRead ? 'border-left: 4px solid #6366f1;' : ''}" 
+                    onclick="viewMessage(${m.id}, '${(m.name || '').replace(/'/g, "\\'")}', '${(m.email || '').replace(/'/g, "\\'")}', '${(m.message || '').replace(/'/g, "\\'").replace(/\n/g, ' ')}')">
+                    
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white" 
+                        style="width:40px;height:40px;background:${isRead ? '#94a3b8' : '#6366f1'}">
+                        <i class="fas fa-envelope${isRead ? '-open' : ''}"></i>
                     </div>
-                    <div class="d-flex flex-column gap-1">
-                        ${!msg.isRead ? `
-                            <button class="btn btn-sm btn-outline-success" 
-                                    onclick="markAsRead(${msg.id})">
-                                <i class="fas fa-check"></i>
-                            </button>` : ''}
-                        <button class="btn btn-sm btn-outline-danger" 
-                                onclick="deleteMessage(${msg.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="fw-bold text-dark">${m.name || 'Adsız'}</div>
+                        <div class="small text-muted text-truncate">${(m.message || '').substring(0,60)}...</div>
+                    </div>
+                    
+                    <div class="text-end" style="min-width: 80px;">
+                        <div class="small text-muted">${formatDate(m.sentAt)}</div>
+                        <button class="btn btn-sm text-danger p-0 mt-1" onclick="event.stopPropagation();deleteMessage(${m.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
-            </div>`;
-        list.innerHTML += item;
-    });
+            `;
+        });
+    } catch(e) { 
+        console.error(e);
+        Swal.fire('Xəta', 'Mesajlar yüklənmədi', 'error');
+    }
 }
 
-async function markAsRead(id) {
-    const res = await authFetch(`${API.CONTACTS}/${id}/read`, {method: 'PATCH'});
-    if (res && res.ok) {
-        loadMessages();
-        Swal.fire({icon: 'success', title: 'Oxundu', timer: 1000, showConfirmButton: false});
-    }
+async function viewMessage(id, name, email, message) {
+    await Swal.fire({
+        title: `<strong>${name}</strong>`,
+        html: `
+            <div class="text-start">
+                <p class="text-muted mb-2"><i class="fas fa-envelope"></i> ${email}</p>
+                <div class="p-3 bg-light rounded">${message}</div>
+            </div>
+        `,
+        confirmButtonText: 'Bağla'
+    });
+    
+    try { 
+        await authFetch(`${API.CONTACTS}/${id}/read`, { method: 'PATCH' }); 
+        loadMessages(); 
+        loadDashboard();
+    } catch (e) {}
 }
 
 async function deleteMessage(id) {
-    const result = await Swal.fire({
-        title: 'Əminsiniz?',
-        text: 'Mesajı silmək istəyirsiniz?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Bəli, sil',
-        cancelButtonText: 'Xeyr'
-    });
-
-    if (result.isConfirmed) {
-        const res = await authFetch(`${API.CONTACTS}/${id}`, {method: 'DELETE'});
-        if (res && res.ok) {
-            loadMessages();
-            Swal.fire('Silindi!', '', 'success');
-        }
+    const r = await Swal.fire({title: 'Mesaj silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
+    if(r.isConfirmed) {
+        await authFetch(`${API.CONTACTS}/${id}`, { method: 'DELETE' });
+        loadMessages();
+        loadDashboard();
     }
 }
 
 // ============================================
-// 7. ABOUT FUNCTIONS
+// 9. ABOUT
 // ============================================
+
 async function loadAbout() {
-    const res = await authFetch(`${API.ABOUT}`);
-    if (res && res.ok) {
+    try {
+        const res = await fetch(`${API.ABOUT}/getAbout`);
+        if(!res.ok) return;
         const data = await res.json();
+        
         document.getElementById('aMainTitle').value = data.mainTitle || '';
-        document.getElementById('aWho').value = data.whoWeAre || '';
+        document.getElementById('aSubTitle').value = data.subTitle || '';
+        document.getElementById('aWho').value = data.whoWeAreText || '';
+        document.getElementById('aMission').value = data.ourMissionText || '';
+        document.getElementById('aApproach').value = data.ourApproachText || '';
+        document.getElementById('aEmail').value = data.email || '';
+        document.getElementById('aPhone').value = data.phone || '';
+        document.getElementById('aAddress').value = data.address || '';
+    } catch(e) { 
+        console.error(e);
+        Swal.fire('Xəta', 'Haqqımızda məlumatları yüklənmədi', 'error');
     }
 }
 
 document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
-    const payload = {
-        mainTitle: document.getElementById('aMainTitle').value,
-        whoWeAre: document.getElementById('aWho').value
-    };
-
-    const res = await authFetch(API.ABOUT, {
-        method: 'PUT',
-        body: JSON.stringify(payload)
-    });
-
-    if (res && res.ok) {
-        Swal.fire('Uğurlu!', 'Haqqımızda məlumatları yeniləndi', 'success');
-    } else {
-        Swal.fire('Xəta', 'Yeniləmə uğursuz oldu', 'error');
-    }
+    const fd = new FormData();
+    fd.append('mainTitle', document.getElementById('aMainTitle').value);
+    fd.append('subTitle', document.getElementById('aSubTitle').value);
+    fd.append('whoWeAreText', document.getElementById('aWho').value);
+    fd.append('ourMissionText', document.getElementById('aMission').value);
+    fd.append('ourApproachText', document.getElementById('aApproach').value);
+    fd.append('email', document.getElementById('aEmail').value);
+    fd.append('phone', document.getElementById('aPhone').value);
+    fd.append('address', document.getElementById('aAddress').value);
+    
+    const video = document.getElementById('aVideoFile').files[0];
+    if(video) fd.append('videoFile', video);
+    
+    Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
+    try {
+        const res = await authFetch(`${API.ABOUT}/updateAbout`, { method: 'PUT', body: fd });
+        
+        if(res && res.ok) {
+            Swal.fire('Uğurlu!', 'Məlumatlar yeniləndi', 'success');
+            document.getElementById('aVideoFile').value = ''; 
+            loadAbout();
+        } else { Swal.fire('Xəta', 'Yadda saxlamaq mümkün olmadı', 'error'); }
+    } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
 });
 
 // ============================================
-// 8. INITIALIZATION
+// 10. THEME & INIT
 // ============================================
-window.addEventListener('DOMContentLoaded', () => {
-    if (checkAuth()) {
-        loadDashboard();
-    }
+
+// Dark Mode
+const themeCheckbox = document.getElementById('themeCheckbox');
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    if (themeCheckbox) themeCheckbox.checked = true;
+}
+document.getElementById('themeToggleNav')?.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 });
+
+// Başla
+checkAuth();

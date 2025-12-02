@@ -3,136 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineChord Admin Panel</title>
+    <title>CineChord Admin Pro</title>
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Admin CSS -->
-    <link rel="stylesheet" href="/admin.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-    <!-- ============================================
-         LOGIN OVERLAY
-         ============================================ -->
+    <!-- LOGIN OVERLAY -->
     <div id="login-overlay" style="display: flex;">
         <div class="login-container">
-            <!-- LEFT SIDE - BRANDING -->
             <div class="login-left">
-                <div class="login-brand-section">
-                    <div class="login-logo-wrapper">
-                        <i class="fas fa-film" style="font-size: 3rem;"></i>
-                    </div>
-                    <div class="login-brand-text">
-                        <div class="brand-name">
-                            <span class="brand-cine">CINE</span>
-                            <span class="brand-chord">CHORD</span>
-                        </div>
-                        <div class="brand-tagline">Professional Admin Panel</div>
-                    </div>
+                <div class="brand-logo">
+                    <i class="fas fa-clapperboard"></i>
+                    <span>CineChord</span>
                 </div>
-                <div class="login-description">
-                    <h2>Xoş Gəldiniz</h2>
-                    <p>CineChord idarəetmə sisteminə daxil olun və portfolio, xidmətlər və mesajları idarə edin.</p>
-                </div>
-                <div class="login-features">
-                    <div class="feature-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Təhlükəsiz Giriş</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Real-time Dashboard</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>Responsive Design</span>
-                    </div>
-                </div>
+                <h2>Admin Panel</h2>
+                <p>Professional Content Management System</p>
             </div>
-
-            <!-- RIGHT SIDE - LOGIN FORM -->
             <div class="login-right">
                 <form id="loginForm" class="login-form">
-                    <div class="form-header">
-                        <h3>Giriş</h3>
-                        <p class="subtitle">Hesabınıza daxil olun</p>
-                    </div>
+                    <h3>Xoş Gəldiniz</h3>
+                    <p class="subtitle">Davam etmək üçün giriş edin</p>
                     
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> İstifadəçi adı</label>
-                        <input type="text" id="loginUser" class="form-control" placeholder="admin" required autocomplete="username">
+                        <input type="text" id="loginUser" placeholder="admin" required autocomplete="username">
                     </div>
                     
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Şifrə</label>
-                        <input type="password" id="loginPass" class="form-control" placeholder="••••••" required autocomplete="current-password">
+                        <input type="password" id="loginPass" placeholder="••••••" required autocomplete="current-password">
                     </div>
                     
                     <button type="submit" class="btn-login">
-                        Daxil ol <i class="fas fa-arrow-right"></i>
+                        <span>Giriş et</span>
+                        <i class="fas fa-arrow-right"></i>
                     </button>
-
-                    <div class="login-footer-note">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Admin girişi yalnız səlahiyyətli istifadəçilər üçündür</span>
-                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- ============================================
-         ADMIN PANEL WRAPPER
-         ============================================ -->
+    <!-- ADMIN WRAPPER -->
     <div class="admin-wrapper" id="admin-wrapper" style="display: none;">
         
-        <!-- ============================================
-             SIDEBAR
-             ============================================ -->
+        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="brand">
-                    <i class="fas fa-film text-primary"></i>
+                    <i class="fas fa-clapperboard"></i>
                     <span>CineChord</span>
                 </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
             
             <nav class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-title">MENYU</div>
-                    <a href="#" class="nav-item active" onclick="event.preventDefault(); switchView('dashboard')">
-                        <i class="fas fa-chart-line"></i> 
+                    <div class="nav-title">ƏSAS</div>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-chart-line"></i>
                         <span>Dashboard</span>
+                        <div class="nav-indicator"></div>
                     </a>
-                    <a href="#" class="nav-item" onclick="event.preventDefault(); switchView('works')">
-                        <i class="fas fa-video"></i> 
-                        <span>İşlər (Portfolio)</span>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">İDARƏETMƏ</div>
+                    <a href="#" class="nav-item" data-page="works">
+                        <i class="fas fa-film"></i>
+                        <span>Portfolio</span>
+                        <span class="badge" id="worksCount">0</span>
                     </a>
-                    <a href="#" class="nav-item" onclick="event.preventDefault(); switchView('services')">
-                        <i class="fas fa-layer-group"></i> 
+                    <a href="#" class="nav-item" data-page="services">
+                        <i class="fas fa-magic"></i>
                         <span>Xidmətlər</span>
+                        <span class="badge" id="servicesCount">0</span>
                     </a>
-                    <a href="#" class="nav-item" onclick="event.preventDefault(); switchView('messages')">
-                        <i class="fas fa-envelope"></i> 
+                    <a href="#" class="nav-item" data-page="messages">
+                        <i class="fas fa-envelope"></i>
                         <span>Mesajlar</span>
-                        <span class="badge badge-danger" id="unreadBadge" style="display: none;">0</span>
+                        <span class="badge badge-danger" id="messagesCount">0</span>
                     </a>
-                    <a href="#" class="nav-item" onclick="event.preventDefault(); switchView('about')">
-                        <i class="fas fa-info-circle"></i> 
+                    <a href="#" class="nav-item" data-page="about">
+                        <i class="fas fa-info-circle"></i>
                         <span>Haqqımızda</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">SİSTEM</div>
+                    <a href="#" class="nav-item" id="themeToggleNav">
+                        <i class="fas fa-moon"></i>
+                        <span>Dark Mode</span>
+                        <div class="theme-switch">
+                            <input type="checkbox" id="themeCheckbox">
+                            <label for="themeCheckbox"></label>
+                        </div>
                     </a>
                 </div>
             </nav>
@@ -153,110 +127,134 @@
             </div>
         </aside>
 
-        <!-- ============================================
-             MAIN CONTENT
-             ============================================ -->
+        <!-- MAIN CONTENT -->
         <main class="main-content">
             
-            <!-- ============================================
-                 DASHBOARD VIEW
-                 ============================================ -->
+            <!-- DASHBOARD VIEW -->
             <div class="page-view active" id="view-dashboard">
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Dashboard</h1>
-                        <p class="page-subtitle">CineChord idarəetmə panelinə xoş gəldiniz</p>
+                        <p class="page-subtitle">Xoş gəldiniz! Statistikanıza baxın</p>
                     </div>
-                    <button class="btn btn-primary btn-sm" onclick="loadDashboard()">
-                        <i class="fas fa-sync"></i> Yenilə
-                    </button>
+                    <div class="page-actions">
+                        <button class="btn-primary" onclick="loadDashboard()">
+                            <i class="fas fa-sync"></i> Yenilə
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Stats Cards -->
+                <!-- STATS CARDS -->
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-icon blue">
-                                <i class="fas fa-video"></i>
+                                <i class="fas fa-film"></i>
                             </div>
-                            <div>
-                                <div class="stat-label">İşlər</div>
+                            <div class="stat-info">
+                                <div class="stat-label">Toplam İşlər</div>
                                 <div class="stat-value" id="totalWorks">0</div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-icon purple">
-                                <i class="fas fa-layer-group"></i>
+                                <i class="fas fa-magic"></i>
                             </div>
-                            <div>
-                                <div class="stat-label">Xidmətlər</div>
+                            <div class="stat-info">
+                                <div class="stat-label">Aktiv Xidmətlər</div>
                                 <div class="stat-value" id="totalServices">0</div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-icon pink">
                                 <i class="fas fa-envelope"></i>
                             </div>
-                            <div>
-                                <div class="stat-label">Mesajlar</div>
+                            <div class="stat-info">
+                                <div class="stat-label">Yeni Mesajlar</div>
                                 <div class="stat-value" id="totalMessages">0</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts -->
+                <!-- CHARTS SECTION -->
                 <div class="dashboard-grid">
+                    <!-- Line Chart -->
                     <div class="dashboard-card">
                         <div class="card-header">
-                            <h5 class="card-title">
-                                <i class="fas fa-chart-line"></i> Aylıq Statistika
-                            </h5>
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Son 7 Günün Statistikası
+                            </h3>
                         </div>
                         <div class="card-body">
-                            <canvas id="worksChart" height="250"></canvas>
+                            <canvas id="worksChart" style="max-height: 300px;"></canvas>
                         </div>
                     </div>
-                    
+
+                    <!-- Doughnut Chart -->
                     <div class="dashboard-card">
                         <div class="card-header">
-                            <h5 class="card-title">
-                                <i class="fas fa-chart-pie"></i> Kateqoriyalar
-                            </h5>
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Kateqoriya Bölgüsü
+                            </h3>
                         </div>
                         <div class="card-body">
-                            <canvas id="categoryChart" height="250"></canvas>
+                            <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIVITY SECTION -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-clock"></i>
+                            Son Aktivliklər
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="activityList" class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <div class="activity-title">Yüklənir...</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- ============================================
-                 WORKS VIEW
-                 ============================================ -->
+            <!-- WORKS VIEW -->
             <div class="page-view" id="view-works">
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Portfolio İşləri</h1>
                         <p class="page-subtitle">Video işlərinizi idarə edin</p>
                     </div>
-                    <button class="btn btn-primary" onclick="openWorkModal()">
-                        <i class="fas fa-plus"></i> Yeni İş
+                    <button class="btn-primary" onclick="openWorkModal()">
+                        <i class="fas fa-plus"></i>
+                        Yeni İş
                     </button>
                 </div>
                 
+                <!-- FILTERS -->
                 <div class="filters-bar">
                     <div class="search-box-inline">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="İşlərdə axtar..." id="workSearch">
+                        <input type="text" id="workSearch" placeholder="İşlərdə axtar..." onkeyup="searchWorks()">
                     </div>
-                    <select class="category-select" id="categoryFilter">
+                    
+                    <select id="categoryFilter" class="category-select" onchange="filterWorks()">
                         <option value="">Bütün Kateqoriyalar</option>
                         <option value="FILM">Film</option>
                         <option value="COMMERCIAL">Commercial</option>
@@ -265,94 +263,159 @@
                         <option value="DOCUMENTARY">Documentary</option>
                         <option value="SOCIAL">Social</option>
                     </select>
+                    
+                    <div class="view-switcher">
+                        <button class="view-btn active" data-view="grid" onclick="switchView('grid')">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list" onclick="switchView('list')">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
                 </div>
                 
+                <!-- WORKS GRID -->
                 <div class="works-container" id="worksGrid">
-                    <!-- Works will be loaded here dynamically -->
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Yüklənir...</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 SERVICES VIEW
-                 ============================================ -->
+            <!-- SERVICES VIEW -->
             <div class="page-view" id="view-services">
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Xidmətlər</h1>
-                        <p class="page-subtitle">Təklif etdiyiniz xidmətləri idarə edin</p>
+                        <p class="page-subtitle">Şirkət xidmətlərinizi idarə edin</p>
                     </div>
-                    <button class="btn btn-primary" onclick="openServiceModal()">
-                        <i class="fas fa-plus"></i> Yeni Xidmət
+                    <button class="btn-primary" onclick="openServiceModal()">
+                        <i class="fas fa-plus"></i>
+                        Yeni Xidmət
                     </button>
                 </div>
+                
                 <div class="services-grid" id="servicesGrid">
-                    <!-- Services will be loaded here dynamically -->
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p>Yüklənir...</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 MESSAGES VIEW
-                 ============================================ -->
+            <!-- MESSAGES VIEW -->
             <div class="page-view" id="view-messages">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Gələn Mesajlar</h1>
+                        <h1 class="page-title">Mesajlar</h1>
                         <p class="page-subtitle">Müştəri mesajlarını idarə edin</p>
                     </div>
                 </div>
+                
                 <div class="content-card">
-                    <div id="messagesList" class="list-group">
-                        <!-- Messages will be loaded here dynamically -->
+                    <div class="messages-list" id="messagesList">
+                        <div style="text-align: center; padding: 4rem; color: var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p>Yüklənir...</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 ABOUT VIEW
-                 ============================================ -->
+            <!-- ABOUT VIEW -->
             <div class="page-view" id="view-about">
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Haqqımızda</h1>
-                        <p class="page-subtitle">Şirkət məlumatlarını redaktə edin</p>
+                        <p class="page-subtitle">Şirkət məlumatlarınızı yeniləyin</p>
                     </div>
                 </div>
-                <div class="content-card">
-                    <form id="aboutForm">
+                
+                <form id="aboutForm" class="about-form">
+                    <div class="content-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-video"></i>
+                            Video və Başlıqlar
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Əsas Başlıq</label>
+                                <input type="text" id="aMainTitle" placeholder="OUR STORY">
+                            </div>
+                            <div class="form-group">
+                                <label>Video Faylı</label>
+                                <input type="file" id="aVideoFile" accept="video/mp4">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Alt Başlıq</label>
+                                <textarea id="aSubTitle" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-align-left"></i>
+                            Məzmun Bölmələri
+                        </h3>
                         <div class="form-grid">
                             <div class="form-group full-width">
-                                <label><i class="fas fa-heading"></i> Əsas Başlıq</label>
-                                <input type="text" id="aMainTitle" class="form-control" placeholder="CineChord - Professional Video Production">
+                                <label>Biz Kimik</label>
+                                <textarea id="aWho" rows="3"></textarea>
                             </div>
                             <div class="form-group full-width">
-                                <label><i class="fas fa-align-left"></i> Haqqımızda Mətn</label>
-                                <textarea id="aWho" class="form-control" rows="6" placeholder="Şirkət haqqında məlumat..."></textarea>
+                                <label>Missiyamız</label>
+                                <textarea id="aMission" rows="3"></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Yanaşmamız</label>
+                                <textarea id="aApproach" rows="3"></textarea>
                             </div>
                         </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary">
-                                <i class="fas fa-times"></i> Ləğv et
-                            </button>
-                            <button type="button" id="saveAboutBtn" class="btn-primary">
-                                <i class="fas fa-save"></i> Yadda Saxla
-                            </button>
+                    </div>
+
+                    <div class="content-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-address-card"></i>
+                            Əlaqə Məlumatları
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="aEmail">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon</label>
+                                <input type="text" id="aPhone">
+                            </div>
+                            <div class="form-group">
+                                <label>Ünvan</label>
+                                <input type="text" id="aAddress">
+                            </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary">Ləğv et</button>
+                        <button type="button" id="saveAboutBtn" class="btn-primary">
+                            <i class="fas fa-save"></i>
+                            Yadda Saxla
+                        </button>
+                    </div>
+                </form>
             </div>
 
         </main>
     </div>
 
-    <!-- ============================================
-         WORK MODAL
-         ============================================ -->
+    <!-- WORK MODAL -->
     <div class="modal fade" id="workModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">İş Əlavə Et / Düzəlt</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="workModalTitle">İş Formu</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="workForm">
@@ -360,11 +423,15 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Başlıq</label>
-                                <input type="text" id="wTitle" class="form-control" required placeholder="Məs: Reklam Çəkilişi">
+                                <input type="text" id="wTitle" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Müştəri</label>
+                                <input type="text" id="wClient" class="form-control">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Kateqoriya</label>
-                                <select id="wCategory" class="form-select">
+                                <select id="wCategory" class="form-select" required>
                                     <option value="FILM">FILM</option>
                                     <option value="COMMERCIAL">COMMERCIAL</option>
                                     <option value="CLIP">CLIP</option>
@@ -373,72 +440,70 @@
                                     <option value="SOCIAL">SOCIAL</option>
                                 </select>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Youtube/Vimeo URL</label>
-                                <input type="url" id="wVideoUrl" class="form-control" placeholder="https://youtube.com/watch?v=...">
+                            <div class="col-md-6">
+                                <label class="form-label">Video Link</label>
+                                <input type="url" id="wVideoUrl" class="form-control">
                             </div>
-                            <div class="col-12">
+                            <div class="col-md-6">
                                 <label class="form-label">Poster Şəkli</label>
-                                <input type="file" id="wImage" class="form-control" accept="image/*">
+                                <input type="file" id="wImage" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Preview Video</label>
+                                <input type="file" id="wPreview" class="form-control">
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Təsvir</label>
-                                <textarea id="wDescription" class="form-control" rows="3" placeholder="İş haqqında qısa məlumat..."></textarea>
+                                <label class="form-label">Açıqlama</label>
+                                <textarea id="wDescription" class="form-control" rows="3"></textarea>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
-                    <button type="button" class="btn btn-primary" onclick="submitWork()">Təsdiqlə</button>
+                    <button type="button" class="btn btn-primary w-100" onclick="submitWork()">Təsdiqlə</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ============================================
-         SERVICE MODAL
-         ============================================ -->
+    <!-- SERVICE MODAL -->
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Xidmət Formu</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId">
                         <div class="mb-3">
-                            <label class="form-label">Xidmət Adı</label>
-                            <input type="text" id="sTitle" class="form-control" required placeholder="Məs: Video Montaj">
+                            <label class="form-label">Başlıq</label>
+                            <input type="text" id="sTitle" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">İkon (FontAwesome Class)</label>
-                            <input type="text" id="sIcon" class="form-control" placeholder="fas fa-camera">
-                            <small class="text-muted">Məsələn: fas fa-camera, fas fa-video, fas fa-film</small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Arxa Fon Videosu (MP4)</label>
-                            <input type="file" id="sVideoFile" class="form-control" accept="video/*">
+                            <label class="form-label">Icon Class</label>
+                            <input type="text" id="sIcon" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Təsvir</label>
-                            <textarea id="sDescription" class="form-control" rows="3" placeholder="Xidmət haqqında məlumat..."></textarea>
+                            <textarea id="sDesc" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Video Faylı</label>
+                            <input type="file" id="sVideoFile" class="form-control">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
-                    <button type="button" class="btn btn-primary" onclick="submitService()">Yadda Saxla</button>
+                    <button type="button" class="btn btn-primary w-100" onclick="submitService()">Yadda Saxla</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/admin.js"></script>
+    <script src="admin.js"></script>
 
 </body>
 </html>
