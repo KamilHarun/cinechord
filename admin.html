@@ -12,17 +12,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="/admin.css">
 </head>
 <body>
 
-    <!-- LOGIN OVERLAY -->
     <div id="login-overlay" style="display: flex;">
         <div class="login-container">
             <div class="login-left">
                 <div class="login-brand-section">
                     <div class="login-logo-wrapper">
-                        <img src="photos/CineChord.png" alt="CineChord Logo" class="login-logo-img">
+                        <img src="/photos/CineChord.png" alt="CineChord Logo" class="login-logo-img">
                     </div>
                     <div class="login-brand-text">
                         <div class="brand-name">
@@ -94,14 +93,12 @@
         </div>
     </div>
 
-    <!-- ADMIN WRAPPER -->
     <div class="admin-wrapper" id="admin-wrapper" style="display: none;">
         
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="brand">
-                    <img src="photos/CineChord.png" alt="CineChord" class="sidebar-logo">
+                    <img src="/photos/CineChord.png" alt="CineChord" class="sidebar-logo">
                     <span>CineChord</span>
                 </div>
                 <button class="sidebar-toggle" id="sidebarToggle">
@@ -171,10 +168,8 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content">
             
-            <!-- DASHBOARD VIEW -->
             <div class="page-view active" id="view-dashboard">
                 <div class="page-header">
                     <div>
@@ -188,7 +183,6 @@
                     </div>
                 </div>
 
-                <!-- STATS CARDS -->
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-header">
@@ -227,9 +221,7 @@
                     </div>
                 </div>
 
-                <!-- CHARTS SECTION -->
                 <div class="dashboard-grid">
-                    <!-- Line Chart -->
                     <div class="dashboard-card">
                         <div class="card-header">
                             <h3 class="card-title">
@@ -242,7 +234,6 @@
                         </div>
                     </div>
 
-                    <!-- Doughnut Chart -->
                     <div class="dashboard-card">
                         <div class="card-header">
                             <h3 class="card-title">
@@ -256,7 +247,6 @@
                     </div>
                 </div>
 
-                <!-- ACTIVITY SECTION -->
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h3 class="card-title">
@@ -278,7 +268,6 @@
                     </div>
                 </div>
             </div>
-            <!-- WORKS VIEW -->
             <div class="page-view" id="view-works">
                 <div class="page-header">
                     <div>
@@ -291,7 +280,6 @@
                     </button>
                 </div>
                 
-                <!-- FILTERS -->
                 <div class="filters-bar">
                     <div class="search-box-inline">
                         <i class="fas fa-search"></i>
@@ -318,7 +306,6 @@
                     </div>
                 </div>
                 
-                <!-- WORKS GRID -->
                 <div class="works-container" id="worksGrid">
                     <div class="loading-state">
                         <i class="fas fa-spinner fa-spin"></i>
@@ -327,7 +314,6 @@
                 </div>
             </div>
 
-            <!-- SERVICES VIEW -->
             <div class="page-view" id="view-services">
                 <div class="page-header">
                     <div>
@@ -348,7 +334,6 @@
                 </div>
             </div>
 
-            <!-- MESSAGES VIEW -->
             <div class="page-view" id="view-messages">
                 <div class="page-header">
                     <div>
@@ -367,7 +352,6 @@
                 </div>
             </div>
 
-            <!-- ABOUT VIEW -->
             <div class="page-view" id="view-about">
                 <div class="page-header">
                     <div>
@@ -453,7 +437,6 @@
         </main>
     </div>
 
-    <!-- WORK MODAL -->
     <div class="modal fade" id="workModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -510,7 +493,6 @@
         </div>
     </div>
 
-    <!-- SERVICE MODAL -->
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -547,7 +529,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="admin.js"></script>
+    
+    <script src="/admin.js"></script>
+    
     <script>
         function togglePassword() {
             const passInput = document.getElementById('loginPass');
