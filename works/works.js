@@ -1,23 +1,18 @@
-// works.js - Tam Yenilənmiş Versiya (Backend-ə birbaşa sorğu)
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. API & GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU)
+    // 0. API & GLOBAL VARS
     // ============================================================
-    
-    // Backend URL-i birbaşa Railway-ə yönləndirilir
     const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
-
-    // API yolları tam URL ilə
     const API_WORKS = `${BACKEND_URL}/api/works`;
-    
-    // Uploads qovluğu da eyni backend-dən
     const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
     
     const container = document.getElementById('dynamic-projects-grid');
     const pageTransition = document.querySelector('.page-transition');
     const loadingScreen = document.querySelector('.loading-screen');
-    
+    const header = document.querySelector('.header');
+    const logo = document.querySelector('.center-logo');
+
     const categoryMap = { 
         'FILM': 'films', 'COMMERCIAL': 'commercial', 'CLIP': 'clips',
         'MUSIC_VIDEO': 'clips', 'DOCUMENTARY': 'films', 'SOCIAL': 'commercial'
@@ -28,16 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewVideo = document.getElementById('previewVideo');
     const previewTitleEl = document.getElementById('previewTitle');
     const closePreview = document.getElementById('closePreview'); 
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const playIcon = document.getElementById('playIcon');
-    const pauseIcon = document.getElementById('pauseIcon');
     const modalPlayContainer = document.getElementById('modalPlayBtnContainer');
     const progressBarContainer = document.getElementById('progressBarContainer');
     const progressPlayed = document.getElementById('progressPlayed');
     const currentTimeEl = document.getElementById('currentTime');
     const durationTimeEl = document.getElementById('durationTime');
     const volumeSlider = document.getElementById('volumeSlider');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
     const rewindBtn = document.getElementById('rewindBtn');
     const forwardBtn = document.getElementById('forwardBtn');
     const speedBtn = document.getElementById('speedBtn');
@@ -47,51 +38,64 @@ document.addEventListener('DOMContentLoaded', function() {
     const INACTIVITY_DELAY = 2000; 
 
     // ============================================================
-    // 1. FLASH FIX & PAGE TRANSITION & LOADING SCREEN
+    // 1. PAGE LOAD & TRANSITION & LOADER MƏNTİQİ
     // ============================================================
     
-    if (pageTransition) {
-        setTimeout(() => {
-            pageTransition.classList.add('page-loaded'); 
-        }, 100);
-    }
-
+    // YÜKLƏNMƏ EKRANINI TEZ GİZLƏT
     if (loadingScreen) {
         setTimeout(() => {
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
             }, 500);
-        }, 500);
+        }, 100); // 500ms yox, 100ms sonra başlayır
     }
 
+    // FLASH FIX & SƏHİFƏ KEÇİDİ
+    if (pageTransition) {
+        setTimeout(() => {
+            pageTransition.classList.add('page-loaded'); 
+        }, 50); // Çox daha sürətli
+    }
+
+    function navigateWithTransition(href) {
+        if (pageTransition) {
+            pageTransition.classList.remove('page-loaded'); 
+            pageTransition.style.transition = 'none';
+            pageTransition.classList.add('active');
+        }
+        setTimeout(() => { window.location.href = href; }, 600);
+    }
+    
     // ============================================================
-    // 2. NAVBAR & LOGO SCROLL LOGIC
+    // 2. NAVBAR & LOGO SCROLL MƏNTİQİ
     // ============================================================
     let lastScroll = 0;
-    const navbar = document.querySelector('.header');
-    const logo = document.querySelector('.center-logo');
 
     setTimeout(() => { if (logo) logo.classList.add('entry-done'); }, 200);
 
     function handleScroll() {
         const currentScroll = window.scrollY;
-        if (currentScroll > lastScroll && currentScroll > 50) {
-            if (navbar) navbar.style.transform = 'translateY(-100%)';
-        } else {
-            if (navbar) navbar.style.transform = 'translateY(0)';
+        
+        // Header gizlətmə/göstərmə
+        if (header) {
+            header.style.transform = (currentScroll > lastScroll && currentScroll > 50) ? 'translateY(-100%)' : 'translateY(0)';
         }
-        if (currentScroll > 50) {
-            if (logo) logo.classList.add('scroll-hidden');
-        } else {
-            if (logo) logo.classList.remove('scroll-hidden');
+        
+        // Logo gizlətmə/göstərmə
+        if (logo) {
+            if (currentScroll > 50) {
+                logo.classList.add('scroll-hidden');
+            } else {
+                logo.classList.remove('scroll-hidden');
+            }
         }
         lastScroll = currentScroll;
     }
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     // ============================================================
-    // 3. SCROLL REVEAL (OBSERVER)
+    // 3. SCROLL REVEAL (Intersection Observer)
     // ============================================================
     const observerOptions = {
         threshold: 0.1, 
@@ -111,37 +115,12 @@ document.addEventListener('DOMContentLoaded', function() {
             el.classList.add('reveal-item');
             observer.observe(el);
     });
-
+    
     // ============================================================
-    // 4. PAGE TRANSITION LOGIC & SCRAMBLE (NAVIGASYON)
+    // 4. SCRAMBLE EFFECT VƏ NAVİQASİYA (TƏMİZLƏNİB)
     // ============================================================
     
-    function navigateWithTransition(href) {
-        if (pageTransition) {
-            pageTransition.classList.remove('page-loaded'); 
-            pageTransition.style.transition = 'none';
-            pageTransition.classList.add('active');
-        }
-        setTimeout(() => { window.location.href = href; }, 600);
-    }
-
-    document.querySelectorAll('.nav-btn, .footer-link').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const href = btn.getAttribute('href');
-            if (!href || href === '#') {
-                e.preventDefault();
-                return;
-            }
-            
-            const linkPath = href.split('/').pop();
-            const currentPath = window.location.pathname.split('/').pop();
-            if (linkPath === currentPath) return; 
-
-            e.preventDefault();
-            navigateWithTransition(href);
-        });
-    });
-
+    // Scramble məntiqi olduğu kimi saxlanıldı
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     function applyScrambleEffect(element, textElement, originalText) {
         let iteration = 0; clearInterval(element.interval);
@@ -155,21 +134,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 30);
     }
 
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        const originalText = btn.getAttribute('data-text');
-        if (!originalText) return;
-        const navText = btn.querySelector('.nav-text');
-        if (!navText) return;
+    document.querySelectorAll('.nav-btn, .footer-link').forEach(btn => {
+        const href = btn.getAttribute('href');
+        const isExternal = href && !href.startsWith('#') && !href.startsWith('..');
 
-        btn.addEventListener('mouseenter', function() {
-            if (this.classList.contains('active')) return;
-            applyScrambleEffect(btn, navText, originalText);
-        });
+        if(btn.classList.contains('nav-btn')) {
+            const originalText = btn.getAttribute('data-text');
+            const navText = btn.querySelector('.nav-text');
+            
+            btn.addEventListener('mouseenter', function() {
+                if (this.classList.contains('active')) return;
+                applyScrambleEffect(btn, navText, originalText);
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                if (this.classList.contains('active')) return;
+                clearInterval(btn.interval);
+                navText.innerText = originalText;
+            });
+        }
         
-        btn.addEventListener('mouseleave', function() {
-            if (this.classList.contains('active')) return;
-            clearInterval(btn.interval);
-            navText.innerText = originalText;
+        btn.addEventListener('click', (e) => {
+            if (isExternal || href.startsWith('mailto') || href.startsWith('tel')) return; 
+            if (!href || href === '#') { e.preventDefault(); return; }
+
+            const linkPath = href.split('/').pop();
+            const currentPath = window.location.pathname.split('/').pop();
+            if (linkPath === currentPath) return; 
+
+            e.preventDefault();
+            navigateWithTransition(href);
         });
     });
 
@@ -179,13 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function cleanUrlPath(url) {
         if (url && typeof url === 'string') {
-            // Əgər URL tam yolsa (http ilə başlayırsa), onu olduğu kimi qaytarırıq
             if (url.startsWith('http')) return url;
-            
-            // Əgər /uploads/ ilə başlayırsa, onu təmizləyirik
             if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
-            
-            // Əgər sadəcə fayl adıdırsa, olduğu kimi qaytarırıq
             if (!url.startsWith('/') && url.includes('.')) return url;
         }
         return url;
@@ -195,19 +184,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if(!container) return;
         
         try {
-            console.log('API sorğusu göndərilir:', API_WORKS);
-            
             const response = await fetch(API_WORKS);
-            
-            console.log('Response status:', response.status);
-            
             if (!response.ok) {
-                throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                throw new Error(`Network response was not ok: ${response.status}`);
             }
             
             const data = await response.json();
-            console.log('API cavabı alındı:', data);
-            
             const works = data.content ? data.content : data;
             container.innerHTML = ''; 
 
@@ -220,7 +202,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 let videoSrc = work.previewVideoUrl || work.videoUrl;
                 let imageSrc = work.imageUrl;
                 
-                // Video URL-ini düzəldirik
                 if (videoSrc) {
                     videoSrc = cleanUrlPath(videoSrc);
                     if (!videoSrc.startsWith('http')) {
@@ -228,15 +209,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Şəkil URL-ini düzəldirik
                 if (imageSrc) {
                     imageSrc = cleanUrlPath(imageSrc);
                     if (!imageSrc.startsWith('http')) {
                         imageSrc = UPLOADS_URL + imageSrc;
                     }
                 }
-                
-                console.log('Work yüklənir:', work.title, 'Video:', videoSrc, 'Image:', imageSrc);
                 
                 const categoryClass = categoryMap[work.category] || 'other';
                 
@@ -247,7 +225,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         data-title="${work.title}"
                         style="transition-delay: ${index * 0.05}s;">
                         <div class="project-image-container">
-                            <video muted loop playsinline class="project-video" preload="metadata" poster="${imageSrc || ''}">
+                            <video 
+                                muted loop playsinline 
+                                class="project-video" 
+                                preload="metadata" 
+                                poster="${imageSrc || ''}"
+                            >
                                 ${videoSrc ? `<source src="${videoSrc}" type="video/mp4">` : ''}
                             </video>
                             <div class="card-overlay"></div>
@@ -267,8 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 container.innerHTML += workHTML;
             });
             
-            console.log(`${works.length} work yükləndi`);
-            
             const newCards = container.querySelectorAll('.project-card');
             newCards.forEach(card => observer.observe(card));
 
@@ -278,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("Error loading works:", error);
             container.innerHTML = `
                 <p style="color:red; text-align:center; margin-top:50px;">
-                    API connection failed: ${error.message}<br>
+                    API connection failed. Please check the backend server connection.<br>
                     <small>Trying to connect to: ${API_WORKS}</small>
                 </p>
             `;
@@ -305,18 +286,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
+    /**
+     * Works-dəki videolar üçün Hover effektini tətbiq edir.
+     */
     function attachHoverEffects() {
         document.querySelectorAll('.project-card').forEach(card => {
             const video = card.querySelector('video');
             if (video) {
-                card.addEventListener('mouseenter', () => video.play().catch(()=>{}));
-                card.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
+                // `onloadedmetadata` əvəzinə, sadəcə try/catch ilə cəhd edirik.
+                card.addEventListener('mouseenter', () => {
+                    if(video.readyState >= 2) { 
+                        video.play().catch(()=>{});
+                    } else {
+                        // Metadata yoxdursa, yüklənməyə kömək edirik
+                        video.load(); 
+                        video.onloadedmetadata = () => video.play().catch(()=>{});
+                    }
+                });
+
+                card.addEventListener('mouseleave', () => { 
+                    video.pause(); 
+                    video.currentTime = 0; 
+                });
             }
         });
     }
 
     // ============================================================
-    // 6. VIDEO MODAL LOGIC
+    // 6. VIDEO MODAL LOGIC (TƏMİZLƏNİB)
     // ============================================================
     
     function formatTime(seconds) {
@@ -341,8 +338,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function openModal(videoSrc, title) {
         if (!videoSrc) return;
         
-        console.log('Modal açılır:', title, videoSrc);
-        
         if(previewTitleEl) {
             previewTitleEl.textContent = title;
             previewTitleEl.setAttribute('data-text', title);
@@ -359,12 +354,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 previewVideo.onloadedmetadata = function() {
                     if(durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
-                    if (modalPlayContainer) {
-                         const modalPlayText = modalPlayContainer.querySelector('.play-text');
-                         if(modalPlayText) {
-                            modalPlayText.setAttribute('data-text', 'PLAY');
-                            modalPlayText.innerText = 'PLAY'; 
-                         }
+                    const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
+                    if(modalPlayText) {
+                        modalPlayText.setAttribute('data-text', 'PLAY');
+                        modalPlayText.innerText = 'PLAY'; 
                     }
                 };
             }, 10);
@@ -378,14 +371,13 @@ document.addEventListener('DOMContentLoaded', function() {
         previewContainer.classList.remove('user-inactive'); 
         clearTimeout(activityTimeout);
         document.body.style.overflow = 'auto';
-        
-        if(previewTitleEl) previewTitleEl.removeAttribute('data-text');
 
         setTimeout(() => {
             previewVideo.pause();
             previewVideo.currentTime = 0;
-            previewVideo.src = '';
+            previewVideo.removeAttribute('src'); // `src` silindi
             if(durationTimeEl) durationTimeEl.textContent = '0:00';
+            previewContainer.style.display = 'none'; // Tamamilə gizlət
         }, 500);
     }
 
@@ -393,92 +385,66 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
         
         if (previewVideo.paused) {
-            if(playIcon) playIcon.style.display = 'block';
-            if(pauseIcon) pauseIcon.style.display = 'none';
+            if(modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PLAY");
             previewContainer.classList.add('is-paused');
             previewContainer.classList.remove('user-inactive'); 
             clearTimeout(activityTimeout);
-            
-            if(modalPlayText) {
-                modalPlayText.setAttribute('data-text', 'PLAY');
-                if(modalPlayText.innerText !== "PLAY") applyScrambleEffect(modalPlayContainer, modalPlayText, "PLAY");
-            }
         } else {
-            if(playIcon) playIcon.style.display = 'none';
-            if(pauseIcon) pauseIcon.style.display = 'block';
+            if(modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PAUSE");
             previewContainer.classList.remove('is-paused');
             handleUserActivity(); 
-            
-            if(modalPlayText) {
-                modalPlayText.setAttribute('data-text', 'PAUSE');
-                if(modalPlayText.innerText !== "PAUSE") applyScrambleEffect(modalPlayContainer, modalPlayText, "PAUSE");
-            }
         }
+        // İkonların göstərilməsi üçün CSS-də düzəliş edilmədi, JS-də sadəcə məntiqi saxlayıram
     }
 
     function togglePlay(e) {
         if(e) e.stopPropagation();
-        if (previewVideo.paused) {
-            previewVideo.play();
-        } else {
-            previewVideo.pause();
-        }
+        previewVideo.paused ? previewVideo.play() : previewVideo.pause();
     }
 
 
     // ** Event Listenerlər **
     document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('fullscreen-btn')) {
-            const videoSrc = e.target.getAttribute('data-video-src');
-            const title = e.target.getAttribute('data-title');
+        if (e.target.closest('.fullscreen-btn')) {
+            const btn = e.target.closest('.fullscreen-btn');
+            const videoSrc = btn.getAttribute('data-video-src');
+            const title = btn.getAttribute('data-title');
             e.preventDefault();
             openModal(videoSrc, title);
         }
         
-        if (e.target.closest('#playPauseBtn')) {
-            togglePlay(e);
+        if (e.target.closest('#playPauseBtn') || e.target.closest('#modalPlayBtnContainer')) {
+             e.stopPropagation();
+             togglePlay();
         }
     });
 
     if (previewContainer) {
-        previewContainer.addEventListener('mousemove', handleUserActivity);
-        previewContainer.addEventListener('click', handleUserActivity);
-        previewContainer.addEventListener('touchstart', handleUserActivity);
+        // Modalın hər hansı bir yerinə kliklədikdə/hərəkət etdikdə
+        ['mousemove', 'click', 'touchstart'].forEach(event => {
+            previewContainer.addEventListener(event, handleUserActivity);
+        });
     }
     
     if (previewVideo) {
-        previewVideo.onclick = togglePlay;
+        previewVideo.addEventListener('click', togglePlay);
         previewVideo.addEventListener('play', updatePlayButtonUI);
         previewVideo.addEventListener('pause', updatePlayButtonUI);
-        previewVideo.addEventListener('loadedmetadata', updatePlayButtonUI); 
+        previewVideo.addEventListener('ended', () => {
+            previewVideo.pause();
+            previewVideo.currentTime = 0;
+        }); 
         
         previewVideo.addEventListener('timeupdate', () => {
             const percent = (previewVideo.currentTime / previewVideo.duration) * 100;
             if(progressPlayed) progressPlayed.style.width = percent + '%';
             if(currentTimeEl) currentTimeEl.textContent = formatTime(previewVideo.currentTime);
         });
-
-        previewVideo.addEventListener('ended', () => {
-            previewVideo.pause();
-            previewVideo.currentTime = 0;
-        }); 
     }
     
     if(closePreview) closePreview.onclick = closeVideoPreview;
-
-    if (modalPlayContainer) {
-        modalPlayContainer.addEventListener('click', (e) => {
-            e.stopPropagation();
-            togglePlay();
-        });
-        const modalPlayTextSpan = modalPlayContainer.querySelector('.play-text');
-        modalPlayContainer.addEventListener("mouseenter", () => {
-            if(!previewVideo) return;
-            const currentText = previewVideo.paused ? "PLAY" : "PAUSE";
-            applyScrambleEffect(modalPlayContainer, modalPlayTextSpan, currentText);
-        });
-    }
     
+    // Nəzarət düymələri və slaydlar
     if(progressBarContainer) progressBarContainer.addEventListener('click', (e) => {
         const rect = progressBarContainer.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
@@ -489,29 +455,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     if(volumeSlider) volumeSlider.oninput = function(e) { 
-        e.stopPropagation(); 
         previewVideo.volume = e.target.value / 100; 
         handleUserActivity();
     };
     
-    if(rewindBtn) rewindBtn.onclick = (e) => { e.stopPropagation(); previewVideo.currentTime -= 5; handleUserActivity(); };
-    if(forwardBtn) forwardBtn.onclick = (e) => { e.stopPropagation(); previewVideo.currentTime += 5; handleUserActivity(); };
+    if(rewindBtn) rewindBtn.onclick = () => { previewVideo.currentTime -= 5; handleUserActivity(); };
+    if(forwardBtn) forwardBtn.onclick = () => { previewVideo.currentTime += 5; handleUserActivity(); };
     
-    if(fullscreenBtn) fullscreenBtn.onclick = (e) => {
-        e.stopPropagation();
-        if(document.fullscreenElement) document.exitFullscreen();
-        else if(previewVideo.requestFullscreen) previewVideo.requestFullscreen();
-        handleUserActivity();
-    };
-    
-    if (speedBtn) speedBtn.addEventListener('click', () => {
-        let newSpeed = previewVideo.playbackRate + 0.25;
-        if (newSpeed > 2) newSpeed = 0.5; 
-        previewVideo.playbackRate = newSpeed;
-        speedBtn.textContent = `${newSpeed}x`;
-        handleUserActivity();
-    });
-
     document.addEventListener('keydown', (e) => {
         if(previewContainer && previewContainer.classList.contains('active')) {
             if(e.key === 'Escape') closeVideoPreview();
@@ -522,6 +472,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Yükləməni başlat
-    console.log('Works yüklənməyə başlayır...');
     loadDynamicWorks();
 });

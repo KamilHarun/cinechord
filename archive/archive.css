@@ -1,4 +1,12 @@
-/* GLOBAL RESETS */
+/* ============================================================
+   CineChord Archive - Main Stylesheet
+   Version: 2.0
+   Description: Professional archive page with video preview system
+   ============================================================ */
+
+/* ============================================================
+   1. GLOBAL RESETS & BASE STYLES
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
@@ -20,51 +28,46 @@ body {
     position: relative;
 }
 
-/* FONT-FACE - Neue Metana OUTLINE */
+/* ============================================================
+   2. CUSTOM FONTS
+   ============================================================ */
 @font-face {
     font-family: 'NeueMetanaOutline';
     src: url('../fonts/NeueMetanaNextOutline-Black.woff2') format('woff2'),
          url('../fonts/NeueMetanaNextOutline-Black.woff') format('woff');
     font-weight: 900;
     font-style: normal;
+    font-display: swap;
 }
 
-/* PAGE TRANSITION ANIMATION */
+/* ============================================================
+   3. PAGE TRANSITION SYSTEM
+   ============================================================ */
 .page-transition {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  z-index: 9999;
-  transform: translateY(-100%);
-  pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 9999;
+    transform: translateY(-100%);
+    pointer-events: none;
 }
 
 .page-transition.active {
-  animation: pageTransition 1.2s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+    animation: pageTransition 1.2s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
 
 @keyframes pageTransition {
-  0% { transform: translateY(-100%); }
-  50% { transform: translateY(0); }
-  100% { transform: translateY(100%); }
+    0% { transform: translateY(-100%); }
+    50% { transform: translateY(0); }
+    100% { transform: translateY(100%); }
 }
 
-/* Animations */
-@keyframes fadeInUp {
-    0% {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* GRAIN OVERLAY */
+/* ============================================================
+   4. GRAIN OVERLAY EFFECT
+   ============================================================ */
 .grain-overlay {
     position: fixed;
     top: 0;
@@ -91,7 +94,9 @@ body {
     90% { transform: translate(-1%, -1%); }
 }
 
-/* PROGRESS BAR */
+/* ============================================================
+   5. SCROLL PROGRESS BAR
+   ============================================================ */
 .progress-bar-top {
     position: fixed;
     top: 0;
@@ -104,30 +109,34 @@ body {
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-/* CENTER LOGO STYLES */
+/* ============================================================
+   6. CENTER LOGO
+   ============================================================ */
 .center-logo {
     position: fixed;
     top: 30px;
     left: 50%;
-    transform: translateX(-50%) scale(0.5) rotate(-180deg);
+    transform: translateX(-50%) scale(1);
     z-index: 1001;
-    opacity: 0;
-    transition: none !important;
+    opacity: 1;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    will-change: transform, opacity;
+    animation: fadeInScale 0.8s ease;
 }
 
-/* Entry animasiya - JavaScript ilə kontrol */
-.center-logo.entry-done {
-    animation: fadeInScale 0.8s ease forwards;
-}
-
+/* Entry animation */
 @keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.5) rotate(-180deg);
+    }
     to {
         opacity: 1;
         transform: translateX(-50%) scale(1) rotate(0deg);
     }
 }
 
-/* Scroll hide - JavaScript ilə kontrol */
+/* Hide on scroll - controlled by JavaScript */
 .center-logo.scroll-hidden {
     transform: translateX(-50%) translateY(-100px) !important;
     opacity: 0 !important;
@@ -141,31 +150,34 @@ body {
     filter: brightness(0) invert(1);
 }
 
-
-/* HEADER / NAVBAR */
+/* ============================================================
+   7. HEADER & NAVIGATION
+   ============================================================ */
 .header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     padding: 20px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000 !important;
-    background: transparent !important;
-    transition: transform 0.4s ease !important;
+    z-index: 1000;
+    background: transparent;
+    transition: transform 0.4s ease;
     transform: translateY(0);
     pointer-events: auto;
+    will-change: transform;
 }
 
+/* Navigation hide/show states */
 .header.navbar-hide {
-    transform: translateY(-100%) !important;
+    transform: translateY(-100%);
     pointer-events: none;
 }
 
 .header.navbar-show {
-    transform: translateY(0) !important;
+    transform: translateY(0);
     pointer-events: auto;
 }
 
@@ -175,6 +187,9 @@ body {
     gap: 15px;
 }
 
+/* ============================================================
+   8. NAVIGATION BUTTONS
+   ============================================================ */
 .nav-btn {
     padding: 12px 30px;
     background: transparent;
@@ -189,18 +204,31 @@ body {
     text-transform: capitalize;
     position: relative;
     overflow: hidden;
-    animation: fadeInUp 0.8s ease both;
     text-decoration: none;
     display: inline-block;
+    will-change: background, border-color, color;
 }
 
-.nav-left .nav-btn:nth-child(1) { animation-delay: 0.1s; }
-.nav-left .nav-btn:nth-child(2) { animation-delay: 0.2s; }
-.nav-left .nav-btn:nth-child(3) { animation-delay: 0.25s; }
-.nav-right .nav-btn:nth-child(1) { animation-delay: 0.3s; }
-.nav-right .nav-btn:nth-child(2) { animation-delay: 0.35s; }
-.nav-right .nav-btn:nth-child(3) { animation-delay: 0.4s; }
+/* Staggered entrance animations */
+.nav-left .nav-btn:nth-child(1) { animation: fadeInUp 0.8s ease 0.1s both; }
+.nav-left .nav-btn:nth-child(2) { animation: fadeInUp 0.8s ease 0.2s both; }
+.nav-left .nav-btn:nth-child(3) { animation: fadeInUp 0.8s ease 0.25s both; }
+.nav-right .nav-btn:nth-child(1) { animation: fadeInUp 0.8s ease 0.3s both; }
+.nav-right .nav-btn:nth-child(2) { animation: fadeInUp 0.8s ease 0.35s both; }
+.nav-right .nav-btn:nth-child(3) { animation: fadeInUp 0.8s ease 0.4s both; }
 
+@keyframes fadeInUp {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Hover effect overlay */
 .nav-btn::before {
     content: attr(data-text);
     position: absolute;
@@ -243,6 +271,7 @@ body {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* Disabled state */
 .nav-btn.disabled {
     opacity: 0.3;
     cursor: not-allowed;
@@ -264,7 +293,7 @@ body {
     transform: translateY(10px);
 }
 
-/* ACTIVE STATE */
+/* Active state (current page) */
 .nav-btn.active {
     background: #FFA500;
     border-color: #FFA500;
@@ -297,10 +326,9 @@ body {
     transform: translateY(10px);
 }
 
-/* ========================================
-   VIDEO PREVIEW CONTAINER - LOCAL MP4
-   ======================================== */
-
+/* ============================================================
+   9. VIDEO PREVIEW MODAL SYSTEM
+   ============================================================ */
 .preview-container {
     position: fixed;
     top: 0;
@@ -324,7 +352,7 @@ body {
     background: rgba(0, 0, 0, 0.75);
 }
 
-/* Video Wrapper */
+/* Video wrapper container */
 .video-wrapper {
     position: relative;
     width: 85%;
@@ -342,7 +370,7 @@ body {
     transform: scale(1) translateY(0);
 }
 
-/* Video Element */
+/* Video element */
 .preview-video {
     max-width: 100%;
     max-height: 70vh;
@@ -354,7 +382,7 @@ body {
     border-radius: 4px;
 }
 
-/* Loading Spinner */
+/* Loading spinner */
 .video-loading {
     position: absolute;
     top: 50%;
@@ -374,7 +402,19 @@ body {
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Preview Info */
+/* Fade in animation for smooth loading */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Video information display */
 .preview-info {
     position: absolute;
     bottom: 60px;
@@ -406,7 +446,7 @@ body {
     letter-spacing: 1px;
 }
 
-/* Close Button */
+/* Close button */
 .close-preview {
     position: absolute;
     top: 40px;
@@ -440,7 +480,9 @@ body {
     transform: scale(1.1) rotate(90deg);
 }
 
-/* Archive Section */
+/* ============================================================
+   10. ARCHIVE SECTION
+   ============================================================ */
 .archive-section {
     min-height: 100vh;
     padding: 180px 40px 80px;
@@ -449,7 +491,7 @@ body {
     z-index: 100;
 }
 
-/* Split Titles */
+/* Split title layout */
 .split-titles {
     display: flex;
     justify-content: space-between;
@@ -457,6 +499,7 @@ body {
     margin-bottom: 60px;
 }
 
+/* Animated video category titles */
 .video-title {
     display: flex;
     flex-direction: column;
@@ -480,6 +523,7 @@ body {
     animation: cycleWords 9s infinite;
 }
 
+/* Staggered cycling animation */
 .video-word:nth-child(1) { animation: cycleWords 9s infinite 0s; }
 .video-word:nth-child(2) { animation: cycleWords 9s infinite 3s; }
 .video-word:nth-child(3) { animation: cycleWords 9s infinite 6s; }
@@ -507,6 +551,7 @@ body {
     }
 }
 
+/* Archive title section */
 .archive-title-container {
     text-align: right;
     opacity: 0;
@@ -559,7 +604,9 @@ body {
     opacity: 0.8;
 }
 
-/* Archive Table */
+/* ============================================================
+   11. ARCHIVE TABLE
+   ============================================================ */
 .archive-table {
     width: 100%;
     border-collapse: collapse;
@@ -603,6 +650,7 @@ body {
     transition: all 0.3s ease;
 }
 
+/* Row hover effects */
 .archive-table tbody tr:hover {
     background: rgba(255, 165, 0, 0.03);
 }
@@ -620,6 +668,7 @@ body {
     transition: all 0.3s ease;
 }
 
+/* Column specific styles */
 .number-col {
     opacity: 0.4;
     width: 60px;
@@ -649,7 +698,7 @@ body {
     opacity: 0.7;
 }
 
-/* Play icon indicator on hover */
+/* Play icon indicator */
 .archive-table tbody tr::after {
     content: '▶';
     position: absolute;
@@ -667,7 +716,7 @@ body {
     opacity: 0.6;
 }
 
-/* Hover effects for table cells */
+/* Enhanced hover effects */
 .archive-table tbody tr:hover .client-col,
 .archive-table tbody tr:hover .title-col,
 .archive-table tbody tr:hover .type-col,
@@ -678,10 +727,9 @@ body {
     opacity: 1;
 }
 
-/* ========================================
-   CUSTOM VIDEO CONTROLS
-   ======================================== */
-
+/* ============================================================
+   12. CUSTOM VIDEO CONTROLS
+   ============================================================ */
 .custom-controls {
     position: absolute;
     bottom: 0;
@@ -701,6 +749,7 @@ body {
     transform: translateY(0);
 }
 
+/* Progress bar section */
 .controls-progress {
     margin-bottom: 12px;
 }
@@ -751,6 +800,7 @@ body {
     margin: 0;
 }
 
+/* Control buttons */
 .controls-buttons {
     display: flex;
     align-items: center;
@@ -779,6 +829,7 @@ body {
     transform: scale(0.95);
 }
 
+/* Time display */
 .time-display {
     font-family: 'Courier New', monospace;
     font-size: 12px;
@@ -795,6 +846,7 @@ body {
     color: #FFA500;
 }
 
+/* Volume controls */
 .volume-wrapper {
     display: flex;
     align-items: center;
@@ -831,6 +883,7 @@ body {
     border: none;
 }
 
+/* Speed control button */
 .speed-btn {
     font-family: 'Courier New', monospace;
     font-size: 11px;
@@ -839,13 +892,18 @@ body {
     min-width: 40px;
 }
 
-/* Responsive */
+/* ============================================================
+   13. RESPONSIVE DESIGN
+   ============================================================ */
+
+/* Large tablets and small desktops */
 @media (max-width: 1200px) {
     .video-wrapper {
         width: 90%;
     }
 }
 
+/* Tablets */
 @media (max-width: 1024px) {
     .header {
         padding: 15px 40px;
@@ -869,6 +927,7 @@ body {
     }
 }
 
+/* Mobile landscape and small tablets */
 @media (max-width: 768px) {
     .video-wrapper {
         width: 95%;
@@ -988,6 +1047,7 @@ body {
     }
 }
 
+/* Mobile portrait */
 @media (max-width: 480px) {
     .archive-section {
         padding: 140px 20px 60px;

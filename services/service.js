@@ -1,203 +1,271 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. STATİK SERVİS DATA (Backend çağırışı yoxdur)
+    // 0. DOM ELEMENTS & CONFIG
     // ============================================================
     
-    const SERVICES_DATA = [
-        {
-            title: "FILM SHOOTING",
-            description: "Professional film production services with cinematic excellence",
-            videoUrl: "../videos/we_create.mp4",
-            bulletPoints: [
-                "Creative storytelling",
-                "Professional cinematography",
-                "Post-production excellence"
-            ],
-            processSteps: [
-                "Pre-production planning",
-                "Principal photography",
-                "Post-production & delivery"
-            ]
-        }
-        // Başqa servislər əlavə et (video olmadan da olar)
-    ];
-    
-    const ICONS = { 
-        "COMMERCIAL SHOOTING": "fa-shopping-cart", 
-        "FILM SHOOTING": "fa-film", 
-        "DOCUMENTARY": "fa-video", 
-        "MUSIC VIDEOS": "fa-clapperboard" 
-    };
-
-    // DOM elementləri
     const pageTransition = document.querySelector('.page-transition');
-    
-    // ============================================================
-    // 1. NAVBAR & LOGO SCROLL LOGIC (saxla)
-    // ============================================================
-    let lastScroll = 0;
     const navbar = document.querySelector('.header');
     const logo = document.querySelector('.center-logo');
+    const isMobile = window.innerWidth <= 768;
+    
+    const CONFIG = {
+        SCROLL_THRESHOLD: 50,
+        TRANSITION_DURATION: 600, // ✅ CSS ilə eyni
+        FALLBACK_TIMEOUT: 1600
+    };
 
-    setTimeout(() => { if (logo) logo.classList.add('entry-done'); }, 200);
+    // ============================================================
+    // 1. 🔥 VIDEO LAZY LOADING (ƏN VACİB!)
+    // ============================================================
+    
+    /**
+     * Video lazy loading - yalnız görünəndə yüklə
+     * Bu 5 videonu eyni anda yükləməyi qarşısını alır
+     */
+    function initVideoLazyLoad() {
+        const videoObserverOptions = {
+            threshold: 0.25, // Video 25% görünəndə yüklə
+            rootMargin: "100px" // 100px əvvəlcədən hazırla
+        };
+
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const video = entry.target;
+                    const videoSrc = video.getAttribute('data-src');
+                    
+                    if (videoSrc && !video.src) {
+                        console.log('📹 Loading video:', videoSrc);
+                        
+                        // Show loading state
+                        video.style.background = 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)';
+                        
+                        // Load video
+                        video.src = videoSrc;
+                        video.load();
+                        
+                        // Play when ready
+                        video.addEventListener('loadeddata', () => {
+                            video.style.background = '#000';
+                            video.play().catch(err => {
+                                console.log('Video autoplay blocked:', err);
+                            });
+                        });
+                        
+                        // Error handling
+                        video.addEventListener('error', () => {
+                            console.error('❌ Video load error:', videoSrc);
+                            video.style.background = '#1a1a1a';
+                        });
+                    }
+                    
+                    videoObserver.unobserve(video);
+                }
+            });
+        }, videoObserverOptions);
+
+        // Observe all videos with data-src
+        document.querySelectorAll('video[data-src]').forEach(video => {
+            videoObserver.observe(video);
+        });
+        
+        console.log('✅ Video lazy loading initialized');
+    }
+
+    // ============================================================
+    // 2. 🔥 NAVBAR & LOGO SCROLL (RAF Optimized)
+    // ============================================================
+    
+    let lastScroll = 0;
+    let ticking = false;
+
+    setTimeout(() => { 
+        if (logo) logo.classList.add('entry-done'); 
+    }, 200);
+
+    function updateScroll(currentScroll) {
+        if (currentScroll > lastScroll && currentScroll > CONFIG.SCROLL_THRESHOLD) {
+            if (navbar) navbar.style.transform = 'translateY(-100%)';
+        } else {
+            if (navbar) navbar.style.transform = 'translateY(0)';
+        }
+        
+        if (currentScroll > CONFIG.SCROLL_THRESHOLD) {
+            if (logo) logo.classList.add('scroll-hidden');
+        } else {
+            if (logo) logo.classList.remove('scroll-hidden');
+        }
+        
+        lastScroll = currentScroll;
+        ticking = false;
+    }
 
     function handleScroll() {
         const currentScroll = window.scrollY;
-        if (currentScroll > lastScroll && currentScroll > 50) {
-             if (navbar) navbar.style.transform = 'translateY(-100%)';
-        } else {
-             if (navbar) navbar.style.transform = 'translateY(0)';
+        
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updateScroll(currentScroll);
+            });
+            ticking = true;
         }
-        if (currentScroll > 50) {
-             if (logo) logo.classList.add('scroll-hidden');
-        } else {
-             if (logo) logo.classList.remove('scroll-hidden');
-        }
-        lastScroll = currentScroll;
     }
+
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     // ============================================================
-    // 2. SCROLL REVEAL (saxla)
+    // 3. SCROLL REVEAL (Intersection Observer)
     // ============================================================
+    
     const observerOptions = {
-        threshold: 0.15, 
+        threshold: 0.15,
         rootMargin: "0px 0px -50px 0px"
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-             if (entry.isIntersecting) {
-                 entry.target.classList.add('active');
-                 observer.unobserve(entry.target);
-             }
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
         });
     }, observerOptions);
 
-    const staticReveals = document.querySelectorAll('.services-title-container, .chat-section, .main-footer');
-    staticReveals.forEach(el => {
+    document.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
+    
+    document.querySelectorAll('.page-wrapper').forEach(el => {
         el.classList.add('reveal-item');
         observer.observe(el);
     });
-
-    // ============================================================
-    // 3. PAGE TRANSITION & NAV (saxla)
-    // ============================================================
-    function navigateWithTransition(href) {
-        if (pageTransition) {
-             pageTransition.classList.remove('page-loaded'); 
-             pageTransition.style.transition = 'none';
-             pageTransition.classList.add('active'); 
-        }
-        setTimeout(() => { window.location.href = href; }, 600); 
+    
+    // ✅ Chat section lazy reveal
+    const chatSection = document.querySelector('.chat-section');
+    if (chatSection) {
+        observer.observe(chatSection);
     }
 
-    document.querySelectorAll('.nav-btn, .footer-link, .cta-button, .chat-cta-button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const href = btn.getAttribute('href');
-            if (!href || href === '#' || href.startsWith('#')) return;
-            e.preventDefault();
-            navigateWithTransition(href);
-        });
-    });
-
-    // Nav Scramble Effect
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        const originalText = btn.getAttribute('data-text');
-        if (!originalText) return;
-        const navText = btn.querySelector('.nav-text');
-        if (!navText) return;
-
-        btn.addEventListener('mouseenter', function() {
-            if (this.classList.contains('active')) return;
-            let iteration = 0;
-            let interval = setInterval(() => {
-                navText.innerText = originalText.split("").map((letter, index) => {
-                    if(index < iteration) return originalText[index];
-                    return letters[Math.floor(Math.random() * letters.length)];
-                }).join("");
-                if(iteration >= originalText.length) clearInterval(interval);
-                iteration += 1/3;
-            }, 30);
-        });
-        
-        btn.addEventListener('mouseleave', function() {
-            if (this.classList.contains('active')) return;
-            navText.innerText = originalText;
-        });
-    });
-
     // ============================================================
-    // 4. RENDER SERVICES (STATİK - Backend yoxdur)
+    // 4. 🔥 PAGE TRANSITION (SERVER OPTIMIZED)
     // ============================================================
     
-    function renderServices() {
-        const container = document.getElementById("services-dynamic");
-        if (!container) {
-            console.warn("services-dynamic container tapılmadı!");
+    let isTransitioning = false;
+    
+    function navigateWithTransition(href) {
+        // ✅ Prevent double navigation
+        if (isTransitioning) {
+            console.warn('⚠️ Transition already in progress');
             return;
         }
-
-        console.log(`${SERVICES_DATA.length} servis render edilir`);
-
-        const fragment = document.createDocumentFragment();
-
-        SERVICES_DATA.forEach((service, index) => {
-            const iconClass = ICONS[service.title] || "fa-star";
-            const bulletPoints = service.bulletPoints || [];
-            const steps = service.processSteps || [];
-            const videoUrl = service.videoUrl || null;
-
-            const section = document.createElement('section');
-            section.className = 'page-wrapper reveal-item'; 
-            
-            const leftVideo = (index % 2 === 0 && videoUrl) ? `
-                <div class="media-column"><div class="media-container"><div class="media-frame">
-                <video class="media-content" autoplay muted loop playsinline src="${videoUrl}"></video>
-                </div></div></div>` : "";
-
-            const rightVideo = (index % 2 === 1 && videoUrl) ? `
-                <div class="media-column"><div class="media-container"><div class="media-frame">
-                <video class="media-content" autoplay muted loop playsinline src="${videoUrl}"></video>
-                </div></div></div>` : "";
-
-            section.innerHTML = `
-                ${leftVideo}
-                <div class="content-column"><div class="content-wrapper">
-                    <div class="service-header">
-                        <div class="icon-container"><i class="fas ${iconClass}"></i></div>
-                        <h2 class="service-title" data-text="${service.title}"><span>${service.title}</span></h2>
-                    </div>
-                    <p class="description">${service.description || ''}</p>
-                    <ul class="bullet-list">${bulletPoints.map(item => `<li>${item}</li>`).join("")}</ul>
-                    <div class="divider"></div>
-                    <ol class="numbered-list">${steps.map(step => `<li>${step}</li>`).join("")}</ol>
-                    
-                    <a href="../contact/" class="cta-button">CONTACT <i class="fas fa-long-arrow-alt-right"></i></a>
-                </div></div>
-                ${rightVideo}
-            `;
-            fragment.appendChild(section);
-        });
-
-        container.appendChild(fragment);
         
-        // Scroll Reveal
-        requestAnimationFrame(() => {
-            const newSections = container.querySelectorAll('.page-wrapper.reveal-item');
-            newSections.forEach(el => observer.observe(el));
+        isTransitioning = true;
+        console.log('🚀 Starting navigation to:', href);
+        
+        // Stop and cleanup all videos
+        document.querySelectorAll('video').forEach(video => {
+            video.pause();
+            video.currentTime = 0;
+        });
+        
+        // Start transition
+        if (pageTransition) {
+            pageTransition.classList.remove('page-loaded'); 
+            pageTransition.style.transition = 'none';
+            void pageTransition.offsetWidth; // Force reflow
+            pageTransition.classList.add('active'); 
+        }
+        
+        // ✅ Navigate with correct timing (matches CSS)
+        setTimeout(() => { 
+            window.location.href = href; 
+        }, CONFIG.TRANSITION_DURATION);
+        
+        // ✅ Fallback for slow server
+        setTimeout(() => {
+            if (!document.hidden) {
+                console.warn('⚠️ Slow server response, forcing navigation');
+                window.location.href = href;
+            }
+        }, CONFIG.FALLBACK_TIMEOUT);
+    }
+
+    function setupNavButtons() {
+        document.querySelectorAll('.nav-btn, .footer-link, .chat-cta-button, .cta-button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const href = btn.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('#')) return;
+                
+                e.preventDefault();
+                navigateWithTransition(href);
+            });
         });
     }
 
-    // Page transition
+    setupNavButtons();
+
+    // ============================================================
+    // 5. 🔥 NAV SCRAMBLE EFFECT (Desktop Only)
+    // ============================================================
+    
+    if (!isMobile) {
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            const originalText = btn.getAttribute('data-text');
+            if (!originalText) return;
+            
+            const navText = btn.querySelector('.nav-text');
+            if (!navText) return;
+
+            btn.addEventListener('mouseenter', function() {
+                if (this.classList.contains('active')) return;
+                
+                let iteration = 0;
+                const interval = setInterval(() => {
+                    navText.innerText = originalText.split("").map((letter, index) => {
+                        if (index < iteration) return originalText[index];
+                        return letters[Math.floor(Math.random() * letters.length)];
+                    }).join("");
+                    
+                    if (iteration >= originalText.length) {
+                        clearInterval(interval);
+                    }
+                    iteration += 1/3;
+                }, 30);
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                if (this.classList.contains('active')) return;
+                navText.innerText = originalText;
+            });
+        });
+    }
+
+    // ============================================================
+    // 6. 🔥 MOBILE OPTIMIZATIONS
+    // ============================================================
+    
+    if (isMobile) {
+        // Reduce video quality on mobile
+        document.querySelectorAll('video').forEach(video => {
+            video.setAttribute('preload', 'metadata');
+        });
+        
+        console.log('✅ Mobile optimizations applied');
+    }
+
+    // ============================================================
+    // 7. INITIALIZE
+    // ============================================================
+    
     if (pageTransition) {
         setTimeout(() => {
-             pageTransition.classList.add('page-loaded'); 
+            pageTransition.classList.add('page-loaded'); 
         }, 100);
     }
     
-    // Servislər render et
-    renderServices();
+    // Initialize video lazy loading
+    initVideoLazyLoad();
+    
+    console.log('✅ Services page fully optimized and ready');
 });

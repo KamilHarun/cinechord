@@ -1,59 +1,60 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ============================================================
-    // 0. GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU)
-    // ============================================================
+    // ===================================================================
+    // 0. CONFIGURATION & DOM REFERENCES
+    // ===================================================================
     
-    // Backend URL-i birbaşa Railway-ə yönləndirilir
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app"; 
-    
-    // API Public Controller-ə yönləndirilir: /api/about/getAbout
-    const ABOUT_API = `${BACKEND_URL}/api/about/getAbout`;
-    
-    // Uploads qovluğu da eyni backend-dən
-    const UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
+    const ABOUT_DATA = {
+        mainTitle: "OUR STORY",
+        subTitle: "We are passionate filmmakers dedicated to bringing stories to life through the power of cinema.",
+        whoWeAreText: "CINE CHORD is a collective of creative professionals specializing in cinematic storytelling. With years of experience in film production, we combine technical expertise with artistic vision to create compelling visual narratives that resonate with audiences.",
+        ourMissionText: "Our mission is to elevate the art of filmmaking by delivering high-quality productions that exceed expectations. We believe in the power of storytelling to inspire, educate, and entertain, and we're committed to bringing your vision to the screen with professionalism and creativity.",
+        ourApproachText: "We take a collaborative approach to every project, working closely with our clients to understand their goals and bring their ideas to life. From concept development to final delivery, we ensure every frame meets our high standards of excellence.",
+        email: "info@cinechord.az",
+        phone: "+994 50 123 45 67",
+        address: "Baku, Azerbaijan",
+        videoUrl: "/videos/Showreel.mp4" 
+    };
 
-    // Yerdə qalan DOM elementləri
     const pageTransition = document.querySelector('.page-transition');
+    const logo = document.querySelector('.center-logo');
+    const header = document.querySelector('.header');
+    const scrollContainer = document.querySelector('.content-section') || window; 
+    const headerEl = document.querySelector('.header');
+    
+    // Səhifə yüklənəndə transition effekti
     if (pageTransition) {
         setTimeout(() => {
              pageTransition.classList.add('page-loaded'); 
         }, 100);
     }
     
-    // ============================================================
-    // 1. HAMBURGER MENU (MOBILE)
-    // ============================================================
+    // ===================================================================
+    // 1. MOBILE NAVIGATION & HAMBURGER
+    // ===================================================================
+    
     const hamburger = document.createElement('div');
     hamburger.className = 'hamburger';
     hamburger.innerHTML = '<span></span><span></span><span></span>';
     hamburger.setAttribute('aria-label', 'Toggle menu');
     hamburger.setAttribute('role', 'button');
     
-    const header = document.querySelector('.header');
     if (header) {
         header.appendChild(hamburger);
     }
 
-    // Create mobile menu
     const mobileMenu = document.createElement('div');
     mobileMenu.className = 'mobile-menu';
-    
-    // Create overlay
     const overlay = document.createElement('div');
     overlay.className = 'mobile-menu-overlay';
     
-    // Copy all nav buttons to mobile menu
-    const navBtns = document.querySelectorAll('.nav-btn');
-    navBtns.forEach(btn => {
-        const clone = btn.cloneNode(true);
-        mobileMenu.appendChild(clone);
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        mobileMenu.appendChild(btn.cloneNode(true));
     });
     
     document.body.appendChild(overlay);
     document.body.appendChild(mobileMenu);
 
-    // Toggle mobile menu
     function toggleMenu() {
         const isActive = hamburger.classList.contains('active');
         
@@ -61,24 +62,17 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenu.classList.toggle('active');
         overlay.classList.toggle('active');
         
-        // Prevent scroll when menu is open
-        document.body.style.overflow = isActive ? '' : 'hidden';
+        document.body.style.overflow = isActive ? '' : 'hidden'; 
     }
 
-    // Open/close menu
     hamburger.addEventListener('click', toggleMenu);
-
-    // Close menu when clicking overlay
     overlay.addEventListener('click', toggleMenu);
-
-    // Close menu when clicking a link
     mobileMenu.addEventListener('click', function(e) {
         if (e.target.classList.contains('nav-btn') || e.target.closest('.nav-btn')) {
             toggleMenu();
         }
     });
 
-    // Close menu on window resize to desktop
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
@@ -89,26 +83,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 250);
     });
 
-    // ============================================================
-    // 2. NAVBAR & LOGO SCROLL LOGIC
-    // ============================================================
+    // ===================================================================
+    // 2. SCROLL & HEADER ANIMATION LOGIC
+    // ===================================================================
+    
     let lastScroll = 0;
-    // Header və logo elementlərini yuxarıda təyin etmişik.
-    const scrollContainer = document.querySelector('.content-section') || window; 
-
-    setTimeout(() => { if (logo) logo.classList.add('entry-done'); }, 500);
 
     function handleScroll(e) {
         const currentScroll = (scrollContainer === window) ? window.scrollY : e.target.scrollTop;
 
-        // Hide navbar on scroll down, show on scroll up
         if (currentScroll > lastScroll && currentScroll > 50) {
-            if (header) header.style.transform = 'translateY(-100%)'; // header (navbar) istifadə olunur
+            if (headerEl) headerEl.style.transform = 'translateY(-100%)';
         } else {
-            if (header) header.style.transform = 'translateY(0)';
+            if (headerEl) headerEl.style.transform = 'translateY(0)';
         }
 
-        // Hide logo on scroll
         if (currentScroll > 50) {
             if (logo) logo.classList.add('scroll-hidden');
         } else {
@@ -119,9 +108,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
 
-    // ============================================================
-    // 3. SCROLL REVEAL (FOCUS-IN)
-    // ============================================================
+    setTimeout(() => { if (logo) logo.classList.add('entry-done'); }, 500);
+
+
+    // ===================================================================
+    // 3. SCROLL REVEAL (Intersection Observer)
+    // ===================================================================
+    
     const observerOptions = {
         threshold: 0.15, 
         rootMargin: "0px 0px -50px 0px"
@@ -140,26 +133,48 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
 
-    // ============================================================
-    // 4. PAGE TRANSITION & NAV
-    // ============================================================
+    // ===================================================================
+    // 4. PAGE TRANSITION & NAVIGATION (SERVER FIX)
+    // ===================================================================
+    
+    // ✅ SERVER FIX: Transition lock və fallback
+    let isTransitioning = false;
+    
     function navigateWithTransition(href) {
+        // ✅ Prevent double navigation
+        if (isTransitioning) {
+            console.warn('⚠️ Transition in progress, ignoring click');
+            return;
+        }
+        
+        isTransitioning = true;
+        
         if (pageTransition) {
              pageTransition.classList.remove('page-loaded'); 
              pageTransition.style.transition = 'none';
              pageTransition.classList.add('active');
         }
-        setTimeout(() => { window.location.href = href; }, 600);
+        
+        // ✅ Normal navigation
+        setTimeout(() => { 
+            window.location.href = href; 
+        }, 600);
+        
+        // ✅ Fallback: Server gec cavab verərsə, force et
+        setTimeout(() => {
+            if (!document.hidden) {
+                console.warn('⚠️ Slow server, forcing navigation');
+                window.location.href = href;
+            }
+        }, 1600);
     }
 
-    // Handle both desktop and mobile nav buttons
     function setupNavButtons() {
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const href = btn.getAttribute('href');
                 if (!href || href === '#' || href.startsWith('#')) return;
                 
-                // Eyni səhifə
                 if (href === window.location.pathname.split('/').pop()) return;
                 
                 e.preventDefault();
@@ -169,13 +184,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     setupNavButtons();
-
-    // Re-setup after mobile menu is populated
     setTimeout(setupNavButtons, 100);
 
-    // ============================================================
-    // 5. SCRAMBLE EFFECT (DESKTOP ONLY)
-    // ============================================================
+    // ===================================================================
+    // 5. SCRAMBLE EFFECT (DESKTOP)
+    // ===================================================================
+    
     if (window.innerWidth > 768) {
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -204,55 +218,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ============================================================
-    // 6. TOUCH ENHANCEMENTS FOR MOBILE
-    // ============================================================
-    if ('ontouchstart' in window) {
-        // Add active state on touch for better feedback
-        document.querySelectorAll('.nav-btn, .social-link').forEach(el => {
-            el.addEventListener('touchstart', function() {
-                this.style.transform = 'scale(0.95)';
-            }, { passive: true });
-            
-            el.addEventListener('touchend', function() {
-                this.style.transform = '';
-            }, { passive: true });
-        });
-    }
-
-    // ============================================================
-    // 7. LOAD ABOUT DATA (BACKEND - YENİLƏNDİ)
-    // ============================================================
-    async function loadAboutData() {
+    // ===================================================================
+    // 6. LOAD ABOUT DATA
+    // ===================================================================
+    
+    function loadAboutData() {
         try {
-            // BACKEND_URL ilə tam yolu çağırırıq:
-            const res = await fetch(ABOUT_API); 
-            
-            if (!res.ok) {
-                console.error(`HTTP Error! Status: ${res.status}`);
-                return;
-            }
-
-            const data = await res.json();
-            
-            // --- VIDEO ---
             const video = document.getElementById('about-video');
-            if (video && data.videoUrl) {
-                let videoUrl = data.videoUrl.trim();
-                
-                // Video yollarını təmizləyirik
-                if (!videoUrl.startsWith('http')) {
-                    // Yolu təmizləmək lazımdırsa, UPLOADS_BASE istifadə edirik
-                    let cleanedUrl = videoUrl.replace(/^\/uploads\//, '').replace(/^uploads\//, '');
-                    videoUrl = UPLOADS_BASE + cleanedUrl;
-                }
-                
-                video.querySelector('source').src = videoUrl;
+            if (video && ABOUT_DATA.videoUrl) {
+                video.src = ABOUT_DATA.videoUrl;
                 video.load();
-                video.play().catch(err => console.log('Video autoplay error:', err));
+                video.play().catch(err => console.log('Video autoplay blocked:', err));
             }
 
-            // --- TEXT CONTENT ---
             const setText = (id, text) => {
                 const el = document.getElementById(id);
                 if (el && text) el.textContent = text;
@@ -268,54 +246,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
 
-            setRolling('main-title', data.mainTitle);
-            setText('subtitle', data.subTitle);
-            setText('who-we-are', data.whoWeAreText);
-            setText('our-mission', data.ourMissionText);
-            setText('our-approach', data.ourApproachText);
+            setRolling('main-title', ABOUT_DATA.mainTitle);
+            setText('subtitle', ABOUT_DATA.subTitle);
+            setText('who-we-are', ABOUT_DATA.whoWeAreText);
+            setText('our-mission', ABOUT_DATA.ourMissionText);
+            setText('our-approach', ABOUT_DATA.ourApproachText);
 
-            // --- CONTACT INFO ---
             const emailLink = document.getElementById('email-link');
-            if (emailLink && data.email) {
-                const emailUpper = data.email.toUpperCase();
-                emailLink.href = `mailto:${data.email}`;
+            if (emailLink && ABOUT_DATA.email) {
+                const emailUpper = ABOUT_DATA.email.toUpperCase();
+                emailLink.href = `mailto:${ABOUT_DATA.email}`;
                 emailLink.setAttribute('data-text', emailUpper);
                 const span = emailLink.querySelector('span');
                 if(span) span.textContent = emailUpper;
             }
 
             const phoneLink = document.getElementById('phone-link');
-            if (phoneLink && data.phone) {
-                phoneLink.href = `tel:${data.phone.replace(/\s/g, '')}`;
-                phoneLink.setAttribute('data-text', data.phone);
+            if (phoneLink && ABOUT_DATA.phone) {
+                phoneLink.href = `tel:${ABOUT_DATA.phone.replace(/\s/g, '')}`;
+                phoneLink.setAttribute('data-text', ABOUT_DATA.phone);
                 const span = phoneLink.querySelector('span');
-                if(span) span.textContent = data.phone;
+                if(span) span.textContent = ABOUT_DATA.phone;
             }
 
-            if (data.address) {
-                setText('address', data.address.toUpperCase());
+            if (ABOUT_DATA.address) {
+                setText('address', ABOUT_DATA.address.toUpperCase());
             }
-
-            console.log('About data loaded successfully');
 
         } catch (err) {
-            console.error('Failed to load about data:', err);
+            console.error('Content loading error:', err);
         }
     }
 
-    // ============================================================
-    // 8. PERFORMANCE OPTIMIZATIONS
-    // ============================================================
+    // ===================================================================
+    // 7. PERFORMANCE OPTIMIZATIONS
+    // ===================================================================
     
-    // Lazy load video on mobile to save bandwidth
-    if (window.innerWidth <= 768) {
-        const video = document.getElementById('about-video');
-        if (video) {
-            video.setAttribute('preload', 'metadata');
-        }
-    }
-
-    // Debounce scroll events for better performance
     function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -328,15 +294,30 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Apply debounce to scroll handler on mobile
     if (window.innerWidth <= 768) {
+        const video = document.getElementById('about-video');
+        if (video) {
+            video.setAttribute('preload', 'metadata');
+        }
+        
         const debouncedScroll = debounce(handleScroll, 10);
         scrollContainer.removeEventListener('scroll', handleScroll);
         scrollContainer.addEventListener('scroll', debouncedScroll, { passive: true });
     }
+    
+    if ('ontouchstart' in window) {
+        document.querySelectorAll('.nav-btn, .social-link').forEach(el => {
+            el.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            }, { passive: true });
+            
+            el.addEventListener('touchend', function() {
+                this.style.transform = '';
+            }, { passive: true });
+        });
+    }
 
-    // ============================================================
-    // INITIALIZE
-    // ============================================================
     loadAboutData();
+    
+    console.log('✅ About page loaded successfully');
 });

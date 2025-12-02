@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WORKS — Cine Chord</title>
+    <title>Cine Chord — Works</title>
+    
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="../photos/CineChord.png">
+    <link rel="shortcut icon" type="image/png" href="../photos/CineChord.png">
+    <link rel="apple-touch-icon" href="../photos/CineChord.png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="works.css">
+
     <style>
+        /* MƏRKƏZİ KLASSLAR BURA KÖÇÜRÜLDÜ (Daha sürətli render üçün) */
         .projects-grid { min-height: 300px; }
         .preview-container { display: none; opacity: 0; }
-        /* Loader stili - Orijinal halına qaytarıldı */
         .loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999; display: flex;
@@ -89,7 +96,7 @@
 
     <section class="hero-section">
         <div class="hero-bg">
-            <video autoplay muted loop playsinline class="hero-video">
+            <video autoplay muted loop playsinline class="hero-video" preload="auto">
                 <source src="../videos/Showreel.mp4" type="video/mp4">
             </video>
             <div class="hero-overlay"></div>
@@ -155,8 +162,8 @@
         </div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="works.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script defer src="works.js"></script>
 </body>
 </html>

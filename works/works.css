@@ -48,6 +48,7 @@ body {
     transform: translateY(0);
     pointer-events: all;
     transition: none;
+    will-change: transform;
 }
 
 .page-transition.page-loaded {
@@ -91,6 +92,7 @@ body {
     transition: transform 0.4s ease;
     transform: translateY(0);
     animation: fadeInHeader 1s ease 0.2s both;
+    will-change: transform, opacity;
 }
 
 @keyframes fadeInHeader {
@@ -125,6 +127,7 @@ body {
     display: inline-block;
     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     opacity: 0;
+    will-change: transform, opacity;
 }
 
 @keyframes fadeInUp {
@@ -222,6 +225,7 @@ body {
     opacity: 0;
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: auto;
+    will-change: transform, opacity;
 }
 
 .center-logo.entry-done {
@@ -272,7 +276,7 @@ body {
     height: 3px;
     background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.5));
     z-index: 9997;
-    transition: width 0.1s ease;
+    transition: width 0.1s linear; 
 }
 
 /* =========================================
@@ -320,6 +324,7 @@ body {
     object-position: center top;
     filter: brightness(0.6);
     transform: scale(1.1);
+    will-change: transform;
 }
 
 .hero-overlay {
@@ -402,11 +407,7 @@ body {
 }
 
 @keyframes bounce {
-    0%,
-    20%,
-    50%,
-    80%,
-    100% {
+    0%, 20%, 50%, 80%, 100% {
         transform: rotate(45deg) translateY(0);
     }
     40% {
@@ -497,8 +498,8 @@ body {
     overflow: hidden;
     opacity: 0;
     transform: translateY(100px);
-    will-change: transform, opacity;
     transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
 }
 
 .project-card.active {
@@ -523,6 +524,7 @@ body {
     display: block;
     transform: scale(1);
     transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
 }
 
 .project-card:hover .project-video {
@@ -613,65 +615,145 @@ body {
 }
 
 /* ================================================================
-   MODAL VIDEO PLAYER (YENİLƏNMİŞ BLOK)
+   MODAL VIDEO PLAYER
    ================================================================ */
 .preview-container {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.95); z-index: 99999; display: flex; align-items: center;
-    justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    will-change: opacity;
 }
-.preview-container.active { opacity: 1; pointer-events: all; }
-.preview-container.user-inactive { cursor: none; } /* MOUSE GİZLƏDİLİR */
+
+.preview-container.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.preview-container.user-inactive {
+    cursor: none;
+}
 
 .video-wrapper {
-    position: relative; width: 98%; height: 95%; display: flex; align-items: center;
-    justify-content: center; margin: auto; transform: translateY(100%); opacity: 0;
+    position: relative;
+    width: 98%;
+    height: 95%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    transform: translateY(100%);
+    opacity: 0;
     transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+    will-change: transform, opacity;
 }
-.preview-container.active .video-wrapper { transform: translateY(0); opacity: 1; }
-.preview-video { width: 100%; height: 100%; object-fit: contain; box-shadow: none; border: none; outline: none; }
+
+.preview-container.active .video-wrapper {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    box-shadow: none;
+    border: none;
+    outline: none;
+}
 
 .preview-info {
-    position: absolute; top: 60px; left: 60px; z-index: 20; pointer-events: none;
-    display: flex; flex-direction: column; gap: 5px; transition: all 0.5s ease;
+    position: absolute;
+    top: 60px;
+    left: 60px;
+    z-index: 20;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: all 0.5s ease;
+    will-change: opacity, transform;
 }
-.preview-container.user-inactive .preview-info { opacity: 0; transform: translateY(-40px); } /* BAŞLIĞI GİZLƏT */
+
+.preview-container.user-inactive .preview-info {
+    opacity: 0;
+    transform: translateY(-40px);
+}
 
 .preview-title {
-    font-family: 'NeueMetanaOutline', sans-serif; font-weight: 900; color: transparent;
-    -webkit-text-stroke: 1px #fff; font-size: clamp(24px, 4vw, 50px); margin: 0;
-    text-transform: uppercase; transform: translateY(105%);
+    font-family: 'NeueMetanaOutline', sans-serif;
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1px #fff;
+    font-size: clamp(24px, 4vw, 50px);
+    margin: 0;
+    text-transform: uppercase;
+    transform: translateY(105%);
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
 }
 
-/* BAŞLIQ MASK/REVEAL EFFEKTİ */
 .preview-title::after {
-    content: attr(data-text); 
+    content: attr(data-text);
     position: absolute;
     top: 0;
     left: 0;
-    color: #fff; /* Dolğu rəngi ağdır */
+    color: #fff;
     -webkit-text-stroke: 0;
     clip-path: inset(0 100% 0 0);
     transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
 
-.preview-container.active .preview-title { transform: translateY(0); }
-.preview-container.active .preview-title::after { clip-path: inset(0 0% 0 0); } /* REVEAL */
+.preview-container.active .preview-title {
+    transform: translateY(0);
+}
+
+.preview-container.active .preview-title::after {
+    clip-path: inset(0 0% 0 0);
+}
 
 .close-preview {
-    position: absolute; top: 40px; right: 40px; width: 50px; height: 50px;
-    background: transparent; border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%; color: #fff; font-size: 24px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2001; pointer-events: auto;
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2001;
+    pointer-events: auto;
+    will-change: transform, opacity;
 }
-.preview-container.user-inactive .close-preview { opacity: 0; transform: scale(0.8) rotate(90deg); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); } /* BAĞLAMA DÜYMƏSİNİ GİZLƏT */
-.close-preview:hover { border-color: #FFA500; color: #FFA500; transform: rotate(90deg); }
 
+.preview-container.user-inactive .close-preview {
+    opacity: 0;
+    transform: scale(0.8) rotate(90deg);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-/* MODAL PLAY BUTTON - DÜZƏLTILMIŞ (TAM MƏRKƏZƏ) */
+.close-preview:hover {
+    border-color: #FFA500;
+    color: #FFA500;
+    transform: rotate(90deg);
+}
+
 .modal-play-btn {
     position: fixed;
     top: 50%;
@@ -686,17 +768,15 @@ body {
     justify-content: center;
 }
 
-/* Pause və ya Mouse hərəkətində görünür */
-.preview-container.is-paused .modal-play-btn, 
+.preview-container.is-paused .modal-play-btn,
 .preview-container:not(.is-paused):not(.user-inactive) .modal-play-btn {
-    opacity: 1; 
-}
-/* Oynayarkən hərəkətsizlikdə gizlət */
-.preview-container:not(.is-paused).user-inactive .modal-play-btn {
-    opacity: 0; 
+    opacity: 1;
 }
 
-/* **PLAY DÜYMƏSİNİN ORİJİNAL DİZAYNI** */
+.preview-container:not(.is-paused).user-inactive .modal-play-btn {
+    opacity: 0;
+}
+
 .play-button-container {
     width: 250px;
     height: 120px;
@@ -706,136 +786,237 @@ body {
 }
 
 .play-button {
-    position: relative; 
-    width: 90px; 
-    height: 34px; 
-    background: transparent; /* Şəffaf fon */
-    border: 1px solid rgba(255, 255, 255, 0.9); /* Ən iç çərçivə */
+    position: relative;
+    width: 90px;
+    height: 34px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.9);
     border-radius: 100px;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.4s ease;
-    pointer-events: none; 
+    pointer-events: none;
 }
 
 .play-button::before {
-    content: ''; 
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    width: 135px; 
-    height: 46px; 
+    width: 135px;
+    height: 46px;
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 100px; 
-    transition: all 0.4s ease; 
+    border-radius: 100px;
+    transition: all 0.4s ease;
     pointer-events: none;
 }
 
 .play-button::after {
-    content: ''; 
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    width: 180px; 
-    height: 58px; 
+    width: 180px;
+    height: 58px;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 100px; 
-    transition: all 0.4s ease; 
+    border-radius: 100px;
+    transition: all 0.4s ease;
     pointer-events: none;
 }
 
 .play-button i {
-    display: none !important; /* İkonlar gizlənir, çünki bu dizaynda sadəcə mətn var */
+    display: none !important;
 }
 
 .play-text {
-    font-family: 'Rajdhani', sans-serif; 
-    font-size: 12px; 
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 2px; 
-    color: #fff; /* Ağ Mətn */
-    text-transform: uppercase; 
+    letter-spacing: 2px;
+    color: #fff;
+    text-transform: uppercase;
     pointer-events: none;
     transition: color 0.3s ease, letter-spacing 0.3s ease;
 }
 
-/* HOVER EFFECTLƏRİ */
 .play-button-container:hover .play-button {
-    border-color: #ffffff; 
-    background: rgba(255, 255, 255, 0.15); /* Yüngül fon doldurma */
-    width: 98px; /* Mərkəzi çərçivəni bir az genişlət */
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    width: 98px;
 }
 
-.play-button-container:hover .play-text { 
-    color: #ffffff; 
-    letter-spacing: 3px; /* Mətnin cəlb edilməsi */
+.play-button-container:hover .play-text {
+    color: #ffffff;
+    letter-spacing: 3px;
 }
 
 .play-button-container:hover .play-button::before {
-    border-color: rgba(255, 255, 255, 0.8); 
-    width: 145px; 
+    border-color: rgba(255, 255, 255, 0.8);
+    width: 145px;
     height: 50px;
 }
 
 .play-button-container:hover .play-button::after {
-    border-color: rgba(255, 255, 255, 0.5); 
-    width: 200px; 
+    border-color: rgba(255, 255, 255, 0.5);
+    width: 200px;
     height: 66px;
 }
-/* **PLAY DÜYMƏSİNİN ORİJİNAL DİZAYINININ SONU** */
 
-/* NƏZARƏT PANELİ (CONTROLS BAR) */
 .custom-controls {
-    position: absolute; bottom: 0; left: 0; width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
-    padding: 0 40px 30px 40px; z-index: 1001; display: flex; flex-direction: column-reverse;
-    gap: 15px; opacity: 1; transform: translateY(0);
+    padding: 0 40px 30px 40px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 15px;
+    opacity: 1;
+    transform: translateY(0);
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
 }
-.preview-container.user-inactive .custom-controls { opacity: 0; transform: translateY(40px); pointer-events: none; } /* GİZLƏT */
-.preview-container.is-paused .custom-controls { opacity: 1 !important; transform: translateY(0) !important; pointer-events: auto !important; } /* PAUSE OLANDA GÖRÜNÜR */
 
-/* Qalan nəzarət stilləri */
+.preview-container.user-inactive .custom-controls {
+    opacity: 0;
+    transform: translateY(40px);
+    pointer-events: none;
+}
+
+.preview-container.is-paused .custom-controls {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
+
 .progress-bar-container {
-    width: 100%; height: 4px; background: rgba(255, 255, 255, 0.15); cursor: pointer;
-    position: relative; transition: height 0.2s ease;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    position: relative;
+    transition: height 0.2s ease;
 }
-.progress-bar-container:hover { height: 6px; }
-.progress-played { position: absolute; top: 0; left: 0; height: 100%; background: #FFA500; }
-.progress-slider { 
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; 
-    -webkit-appearance: none; appearance: none;
-}
-.controls-buttons { display: flex; align-items: center; width: 100%; gap: 15px; }
-.ctrl-btn {
-    background: transparent; border: none; color: #fff; padding: 0; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform 0.2s ease, color 0.2s ease; opacity: 0.8;
-}
-.ctrl-btn:hover { color: #FFA500; transform: scale(1.1); opacity: 1; }
-.ctrl-btn i { font-size: 20px; } .main-play-btn i { font-size: 32px; }
-.time-display {
-    font-family: monospace; font-size: 13px; color: rgba(255, 255, 255, 0.6);
-    margin-left: 10px; display: flex; align-items: center; gap: 5px;
-}
-#currentTime { color: #fff; }
-.right-controls-group { margin-left: auto; display: flex; align-items: center; gap: 20px; }
-.volume-wrapper { display: flex; align-items: center; }
-.volume-slider { width: 80px; height: 2px; accent-color: #FFA500; cursor: pointer; }
-.video-loading {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 60px; height: 60px; border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top-color: #FFA500; border-radius: 50%; animation: spin 1s linear infinite;
-    z-index: 10; display: none;
-}
-@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
+.progress-bar-container:hover {
+    height: 6px;
+}
+
+.progress-played {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #FFA500;
+}
+
+.progress-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.controls-buttons {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+}
+
+.ctrl-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+    opacity: 0.8;
+}
+
+.ctrl-btn:hover {
+    color: #FFA500;
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.ctrl-btn i {
+    font-size: 20px;
+}
+
+.main-play-btn i {
+    font-size: 32px;
+}
+
+.time-display {
+    font-family: monospace;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#currentTime {
+    color: #fff;
+}
+
+.right-controls-group {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.volume-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.volume-slider {
+    width: 80px;
+    height: 2px;
+    accent-color: #FFA500;
+    cursor: pointer;
+}
+
+.video-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #FFA500;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10;
+    display: none;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
 
 /* =========================================
-   FOOTER (Orijinal Məntiq)
+   FOOTER
    ========================================= */
 .main-footer {
     background: #000;
@@ -952,7 +1133,7 @@ body {
 }
 
 /* =========================================
-   RESPONSIVE STYLES (Orijinal Məntiq)
+   RESPONSIVE STYLES
    ========================================= */
 @media (max-width: 768px) {
     .header {
