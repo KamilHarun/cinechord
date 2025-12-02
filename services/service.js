@@ -1,21 +1,28 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. GLOBAL VARS (BİRBAŞA BACKEND-Ə SORĞU)
+    // 0. STATİK SERVİS DATA (Backend çağırışı yoxdur)
     // ============================================================
     
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
+    const SERVICES_DATA = [
+        {
+            title: "FILM SHOOTING",
+            description: "Professional film production services with cinematic excellence",
+            videoUrl: "../videos/we_create.mp4",
+            bulletPoints: [
+                "Creative storytelling",
+                "Professional cinematography",
+                "Post-production excellence"
+            ],
+            processSteps: [
+                "Pre-production planning",
+                "Principal photography",
+                "Post-production & delivery"
+            ]
+        }
+        // Başqa servislər əlavə et (video olmadan da olar)
+    ];
     
-    // API Public Controller-ə yönləndirilir
-    const SERVICES_API = `${BACKEND_URL}/api/service`; 
-    
-    // Uploads qovluğu da eyni backend-dən
-    const UPLOADS_BASE = `${BACKEND_URL}/uploads/`;
-    
-    // DOM elementləri
-    const pageTransition = document.querySelector('.page-transition');
-    
-    // ICONS (dəyişmədi)
     const ICONS = { 
         "COMMERCIAL SHOOTING": "fa-shopping-cart", 
         "FILM SHOOTING": "fa-film", 
@@ -23,9 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
         "MUSIC VIDEOS": "fa-clapperboard" 
     };
 
-
+    // DOM elementləri
+    const pageTransition = document.querySelector('.page-transition');
+    
     // ============================================================
-    // 1. NAVBAR & LOGO SCROLL LOGIC
+    // 1. NAVBAR & LOGO SCROLL LOGIC (saxla)
     // ============================================================
     let lastScroll = 0;
     const navbar = document.querySelector('.header');
@@ -50,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     // ============================================================
-    // 2. SCROLL REVEAL (OBSERVER)
+    // 2. SCROLL REVEAL (saxla)
     // ============================================================
     const observerOptions = {
         threshold: 0.15, 
@@ -73,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 3. PAGE TRANSITION & NAV
+    // 3. PAGE TRANSITION & NAV (saxla)
     // ============================================================
     function navigateWithTransition(href) {
         if (pageTransition) {
@@ -87,16 +96,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-btn, .footer-link, .cta-button, .chat-cta-button').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const href = btn.getAttribute('href');
-            
-            if (!href || href === '#') return;
-            if (href.startsWith('#')) return;
-
+            if (!href || href === '#' || href.startsWith('#')) return;
             e.preventDefault();
             navigateWithTransition(href);
         });
     });
 
-    // Nav Scramble Effect (Mətn Dəyişmə)
+    // Nav Scramble Effect
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     document.querySelectorAll('.nav-btn').forEach(btn => {
         const originalText = btn.getAttribute('data-text');
@@ -123,142 +129,75 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-
     // ============================================================
-    // 4. LOAD SERVICES (Dynamic Sections)
+    // 4. RENDER SERVICES (STATİK - Backend yoxdur)
     // ============================================================
     
-    // URL-i təmizləyən funksiya
-    function cleanUrlPath(url) {
-        if (url && typeof url === 'string') {
-            if (url.startsWith('http')) return url; 
-            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length); 
-            if (url.startsWith('uploads/')) return url.substring('uploads/'.length);
-        }
-        return url;
-    }
-
-    async function loadServices() {
+    function renderServices() {
         const container = document.getElementById("services-dynamic");
         if (!container) {
             console.warn("services-dynamic container tapılmadı!");
             return;
         }
 
-        try {
-            console.log('API sorğusu göndərilir:', SERVICES_API);
+        console.log(`${SERVICES_DATA.length} servis render edilir`);
+
+        const fragment = document.createDocumentFragment();
+
+        SERVICES_DATA.forEach((service, index) => {
+            const iconClass = ICONS[service.title] || "fa-star";
+            const bulletPoints = service.bulletPoints || [];
+            const steps = service.processSteps || [];
+            const videoUrl = service.videoUrl || null;
+
+            const section = document.createElement('section');
+            section.className = 'page-wrapper reveal-item'; 
             
-            // API çağırışı
-            const res = await fetch(SERVICES_API); 
-            
-            console.log('Response status:', res.status);
-            
-            if (!res.ok) { 
-                throw new Error(`HTTP Error! Status: ${res.status}`); 
-            }
+            const leftVideo = (index % 2 === 0 && videoUrl) ? `
+                <div class="media-column"><div class="media-container"><div class="media-frame">
+                <video class="media-content" autoplay muted loop playsinline src="${videoUrl}"></video>
+                </div></div></div>` : "";
 
-            const responseData = await res.json();
-            console.log("API cavabı:", responseData);
-            
-            // ✅ Paginated struktur handle edilməsi (Spring Data Page)
-            let services;
-            if (responseData.content && Array.isArray(responseData.content)) {
-                services = responseData.content;
-            } else if (Array.isArray(responseData)) {
-                services = responseData;
-            } else {
-                throw new Error("Gözlənilməz data strukturu"); 
-            }
+            const rightVideo = (index % 2 === 1 && videoUrl) ? `
+                <div class="media-column"><div class="media-container"><div class="media-frame">
+                <video class="media-content" autoplay muted loop playsinline src="${videoUrl}"></video>
+                </div></div></div>` : "";
 
-            // Əgər heç bir servis yoxdursa
-            if (!services || services.length === 0) { 
-                console.warn("Heç bir servis tapılmadı!");
-                container.innerHTML = '<p style="text-align:center; color: #999;">Heç bir servis mövcud deyil.</p>';
-                return; 
-            }
-
-            console.log(`${services.length} servis yükləndi`);
-
-            const fragment = document.createDocumentFragment();
-
-            services.forEach((service, index) => {
-                let videoUrl = null;
-                if (service.videoUrl && service.videoUrl.trim() !== "") {
-                    let rawUrl = service.videoUrl.trim();
-                    let cleanedUrl = cleanUrlPath(rawUrl);
+            section.innerHTML = `
+                ${leftVideo}
+                <div class="content-column"><div class="content-wrapper">
+                    <div class="service-header">
+                        <div class="icon-container"><i class="fas ${iconClass}"></i></div>
+                        <h2 class="service-title" data-text="${service.title}"><span>${service.title}</span></h2>
+                    </div>
+                    <p class="description">${service.description || ''}</p>
+                    <ul class="bullet-list">${bulletPoints.map(item => `<li>${item}</li>`).join("")}</ul>
+                    <div class="divider"></div>
+                    <ol class="numbered-list">${steps.map(step => `<li>${step}</li>`).join("")}</ol>
                     
-                    // Tam URL-i qururuq
-                    videoUrl = UPLOADS_BASE + cleanedUrl; 
-                    console.log(`Video URL [${service.title}]:`, videoUrl);
-                }
+                    <a href="../contact/" class="cta-button">CONTACT <i class="fas fa-long-arrow-alt-right"></i></a>
+                </div></div>
+                ${rightVideo}
+            `;
+            fragment.appendChild(section);
+        });
 
-                const iconClass = ICONS[service.title] || "fa-star";
-                const bulletPoints = service.bulletPoints || [];
-                const steps = service.processSteps || service.steps || [];
-
-                const section = document.createElement('section');
-                section.className = 'page-wrapper reveal-item'; 
-                
-                const leftVideo = (index % 2 === 0 && videoUrl) ? `
-                    <div class="media-column"><div class="media-container"><div class="media-frame">
-                    <video class="media-content" autoplay muted loop playsinline crossorigin="anonymous" src="${videoUrl}" type="video/mp4"></video>
-                    </div></div></div>` : "";
-
-                const rightVideo = (index % 2 === 1 && videoUrl) ? `
-                    <div class="media-column"><div class="media-container"><div class="media-frame">
-                    <video class="media-content" autoplay muted loop playsinline crossorigin="anonymous" src="${videoUrl}" type="video/mp4"></video>
-                    </div></div></div>` : "";
-
-                section.innerHTML = `
-                    ${leftVideo}
-                    <div class="content-column"><div class="content-wrapper">
-                        <div class="service-header">
-                            <div class="icon-container"><i class="fas ${iconClass}"></i></div>
-                            <h2 class="service-title" data-text="${service.title}"><span>${service.title}</span></h2>
-                        </div>
-                        <p class="description">${service.description || ''}</p>
-                        <ul class="bullet-list">${bulletPoints.map(item => `<li>${item}</li>`).join("")}</ul>
-                        <div class="divider"></div>
-                        <ol class="numbered-list">${steps.map(step => `<li>${step}</li>`).join("")}</ol>
-                        
-                        <a href="../contact/" class="cta-button">CONTACT <i class="fas fa-long-arrow-alt-right"></i></a>
-                    </div></div>
-                    ${rightVideo}
-                `;
-                fragment.appendChild(section);
-            });
-
-            container.appendChild(fragment);
-            
-            // Scroll Reveal və Navigasiyanı yeni elementlərə tətbiq etmək
-            requestAnimationFrame(() => {
-                const newSections = container.querySelectorAll('.page-wrapper.reveal-item');
-                newSections.forEach(el => observer.observe(el));
-                
-                document.querySelectorAll('.cta-button').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const href = btn.getAttribute('href');
-                        if (!href || href === '#' || href.startsWith('#')) return;
-                        e.preventDefault();
-                        navigateWithTransition(href);
-                    });
-                });
-            });
-            
-        } catch (err) { 
-            console.error("Servislər yüklənərkən xəta:", err);
-            container.innerHTML = `<p style="color:red; text-align:center;">Servislər yüklənərkən xəta baş verdi: ${err.message}<br><small>URL: ${SERVICES_API}</small></p>`; 
-        }
+        container.appendChild(fragment);
+        
+        // Scroll Reveal
+        requestAnimationFrame(() => {
+            const newSections = container.querySelectorAll('.page-wrapper.reveal-item');
+            newSections.forEach(el => observer.observe(el));
+        });
     }
 
-    // Page transition ilkin yükləmə
+    // Page transition
     if (pageTransition) {
         setTimeout(() => {
              pageTransition.classList.add('page-loaded'); 
         }, 100);
     }
     
-    // Servislər yüklənsin
-    console.log('Servislər yüklənməyə başlayır...');
-    loadServices();
+    // Servislər render et
+    renderServices();
 });
