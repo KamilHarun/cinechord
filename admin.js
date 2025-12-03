@@ -7,12 +7,12 @@
 // 1. Lokalda işləyərkən bunu açıq saxlayın:
 const BASE_URL = "http://localhost:8080"; 
 
-// 2. Serverə (Railway) yükləyəndə yuxarıdakını şərhə alıb, bunu açın:
+// 2. Serverdə istifadə üçün:
 // const BASE_URL = "https://cinechord-admin-production.up.railway.app";
 
 const UPLOADS_URL = `${BASE_URL}/uploads/`;
 
-// ✅ API Endpoints
+// API
 const API = {
     LOGIN: `${BASE_URL}/api/auth/login`,
     WORKS: `${BASE_URL}/admin/works`,
@@ -21,21 +21,19 @@ const API = {
     ABOUT: `${BASE_URL}/api/about`
 };
 
-// Qlobal Dəyişənlər
+// GLOBAL
 let worksChart, categoryChart;
 let currentPage = 0;
 const pageSize = 20;
 let searchTimeout;
 let selectedItems = [];
-
-let worksDataCache = []; // <-- YENİ: Təhlükəsiz Redaktə üçün data cache
+let worksDataCache = []; // <-- Dəyişiklik: Edit üçün cache
 
 // ============================================
-// 1. KÖMƏKÇİ FUNKSİYALAR (UTILS)
+// UTILS
 // ============================================
 
 function getImageUrl(url) {
-    // Etibarlı placeholder servisi
     if (!url) return 'https://placehold.co/400x225/6366f1/ffffff?text=No+Image';
     if (url.startsWith('http')) return url;
     return url.startsWith('/') ? `${BASE_URL}${url}` : `${UPLOADS_URL}${url}`;
@@ -50,7 +48,7 @@ function formatDate(dateString) {
     });
 }
 
-// Token müddətini yoxla
+// TOKEN EXPIRY
 function checkTokenExpiry() {
     const token = localStorage.getItem('jwt_token');
     if(!token) return;
@@ -58,16 +56,13 @@ function checkTokenExpiry() {
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const exp = payload.exp * 1000;
-        if(exp < Date.now()) {
-            console.warn("Token vaxtı bitdi");
-            logout();
-        }
-    } catch(e) { console.warn('Token parse error:', e); }
+        if(exp < Date.now()) logout();
+    } catch(e) {}
 }
-setInterval(checkTokenExpiry, 60000); // Hər dəqiqə yoxla
+setInterval(checkTokenExpiry, 60000);
 
 // ============================================
-// 2. AUTHENTICATION & FETCH
+// AUTH
 // ============================================
 
 function checkAuth() {
@@ -87,7 +82,7 @@ async function authFetch(url, options = {}) {
     if(!(options.body instanceof FormData)) {
         options.headers['Content-Type'] = 'application/json';
     }
-    
+
     const token = localStorage.getItem('jwt_token');
     if (token) options.headers['Authorization'] = `Bearer ${token}`;
 
@@ -99,7 +94,6 @@ async function authFetch(url, options = {}) {
         }
         return res;
     } catch (error) {
-        console.error("Fetch Error:", error);
         Swal.fire('Əlaqə Xətası', 'Serverlə əlaqə qurmaq olmur', 'error');
         return null;
     }
@@ -139,7 +133,7 @@ function logout() {
 }
 
 // ============================================
-// 3. NAVIGATION
+// NAVIGATION
 // ============================================
 
 function navigateTo(page) {
@@ -170,20 +164,17 @@ document.querySelectorAll('.nav-item').forEach(item => {
 });
 
 // ============================================
-// 4. DASHBOARD
+// DASHBOARD
 // ============================================
 
 async function loadDashboard() {
     try {
-        // İşlər
         const worksRes = await authFetch(`${API.WORKS}/getAllWorks?size=100&t=${Date.now()}`);
         const worksData = worksRes && worksRes.ok ? await worksRes.json() : { content: [] };
         
-        // Xidmətlər
         const servicesRes = await authFetch(`${API.SERVICES}/getAll?t=${Date.now()}`);
         const services = servicesRes && servicesRes.ok ? await servicesRes.json() : [];
 
-        // Mesajlar
         const messagesRes = await authFetch(`${API.CONTACTS}/allMessages?t=${Date.now()}`);
         const messages = messagesRes && messagesRes.ok ? await messagesRes.json() : [];
 
@@ -211,8 +202,7 @@ function initCharts(works) {
     const ctx = document.getElementById('worksChart');
     if (ctx) {
         if (worksChart) worksChart.destroy();
-        
-        // Sadə qrafik nümunəsi
+
         const labels = works.slice(0, 7).map(w => w.title.substring(0, 10));
         const data = works.slice(0, 7).map(() => Math.floor(Math.random() * 10) + 1);
 
@@ -488,7 +478,6 @@ function filterWorks() {
         card.style.display = (!cat || wCat === cat) ? '' : 'none';
     });
 }
-
 // ============================================
 // 6. SERVICES (XİDMƏTLƏR)
 // ============================================
@@ -558,7 +547,6 @@ async function deleteService(id) {
         loadDashboard();
     }
 }
-
 // ============================================
 // 7. MESSAGES (MESAJLAR)
 // ============================================
@@ -634,7 +622,6 @@ async function viewMessage(id, name, email, message) {
 async function deleteMessage(id) {
     const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
     if(r.isConfirmed) {
-        // DÜZƏLİŞ: URL-i Backend Controller-ə uyğunlaşdırıldı
         const res = await authFetch(`${API.CONTACTS}/${id}`, { method: 'DELETE' });
         if(res && res.ok) {
             loadMessages();
@@ -691,7 +678,6 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
         } else { Swal.fire('Xəta', 'Yadda saxlamaq olmadı', 'error'); }
     } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
 });
-
 // ============================================
 // 9. INIT (BAŞLANĞIC)
 // ============================================
@@ -709,3 +695,5 @@ document.getElementById('themeToggleNav')?.addEventListener('click', () => {
 
 // App Start
 checkAuth();
+
+
