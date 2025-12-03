@@ -51,8 +51,9 @@ body {
     height: 100%;
     background: #000;
     z-index: 9999;
-    transform: translateY(0); /* Başlanğıcda tam görünür */
+    transform: translateY(0);
     pointer-events: all;
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 /* Səhifə yükləndikdən sonra yuxarı sürüşür */

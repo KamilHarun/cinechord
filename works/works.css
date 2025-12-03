@@ -35,7 +35,7 @@ body {
 }
 
 /* =========================================
-   PAGE TRANSITION
+   PAGE TRANSITION - SLIDE EFFECT
    ========================================= */
 .page-transition {
     position: fixed;
@@ -47,32 +47,14 @@ body {
     z-index: 9999;
     transform: translateY(0);
     pointer-events: all;
-    transition: none;
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
     will-change: transform;
 }
 
 .page-transition.page-loaded {
     transform: translateY(-100%);
     pointer-events: none;
-    transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-.page-transition.active {
-    animation: pageTransition 1.2s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-    pointer-events: all;
-    transition: none;
-}
-
-@keyframes pageTransition {
-    0% {
-        transform: translateY(-100%);
-    }
-    50% {
-        transform: translateY(0);
-    }
-    100% {
-        transform: translateY(-100%);
-    }
+    transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 /* =========================================
@@ -211,6 +193,96 @@ body {
     background: #FFA500;
     border-color: #FFA500;
     color: #000;
+}
+
+/* =========================================
+   HAMBURGER MENU (MOBILE)
+   ========================================= */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 1002;
+    position: relative;
+    padding: 10px;
+    background: transparent;
+    border: none;
+}
+
+.hamburger span {
+    width: 28px;
+    height: 2.5px;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 2px;
+    display: block;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+    background: #FFA500;
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+    background: #FFA500;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.98);
+    backdrop-filter: blur(20px);
+    z-index: 1001;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 100px 30px 30px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255, 165, 0, 0.1);
+}
+
+.mobile-menu.active {
+    right: 0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-menu .nav-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 14px;
+    animation: none;
+    opacity: 1;
+}
+
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: all;
 }
 
 /* =========================================
@@ -1133,11 +1205,51 @@ body {
 }
 
 /* =========================================
-   RESPONSIVE STYLES
+   RESPONSIVE STYLES - MOBILE
    ========================================= */
 @media (max-width: 768px) {
+    /* Header */
     .header {
-        padding: 12px 20px;
+        padding: 15px 20px;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(10px);
+        justify-content: flex-end;
+    }
+    
+    /* Hide desktop nav */
+    .nav-left,
+    .nav-right {
+        display: none !important;
+    }
+    
+    /* Show hamburger */
+    .hamburger {
+        display: flex !important;
+    }
+    
+    /* Show mobile menu */
+    .mobile-menu {
+        display: flex !important;
+    }
+    
+    /* Logo */
+    .center-logo {
+        top: 15px;
+        left: 20px;
+        transform: translateX(0) scale(0.5) rotate(-180deg);
+    }
+    
+    .center-logo.entry-done {
+        transform: translateX(0) scale(1) rotate(0deg);
+    }
+    
+    .center-logo.scroll-hidden {
+        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+    }
+    
+    .logo-img {
+        width: 70px;
+        height: 70px;
     }
 
     .hero-left-title {
@@ -1162,11 +1274,6 @@ body {
         padding: 0 20px;
         grid-template-columns: 1fr;
         gap: 30px;
-    }
-
-    .nav-left,
-    .nav-right {
-        gap: 10px;
     }
 
     .nav-btn {

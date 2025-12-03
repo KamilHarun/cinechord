@@ -1,15 +1,13 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 2.0 - ARCHIVE PATTERN REFACTORED
-   Description: Professional about page with complete features
-   Author: Kamil
+   Version: 5.0 - FIXED FOR YOUR API RESPONSE
    ============================================================ */
 
 (function() {
     'use strict';
 
     /* ============================================================
-       1. CONFIGURATION & CONSTANTS
+       1. CONFIGURATION
        ============================================================ */
     
     const CONFIG = {
@@ -17,28 +15,10 @@
         ENDPOINTS: {
             ABOUT: '/api/about/getAbout'
         },
-        STATIC_VIDEO_URL: '/videos/Showreel.mp4',
+        STATIC_VIDEO: '../videos/Showreel.mp4', // Video STATİC
         SCROLL_THRESHOLD: 50,
         LOGO_ENTRY_DELAY: 500,
-        PAGE_LOAD_DELAY: 100,
-        NAVIGATION_DELAY: 600,
-        FALLBACK_DELAY: 1600,
-        RESIZE_DEBOUNCE: 250
-    };
-
-    const API_URLS = {
-        ABOUT: `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}`
-    };
-
-    const FALLBACK_DATA = {
-        mainTitle: "OUR STORY",
-        subTitle: "We are passionate filmmakers dedicated to bringing stories to life through the power of cinema.",
-        whoWeAreText: "CINE CHORD is a collective of creative professionals specializing in cinematic storytelling. With years of experience in film production, we combine technical expertise with artistic vision to create compelling visual narratives that resonate with audiences.",
-        ourMissionText: "Our mission is to elevate the art of filmmaking by delivering high-quality productions that exceed expectations. We believe in the power of storytelling to inspire, educate, and entertain, and we're committed to bringing your vision to the screen with professionalism and creativity.",
-        ourApproachText: "We take a collaborative approach to every project, working closely with our clients to understand their goals and bring their ideas to life. From concept development to final delivery, we ensure every frame meets our high standards of excellence.",
-        email: "info@cinechord.az",
-        phone: "+994 50 123 45 67",
-        address: "Baku, Azerbaijan"
+        PAGE_LOAD_DELAY: 100
     };
 
     /* ============================================================
@@ -46,11 +26,15 @@
        ============================================================ */
     
     const elements = {
+        // Page elements
         pageTransition: document.querySelector('.page-transition'),
         centerLogo: document.querySelector('.center-logo'),
         header: document.querySelector('.header'),
-        scrollContainer: document.querySelector('.content-section') || window,
+        
+        // Video - STATIC
         aboutVideo: document.getElementById('about-video'),
+        
+        // Text elements - ALL DYNAMIC
         mainTitle: document.getElementById('main-title'),
         subtitle: document.getElementById('subtitle'),
         whoWeAre: document.getElementById('who-we-are'),
@@ -62,111 +46,419 @@
     };
 
     /* ============================================================
-       3. STATE VARIABLES
+       3. INITIALIZATION
        ============================================================ */
     
-    let lastScrollTop = 0;
-    let isTransitioning = false;
-
-    /* ============================================================
-       4. UTILITY FUNCTIONS
-       ============================================================ */
-    
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    function setText(id, text) {
-        const el = document.getElementById(id);
-        if (el && text) {
-            el.textContent = text;
+    function init() {
+        console.log('🚀 About page initialized');
+        
+        // 1. Page transition
+        initPageTransition();
+        
+        // 2. Logo animation
+        initLogoAnimation();
+        
+        // 3. Load STATIC video immediately
+        loadStaticVideo();
+        
+        // 4. Load DYNAMIC content from API
+        loadDynamicContent();
+        
+        // 5. Setup scroll effects
+        initScrollEffects();
+        
+        // 6. Setup navigation
+        setupNavigation();
+        
+        // 7. Mobile menu (yalnız mobile üçün)
+        if (window.innerWidth <= 768) {
+            initMobileMenu();
         }
-    }
-
-    function setRollingText(id, text) {
-        const el = document.getElementById(id);
-        if (el && text) {
-            const upper = text.toUpperCase();
-            el.setAttribute('data-text', upper);
-            const span = el.querySelector('span');
-            if (span) span.textContent = upper;
-        }
+        
+        // 8. Reveal animations
+        setTimeout(initRevealAnimations, 1000);
     }
 
     /* ============================================================
-       5. PAGE TRANSITION SYSTEM
+       4. PAGE TRANSITION
        ============================================================ */
     
     function initPageTransition() {
-        if (!elements.pageTransition) return;
-        
-        // Səhifə yükləndikdən sonra qara ekran yuxarı sürüşür
-        setTimeout(() => {
-            elements.pageTransition.classList.add('page-loaded');
-        }, CONFIG.PAGE_LOAD_DELAY);
-        
-    }
-
-    function navigateWithTransition(href) {
-        if (isTransitioning) {
-            return;
-        }
-        
-        isTransitioning = true;
-        
         if (elements.pageTransition) {
-            // page-loaded silmək qara ekranı aşağı endirir
-            elements.pageTransition.classList.remove('page-loaded');
+            setTimeout(() => {
+                elements.pageTransition.classList.add('page-loaded');
+                console.log('✅ Page transition complete');
+            }, CONFIG.PAGE_LOAD_DELAY);
         }
-        
-        // Qara ekran tam endikdən sonra navigate et
-        setTimeout(() => {
-            window.location.href = href;
-        }, CONFIG.NAVIGATION_DELAY);
-        
-        // Fallback
-        setTimeout(() => {
-            if (!document.hidden) {
-                window.location.href = href;
-            }
-        }, CONFIG.FALLBACK_DELAY);
     }
 
     /* ============================================================
-       6. MOBILE NAVIGATION & HAMBURGER
+       5. STATIC VIDEO LOADING
+       ============================================================ */
+    
+    function loadStaticVideo() {
+        if (elements.aboutVideo) {
+            console.log('📹 Loading static video:', CONFIG.STATIC_VIDEO);
+            elements.aboutVideo.src = CONFIG.STATIC_VIDEO;
+            elements.aboutVideo.load();
+            
+            elements.aboutVideo.addEventListener('loadeddata', function() {
+                console.log('✅ Static video loaded');
+            });
+            
+            elements.aboutVideo.addEventListener('error', function(e) {
+                console.error('❌ Video error:', e);
+            });
+        }
+    }
+
+    /* ============================================================
+       6. DYNAMIC CONTENT LOADING (API)
+       ============================================================ */
+    
+    async function loadDynamicContent() {
+        console.log('🌐 Fetching dynamic content from API...');
+        
+        try {
+            const apiUrl = `${CONFIG.BACKEND_URL}/api/about/getAbout?t=${Date.now()}`;
+            console.log('API URL:', apiUrl);
+            
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const apiData = await response.json();
+            console.log('📦 API Response:', apiData);
+            
+            // Process data
+            processApiData(apiData);
+            
+        } catch (error) {
+            console.error('❌ API Error:', error);
+            
+            // Fallback content
+            showFallbackContent();
+        }
+    }
+
+    /* ============================================================
+       7. PROCESS API DATA
+       ============================================================ */
+    
+    function processApiData(data) {
+        console.log('🔧 Processing API data...');
+        
+        // Format text: Replace \r\n with <br> for HTML
+        function formatText(text) {
+            if (!text) return '';
+            return text.replace(/\r\n/g, '<br>');
+        }
+        
+        const content = {
+            // Titles
+            mainTitle: data.mainTitle || "OUR STORY",
+            subTitle: data.subTitle || "We create cinematic experiences", // əgər boşdursa default
+            
+            // Content sections
+            whoWeAreText: formatText(data.whoWeAreText) || "CineChord is a creative production studio",
+            ourMissionText: formatText(data.ourMissionText) || "Our mission is visual storytelling",
+            ourApproachText: formatText(data.ourApproachText) || "We approach projects with creativity",
+            
+            // Contact info
+            email: data.email || "cinechord@gmail.com",
+            phone: data.phone || "+994 50 123 45 67",
+            address: data.address || "Baku, Azerbaijan"
+        };
+        
+        console.log('📝 Processed content:', content);
+        
+        // Populate HTML
+        populateContent(content);
+    }
+
+    /* ============================================================
+       8. POPULATE HTML CONTENT
+       ============================================================ */
+    
+    function populateContent(content) {
+        console.log('🎨 Populating HTML content...');
+        
+        // 1. MAIN TITLE
+        if (elements.mainTitle && content.mainTitle) {
+            const upperTitle = content.mainTitle.toUpperCase();
+            elements.mainTitle.setAttribute('data-text', upperTitle);
+            const span = elements.mainTitle.querySelector('span');
+            if (span) {
+                span.textContent = upperTitle;
+                console.log('✅ Main title set:', upperTitle);
+            }
+        }
+        
+        // 2. SUBTITLE
+        if (elements.subtitle) {
+            if (content.subTitle && content.subTitle.trim() !== '') {
+                elements.subtitle.textContent = content.subTitle;
+                console.log('✅ Subtitle set:', content.subTitle);
+            } else {
+                elements.subtitle.textContent = "We are passionate filmmakers dedicated to cinematic storytelling";
+                console.log('⚠️  Subtitle was empty, used default');
+            }
+        }
+        
+        // 3. WHO WE ARE
+        if (elements.whoWeAre && content.whoWeAreText) {
+            elements.whoWeAre.innerHTML = content.whoWeAreText;
+            console.log('✅ WHO WE ARE set');
+        }
+        
+        // 4. OUR MISSION
+        if (elements.ourMission && content.ourMissionText) {
+            elements.ourMission.innerHTML = content.ourMissionText;
+            console.log('✅ OUR MISSION set');
+        }
+        
+        // 5. OUR APPROACH
+        if (elements.ourApproach && content.ourApproachText) {
+            elements.ourApproach.innerHTML = content.ourApproachText;
+            console.log('✅ OUR APPROACH set');
+        }
+        
+        // 6. EMAIL
+        if (content.email) {
+            const emailUpper = content.email.toUpperCase();
+            
+            if (elements.emailLink) {
+                // Set href
+                elements.emailLink.href = `mailto:${content.email}`;
+                
+                // Set data-text attribute for rolling effect
+                elements.emailLink.setAttribute('data-text', emailUpper);
+                
+                // Find or create span inside emailLink
+                let emailSpan = elements.emailLink.querySelector('span');
+                if (!emailSpan) {
+                    emailSpan = document.createElement('span');
+                    elements.emailLink.appendChild(emailSpan);
+                }
+                emailSpan.textContent = emailUpper;
+                
+                console.log('✅ Email set:', content.email);
+            }
+        }
+        
+        // 7. PHONE
+        if (content.phone) {
+            const phoneDigits = content.phone.replace(/\D/g, '');
+            
+            if (elements.phoneLink) {
+                // Set href
+                elements.phoneLink.href = `tel:+${phoneDigits}`;
+                
+                // Set data-text attribute
+                elements.phoneLink.setAttribute('data-text', content.phone);
+                
+                // Find or create span inside phoneLink
+                let phoneSpan = elements.phoneLink.querySelector('span');
+                if (!phoneSpan) {
+                    phoneSpan = document.createElement('span');
+                    elements.phoneLink.appendChild(phoneSpan);
+                }
+                phoneSpan.textContent = content.phone;
+                
+                console.log('✅ Phone set:', content.phone);
+            }
+        }
+        
+        // 8. ADDRESS
+        if (elements.address && content.address) {
+            elements.address.textContent = content.address.toUpperCase();
+            console.log('✅ Address set:', content.address);
+        }
+        
+        console.log('🎉 All content populated successfully!');
+    }
+
+    /* ============================================================
+       9. FALLBACK CONTENT
+       ============================================================ */
+    
+    function showFallbackContent() {
+        console.log('🔄 Showing fallback content');
+        
+        const fallback = {
+            mainTitle: "OUR STORY",
+            subTitle: "We are passionate filmmakers dedicated to cinematic storytelling",
+            whoWeAreText: "CineChord is a creative studio specializing in visual storytelling and film production.",
+            ourMissionText: "Our mission is to transform ideas into powerful visual experiences that resonate with audiences.",
+            ourApproachText: "We approach every project with a balance of creativity, strategy, and technical excellence.",
+            email: "cinechord@gmail.com",
+            phone: "+994 50 123 45 67",
+            address: "Baku, Azerbaijan"
+        };
+        
+        populateContent(fallback);
+    }
+
+    /* ============================================================
+       10. SCROLL REVEAL ANIMATIONS
+       ============================================================ */
+    
+    function initRevealAnimations() {
+        const revealElements = document.querySelectorAll('.reveal-item');
+        console.log(`👁️ Found ${revealElements.length} reveal elements`);
+        
+        if (revealElements.length === 0) return;
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -30px 0px'
+        });
+        
+        revealElements.forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    /* ============================================================
+       11. LOGO ANIMATION
+       ============================================================ */
+    
+    function initLogoAnimation() {
+        if (elements.centerLogo) {
+            setTimeout(() => {
+                elements.centerLogo.classList.add('entry-done');
+                console.log('✅ Logo animation started');
+            }, CONFIG.LOGO_ENTRY_DELAY);
+        }
+    }
+
+    /* ============================================================
+       12. SCROLL EFFECTS
+       ============================================================ */
+    
+    function initScrollEffects() {
+        let lastScrollTop = 0;
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            
+            // Progress bar
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            const progressBar = document.querySelector('.progress-bar-top');
+            if (progressBar) {
+                progressBar.style.width = scrollPercent + '%';
+            }
+            
+            // Logo hide/show
+            if (elements.centerLogo) {
+                if (scrollTop > CONFIG.SCROLL_THRESHOLD) {
+                    elements.centerLogo.classList.add('scroll-hidden');
+                } else {
+                    elements.centerLogo.classList.remove('scroll-hidden');
+                }
+            }
+            
+            // Header hide/show
+            if (elements.header) {
+                if (scrollTop > lastScrollTop && scrollTop > 100) {
+                    elements.header.style.transform = 'translateY(-100%)';
+                } else {
+                    elements.header.style.transform = 'translateY(0)';
+                }
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+    }
+
+    /* ============================================================
+       13. NAVIGATION
+       ============================================================ */
+    
+    function setupNavigation() {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                // Skip if same page or anchor
+                if (!href || href === '#' || href.includes('about')) {
+                    return;
+                }
+                
+                e.preventDefault();
+                console.log('🔗 Navigating to:', href);
+                
+                // Page transition
+                if (elements.pageTransition) {
+                    elements.pageTransition.classList.remove('page-loaded');
+                }
+                
+                // Navigate after transition
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
+            });
+        });
+    }
+
+    /* ============================================================
+       14. MOBILE MENU
        ============================================================ */
     
     function initMobileMenu() {
-        const hamburger = document.createElement('div');
+        console.log('📱 Initializing mobile menu');
+        
+        // Check if already exists
+        if (document.querySelector('.hamburger')) {
+            console.log('ℹ️  Mobile menu already exists');
+            return;
+        }
+        
+        // Create hamburger
+        const hamburger = document.createElement('button');
         hamburger.className = 'hamburger';
         hamburger.innerHTML = '<span></span><span></span><span></span>';
         hamburger.setAttribute('aria-label', 'Toggle menu');
-        hamburger.setAttribute('role', 'button');
+        
+        // Create mobile menu
+        const mobileMenu = document.createElement('div');
+        mobileMenu.className = 'mobile-menu';
+        
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'mobile-menu-overlay';
+        
+        // Clone nav buttons
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            const clone = btn.cloneNode(true);
+            mobileMenu.appendChild(clone);
+        });
+        
+        // Add to DOM
+        document.body.appendChild(overlay);
+        document.body.appendChild(mobileMenu);
         
         if (elements.header) {
             elements.header.appendChild(hamburger);
         }
-
-        const mobileMenu = document.createElement('div');
-        mobileMenu.className = 'mobile-menu';
-        const overlay = document.createElement('div');
-        overlay.className = 'mobile-menu-overlay';
         
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            mobileMenu.appendChild(btn.cloneNode(true));
-        });
-        
-        document.body.appendChild(overlay);
-        document.body.appendChild(mobileMenu);
-
+        // Toggle function
         function toggleMenu() {
             const isActive = hamburger.classList.contains('active');
             hamburger.classList.toggle('active');
@@ -174,277 +466,59 @@
             overlay.classList.toggle('active');
             document.body.style.overflow = isActive ? '' : 'hidden';
         }
-
+        
+        // Event listeners
         hamburger.addEventListener('click', toggleMenu);
         overlay.addEventListener('click', toggleMenu);
-        mobileMenu.addEventListener('click', function(e) {
-            if (e.target.classList.contains('nav-btn') || e.target.closest('.nav-btn')) {
+        
+        // Close menu on link click
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-btn')) {
                 toggleMenu();
             }
         });
-
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                if (window.innerWidth > 768 && hamburger.classList.contains('active')) {
-                    toggleMenu();
-                }
-            }, CONFIG.RESIZE_DEBOUNCE);
+        
+        // Close on resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
+                toggleMenu();
+            }
         });
         
+        console.log('✅ Mobile menu initialized');
     }
 
     /* ============================================================
-       7. SCROLL EFFECTS
+       15. DEBUG HELPER
        ============================================================ */
     
-    function handleScroll(e) {
-        const currentScroll = (elements.scrollContainer === window) 
-            ? window.scrollY 
-            : e.target.scrollTop;
-
-        // Header hide/show
-        if (currentScroll > lastScrollTop && currentScroll > CONFIG.SCROLL_THRESHOLD) {
-            if (elements.header) elements.header.style.transform = 'translateY(-100%)';
-        } else {
-            if (elements.header) elements.header.style.transform = 'translateY(0)';
-        }
-
-        // Logo hide/show
-        if (currentScroll > CONFIG.SCROLL_THRESHOLD) {
-            if (elements.centerLogo) elements.centerLogo.classList.add('scroll-hidden');
-        } else {
-            if (elements.centerLogo) elements.centerLogo.classList.remove('scroll-hidden');
-        }
-        
-        lastScrollTop = currentScroll;
-    }
-
-    function initScrollEffects() {
-        if (window.innerWidth <= 768) {
-            const debouncedScroll = debounce(handleScroll, 10);
-            elements.scrollContainer.addEventListener('scroll', debouncedScroll, { passive: true });
-        } else {
-            elements.scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-        }
-        
-    }
-
-    /* ============================================================
-       8. SCROLL REVEAL (INTERSECTION OBSERVER)
-       ============================================================ */
-    
-    function initScrollReveal() {
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: "0px 0px -50px 0px"
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.reveal-item').forEach((el) => {
-            observer.observe(el);
-        });
-        
-    }
-
-    /* ============================================================
-       9. NAVIGATION & SCRAMBLE EFFECT
-       ============================================================ */
-    
-    function setupNavButtons() {
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const href = btn.getAttribute('href');
-                if (!href || href === '#' || href.startsWith('#')) return;
-                if (href === window.location.pathname.split('/').pop()) return;
-                e.preventDefault();
-                navigateWithTransition(href);
-            });
+    function debugElements() {
+        console.log('🔍 Debugging elements:');
+        Object.keys(elements).forEach(key => {
+            console.log(`${key}:`, elements[key] ? '✅ Found' : '❌ Not found');
         });
     }
 
-    function initNavigation() {
-        setupNavButtons();
-        setTimeout(setupNavButtons, 100);
-
-        // Scramble effect (Desktop only)
-        if (window.innerWidth > 768) {
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                const originalText = btn.getAttribute('data-text');
-                if (!originalText) return;
-                const navText = btn.querySelector('.nav-text');
-                if (!navText) return;
-
-                btn.addEventListener('mouseenter', function() {
-                    if (this.classList.contains('active')) return;
-                    let iteration = 0;
-                    let interval = setInterval(() => {
-                        navText.innerText = originalText.split("").map((letter, index) => {
-                            if (index < iteration) return originalText[index];
-                            return letters[Math.floor(Math.random() * letters.length)];
-                        }).join("");
-                        if (iteration >= originalText.length) clearInterval(interval);
-                        iteration += 1 / 3;
-                    }, 30);
-                });
-                
-                btn.addEventListener('mouseleave', function() {
-                    if (this.classList.contains('active')) return;
-                    navText.innerText = originalText;
-                });
-            });
-        }
-        
-    }
-
     /* ============================================================
-       10. DATA LOADING FROM BACKEND
+       16. START APPLICATION
        ============================================================ */
     
-    async function fetchAboutData() {
-        try {
-            
-            const response = await fetch(API_URLS.ABOUT, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            return data;
-            
-        } catch (error) {
-            return FALLBACK_DATA;
-        }
-    }
-
-    async function loadAboutData() {
-        try {
-            // 1. Video (always static)
-            if (elements.aboutVideo) {
-                elements.aboutVideo.src = CONFIG.STATIC_VIDEO_URL;
-                elements.aboutVideo.load();
-            }
-
-            // 2. Fetch API data
-            const aboutData = await fetchAboutData();
-
-            // 3. Populate content
-            setRollingText('main-title', aboutData.mainTitle || FALLBACK_DATA.mainTitle);
-            setText('subtitle', aboutData.subTitle || FALLBACK_DATA.subTitle);
-            setText('who-we-are', aboutData.whoWeAreText || FALLBACK_DATA.whoWeAreText);
-            setText('our-mission', aboutData.ourMissionText || FALLBACK_DATA.ourMissionText);
-            setText('our-approach', aboutData.ourApproachText || FALLBACK_DATA.ourApproachText);
-
-            // 4. Email
-            const emailData = aboutData.email || FALLBACK_DATA.email;
-            if (elements.emailLink && emailData) {
-                const emailUpper = emailData.toUpperCase();
-                elements.emailLink.href = `mailto:${emailData}`;
-                elements.emailLink.setAttribute('data-text', emailUpper);
-                const span = elements.emailLink.querySelector('span');
-                if (span) span.textContent = emailUpper;
-            }
-
-            // 5. Phone
-            const phoneData = aboutData.phone || FALLBACK_DATA.phone;
-            if (elements.phoneLink && phoneData) {
-                elements.phoneLink.href = `tel:${phoneData.replace(/\s/g, '')}`;
-                elements.phoneLink.setAttribute('data-text', phoneData);
-                const span = elements.phoneLink.querySelector('span');
-                if (span) span.textContent = phoneData;
-            }
-
-            // 6. Address
-            const addressData = aboutData.address || FALLBACK_DATA.address;
-            if (addressData) {
-                setText('address', addressData.toUpperCase());
-            }
-
-
-        } catch (err) {
-            
-            // Fallback
-            setRollingText('main-title', FALLBACK_DATA.mainTitle);
-            setText('subtitle', FALLBACK_DATA.subTitle);
-            setText('who-we-are', FALLBACK_DATA.whoWeAreText);
-            setText('our-mission', FALLBACK_DATA.ourMissionText);
-            setText('our-approach', FALLBACK_DATA.ourApproachText);
-        }
-    }
-
-    /* ============================================================
-       11. TOUCH OPTIMIZATION
-       ============================================================ */
-    
-    function initTouchOptimization() {
-        if ('ontouchstart' in window) {
-            document.querySelectorAll('.nav-btn, .social-link').forEach(el => {
-                el.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.95)';
-                }, { passive: true });
-                
-                el.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                }, { passive: true });
-            });
-        }
-
-        // Mobile video optimization
-        if (window.innerWidth <= 768 && elements.aboutVideo) {
-            elements.aboutVideo.setAttribute('preload', 'metadata');
-        }
-        
-    }
-
-    /* ============================================================
-       12. LOGO ENTRY ANIMATION
-       ============================================================ */
-    
-    function initLogoAnimation() {
-        setTimeout(() => {
-            if (elements.centerLogo) elements.centerLogo.classList.add('entry-done');
-        }, CONFIG.LOGO_ENTRY_DELAY);
-    }
-
-    /* ============================================================
-       13. INITIALIZATION
-       ============================================================ */
-    
-    function init() {
-        
-        initPageTransition();
-        initMobileMenu();
-        initScrollEffects();
-        initScrollReveal();
-        initNavigation();
-        initTouchOptimization();
-        initLogoAnimation();
-        loadAboutData();
-        
-    }
-
-    // Start initialization
+    // DOM ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM fully loaded');
+            debugElements();
+            init();
+        });
     } else {
+        console.log('⚡ DOM already loaded');
+        debugElements();
         init();
     }
+
+    // Global error handler
+    window.addEventListener('error', function(e) {
+        console.error('💥 Global error:', e.error);
+    });
 
 })();

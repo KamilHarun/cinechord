@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
+    'use strict';
 
     // ============================================================
     // 0. API & GLOBAL VARS
@@ -48,21 +49,19 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
             }, 500);
-        }, 100); // 500ms yox, 100ms sonra başlayır
+        }, 100);
     }
 
-    // FLASH FIX & SƏHİFƏ KEÇİDİ
+    // PAGE TRANSITION - SLIDE EFFECT
     if (pageTransition) {
         setTimeout(() => {
             pageTransition.classList.add('page-loaded'); 
-        }, 50); // Çox daha sürətli
+        }, 100);
     }
 
     function navigateWithTransition(href) {
         if (pageTransition) {
-            pageTransition.classList.remove('page-loaded'); 
-            pageTransition.style.transition = 'none';
-            pageTransition.classList.add('active');
+            pageTransition.classList.remove('page-loaded');
         }
         setTimeout(() => { window.location.href = href; }, 600);
     }
@@ -266,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Filter Logic
+    // Filter Logic - GLOBAL
     window.filterWorks = function(category, btn) {
         if(btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
@@ -293,12 +292,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.project-card').forEach(card => {
             const video = card.querySelector('video');
             if (video) {
-                // `onloadedmetadata` əvəzinə, sadəcə try/catch ilə cəhd edirik.
                 card.addEventListener('mouseenter', () => {
                     if(video.readyState >= 2) { 
                         video.play().catch(()=>{});
                     } else {
-                        // Metadata yoxdursa, yüklənməyə kömək edirik
                         video.load(); 
                         video.onloadedmetadata = () => video.play().catch(()=>{});
                     }
@@ -375,9 +372,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             previewVideo.pause();
             previewVideo.currentTime = 0;
-            previewVideo.removeAttribute('src'); // `src` silindi
+            previewVideo.removeAttribute('src');
             if(durationTimeEl) durationTimeEl.textContent = '0:00';
-            previewContainer.style.display = 'none'; // Tamamilə gizlət
+            previewContainer.style.display = 'none';
         }, 500);
     }
 
@@ -394,7 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
             previewContainer.classList.remove('is-paused');
             handleUserActivity(); 
         }
-        // İkonların göstərilməsi üçün CSS-də düzəliş edilmədi, JS-də sadəcə məntiqi saxlayıram
     }
 
     function togglePlay(e) {
@@ -420,7 +416,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     if (previewContainer) {
-        // Modalın hər hansı bir yerinə kliklədikdə/hərəkət etdikdə
         ['mousemove', 'click', 'touchstart'].forEach(event => {
             previewContainer.addEventListener(event, handleUserActivity);
         });
@@ -444,7 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if(closePreview) closePreview.onclick = closeVideoPreview;
     
-    // Nəzarət düymələri və slaydlar
     if(progressBarContainer) progressBarContainer.addEventListener('click', (e) => {
         const rect = progressBarContainer.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
@@ -471,6 +465,76 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Yükləməni başlat
-    loadDynamicWorks();
-});
+    // ============================================================
+    // 7. MOBILE MENU
+    // ============================================================
+    
+    function initMobileMenu() {
+        if (document.querySelector('.hamburger')) return;
+        
+        const hamburger = document.createElement('button');
+        hamburger.className = 'hamburger';
+        hamburger.innerHTML = '<span></span><span></span><span></span>';
+        hamburger.setAttribute('aria-label', 'Toggle menu');
+        
+        const mobileMenu = document.createElement('div');
+        mobileMenu.className = 'mobile-menu';
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'mobile-menu-overlay';
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            const clone = btn.cloneNode(true);
+            mobileMenu.appendChild(clone);
+        });
+        
+        document.body.appendChild(overlay);
+        document.body.appendChild(mobileMenu);
+        
+        if (header) {
+            header.appendChild(hamburger);
+        }
+        
+        function toggleMenu() {
+            const isActive = hamburger.classList.contains('active');
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = isActive ? '' : 'hidden';
+        }
+        
+        hamburger.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+        
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-btn')) {
+                toggleMenu();
+            }
+        });
+        
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
+                toggleMenu();
+            }
+        });
+    }
+
+    // ============================================================
+    // 8. INIT
+    // ============================================================
+    
+    function init() {
+        loadDynamicWorks();
+        
+        if (window.innerWidth <= 768) {
+            initMobileMenu();
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})();
