@@ -1,5 +1,6 @@
 // ============================================
 // CINECHORD ADMIN PANEL - TAM VƏ YENİLƏNMİŞ JS
+// DÜZƏLİŞLƏR: Works Edit təhlükəsizliyi və Mesaj Silmə URL-i
 // ============================================
 
 // ✅ URL TƏNZİMLƏMƏLƏRİ
@@ -26,6 +27,8 @@ let currentPage = 0;
 const pageSize = 20;
 let searchTimeout;
 let selectedItems = [];
+
+let worksDataCache = []; // <-- YENİ: Təhlükəsiz Redaktə üçün data cache
 
 // ============================================
 // 1. KÖMƏKÇİ FUNKSİYALAR (UTILS)
@@ -251,6 +254,8 @@ async function loadWorks(page = 0) {
         const works = data.content || [];
         currentPage = page;
         
+        worksDataCache = works; // <--- DÜZƏLİŞ: Məlumatları cache-də saxlayırıq
+        
         if (works.length === 0) {
             grid.innerHTML = `<div class="empty-state"><i class="fas fa-film"></i><h3>Hələ heç bir iş yoxdur</h3></div>`;
             renderPagination(0, 0);
@@ -272,7 +277,7 @@ async function loadWorks(page = 0) {
                             ${w.isFeatured ? '<i class="fas fa-star text-warning" title="Featured"></i>' : ''}
                         </div>
                         <div class="work-actions">
-                            <button class="btn-edit" onclick='editWork(${JSON.stringify(w).replace(/'/g, "&apos;")})'>
+                            <button class="btn-edit" onclick='editWorkById(${w.id})'>
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn-delete" onclick="deleteWork(${w.id})">
@@ -313,7 +318,7 @@ async function deleteWork(id) {
     
     if(r.isConfirmed) {
         try {
-            // URL Strukturu: /admin/works/deleteWork/{id}
+            // URL Strukturu: /admin/works/deleteWork/{id} (Backend ilə uyğun gəlir)
             const res = await authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' });
             
             if (res && res.ok) {
@@ -329,7 +334,7 @@ async function deleteWork(id) {
     }
 }
 
-// --- MODAL & FORM ---
+// --- MODAL & FORM (Köhnə editWork funksiyası silinib/əvəz edilib) ---
 function openWorkModal() {
     document.getElementById('workForm').reset();
     document.getElementById('workId').value = ''; 
@@ -337,7 +342,15 @@ function openWorkModal() {
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
-function editWork(w) {
+// YENİ TƏHLÜKƏSİZ REDAKTƏ FUNKSİYASI
+function editWorkById(id) {
+    const w = worksDataCache.find(work => work.id === id); // Cache-dən ID ilə tapırıq
+
+    if (!w) {
+        Swal.fire('Xəta', 'Məlumat tapılmadı!', 'error');
+        return;
+    }
+    
     document.getElementById('workForm').reset();
     document.getElementById('imagePreviewContainer')?.remove();
 
@@ -579,8 +592,8 @@ async function loadMessages() {
 
             list.innerHTML += `
                 <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded shadow-sm bg-white border" 
-                     style="cursor:pointer; border-left: 4px solid ${isRead ? '#cbd5e1' : '#6366f1'} !important;" 
-                     onclick="viewMessage(${m.id}, '${safeName}', '${safeEmail}', '${safeMsg}')">
+                    style="cursor:pointer; border-left: 4px solid ${isRead ? '#cbd5e1' : '#6366f1'} !important;" 
+                    onclick="viewMessage(${m.id}, '${safeName}', '${safeEmail}', '${safeMsg}')">
                     
                     <div class="rounded-circle d-flex align-items-center justify-content-center text-white" 
                         style="width:40px;height:40px;background:${isRead ? '#94a3b8' : '#6366f1'}">
@@ -621,8 +634,8 @@ async function viewMessage(id, name, email, message) {
 async function deleteMessage(id) {
     const r = await Swal.fire({title: 'Silinsin?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sil'});
     if(r.isConfirmed) {
-        // Backend strukturuna görə buranı dəyişin. Adətən: deleteMessage/{id}
-        const res = await authFetch(`${API.CONTACTS}/deleteMessage/${id}`, { method: 'DELETE' });
+        // DÜZƏLİŞ: URL-i Backend Controller-ə uyğunlaşdırıldı
+        const res = await authFetch(`${API.CONTACTS}/${id}`, { method: 'DELETE' });
         if(res && res.ok) {
             loadMessages();
             loadDashboard();
