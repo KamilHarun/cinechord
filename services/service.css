@@ -41,7 +41,7 @@ body {
 }
 
 /* =========================================
-   🔥 GPU ACCELERATION & PERFORMANCE
+   GPU ACCELERATION & PERFORMANCE
    ========================================= */
 .page-transition,
 .header,
@@ -56,7 +56,7 @@ body {
 }
 
 /* =========================================
-   PAGE TRANSITION (Optimized)
+   PAGE TRANSITION - SLIDE EFFECT (FIXED)
    ========================================= */
 .page-transition {
     position: fixed;
@@ -66,27 +66,22 @@ body {
     height: 100%;
     background: #000;
     z-index: 9999;
-    transform: translateY(0);
+    transform: translateY(0); /* Başlanğıcda tam görünür */
     pointer-events: all;
-    transition: none;
 }
 
+/* Səhifə yükləndikdən sonra yuxarı sürüşür */
 .page-transition.page-loaded {
     transform: translateY(-100%);
     pointer-events: none;
     transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
+/* Başqa səhifəyə keçəndə - aşağı enir və qalır */
 .page-transition.active {
-    animation: pageTransition 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+    transform: translateY(0) !important;
     pointer-events: all;
-    transition: none;
-}
-
-@keyframes pageTransition {
-    0% { transform: translateY(-100%); }
-    50% { transform: translateY(0); }
-    100% { transform: translateY(-100%); }
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1) !important;
 }
 
 /* GRAIN & PROGRESS */
@@ -234,6 +229,98 @@ body {
 }
 
 /* =========================================
+   HAMBURGER MENU (MOBILE) - ABOUT PATTERN
+   ========================================= */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 1002;
+    position: relative;
+    padding: 10px;
+    background: transparent;
+    border: none;
+}
+
+.hamburger span {
+    width: 28px;
+    height: 2.5px;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 2px;
+    display: block;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+    background: #FFA500;
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+    background: #FFA500;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.98);
+    backdrop-filter: blur(20px);
+    z-index: 1001;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 100px 30px 30px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255, 165, 0, 0.1);
+}
+
+.mobile-menu.active {
+    right: 0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-menu .nav-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 14px;
+    animation: none;
+    opacity: 1;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* =========================================
    CENTER LOGO (Smooth Hide/Show)
    ========================================= */
 .center-logo {
@@ -273,7 +360,7 @@ body {
 }
 
 /* =========================================
-   🔥 SCROLL REVEAL (Optimized)
+   SCROLL REVEAL (Optimized)
    ========================================= */
 .reveal-item {
     opacity: 0;
@@ -391,7 +478,7 @@ body {
     overflow: hidden;
 }
 
-/* 🔥 VIDEO LAZY LOADING SKELETON */
+/* VIDEO LAZY LOADING SKELETON */
 .media-content {
     width: 100%;
     height: 100%;
@@ -402,7 +489,6 @@ body {
     background-size: 200% 100%;
 }
 
-/* Skeleton animation while loading */
 .media-content:not([src]) {
     animation: loading 1.5s infinite;
 }
@@ -412,7 +498,6 @@ body {
     100% { background-position: -200% 0; }
 }
 
-/* Remove animation after video loads */
 .media-content[src] {
     animation: none;
     background: #000;
@@ -689,7 +774,7 @@ body {
 }
 
 /* =========================================
-   🔥 REDUCE MOTION (Accessibility)
+   REDUCE MOTION (Accessibility)
    ========================================= */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -703,7 +788,7 @@ body {
 }
 
 /* =========================================
-   RESPONSIVE DESIGN
+   RESPONSIVE - TABLET
    ========================================= */
 @media (max-width: 1024px) {
     .page-wrapper {
@@ -728,40 +813,216 @@ body {
     .social-icons {
         justify-content: center;
     }
+    
+    .center-logo {
+        top: 20px;
+    }
+    
+    .logo-img {
+        width: 90px;
+        height: 90px;
+    }
 }
 
+/* =========================================
+   RESPONSIVE - MOBILE (ABOUT PATTERN)
+   ========================================= */
 @media (max-width: 768px) {
-    .header {
+    /* Header & Navigation */
+    .header { 
         padding: 15px 20px;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(10px);
+        justify-content: flex-end;
     }
     
-    .nav-left, .nav-right {
-        gap: 10px;
+    /* DESKTOP NAVBAR GİZLƏT */
+    .nav-left, 
+    .nav-right { 
+        display: none !important;
     }
     
-    .nav-btn {
-        padding: 10px 20px;
-        font-size: 11px;
+    /* HAMBURGER GÖSTƏR */
+    .hamburger {
+        display: flex !important;
     }
     
+    /* MOBILE MENU GÖSTƏR */
+    .mobile-menu {
+        display: flex !important;
+    }
+    
+    /* Logo adjustments */
+    .center-logo {
+        top: 15px;
+        left: 20px;
+        transform: translateX(0) scale(0.5) rotate(-180deg);
+    }
+    
+    .center-logo.entry-done {
+        transform: translateX(0) scale(1) rotate(0deg);
+    }
+    
+    .center-logo.scroll-hidden {
+        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+    }
+    
+    .logo-img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* Services Title */
     .services-title-container {
         margin-top: 140px;
         margin-bottom: 80px;
     }
     
+    /* Container */
     .container {
         padding: 40px 15px;
     }
     
+    /* Page Wrapper */
     .page-wrapper {
         margin-bottom: 80px;
+    }
+    
+    .media-container {
+        min-height: 300px;
+    }
+    
+    .content-column {
+        padding: 20px 15px;
+    }
+    
+    .service-header {
+        margin-bottom: 20px;
+    }
+    
+    .icon-container {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .icon-container i {
+        font-size: 16px;
+    }
+    
+    .service-title {
+        font-size: 16px;
+        letter-spacing: 2px;
+    }
+    
+    .description {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+    
+    .bullet-list li, .numbered-list li {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    
+    /* Chat Section */
+    .chat-section {
+        margin-top: 80px;
+        margin-bottom: 60px;
     }
     
     .chat-video-container {
         height: 300px;
     }
     
+    .chat-cta-button {
+        margin-top: 200px;
+        padding: 14px 30px;
+        font-size: 12px;
+    }
+    
+    /* Footer */
     .main-footer {
-        padding: 60px 30px;
+        padding: 60px 20px;
+    }
+    
+    .footer-wrapper {
+        gap: 30px;
+    }
+}
+
+/* =========================================
+   RESPONSIVE - SMALL MOBILE
+   ========================================= */
+@media (max-width: 480px) {
+    .services-title-container {
+        margin-top: 120px;
+        margin-bottom: 60px;
+    }
+    
+    .container {
+        padding: 30px 15px;
+    }
+    
+    .page-wrapper {
+        margin-bottom: 60px;
+    }
+    
+    .media-container {
+        min-height: 250px;
+    }
+    
+    .service-title {
+        font-size: 14px;
+    }
+    
+    .description {
+        font-size: 12px;
+    }
+    
+    .cta-button {
+        padding: 14px 15px;
+        font-size: 12px;
+    }
+    
+    .chat-video-container {
+        height: 250px;
+    }
+    
+    .chat-cta-button {
+        margin-top: 150px;
+    }
+    
+    .main-footer {
+        padding: 40px 15px;
+    }
+    
+    /* Mobile menu adjustments */
+    .mobile-menu {
+        width: 85%;
+        padding: 70px 25px 25px;
+    }
+}
+
+/* =========================================
+   TOUCH IMPROVEMENTS
+   ========================================= */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn {
+        padding: 14px 25px;
+        font-size: 14px;
+    }
+    
+    .social-icon-btn {
+        width: 48px;
+        height: 48px;
+    }
+    
+    /* Disable hover effects on touch */
+    .services-title:hover span {
+        transform: none;
+    }
+    
+    .services-title:hover::after {
+        transform: none;
     }
 }

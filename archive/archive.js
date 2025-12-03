@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Main JavaScript
-   Version: 2.5 - FULLY OPTIMIZED
+   Version: 3.0 - ABOUT PATTERN + MOBILE OPTIMIZED
    Description: Professional archive system with complete features
    Author: Kamil
    ============================================================ */
@@ -12,27 +12,28 @@
        1. CONFIGURATION & CONSTANTS
        ============================================================ */
     
-    // Backend configuration - Railway production server
     const CONFIG = {
         BACKEND_URL: 'https://cinechord-admin-production.up.railway.app',
         ENDPOINTS: {
             ARCHIVE: '/api/archive'
         },
-        RETRY_ATTEMPTS: 3,
+        RETRY_ATTEMPTS: 2,
         RETRY_DELAY: 1000,
-        REQUEST_TIMEOUT: 15000,
-        SCROLL_THROTTLE: 16, // 60fps
+        REQUEST_TIMEOUT: 10000,
+        SCROLL_THROTTLE: 16,
         NAVBAR_HIDE_THRESHOLD: 200,
-        LOGO_HIDE_THRESHOLD: 100
+        LOGO_HIDE_THRESHOLD: 100,
+        PAGE_LOAD_DELAY: 100,
+        NAVIGATION_DELAY: 600,
+        FALLBACK_DELAY: 1600,
+        RESIZE_DEBOUNCE: 250
     };
 
-    // Build complete API URLs
     const API_URLS = {
         ARCHIVE: `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ARCHIVE}`,
         UPLOADS: `${CONFIG.BACKEND_URL}/uploads/`
     };
 
-    // Backend to Frontend category mapping
     const CATEGORY_MAP = {
         'FILM': 'FILM',
         'COMMERCIAL': 'COMMERCIAL',
@@ -47,18 +48,13 @@
        ============================================================ */
     
     const elements = {
-        // Table elements
         tableBody: document.querySelector('.archive-table tbody'),
-        
-        // Video preview modal elements
         previewContainer: document.getElementById('previewContainer'),
         videoElement: document.getElementById('previewVideo'),
         previewTitle: document.getElementById('previewTitle'),
         previewMeta: document.getElementById('previewMeta'),
         videoLoading: document.querySelector('.video-loading'),
         closeButton: document.getElementById('closePreview'),
-        
-        // Video control elements
         playPauseBtn: document.getElementById('playPauseBtn'),
         playIcon: document.getElementById('playIcon'),
         pauseIcon: document.getElementById('pauseIcon'),
@@ -75,28 +71,21 @@
         progressBuffered: document.getElementById('progressBuffered'),
         currentTimeDisplay: document.getElementById('currentTime'),
         durationTimeDisplay: document.getElementById('durationTime'),
-        
-        // Page elements
         pageTransition: document.querySelector('.page-transition'),
         progressBarTop: document.querySelector('.progress-bar-top'),
         centerLogo: document.querySelector('.center-logo'),
         header: document.querySelector('.header')
     };
 
-    // Scroll state tracking
     let lastScrollTop = 0;
-    let isScrolling = false;
+    
+    // Page transition lock
+    let isTransitioning = false;
 
     /* ============================================================
        3. UTILITY FUNCTIONS
        ============================================================ */
     
-    /**
-     * Throttle function calls for performance
-     * @param {Function} func - Function to throttle
-     * @param {number} delay - Delay in milliseconds
-     * @returns {Function} Throttled function
-     */
     function throttle(func, delay) {
         let lastCall = 0;
         return function(...args) {
@@ -107,12 +96,6 @@
         };
     }
 
-    /**
-     * Debounce function calls
-     * @param {Function} func - Function to debounce
-     * @param {number} delay - Delay in milliseconds
-     * @returns {Function} Debounced function
-     */
     function debounce(func, delay) {
         let timeoutId;
         return function(...args) {
@@ -121,59 +104,27 @@
         };
     }
 
-    /**
-     * Clean URL path by removing duplicate /uploads/ prefix
-     * @param {string} url - URL to clean
-     * @returns {string} Cleaned URL
-     */
     function cleanUrlPath(url) {
         if (!url || typeof url !== 'string') return url;
-        
-        // If it's already a full URL, return as is
         if (url.startsWith('http')) return url;
-        
-        // Remove /uploads/ prefix if exists
         return url.replace(/^\/uploads\//, '').replace(/^uploads\//, '');
     }
 
-    /**
-     * Build complete video URL from relative path
-     * @param {string} videoUrl - Relative or absolute video URL
-     * @returns {string|null} Complete video URL or null
-     */
     function getFullVideoUrl(videoUrl) {
         if (!videoUrl) return null;
-        
         const url = videoUrl.trim();
-        
-        // If already a full URL, return as is
         if (url.startsWith('http')) return url;
-        
-        // Clean the URL and prepend uploads base URL
         const cleanedUrl = cleanUrlPath(url);
         return API_URLS.UPLOADS + cleanedUrl;
     }
 
-    /**
-     * Format time in MM:SS format
-     * @param {number} seconds - Time in seconds
-     * @returns {string} Formatted time string
-     */
     function formatTime(seconds) {
         if (isNaN(seconds) || seconds === Infinity) return '0:00';
-        
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
-    /**
-     * Fetch with timeout support
-     * @param {string} url - URL to fetch
-     * @param {Object} options - Fetch options
-     * @param {number} timeout - Timeout in milliseconds
-     * @returns {Promise} Fetch promise
-     */
     function fetchWithTimeout(url, options = {}, timeout = CONFIG.REQUEST_TIMEOUT) {
         return Promise.race([
             fetch(url, options),
@@ -183,56 +134,91 @@
         ]);
     }
 
-    /**
-     * Retry fetch with exponential backoff
-     * @param {Function} fetchFn - Fetch function to retry
-     * @param {number} attempts - Number of retry attempts
-     * @returns {Promise} Result of fetch
-     */
     async function retryFetch(fetchFn, attempts = CONFIG.RETRY_ATTEMPTS) {
         let lastError;
-        
         for (let i = 0; i < attempts; i++) {
             try {
                 return await fetchFn();
             } catch (error) {
                 lastError = error;
-                console.warn(`Attempt ${i + 1} failed:`, error.message);
-                
                 if (i < attempts - 1) {
-                    // Exponential backoff
                     const delay = CONFIG.RETRY_DELAY * Math.pow(2, i);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
-        
         throw lastError;
     }
 
     /* ============================================================
-       4. SCROLL EFFECTS
+       4. MOBILE NAVIGATION & HAMBURGER
        ============================================================ */
     
-    /**
-     * Update scroll progress bar
-     */
+    function initMobileMenu() {
+        const hamburger = document.createElement('div');
+        hamburger.className = 'hamburger';
+        hamburger.innerHTML = '<span></span><span></span><span></span>';
+        hamburger.setAttribute('aria-label', 'Toggle menu');
+        hamburger.setAttribute('role', 'button');
+        
+        if (elements.header) {
+            elements.header.appendChild(hamburger);
+        }
+
+        const mobileMenu = document.createElement('div');
+        mobileMenu.className = 'mobile-menu';
+        const overlay = document.createElement('div');
+        overlay.className = 'mobile-menu-overlay';
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            mobileMenu.appendChild(btn.cloneNode(true));
+        });
+        
+        document.body.appendChild(overlay);
+        document.body.appendChild(mobileMenu);
+
+        function toggleMenu() {
+            const isActive = hamburger.classList.contains('active');
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = isActive ? '' : 'hidden';
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+        mobileMenu.addEventListener('click', function(e) {
+            if (e.target.classList.contains('nav-btn') || e.target.closest('.nav-btn')) {
+                toggleMenu();
+            }
+        });
+
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                if (window.innerWidth > 768 && hamburger.classList.contains('active')) {
+                    toggleMenu();
+                }
+            }, CONFIG.RESIZE_DEBOUNCE);
+        });
+        
+    }
+
+    /* ============================================================
+       5. SCROLL EFFECTS
+       ============================================================ */
+    
     function updateScrollProgress() {
         if (!elements.progressBarTop) return;
-        
         const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrolled = (window.pageYOffset / windowHeight) * 100;
         elements.progressBarTop.style.width = Math.min(scrolled, 100) + '%';
     }
 
-    /**
-     * Handle center logo visibility on scroll
-     */
     function handleLogoScroll() {
         if (!elements.centerLogo) return;
-        
         const scrollTop = window.pageYOffset;
-        
         if (scrollTop > CONFIG.LOGO_HIDE_THRESHOLD) {
             elements.centerLogo.classList.add('scroll-hidden');
         } else {
@@ -240,108 +226,85 @@
         }
     }
 
-    /**
-     * Handle navbar show/hide on scroll
-     */
     function handleNavbarScroll() {
         if (!elements.header) return;
-        
         const currentScroll = window.pageYOffset;
         
-        // Don't hide navbar at the top of the page
         if (currentScroll <= 0) {
-            elements.header.classList.remove('navbar-hide');
-            elements.header.classList.add('navbar-show');
+            elements.header.style.transform = 'translateY(0)';
             lastScrollTop = currentScroll;
             return;
         }
         
-        // Hide navbar when scrolling down, show when scrolling up
         if (currentScroll > lastScrollTop && currentScroll > CONFIG.NAVBAR_HIDE_THRESHOLD) {
-            // Scrolling down
-            elements.header.classList.add('navbar-hide');
-            elements.header.classList.remove('navbar-show');
+            elements.header.style.transform = 'translateY(-100%)';
         } else {
-            // Scrolling up
-            elements.header.classList.remove('navbar-hide');
-            elements.header.classList.add('navbar-show');
+            elements.header.style.transform = 'translateY(0)';
         }
-        
         lastScrollTop = currentScroll;
     }
 
-    /**
-     * Combined scroll handler (throttled)
-     */
     const handleScroll = throttle(() => {
         updateScrollProgress();
         handleLogoScroll();
         handleNavbarScroll();
     }, CONFIG.SCROLL_THROTTLE);
 
-    /**
-     * Initialize scroll effects
-     */
     function initScrollEffects() {
-        window.addEventListener('scroll', handleScroll);
-        
-        // Initial call
+        window.addEventListener('scroll', handleScroll, { passive: true });
         updateScrollProgress();
         handleLogoScroll();
         handleNavbarScroll();
-        
-        console.log('✅ Scroll effects initialized');
     }
 
     /* ============================================================
-       5. PAGE TRANSITION SYSTEM
+       6. PAGE TRANSITION SYSTEM (FIXED SLIDE EFFECT)
        ============================================================ */
     
-    /**
-     * Initialize page transition effect
-     */
     function initPageTransition() {
         if (!elements.pageTransition) return;
         
-        // Remove transition on page load
+        // Səhifə yükləndikdən sonra qara ekran yuxarı sürüşür
         setTimeout(() => {
             elements.pageTransition.classList.add('page-loaded');
-        }, 100);
+        }, CONFIG.PAGE_LOAD_DELAY);
+        
     }
 
-    /**
-     * Navigate to another page with transition effect
-     * @param {string} href - Target URL
-     */
     function navigateWithTransition(href) {
-        if (!elements.pageTransition) {
-            window.location.href = href;
+        if (isTransitioning) {
             return;
         }
         
-        elements.pageTransition.classList.remove('page-loaded');
-        elements.pageTransition.style.transition = 'none';
-        elements.pageTransition.classList.add('active');
+        isTransitioning = true;
         
+        if (elements.pageTransition) {
+            // page-loaded silmək qara ekranı aşağı endirir
+            elements.pageTransition.classList.remove('page-loaded');
+        }
+        
+        // Qara ekran tam endikdən sonra navigate et
         setTimeout(() => {
             window.location.href = href;
-        }, 600);
+        }, CONFIG.NAVIGATION_DELAY);
+        
+        // Fallback
+        setTimeout(() => {
+            if (!document.hidden) {
+                window.location.href = href;
+            }
+        }, CONFIG.FALLBACK_DELAY);
     }
 
     /* ============================================================
-       6. DATA LOADING FROM BACKEND
+       7. DATA LOADING FROM BACKEND
        ============================================================ */
     
-    /**
-     * Load archive data from backend API
-     */
     async function loadArchiveData() {
         if (!elements.tableBody) {
-            console.error('Table body element not found');
             return;
         }
 
-        // Show loading state with smooth animation
         elements.tableBody.innerHTML = `
             <tr class="loading-row">
                 <td colspan="7" style="text-align: center; padding: 60px 20px; opacity: 0; animation: fadeIn 0.3s ease forwards;">
@@ -353,10 +316,8 @@
         `;
 
         try {
-            console.log('📡 Connecting to backend:', API_URLS.ARCHIVE);
             const startTime = performance.now();
 
-            // Fetch archive data with retry logic and progress tracking
             const response = await retryFetch(() => 
                 fetchWithTimeout(API_URLS.ARCHIVE, {
                     method: 'GET',
@@ -368,22 +329,14 @@
             );
 
             const fetchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-            console.log(`⏱️ Server response time: ${fetchTime}s`);
 
-            // Check response status
             if (!response.ok) {
                 throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
             }
 
-            // Parse JSON response
             const data = await response.json();
-            
-            // Extract works array (handle both paginated and direct array responses)
             const works = Array.isArray(data) ? data : (data.content || []);
 
-            console.log(`✅ Successfully loaded ${works.length} works from archive`);
-
-            // Clear table with fade out
             const loadingRow = elements.tableBody.querySelector('.loading-row');
             if (loadingRow) {
                 loadingRow.style.opacity = '0';
@@ -392,7 +345,6 @@
             
             elements.tableBody.innerHTML = '';
 
-            // Check if works exist
             if (works.length === 0) {
                 elements.tableBody.innerHTML = `
                     <tr style="animation: fadeIn 0.5s ease;">
@@ -405,8 +357,7 @@
                 return;
             }
 
-            // Use requestAnimationFrame to prevent UI blocking
-            const batchSize = 10; // Process 10 rows at a time
+            const batchSize = 10;
             let currentIndex = 0;
 
             function processBatch() {
@@ -416,24 +367,17 @@
                     const globalIndex = currentIndex + index;
                     const videoUrl = getFullVideoUrl(work.videoUrl);
                     const previewUrl = getFullVideoUrl(work.previewVideoUrl);
-                    
-                    // Priority: previewVideoUrl > videoUrl
                     const videoSrc = previewUrl || videoUrl || '';
                     
-                    // Create table row
                     const row = document.createElement('tr');
-                    
-                    // Set data attributes for video playback
                     row.setAttribute('data-video', videoSrc);
                     row.setAttribute('data-title', work.title || '');
                     row.setAttribute('data-client', work.clientName || '');
                     row.setAttribute('data-category', work.category || '');
                     row.setAttribute('data-year', work.productionYear || '');
                     
-                    // Get display category
                     const categoryDisplay = CATEGORY_MAP[work.category] || work.category || '-';
                     
-                    // Build row HTML
                     row.innerHTML = `
                         <td class="number-col">${String(globalIndex + 1).padStart(2, '0')}</td>
                         <td class="client-col" data-original="${work.clientName || '-'}">${work.clientName || '-'}</td>
@@ -449,26 +393,18 @@
                 
                 currentIndex += batchSize;
                 
-                // If there are more rows to process, schedule next batch
                 if (currentIndex < works.length) {
                     requestAnimationFrame(processBatch);
                 } else {
-                    // All rows processed, initialize animations and effects
                     initTableAnimations();
                     attachTableRowEffects();
-                    
                     const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
-                    console.log(`🎉 Table rendered in ${totalTime}s (${works.length} rows)`);
                 }
             }
             
-            // Start processing batches
             requestAnimationFrame(processBatch);
 
         } catch (error) {
-            console.error('❌ Archive loading error:', error);
-            
-            // Show user-friendly error message with fade in
             elements.tableBody.innerHTML = `
                 <tr style="animation: fadeIn 0.5s ease;">
                     <td colspan="7" style="text-align: center; padding: 60px 20px;">
@@ -492,110 +428,80 @@
     }
 
     /* ============================================================
-       7. TABLE ANIMATIONS
+       8. SCROLL REVEAL (INTERSECTION OBSERVER)
        ============================================================ */
     
-    /**
-     * Initialize intersection observer for table row animations
-     */
     function initTableAnimations() {
         const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
         };
 
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
+            entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    // Stagger animation with delay
-                    setTimeout(() => {
-                        entry.target.classList.add('visible');
-                    }, index * 50);
-                    
-                    // Stop observing after animation
+                    entry.target.classList.add('visible');
                     observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        // Observe all table rows
         document.querySelectorAll('.archive-table tbody tr').forEach(row => {
             observer.observe(row);
         });
     }
 
     /* ============================================================
-       8. TABLE ROW EFFECTS
+       9. TABLE ROW EFFECTS & SCRAMBLE
        ============================================================ */
     
-    /**
-     * Attach scramble effect and click handlers to table rows
-     */
     function attachTableRowEffects() {
         const rows = document.querySelectorAll('.archive-table tbody tr');
         const scrambleLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         const preserveChars = 'ƏəŞşÜüİıÖöĞğÇç ';
 
         rows.forEach(row => {
-            // Prepare cells for scramble effect
             const cells = row.querySelectorAll('td:not(.number-col)');
             cells.forEach(cell => {
                 const originalText = cell.getAttribute('data-original') || cell.textContent;
                 cell.setAttribute('data-original', originalText);
-                
-                // Wrap each character in span for animation
                 cell.innerHTML = originalText.split('').map(char => 
                     char === ' ' ? ' ' : `<span>${char}</span>`
                 ).join('');
             });
 
-            // Scramble effect on hover
             row.addEventListener('mouseenter', function() {
                 const hoverCells = this.querySelectorAll('td:not(.number-col)');
-                
                 hoverCells.forEach(cell => {
                     const spans = cell.querySelectorAll('span');
                     const originalText = cell.getAttribute('data-original') || '';
-                    
                     let iteration = 0;
                     const interval = setInterval(() => {
                         spans.forEach((span, index) => {
                             const originalChar = originalText[index];
-                            
                             if (index < iteration) {
-                                // Show original character
                                 span.textContent = originalChar;
                             } else if (preserveChars.includes(originalChar)) {
-                                // Preserve special characters
                                 span.textContent = originalChar;
                             } else {
-                                // Show random character
                                 span.textContent = scrambleLetters[Math.floor(Math.random() * scrambleLetters.length)];
                             }
                         });
-                        
                         iteration += 1 / 2.5;
-                        
                         if (iteration >= originalText.length) {
                             clearInterval(interval);
                         }
                     }, 30);
-                    
-                    // Store interval for cleanup
                     cell.dataset.scrambleInterval = interval;
                 });
             });
 
-            // Reset on mouse leave
             row.addEventListener('mouseleave', function() {
                 const cells = this.querySelectorAll('td:not(.number-col)');
                 cells.forEach(cell => {
-                    // Clear any running intervals
                     if (cell.dataset.scrambleInterval) {
                         clearInterval(parseInt(cell.dataset.scrambleInterval));
                     }
-                    
-                    // Reset to original text
                     const originalText = cell.getAttribute('data-original') || '';
                     const spans = cell.querySelectorAll('span');
                     spans.forEach((span, index) => {
@@ -604,51 +510,33 @@
                 });
             });
 
-            // Open video preview on click
             row.addEventListener('click', function() {
                 const videoSrc = this.getAttribute('data-video');
                 const title = this.getAttribute('data-title');
                 const client = this.getAttribute('data-client');
                 const category = this.getAttribute('data-category');
                 const year = this.getAttribute('data-year');
-
                 if (!videoSrc || videoSrc === '') {
-                    console.warn('No video URL available for this work');
                     return;
                 }
-
                 openVideoPreview(videoSrc, title, client, category, year);
             });
         });
     }
 
     /* ============================================================
-       9. VIDEO PREVIEW MODAL
+       10. VIDEO PREVIEW MODAL
        ============================================================ */
     
-    /**
-     * Open video preview modal
-     * @param {string} videoUrl - Video URL to play
-     * @param {string} title - Video title
-     * @param {string} client - Client name
-     * @param {string} category - Video category
-     * @param {string} year - Production year
-     */
     function openVideoPreview(videoUrl, title, client, category, year) {
-        if (!elements.previewContainer || !elements.videoElement) {
-            console.error('Preview container elements not found');
-            return;
-        }
+        if (!elements.previewContainer || !elements.videoElement) return;
 
-        // Show loading spinner
         if (elements.videoLoading) {
             elements.videoLoading.style.display = 'block';
         }
 
-        // Set video source
         elements.videoElement.src = videoUrl;
         
-        // Set video information
         if (elements.previewTitle) {
             elements.previewTitle.textContent = `${client} - ${title}`;
         }
@@ -658,73 +546,51 @@
             elements.previewMeta.textContent = `${categoryDisplay} • ${year}`;
         }
 
-        // Reset playback speed
         if (elements.speedBtn) {
             elements.speedBtn.textContent = '1x';
             elements.videoElement.playbackRate = 1;
         }
 
-        // Video ready handler
         elements.videoElement.oncanplay = function() {
             if (elements.videoLoading) {
                 elements.videoLoading.style.display = 'none';
             }
         };
 
-        // Video error handler
         elements.videoElement.onerror = function() {
             if (elements.videoLoading) {
                 elements.videoLoading.style.display = 'none';
             }
-            console.error('Video loading error:', videoUrl);
             alert('Video yüklənmə xətası. Xahiş edirik bir az sonra yenidən cəhd edin.');
         };
 
-        // Show modal with slight delay for smooth animation
         setTimeout(() => {
             elements.previewContainer.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // Attempt autoplay
             elements.videoElement.play().catch(err => {
-                console.log('Autoplay prevented by browser:', err.message);
             });
         }, 10);
         
-        console.log('🎬 Video opened:', title);
     }
 
-    /**
-     * Close video preview modal
-     */
     function closeVideoPreview() {
         if (!elements.previewContainer || !elements.videoElement) return;
-
-        // Hide modal
         elements.previewContainer.classList.remove('active');
         document.body.style.overflow = '';
-        
-        // Pause and reset video after animation
         setTimeout(() => {
             elements.videoElement.pause();
             elements.videoElement.currentTime = 0;
             elements.videoElement.src = '';
         }, 600);
-        
-        console.log('⏹️ Video closed');
     }
 
     /* ============================================================
-       10. VIDEO PLAYER CONTROLS
+       11. VIDEO PLAYER CONTROLS
        ============================================================ */
     
-    /**
-     * Initialize all video player controls
-     */
     function initVideoControls() {
         if (!elements.videoElement) return;
 
-        // Play/Pause button
         if (elements.playPauseBtn) {
             elements.playPauseBtn.addEventListener('click', () => {
                 if (elements.videoElement.paused) {
@@ -735,14 +601,12 @@
             });
         }
 
-        // Skip backward button (10 seconds)
         if (elements.skipBackBtn) {
             elements.skipBackBtn.addEventListener('click', () => {
                 elements.videoElement.currentTime = Math.max(0, elements.videoElement.currentTime - 10);
             });
         }
 
-        // Skip forward button (10 seconds)
         if (elements.skipForwardBtn) {
             elements.skipForwardBtn.addEventListener('click', () => {
                 elements.videoElement.currentTime = Math.min(
@@ -752,7 +616,6 @@
             });
         }
 
-        // Mute/Unmute button
         if (elements.muteBtn) {
             elements.muteBtn.addEventListener('click', () => {
                 elements.videoElement.muted = !elements.videoElement.muted;
@@ -760,7 +623,6 @@
             });
         }
 
-        // Volume slider
         if (elements.volumeSlider) {
             elements.volumeSlider.addEventListener('input', (e) => {
                 const volume = e.target.value / 100;
@@ -770,11 +632,9 @@
             });
         }
 
-        // Playback speed button
         if (elements.speedBtn) {
             const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-            let currentSpeedIndex = 2; // Start at 1x
-
+            let currentSpeedIndex = 2;
             elements.speedBtn.addEventListener('click', () => {
                 currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
                 const newSpeed = speeds[currentSpeedIndex];
@@ -783,20 +643,14 @@
             });
         }
 
-        // Fullscreen button
         if (elements.fullscreenBtn) {
             elements.fullscreenBtn.addEventListener('click', () => {
                 if (elements.videoElement.requestFullscreen) {
                     elements.videoElement.requestFullscreen();
-                } else if (elements.videoElement.webkitRequestFullscreen) {
-                    elements.videoElement.webkitRequestFullscreen();
-                } else if (elements.videoElement.mozRequestFullScreen) {
-                    elements.videoElement.mozRequestFullScreen();
                 }
             });
         }
 
-        // Progress bar
         if (elements.progressSlider) {
             elements.progressSlider.addEventListener('input', (e) => {
                 const time = (e.target.value / 100) * elements.videoElement.duration;
@@ -804,22 +658,16 @@
             });
         }
 
-        // Update controls on video events
         elements.videoElement.addEventListener('play', updatePlayPauseButton);
         elements.videoElement.addEventListener('pause', updatePlayPauseButton);
         elements.videoElement.addEventListener('timeupdate', updateProgress);
         elements.videoElement.addEventListener('loadedmetadata', updateDuration);
         elements.videoElement.addEventListener('progress', updateBuffered);
         
-        console.log('✅ Video controls initialized');
     }
 
-    /**
-     * Update play/pause button icon
-     */
     function updatePlayPauseButton() {
         if (!elements.videoElement) return;
-
         if (elements.videoElement.paused) {
             if (elements.playIcon) elements.playIcon.style.display = 'block';
             if (elements.pauseIcon) elements.pauseIcon.style.display = 'none';
@@ -829,12 +677,8 @@
         }
     }
 
-    /**
-     * Update mute button icon
-     */
     function updateMuteButton() {
         if (!elements.videoElement) return;
-
         if (elements.videoElement.muted || elements.videoElement.volume === 0) {
             if (elements.volumeIcon) elements.volumeIcon.style.display = 'none';
             if (elements.muteIcon) elements.muteIcon.style.display = 'block';
@@ -844,39 +688,25 @@
         }
     }
 
-    /**
-     * Update progress bar
-     */
     function updateProgress() {
         if (!elements.videoElement || !elements.progressSlider) return;
-
         const progress = (elements.videoElement.currentTime / elements.videoElement.duration) * 100;
         elements.progressSlider.value = progress || 0;
-        
         if (elements.progressPlayed) {
             elements.progressPlayed.style.width = `${progress}%`;
         }
-
         if (elements.currentTimeDisplay) {
             elements.currentTimeDisplay.textContent = formatTime(elements.videoElement.currentTime);
         }
     }
 
-    /**
-     * Update duration display
-     */
     function updateDuration() {
         if (!elements.videoElement || !elements.durationTimeDisplay) return;
-
         elements.durationTimeDisplay.textContent = formatTime(elements.videoElement.duration);
     }
 
-    /**
-     * Update buffered progress
-     */
     function updateBuffered() {
         if (!elements.videoElement || !elements.progressBuffered) return;
-
         if (elements.videoElement.buffered.length > 0) {
             const buffered = elements.videoElement.buffered.end(elements.videoElement.buffered.length - 1);
             const duration = elements.videoElement.duration;
@@ -886,165 +716,133 @@
     }
 
     /* ============================================================
-       11. KEYBOARD SHORTCUTS
+       12. NAVIGATION & SCRAMBLE
        ============================================================ */
     
-    /**
-     * Initialize keyboard shortcuts for video player
-     */
+    function setupNavButtons() {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const href = btn.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('#')) return;
+                if (href === window.location.pathname.split('/').pop()) return;
+                e.preventDefault();
+                navigateWithTransition(href);
+            });
+        });
+    }
+
+    function initNavigation() {
+        setupNavButtons();
+        setTimeout(setupNavButtons, 100);
+
+        // Scramble effect (Desktop only)
+        if (window.innerWidth > 768) {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const originalText = btn.getAttribute('data-text');
+                if (!originalText) return;
+                const navText = btn.querySelector('.nav-text');
+                if (!navText) return;
+
+                btn.addEventListener('mouseenter', function() {
+                    if (this.classList.contains('active')) return;
+                    let iteration = 0;
+                    let interval = setInterval(() => {
+                        navText.innerText = originalText.split("").map((letter, index) => {
+                            if(index < iteration) return originalText[index];
+                            return letters[Math.floor(Math.random() * letters.length)];
+                        }).join("");
+                        if(iteration >= originalText.length) clearInterval(interval);
+                        iteration += 1/3;
+                    }, 30);
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    if (this.classList.contains('active')) return;
+                    navText.innerText = originalText;
+                });
+            });
+        }
+        
+    }
+
+    /* ============================================================
+       13. KEYBOARD SHORTCUTS
+       ============================================================ */
+    
     function initKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
-            // Only work when video modal is open
             if (!elements.previewContainer?.classList.contains('active')) return;
-            
-            // Prevent default for handled keys
             const handledKeys = ['Space', 'ArrowLeft', 'ArrowRight', 'KeyF', 'KeyM', 'Escape'];
-            if (handledKeys.includes(e.code)) {
-                e.preventDefault();
-            }
+            if (handledKeys.includes(e.code)) e.preventDefault();
 
             switch(e.code) {
                 case 'Space':
-                    // Play/Pause
                     if (elements.videoElement.paused) {
                         elements.videoElement.play();
                     } else {
                         elements.videoElement.pause();
                     }
                     break;
-                    
                 case 'ArrowLeft':
-                    // Skip backward 5 seconds
                     elements.videoElement.currentTime = Math.max(0, elements.videoElement.currentTime - 5);
                     break;
-                    
                 case 'ArrowRight':
-                    // Skip forward 5 seconds
                     elements.videoElement.currentTime = Math.min(
                         elements.videoElement.duration,
                         elements.videoElement.currentTime + 5
                     );
                     break;
-                    
                 case 'KeyF':
-                    // Fullscreen
                     if (elements.videoElement.requestFullscreen) {
                         elements.videoElement.requestFullscreen();
                     }
                     break;
-                    
                 case 'KeyM':
-                    // Mute/Unmute
                     elements.videoElement.muted = !elements.videoElement.muted;
                     updateMuteButton();
                     break;
-                    
                 case 'Escape':
-                    // Close modal
                     closeVideoPreview();
                     break;
             }
         });
-        
-        console.log('✅ Keyboard shortcuts initialized (Space, ←/→, F, M, Esc)');
     }
 
     /* ============================================================
-       12. NAVIGATION SYSTEM
+       14. TOUCH OPTIMIZATION
        ============================================================ */
     
-    /**
-     * Initialize navigation button effects and transitions
-     */
-    function initNavigation() {
-        // Navigation transition handlers
-        document.querySelectorAll('.nav-btn, .footer-link').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const href = btn.getAttribute('href');
+    function initTouchOptimization() {
+        if ('ontouchstart' in window) {
+            document.querySelectorAll('.nav-btn, .archive-table tbody tr').forEach(el => {
+                el.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                }, { passive: true });
                 
-                // Skip if no href or anchor link
-                if (!href || href === '#' || href.startsWith('#')) return;
-                
-                e.preventDefault();
-                navigateWithTransition(href);
+                el.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                }, { passive: true });
             });
-        });
+        }
 
-        // Navigation button scramble effect
-        const scrambleLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-@#$%&*';
+        if (window.innerWidth <= 768) {
+            const debouncedScroll = debounce(handleScroll, 10);
+            window.removeEventListener('scroll', handleScroll);
+            window.addEventListener('scroll', debouncedScroll, { passive: true });
+        }
         
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            const originalText = btn.getAttribute('data-text');
-            if (!originalText) return;
-            
-            const navText = btn.querySelector('.nav-text');
-            if (!navText) return;
-            
-            // Wrap each character in span
-            navText.innerHTML = originalText.split('').map(char => 
-                `<span>${char}</span>`
-            ).join('');
-            
-            let scrambleInterval = null;
-            
-            // Scramble on hover
-            btn.addEventListener('mouseenter', function() {
-                // Skip if button is active
-                if (this.classList.contains('active')) return;
-                
-                const spans = navText.querySelectorAll('span');
-                let iteration = 0;
-                
-                clearInterval(scrambleInterval);
-                
-                scrambleInterval = setInterval(() => {
-                    spans.forEach((span, index) => {
-                        if (index < iteration) {
-                            span.textContent = originalText[index];
-                        } else {
-                            span.textContent = scrambleLetters[Math.floor(Math.random() * scrambleLetters.length)];
-                        }
-                    });
-                    
-                    iteration += 0.33;
-                    
-                    if (iteration >= originalText.length) {
-                        clearInterval(scrambleInterval);
-                    }
-                }, 50);
-            });
-            
-            // Reset on mouse leave
-            btn.addEventListener('mouseleave', function() {
-                // Skip if button is active
-                if (this.classList.contains('active')) return;
-                
-                clearInterval(scrambleInterval);
-                
-                const spans = navText.querySelectorAll('span');
-                spans.forEach((span, index) => {
-                    span.textContent = originalText[index];
-                });
-            });
-        });
-        
-        console.log('✅ Navigation initialized');
     }
 
     /* ============================================================
-       13. EVENT LISTENERS
+       15. EVENT LISTENERS
        ============================================================ */
     
-    /**
-     * Initialize all event listeners
-     */
     function initEventListeners() {
-        // Close preview button
         if (elements.closeButton) {
             elements.closeButton.addEventListener('click', closeVideoPreview);
         }
 
-        // Click outside to close
         if (elements.previewContainer) {
             elements.previewContainer.addEventListener('click', (e) => {
                 if (e.target === elements.previewContainer) {
@@ -1052,48 +850,38 @@
                 }
             });
         }
-
-        // Escape key to close (handled in keyboard shortcuts)
         
-        console.log('✅ Event listeners initialized');
     }
 
     /* ============================================================
-       14. INITIALIZATION
+       16. LOGO ENTRY ANIMATION
        ============================================================ */
     
-    /**
-     * Main initialization function
-     */
-    function init() {
-        console.log('🎬 Initializing CineChord Archive v2.5...');
-        
-        // Initialize page transition
-        initPageTransition();
-        
-        // Initialize scroll effects
-        initScrollEffects();
-        
-        // Initialize navigation system
-        initNavigation();
-        
-        // Initialize video controls
-        initVideoControls();
-        
-        // Initialize keyboard shortcuts
-        initKeyboardShortcuts();
-        
-        // Initialize event listeners
-        initEventListeners();
-        
-        // Load archive data from backend
-        loadArchiveData();
-        
-        console.log('✅ Archive initialized successfully');
-        console.log('📌 Keyboard shortcuts: Space (play/pause), ←/→ (skip), F (fullscreen), M (mute), Esc (close)');
+    function initLogoAnimation() {
+        setTimeout(() => { 
+            if (elements.centerLogo) elements.centerLogo.classList.add('entry-done'); 
+        }, 500);
     }
 
-    // Start initialization when DOM is ready
+    /* ============================================================
+       17. INITIALIZATION
+       ============================================================ */
+    
+    function init() {
+        
+        initPageTransition();
+        initScrollEffects();
+        initMobileMenu();
+        initNavigation();
+        initVideoControls();
+        initKeyboardShortcuts();
+        initTouchOptimization();
+        initEventListeners();
+        initLogoAnimation();
+        loadArchiveData();
+        
+    }
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

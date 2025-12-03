@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Main Stylesheet
-   Version: 2.0
+   Version: 3.1 - SLIDE EFFECT + ABOUT PATTERN MOBILE
    Description: Professional archive page with video preview system
    ============================================================ */
 
@@ -41,7 +41,21 @@ body {
 }
 
 /* ============================================================
-   3. PAGE TRANSITION SYSTEM
+   3. GPU ACCELERATION & PERFORMANCE
+   ============================================================ */
+.page-transition,
+.header,
+.center-logo,
+.nav-btn,
+.preview-container {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* ============================================================
+   4. PAGE TRANSITION - SLIDE EFFECT (FIXED)
    ============================================================ */
 .page-transition {
     position: fixed;
@@ -51,22 +65,26 @@ body {
     height: 100%;
     background: #000;
     z-index: 9999;
+    transform: translateY(0); /* Başlanğıcda tam görünür */
+    pointer-events: all;
+}
+
+/* Səhifə yükləndikdən sonra yuxarı sürüşür */
+.page-transition.page-loaded {
     transform: translateY(-100%);
     pointer-events: none;
+    transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
+/* Başqa səhifəyə keçəndə - aşağı enir və qalır */
 .page-transition.active {
-    animation: pageTransition 1.2s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-}
-
-@keyframes pageTransition {
-    0% { transform: translateY(-100%); }
-    50% { transform: translateY(0); }
-    100% { transform: translateY(100%); }
+    transform: translateY(0) !important;
+    pointer-events: all;
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1) !important;
 }
 
 /* ============================================================
-   4. GRAIN OVERLAY EFFECT
+   5. GRAIN OVERLAY EFFECT
    ============================================================ */
 .grain-overlay {
     position: fixed;
@@ -95,7 +113,7 @@ body {
 }
 
 /* ============================================================
-   5. SCROLL PROGRESS BAR
+   6. SCROLL PROGRESS BAR
    ============================================================ */
 .progress-bar-top {
     position: fixed;
@@ -110,37 +128,35 @@ body {
 }
 
 /* ============================================================
-   6. CENTER LOGO
+   7. CENTER LOGO
    ============================================================ */
 .center-logo {
     position: fixed;
     top: 30px;
     left: 50%;
-    transform: translateX(-50%) scale(1);
+    transform: translateX(-50%) scale(0.5) rotate(-180deg);
     z-index: 1001;
-    opacity: 1;
-    transition: transform 0.4s ease, opacity 0.4s ease;
-    will-change: transform, opacity;
-    animation: fadeInScale 0.8s ease;
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto;
 }
 
-/* Entry animation */
+.center-logo.entry-done {
+    animation: fadeInScale 0.8s ease forwards;
+}
+
 @keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) scale(0.5) rotate(-180deg);
-    }
     to {
         opacity: 1;
         transform: translateX(-50%) scale(1) rotate(0deg);
     }
 }
 
-/* Hide on scroll - controlled by JavaScript */
 .center-logo.scroll-hidden {
-    transform: translateX(-50%) translateY(-100px) !important;
+    transform: translateX(-50%) translateY(-120px) scale(0.5) !important;
     opacity: 0 !important;
-    animation: none !important;
+    pointer-events: none !important;
+    visibility: hidden;
 }
 
 .logo-img {
@@ -151,7 +167,7 @@ body {
 }
 
 /* ============================================================
-   7. HEADER & NAVIGATION
+   8. HEADER & NAVIGATION
    ============================================================ */
 .header {
     position: fixed;
@@ -167,18 +183,6 @@ body {
     transition: transform 0.4s ease;
     transform: translateY(0);
     pointer-events: auto;
-    will-change: transform;
-}
-
-/* Navigation hide/show states */
-.header.navbar-hide {
-    transform: translateY(-100%);
-    pointer-events: none;
-}
-
-.header.navbar-show {
-    transform: translateY(0);
-    pointer-events: auto;
 }
 
 .nav-left,
@@ -188,7 +192,7 @@ body {
 }
 
 /* ============================================================
-   8. NAVIGATION BUTTONS
+   9. NAVIGATION BUTTONS
    ============================================================ */
 .nav-btn {
     padding: 12px 30px;
@@ -206,7 +210,6 @@ body {
     overflow: hidden;
     text-decoration: none;
     display: inline-block;
-    will-change: background, border-color, color;
 }
 
 /* Staggered entrance animations */
@@ -271,28 +274,6 @@ body {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Disabled state */
-.nav-btn.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.nav-btn.disabled:hover {
-    background: transparent;
-    border-color: rgba(255, 255, 255, 0.3);
-    color: #fff;
-}
-
-.nav-btn.disabled:hover .nav-text {
-    opacity: 1;
-    transform: none;
-}
-
-.nav-btn.disabled:hover::before {
-    opacity: 0;
-    transform: translateY(10px);
-}
-
 /* Active state (current page) */
 .nav-btn.active {
     background: #FFA500;
@@ -310,24 +291,100 @@ body {
     transform: translateY(10px);
 }
 
-.nav-btn.active:hover {
+/* ============================================================
+   10. HAMBURGER MENU (MOBILE) - ABOUT PATTERN
+   ============================================================ */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 1002;
+    position: relative;
+    padding: 10px;
+    background: transparent;
+    border: none;
+}
+
+.hamburger span {
+    width: 28px;
+    height: 2.5px;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 2px;
+    display: block;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
     background: #FFA500;
-    border-color: #FFA500;
-    color: #000;
 }
 
-.nav-btn.active:hover .nav-text {
-    opacity: 1;
-    transform: none;
-}
-
-.nav-btn.active:hover::before {
+.hamburger.active span:nth-child(2) {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateX(20px);
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+    background: #FFA500;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.98);
+    backdrop-filter: blur(20px);
+    z-index: 1001;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 100px 30px 30px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255, 165, 0, 0.1);
+}
+
+.mobile-menu.active {
+    right: 0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-menu .nav-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 14px;
+    animation: none;
+    opacity: 1;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: all;
 }
 
 /* ============================================================
-   9. VIDEO PREVIEW MODAL SYSTEM
+   11. VIDEO PREVIEW MODAL SYSTEM
    ============================================================ */
 .preview-container {
     position: fixed;
@@ -402,18 +459,6 @@ body {
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Fade in animation for smooth loading */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 /* Video information display */
 .preview-info {
     position: absolute;
@@ -481,7 +526,7 @@ body {
 }
 
 /* ============================================================
-   10. ARCHIVE SECTION
+   12. ARCHIVE SECTION
    ============================================================ */
 .archive-section {
     min-height: 100vh;
@@ -605,7 +650,7 @@ body {
 }
 
 /* ============================================================
-   11. ARCHIVE TABLE
+   13. ARCHIVE TABLE
    ============================================================ */
 .archive-table {
     width: 100%;
@@ -728,7 +773,7 @@ body {
 }
 
 /* ============================================================
-   12. CUSTOM VIDEO CONTROLS
+   14. CUSTOM VIDEO CONTROLS
    ============================================================ */
 .custom-controls {
     position: absolute;
@@ -893,28 +938,26 @@ body {
 }
 
 /* ============================================================
-   13. RESPONSIVE DESIGN
+   15. RESPONSIVE - TABLET
    ============================================================ */
-
-/* Large tablets and small desktops */
 @media (max-width: 1200px) {
     .video-wrapper {
         width: 90%;
     }
 }
 
-/* Tablets */
 @media (max-width: 1024px) {
     .header {
         padding: 15px 40px;
     }
 
     .nav-left, .nav-right {
-        gap: 20px;
+        gap: 10px;
     }
 
     .nav-btn {
         font-size: 11px;
+        padding: 10px 20px;
     }
 
     .center-logo {
@@ -927,8 +970,55 @@ body {
     }
 }
 
-/* Mobile landscape and small tablets */
+/* ============================================================
+   16. RESPONSIVE - MOBILE (ABOUT PATTERN)
+   ============================================================ */
 @media (max-width: 768px) {
+    /* Header & Navigation */
+    .header {
+        padding: 15px 20px;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(10px);
+        justify-content: flex-end;
+    }
+    
+    /* DESKTOP NAVBAR GİZLƏT */
+    .nav-left,
+    .nav-right {
+        display: none !important;
+    }
+    
+    /* HAMBURGER GÖSTƏR */
+    .hamburger {
+        display: flex !important;
+    }
+    
+    /* MOBILE MENU GÖSTƏR */
+    .mobile-menu {
+        display: flex !important;
+    }
+    
+    /* Logo adjustments */
+    .center-logo {
+        top: 15px;
+        left: 20px;
+        transform: translateX(0) scale(0.5) rotate(-180deg);
+    }
+    
+    .center-logo.entry-done {
+        transform: translateX(0) scale(1) rotate(0deg);
+    }
+    
+    .center-logo.scroll-hidden {
+        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+    }
+    
+    .logo-img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* Video wrapper */
     .video-wrapper {
         width: 95%;
     }
@@ -937,24 +1027,10 @@ body {
         max-height: 50vh;
     }
 
+    /* Archive section */
     .archive-section {
         width: 100%;
         padding: 160px 20px 60px;
-    }
-
-    .header {
-        padding: 12px 20px;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .nav-left, .nav-right {
-        gap: 10px;
-    }
-
-    .nav-btn {
-        padding: 10px 20px;
-        font-size: 10px;
     }
 
     .split-titles {
@@ -976,6 +1052,7 @@ body {
         -webkit-text-stroke: 1px #FFA500;
     }
 
+    /* Table */
     .archive-table {
         display: block;
         overflow-x: auto;
@@ -986,17 +1063,18 @@ body {
         font-size: 10px;
     }
 
+    .archive-table th,
+    .archive-table td {
+        white-space: nowrap;
+    }
+
+    /* Preview modal */
     .close-preview {
         top: 20px;
         right: 20px;
         width: 40px;
         height: 40px;
         font-size: 20px;
-    }
-
-    .archive-table th,
-    .archive-table td {
-        white-space: nowrap;
     }
 
     .preview-title {
@@ -1007,6 +1085,7 @@ body {
         bottom: 40px;
     }
 
+    /* Video controls */
     .custom-controls {
         padding: 15px 10px 10px;
     }
@@ -1036,21 +1115,14 @@ body {
         font-size: 10px;
         padding: 5px 8px;
     }
-
-    .center-logo {
-        top: 15px;
-    }
-
-    .logo-img {
-        width: 80px;
-        height: 80px;
-    }
 }
 
-/* Mobile portrait */
+/* ============================================================
+   17. RESPONSIVE - SMALL MOBILE
+   ============================================================ */
 @media (max-width: 480px) {
     .archive-section {
-        padding: 140px 20px 60px;
+        padding: 140px 15px 60px;
     }
 
     .video-word, .archive-title {
@@ -1096,12 +1168,23 @@ body {
         display: none;
     }
 
-    .center-logo {
-        top: 10px;
+    /* Mobile menu adjustments */
+    .mobile-menu {
+        width: 85%;
+        padding: 70px 25px 25px;
     }
+}
 
-    .logo-img {
-        width: 70px;
-        height: 70px;
+/* ============================================================
+   18. TOUCH IMPROVEMENTS
+   ============================================================ */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn {
+        padding: 14px 25px;
+        font-size: 14px;
+    }
+    
+    .archive-table tbody tr:active {
+        background: rgba(255, 165, 0, 0.1);
     }
 }

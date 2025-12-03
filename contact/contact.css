@@ -41,28 +41,52 @@ body {
 }
 
 /* =========================================
-   PAGE TRANSITION & ANIMATION CLASSES
+   PAGE TRANSITION - SLIDE EFFECT (FIXED)
    ========================================= */
 .page-transition {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; z-index: 9999;
-    transform: translateY(-100%); pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 9999;
+    transform: translateY(0); /* Başlanğıcda tam görünür */
+    pointer-events: all;
 }
 
+/* Səhifə yükləndikdən sonra yuxarı sürüşür */
+.page-transition.page-loaded {
+    transform: translateY(-100%);
+    pointer-events: none;
+    transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Başqa səhifəyə keçəndə - aşağı enir və qalır */
 .page-transition.active {
-    animation: pageTransition 1.2s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-}
-
-@keyframes pageTransition {
-    0% { transform: translateY(-100%); }
-    50% { transform: translateY(0); }
-    100% { transform: translateY(100%); }
+    transform: translateY(0) !important;
+    pointer-events: all;
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1) !important;
 }
 
 /* --- ANIMATIONS (NAVBAR) --- */
 @keyframes fadeInUp {
     0% { transform: translateY(40px); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
+}
+
+/* =========================================
+   GPU ACCELERATION & PERFORMANCE
+   ========================================= */
+.page-transition,
+.header,
+.center-logo,
+.nav-btn,
+.reveal-item {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 /* --- SCROLL REVEAL (FOCUS-IN ANIMATION) --- */
@@ -136,6 +160,98 @@ body {
 .nav-btn.active { background: #FFA500; border-color: #FFA500; color: #000; }
 .nav-btn.active .nav-text { opacity: 1; transform: none; }
 .nav-btn.active::before { opacity: 0; transform: translateY(10px); }
+
+/* =========================================
+   HAMBURGER MENU (MOBILE) - ABOUT PATTERN
+   ========================================= */
+.hamburger {
+    display: none; /* Desktop-da gizli */
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 1002;
+    position: relative;
+    padding: 10px;
+    background: transparent;
+    border: none;
+}
+
+.hamburger span {
+    width: 28px;
+    height: 2.5px;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 2px;
+    display: block;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+    background: #FFA500;
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+    background: #FFA500;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.98);
+    backdrop-filter: blur(20px);
+    z-index: 1001;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 100px 30px 30px;
+    display: none; /* Desktop-da gizli */
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255, 165, 0, 0.1);
+}
+
+.mobile-menu.active {
+    right: 0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-menu .nav-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 14px;
+    animation: none;
+    opacity: 1;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
 
 /* =========================================
    CENTER LOGO
@@ -306,11 +422,214 @@ body {
 }
 .social-icons a:hover { background: #FFA500; border-color: #FFA500; transform: translateY(-3px); color: #000; }
 
-/* RESPONSIVE */
+.footer-bottom {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.copyright {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Courier New', monospace;
+}
+
+.form-checkbox {
+    margin: 30px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.form-checkbox label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+}
+
+/* =========================================
+   RESPONSIVE - TABLET
+   ========================================= */
 @media (max-width: 1024px) {
     .contact-wrapper { grid-template-columns: 1fr; gap: 80px; }
     .hero-line, .hero-rolling-text { font-size: 8vw; }
     .footer-wrapper { grid-template-columns: 1fr; gap: 40px; text-align: center; }
     .footer-title::after { left: 50%; transform: translateX(-50%); }
     .social-icons { justify-content: center; }
+}
+
+/* =========================================
+   RESPONSIVE - MOBILE (ABOUT PATTERN)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Header & Navigation */
+    .header { 
+        padding: 15px 20px;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(10px);
+        justify-content: flex-end;
+    }
+    
+    /* DESKTOP NAVBAR GİZLƏT */
+    .nav-left, 
+    .nav-right { 
+        display: none !important;
+    }
+    
+    /* HAMBURGER GÖSTƏR */
+    .hamburger {
+        display: flex !important;
+    }
+    
+    /* MOBILE MENU GÖSTƏR */
+    .mobile-menu {
+        display: flex !important;
+    }
+    
+    /* Logo adjustments */
+    .center-logo {
+        top: 15px;
+        left: 20px;
+        transform: translateX(0) scale(0.5) rotate(-180deg);
+    }
+    
+    .center-logo.entry-done {
+        transform: translateX(0) scale(1) rotate(0deg);
+    }
+    
+    .center-logo.scroll-hidden {
+        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+    }
+    
+    .logo-img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* Hero adjustments */
+    .hero {
+        margin-top: 180px;
+        padding-bottom: 80px;
+    }
+    
+    .hero-line, .hero-rolling-text {
+        font-size: 12vw;
+    }
+    
+    /* Contact form */
+    .contact {
+        padding: 0 20px 60px 20px;
+    }
+    
+    .contact-wrapper {
+        gap: 50px;
+    }
+    
+    .cinematic-input {
+        font-size: 18px;
+    }
+    
+    .floating-label {
+        font-size: 12px;
+    }
+    
+    .rolling-link {
+        font-size: 22px;
+    }
+    
+    /* Footer */
+    .main-footer {
+        padding: 60px 20px;
+    }
+    
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    /* Send button mobile optimization */
+    .send-btn-container {
+        width: 100%;
+        max-width: 280px;
+        margin: 40px auto 0;
+    }
+    
+    /* Social links mobile */
+    .social-icons-minimal {
+        justify-content: center;
+    }
+    
+    .minimal-social {
+        font-size: 11px;
+        padding: 8px 16px;
+    }
+}
+
+/* =========================================
+   RESPONSIVE - SMALL MOBILE
+   ========================================= */
+@media (max-width: 480px) {
+    .hero {
+        margin-top: 150px;
+        padding-bottom: 60px;
+    }
+    
+    .hero-line, .hero-rolling-text {
+        font-size: 14vw;
+    }
+    
+    .contact {
+        padding: 0 15px 40px 15px;
+    }
+    
+    .cinematic-input {
+        font-size: 16px;
+        padding: 12px 0;
+    }
+    
+    .rolling-link {
+        font-size: 20px;
+    }
+    
+    .main-footer {
+        padding: 40px 15px;
+    }
+    
+    .footer-wrapper {
+        gap: 25px;
+    }
+    
+    /* Mobile menu adjustments */
+    .mobile-menu {
+        width: 85%;
+        padding: 70px 25px 25px;
+    }
+}
+
+/* =========================================
+   TOUCH IMPROVEMENTS
+   ========================================= */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn {
+        padding: 14px 25px;
+        font-size: 14px;
+    }
+    
+    /* Disable hover effects on touch */
+    .rolling-link:hover span,
+    .hero-rolling-text:hover span {
+        transform: none;
+    }
+    
+    .rolling-link:hover::after,
+    .hero-rolling-text:hover::after {
+        transform: none;
+    }
 }

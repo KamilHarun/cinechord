@@ -15,7 +15,6 @@
 </head>
 <body>
 
-    <!-- LOGIN OVERLAY -->
     <div id="login-overlay" style="display: flex;">
         <div class="login-container">
             <div class="login-left">
@@ -50,10 +49,8 @@
         </div>
     </div>
 
-    <!-- ADMIN WRAPPER -->
     <div class="admin-wrapper" id="admin-wrapper" style="display: none;">
         
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="brand">
@@ -71,7 +68,6 @@
                     <a href="#" class="nav-item active" data-page="dashboard">
                         <i class="fas fa-chart-line"></i>
                         <span>Dashboard</span>
-                        <div class="nav-indicator"></div>
                     </a>
                 </div>
                 
@@ -127,10 +123,8 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content">
             
-            <!-- DASHBOARD VIEW -->
             <div class="page-view active" id="view-dashboard">
                 <div class="page-header">
                     <div>
@@ -144,37 +138,28 @@
                     </div>
                 </div>
 
-                <!-- STATS CARDS -->
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-icon blue">
-                                <i class="fas fa-film"></i>
-                            </div>
+                            <div class="stat-icon blue"><i class="fas fa-film"></i></div>
                             <div class="stat-info">
                                 <div class="stat-label">Toplam İşlər</div>
                                 <div class="stat-value" id="totalWorks">0</div>
                             </div>
                         </div>
                     </div>
-
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-icon purple">
-                                <i class="fas fa-magic"></i>
-                            </div>
+                            <div class="stat-icon purple"><i class="fas fa-magic"></i></div>
                             <div class="stat-info">
                                 <div class="stat-label">Aktiv Xidmətlər</div>
                                 <div class="stat-value" id="totalServices">0</div>
                             </div>
                         </div>
                     </div>
-
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-icon pink">
-                                <i class="fas fa-envelope"></i>
-                            </div>
+                            <div class="stat-icon pink"><i class="fas fa-envelope"></i></div>
                             <div class="stat-info">
                                 <div class="stat-label">Yeni Mesajlar</div>
                                 <div class="stat-value" id="totalMessages">0</div>
@@ -183,58 +168,26 @@
                     </div>
                 </div>
 
-                <!-- CHARTS SECTION -->
                 <div class="dashboard-grid">
-                    <!-- Line Chart -->
                     <div class="dashboard-card">
                         <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-line"></i>
-                                Son 7 Günün Statistikası
-                            </h3>
+                            <h3 class="card-title"><i class="fas fa-chart-line"></i> Son 7 Günün Statistikası</h3>
                         </div>
                         <div class="card-body">
                             <canvas id="worksChart" style="max-height: 300px;"></canvas>
                         </div>
                     </div>
-
-                    <!-- Doughnut Chart -->
                     <div class="dashboard-card">
                         <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Kateqoriya Bölgüsü
-                            </h3>
+                            <h3 class="card-title"><i class="fas fa-chart-pie"></i> Kateqoriya Bölgüsü</h3>
                         </div>
                         <div class="card-body">
                             <canvas id="categoryChart" style="max-height: 300px;"></canvas>
                         </div>
                     </div>
                 </div>
-
-                <!-- ACTIVITY SECTION -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-clock"></i>
-                            Son Aktivliklər
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="activityList" class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                                <div class="activity-info">
-                                    <div class="activity-title">Yüklənir...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-            <!-- WORKS VIEW -->
+
             <div class="page-view" id="view-works">
                 <div class="page-header">
                     <div>
@@ -242,18 +195,15 @@
                         <p class="page-subtitle">Video işlərinizi idarə edin</p>
                     </div>
                     <button class="btn-primary" onclick="openWorkModal()">
-                        <i class="fas fa-plus"></i>
-                        Yeni İş
+                        <i class="fas fa-plus"></i> Yeni İş
                     </button>
                 </div>
                 
-                <!-- FILTERS -->
                 <div class="filters-bar">
                     <div class="search-box-inline">
                         <i class="fas fa-search"></i>
                         <input type="text" id="workSearch" placeholder="İşlərdə axtar..." onkeyup="searchWorks()">
                     </div>
-                    
                     <select id="categoryFilter" class="category-select" onchange="filterWorks()">
                         <option value="">Bütün Kateqoriyalar</option>
                         <option value="FILM">Film</option>
@@ -263,27 +213,23 @@
                         <option value="DOCUMENTARY">Documentary</option>
                         <option value="SOCIAL">Social</option>
                     </select>
-                    
-                    <div class="view-switcher">
-                        <button class="view-btn active" data-view="grid" onclick="switchView('grid')">
-                            <i class="fas fa-th"></i>
-                        </button>
-                        <button class="view-btn" data-view="list" onclick="switchView('list')">
-                            <i class="fas fa-list"></i>
-                        </button>
-                    </div>
+                </div>
+
+                <div id="bulkActionsBar" class="bulk-actions-bar" style="display: none;">
+                    <span class="bulk-count">0 iş seçildi</span>
+                    <button class="btn-danger" onclick="bulkDelete()"><i class="fas fa-trash"></i> Hamısını Sil</button>
+                    <button class="btn-secondary" onclick="clearBulkSelection()"><i class="fas fa-times"></i> Ləğv et</button>
                 </div>
                 
-                <!-- WORKS GRID -->
                 <div class="works-container" id="worksGrid">
                     <div class="loading-state">
                         <i class="fas fa-spinner fa-spin"></i>
                         <p>Yüklənir...</p>
                     </div>
                 </div>
+                <div id="pagination" class="pagination-container"></div>
             </div>
 
-            <!-- SERVICES VIEW -->
             <div class="page-view" id="view-services">
                 <div class="page-header">
                     <div>
@@ -291,20 +237,12 @@
                         <p class="page-subtitle">Şirkət xidmətlərinizi idarə edin</p>
                     </div>
                     <button class="btn-primary" onclick="openServiceModal()">
-                        <i class="fas fa-plus"></i>
-                        Yeni Xidmət
+                        <i class="fas fa-plus"></i> Yeni Xidmət
                     </button>
                 </div>
-                
-                <div class="services-grid" id="servicesGrid">
-                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-muted);">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                        <p>Yüklənir...</p>
-                    </div>
-                </div>
+                <div class="services-grid" id="servicesGrid"></div>
             </div>
 
-            <!-- MESSAGES VIEW -->
             <div class="page-view" id="view-messages">
                 <div class="page-header">
                     <div>
@@ -312,18 +250,11 @@
                         <p class="page-subtitle">Müştəri mesajlarını idarə edin</p>
                     </div>
                 </div>
-                
                 <div class="content-card">
-                    <div class="messages-list" id="messagesList">
-                        <div style="text-align: center; padding: 4rem; color: var(--text-muted);">
-                            <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <p>Yüklənir...</p>
-                        </div>
-                    </div>
+                    <div class="messages-list" id="messagesList"></div>
                 </div>
             </div>
 
-            <!-- ABOUT VIEW -->
             <div class="page-view" id="view-about">
                 <div class="page-header">
                     <div>
@@ -331,13 +262,9 @@
                         <p class="page-subtitle">Şirkət məlumatlarınızı yeniləyin</p>
                     </div>
                 </div>
-                
                 <form id="aboutForm" class="about-form">
                     <div class="content-card">
-                        <h3 class="card-title">
-                            <i class="fas fa-video"></i>
-                            Video və Başlıqlar
-                        </h3>
+                        <h3 class="card-title"><i class="fas fa-video"></i> Video və Başlıqlar</h3>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Əsas Başlıq</label>
@@ -353,63 +280,30 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="content-card">
-                        <h3 class="card-title">
-                            <i class="fas fa-align-left"></i>
-                            Məzmun Bölmələri
-                        </h3>
+                        <h3 class="card-title"><i class="fas fa-align-left"></i> Məzmun</h3>
                         <div class="form-grid">
-                            <div class="form-group full-width">
-                                <label>Biz Kimik</label>
-                                <textarea id="aWho" rows="3"></textarea>
-                            </div>
-                            <div class="form-group full-width">
-                                <label>Missiyamız</label>
-                                <textarea id="aMission" rows="3"></textarea>
-                            </div>
-                            <div class="form-group full-width">
-                                <label>Yanaşmamız</label>
-                                <textarea id="aApproach" rows="3"></textarea>
-                            </div>
+                            <div class="form-group full-width"><label>Biz Kimik</label><textarea id="aWho" rows="3"></textarea></div>
+                            <div class="form-group full-width"><label>Missiyamız</label><textarea id="aMission" rows="3"></textarea></div>
+                            <div class="form-group full-width"><label>Yanaşmamız</label><textarea id="aApproach" rows="3"></textarea></div>
                         </div>
                     </div>
-
                     <div class="content-card">
-                        <h3 class="card-title">
-                            <i class="fas fa-address-card"></i>
-                            Əlaqə Məlumatları
-                        </h3>
+                        <h3 class="card-title"><i class="fas fa-address-card"></i> Əlaqə</h3>
                         <div class="form-grid">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" id="aEmail">
-                            </div>
-                            <div class="form-group">
-                                <label>Telefon</label>
-                                <input type="text" id="aPhone">
-                            </div>
-                            <div class="form-group">
-                                <label>Ünvan</label>
-                                <input type="text" id="aAddress">
-                            </div>
+                            <div class="form-group"><label>Email</label><input type="email" id="aEmail"></div>
+                            <div class="form-group"><label>Telefon</label><input type="text" id="aPhone"></div>
+                            <div class="form-group"><label>Ünvan</label><input type="text" id="aAddress"></div>
                         </div>
                     </div>
-
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary">Ləğv et</button>
-                        <button type="button" id="saveAboutBtn" class="btn-primary">
-                            <i class="fas fa-save"></i>
-                            Yadda Saxla
-                        </button>
+                        <button type="button" id="saveAboutBtn" class="btn-primary"><i class="fas fa-save"></i> Yadda Saxla</button>
                     </div>
                 </form>
             </div>
-
         </main>
     </div>
 
-    <!-- WORK MODAL -->
     <div class="modal fade" id="workModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -420,17 +314,25 @@
                 <div class="modal-body">
                     <form id="workForm">
                         <input type="hidden" id="workId">
-                        <div class="row g-3">
+                        
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Başlıq</label>
+                                <label class="form-label">Başlıq (Title) *</label>
                                 <input type="text" id="wTitle" class="form-control" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Müştəri</label>
+                                <label class="form-label">Slug (URL adı)</label>
+                                <input type="text" id="wSlug" class="form-control" placeholder="auto-generated-slug">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Müştəri (Client)</label>
                                 <input type="text" id="wClient" class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Kateqoriya</label>
+                                <label class="form-label">Kateqoriya *</label>
                                 <select id="wCategory" class="form-select" required>
                                     <option value="FILM">FILM</option>
                                     <option value="COMMERCIAL">COMMERCIAL</option>
@@ -440,33 +342,56 @@
                                     <option value="SOCIAL">SOCIAL</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Video Link</label>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Agentlik</label>
+                                <input type="text" id="wAgency" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Məkan (Location)</label>
+                                <input type="text" id="wLocation" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">İl (Year)</label>
+                                <input type="text" id="wYear" class="form-control" placeholder="2024">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Video URL (Youtube/Vimeo)</label>
                                 <input type="url" id="wVideoUrl" class="form-control">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Poster Şəkli</label>
-                                <input type="file" id="wImage" class="form-control">
+                                <input type="file" id="wImage" class="form-control" accept="image/*">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Preview Video</label>
-                                <input type="file" id="wPreview" class="form-control">
+                                <input type="file" id="wPreview" class="form-control" accept="video/*">
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Açıqlama</label>
-                                <textarea id="wDescription" class="form-control" rows="3"></textarea>
-                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="wFeatured">
+                            <label class="form-check-label" for="wFeatured">Seçilmiş İş (Featured)</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Açıqlama</label>
+                            <textarea id="wDescription" class="form-control" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary w-100" onclick="submitWork()">Təsdiqlə</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                    <button type="button" class="btn btn-primary w-100" onclick="submitWork()">Yadda Saxla</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- SERVICE MODAL -->
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -482,7 +407,7 @@
                             <input type="text" id="sTitle" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Icon Class</label>
+                            <label class="form-label">Icon Class (fa-solid fa-star)</label>
                             <input type="text" id="sIcon" class="form-control">
                         </div>
                         <div class="mb-3">
@@ -504,6 +429,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="admin.js"></script>
-
 </body>
 </html>
