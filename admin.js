@@ -1,15 +1,12 @@
 // ============================================
-// CINECHORD ADMIN PANEL - TAM VƏ YENİLƏNMİŞ JS
-// DÜZƏLİŞLƏR: Mesaj silmə xətası, ID yoxlanışı və
-// KRİTİK: DTO sahələrinin JSON kimi göndərilməsi (NULL probleminin həlli)
+// CINECHORD ADMIN PANEL 
 // ============================================
 
 // ✅ URL TƏNZİMLƏMƏLƏRİ
-// 1. Lokalda işləyərkən bunu açıq saxlayın:
-const BASE_URL = "http://localhost:8080"; 
+// const BASE_URL = "http://localhost:8080"; 
 
 // 2. Serverdə istifadə üçün:
-// const BASE_URL = "https://cinechord-admin-production.up.railway.app";
+const BASE_URL = "https://cinechord-admin-production.up.railway.app";
 
 const UPLOADS_URL = `${BASE_URL}/uploads/`;
 
