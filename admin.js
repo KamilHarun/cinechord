@@ -16,7 +16,7 @@ const API = {
     WORKS: `${BASE_URL}/admin/works`,
     SERVICES: `${BASE_URL}/admin/services`,
     CONTACTS: `${BASE_URL}/admin/contacts`,
-    ABOUT: `${BASE_URL}/api/about`
+    ABOUT: `${BASE_URL}/admin/about`  // ✅ FİKS: /api/about → /admin/about
 };
 
 // GLOBAL
@@ -359,7 +359,7 @@ function editWorkById(id) {
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
-// --- SUBMIT WORK ---
+// --- SUBMIT WORK - ✅ FİKS: FormData campos birbir əlavə edilir ---
 async function submitWork() {
     const id = document.getElementById('workId').value;
     const fd = new FormData();
@@ -372,35 +372,27 @@ async function submitWork() {
         return;
     }
 
-    // KRİTİK DÜZƏLİŞ: Bütün DTO sahələrini JSON stringi kimi göndəririk
-    // Bu, Spring-in DTO obyektini düzgün bind etməsini məcbur edəcək.
-    const workData = {
-        title: title,
-        category: category,
-        clientName: document.getElementById('wClient').value,
-        slug: document.getElementById('wSlug').value,
-        agency: document.getElementById('wAgency').value,
-        location: document.getElementById('wLocation').value,
-        productionYear: document.getElementById('wYear').value,
-        isFeatured: document.getElementById('wFeatured').checked,
-        videoUrl: document.getElementById('wVideoUrl').value,
-        description: document.getElementById('wDescription').value,
-        // isActive sahəsi yoxdur, çünki bu dəyər MapStruct tərəfindən ignore edilir və dəyişdirilmir
-    };
-
-    // JSON stringini 'request' açarı ilə FormData-ya əlavə edin (Controller-daki ad)
-    fd.append('request', JSON.stringify(workData)); // <-- CRITICAL FIX
+    // ✅ FİKS: JSON stringi yerinə individual sahələri əlavə edin
+    // @ModelAttribute formdata-dan hər sahəni açar adı ilə axtarır
+    fd.append('title', title);
+    fd.append('category', category);
+    fd.append('clientName', document.getElementById('wClient').value);
+    fd.append('slug', document.getElementById('wSlug').value);
+    fd.append('agency', document.getElementById('wAgency').value);
+    fd.append('location', document.getElementById('wLocation').value);
+    fd.append('productionYear', document.getElementById('wYear').value);
+    fd.append('isFeatured', document.getElementById('wFeatured').checked);
+    fd.append('videoUrl', document.getElementById('wVideoUrl').value);
+    fd.append('description', document.getElementById('wDescription').value);
 
     // Fayllar (imageFile və previewVideoFile)
     const img = document.getElementById('wImage').files[0];
     if(img) {
-        // Faylları əlavə edərkən açar adı Controller-dakı @RequestPart adlarına uyğun olmalıdır
         fd.append('imageFile', img); 
     }
     
     const vid = document.getElementById('wPreview').files[0];
     if(vid) {
-        // Faylları əlavə edərkən açar adı Controller-dakı @RequestPart adlarına uyğun olmalıdır
         fd.append('previewVideoFile', vid); 
     }
 
@@ -427,11 +419,7 @@ async function submitWork() {
 
         const token = localStorage.getItem('jwt_token');
         xhr.open(method, url);
-        // JSON content type-ı FormData-ya görə silinməlidir, lakin bəzi hallarda XHR-ə ehtiyac yoxdur.
-        // Spring avtomatik olaraq 'multipart/form-data' təyin edir.
         if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        // Xüsusi: Controller-a JSON göndərdiyimiz üçün, header-də Content-Type: application/json olmalıdır.
-        // Lakin FormData göndərdiyimiz üçün bu mümkün deyil. Spring bu kombinasiyanı idarə etməlidir.
 
         xhr.onload = function() {
             if (xhr.status >= 200 && xhr.status < 300) {
@@ -544,7 +532,7 @@ async function submitService() {
     
     Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
     
-    const res = await authFetch(API.SERVICES, { method: 'POST', body: fd });
+    const res = await authFetch(`${API.SERVICES}`, { method: 'POST', body: fd });
     if(res && res.ok) {
         Swal.fire('Uğurlu', 'Xidmət əlavə edildi', 'success');
         bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
@@ -563,7 +551,7 @@ async function deleteService(id) {
 }
 
 // ============================================
-// 7. MESSAGES (MESAJLAR) - DÜZƏLİŞ EDİLDİ
+// 7. MESSAGES (MESAJLAR)
 // ============================================
 
 async function loadMessages() {
@@ -596,7 +584,7 @@ async function loadMessages() {
             // ID yoxlanışı
             if (!m.id) {
                 console.warn('ID olmayan mesaj:', m);
-                return; // Bu mesajı atlayın
+                return;
             }
             
             const messageId = m.id;
@@ -720,7 +708,7 @@ async function deleteMessage(id) {
 }
 
 // ============================================
-// 8. ABOUT (HAQQIMIZDA)
+// 8. ABOUT (HAQQIMIZDA) - ✅ FİKS: API URL
 // ============================================
 
 async function loadAbout() {
@@ -742,9 +730,6 @@ async function loadAbout() {
 
 document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
     const fd = new FormData();
-    // Eyni NULL binding problemi burada da ola bilər. Ən etibarlı halda
-    // bütün bu sahələri JSON olaraq göndərmək lazımdır, lakin sadəlik üçün
-    // Work'dəki kimi kompleks fayl yoxdur deyə, sadə FormData saxlanılır.
     fd.append('mainTitle', document.getElementById('aMainTitle').value);
     fd.append('subTitle', document.getElementById('aSubTitle').value);
     fd.append('whoWeAreText', document.getElementById('aWho').value);
