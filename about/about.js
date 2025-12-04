@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 5.1 - FIXED URL SYNCHRONIZATION
+   Version: 6.0 - ARCHIVE PATTERN + FULL SYNC
    ============================================================ */
 
 (function() {
@@ -10,13 +10,10 @@
        1. CONFIGURATION - DINAMIK BACKEND URL
        ============================================================ */
     
-    // 🔧 Dinamik Backend URL - Local və Production üçün uyğun
     const getBackendUrl = () => {
-        // Localhost varsa, localhost-dan istifadə et (development)
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             return 'http://localhost:8080';
         }
-        // Production - Railway server
         return 'https://cinechord-admin-production.up.railway.app';
     };
     
@@ -25,13 +22,22 @@
         ENDPOINTS: {
             ABOUT: '/api/about/getAbout'
         },
-        STATIC_VIDEO: '../videos/Showreel.mp4', // Video STATİC
+        STATIC_VIDEO: '../videos/Showreel.mp4',
         SCROLL_THRESHOLD: 50,
         LOGO_ENTRY_DELAY: 500,
-        PAGE_LOAD_DELAY: 100
+        PAGE_LOAD_DELAY: 100,
+        NAVIGATION_DELAY: 600,
+        FALLBACK_DELAY: 1600,
+        SCROLL_THROTTLE: 16,
+        NAVBAR_HIDE_THRESHOLD: 200,
+        LOGO_HIDE_THRESHOLD: 100,
+        RESIZE_DEBOUNCE: 250,
+        REQUEST_TIMEOUT: 10000,
+        RETRY_ATTEMPTS: 2,
+        RETRY_DELAY: 1000
     };
 
-    console.log('🔌 Backend URL:', CONFIG.BACKEND_URL); // Debug
+    console.log('🔌 Backend URL:', CONFIG.BACKEND_URL);
 
     /* ============================================================
        2. DOM ELEMENT REFERENCES
@@ -42,6 +48,7 @@
         pageTransition: document.querySelector('.page-transition'),
         centerLogo: document.querySelector('.center-logo'),
         header: document.querySelector('.header'),
+        progressBarTop: document.querySelector('.progress-bar-top'),
         
         // Video - STATIC
         aboutVideo: document.getElementById('about-video'),
@@ -57,38 +64,54 @@
         address: document.getElementById('address')
     };
 
+    let lastScrollTop = 0;
+    let isTransitioning = false;
+
     /* ============================================================
-       3. INITIALIZATION
+       3. UTILITY FUNCTIONS
        ============================================================ */
     
-    function init() {
-        console.log('🚀 About page initialized');
-        
-        // 1. Page transition
-        initPageTransition();
-        
-        // 2. Logo animation
-        initLogoAnimation();
-        
-        // 3. Load STATIC video immediately
-        loadStaticVideo();
-        
-        // 4. Load DYNAMIC content from API
-        loadDynamicContent();
-        
-        // 5. Setup scroll effects
-        initScrollEffects();
-        
-        // 6. Setup navigation
-        setupNavigation();
-        
-        // 7. Mobile menu (yalnız mobile üçün)
-        if (window.innerWidth <= 768) {
-            initMobileMenu();
+    function throttle(func, delay) {
+        let lastCall = 0;
+        return function(...args) {
+            const now = new Date().getTime();
+            if (now - lastCall < delay) return;
+            lastCall = now;
+            return func(...args);
+        };
+    }
+
+    function debounce(func, delay) {
+        let timeoutId;
+        return function(...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    function fetchWithTimeout(url, options = {}, timeout = CONFIG.REQUEST_TIMEOUT) {
+        return Promise.race([
+            fetch(url, options),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request timeout')), timeout)
+            )
+        ]);
+    }
+
+    async function retryFetch(fetchFn, attempts = CONFIG.RETRY_ATTEMPTS) {
+        let lastError;
+        for (let i = 0; i < attempts; i++) {
+            try {
+                return await fetchFn();
+            } catch (error) {
+                lastError = error;
+                if (i < attempts - 1) {
+                    const delay = CONFIG.RETRY_DELAY * Math.pow(2, i);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
         }
-        
-        // 8. Reveal animations
-        setTimeout(initRevealAnimations, 1000);
+        throw lastError;
     }
 
     /* ============================================================
@@ -96,16 +119,163 @@
        ============================================================ */
     
     function initPageTransition() {
+        if (!elements.pageTransition) return;
+        
+        setTimeout(() => {
+            elements.pageTransition.classList.add('page-loaded');
+            console.log('✅ Page transition complete');
+        }, CONFIG.PAGE_LOAD_DELAY);
+    }
+
+    function navigateWithTransition(href) {
+        if (isTransitioning) return;
+        
+        isTransitioning = true;
+        
         if (elements.pageTransition) {
-            setTimeout(() => {
-                elements.pageTransition.classList.add('page-loaded');
-                console.log('✅ Page transition complete');
-            }, CONFIG.PAGE_LOAD_DELAY);
+            elements.pageTransition.classList.remove('page-loaded');
         }
+        
+        setTimeout(() => {
+            window.location.href = href;
+        }, CONFIG.NAVIGATION_DELAY);
+        
+        setTimeout(() => {
+            if (!document.hidden) {
+                window.location.href = href;
+            }
+        }, CONFIG.FALLBACK_DELAY);
     }
 
     /* ============================================================
-       5. STATIC VIDEO LOADING
+       5. SCROLL EFFECTS (Works Pattern)
+       ============================================================ */
+    
+    function updateScrollProgress() {
+        if (!elements.progressBarTop) return;
+        const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (window.pageYOffset / windowHeight) * 100;
+        elements.progressBarTop.style.width = Math.min(scrolled, 100) + '%';
+    }
+
+    function handleLogoScroll() {
+        if (!elements.centerLogo) return;
+        
+        // About layout'u side-by-side olduğu için, both window scroll ve content-section scroll'u kontrol et
+        const contentSection = document.querySelector('.content-section');
+        let scrollTop = window.pageYOffset;
+        
+        if (contentSection) {
+            scrollTop = Math.max(scrollTop, contentSection.scrollTop);
+        }
+        
+        // Smooth animate with scroll - Works pattern
+        // Calculate offset based on scroll position (proportional)
+        const maxOffset = 120;
+        const offset = Math.min(scrollTop * 0.5, maxOffset);
+        
+        // Apply smooth transform
+        elements.centerLogo.style.transform = `translateX(-50%) translateY(-${offset}px) scale(${1 - (offset / maxOffset) * 0.5}) rotate(-${180 - (offset / maxOffset) * 180}deg)`;
+        
+        // Opacity fade
+        const opacity = Math.max(1 - (offset / maxOffset), 0);
+        elements.centerLogo.style.opacity = opacity;
+        
+        // Hide pointer events when too hidden
+        if (opacity < 0.1) {
+            elements.centerLogo.style.pointerEvents = 'none';
+            elements.centerLogo.style.visibility = 'hidden';
+        } else {
+            elements.centerLogo.style.pointerEvents = 'auto';
+            elements.centerLogo.style.visibility = 'visible';
+        }
+    }
+
+    function handleNavbarScroll() {
+        if (!elements.header) return;
+        
+        // About layout'u side-by-side olduğu için, both window scroll ve content-section scroll'u kontrol et
+        const contentSection = document.querySelector('.content-section');
+        let currentScroll = window.pageYOffset;
+        
+        if (contentSection) {
+            currentScroll = Math.max(currentScroll, contentSection.scrollTop);
+        }
+        
+        if (currentScroll <= 0) {
+            elements.header.style.transform = 'translateY(0)';
+            lastScrollTop = currentScroll;
+            return;
+        }
+        
+        if (currentScroll > lastScrollTop && currentScroll > CONFIG.NAVBAR_HIDE_THRESHOLD) {
+            elements.header.style.transform = 'translateY(-100%)';
+        } else {
+            elements.header.style.transform = 'translateY(0)';
+        }
+        lastScrollTop = currentScroll;
+    }
+
+    function handleVideoScroll() {
+        // Video fade effect on scroll - Works pattern
+        const videoSection = document.querySelector('.video-section');
+        const contentSection = document.querySelector('.content-section');
+        if (!videoSection) return;
+        
+        // Use content-section scroll for About's layout
+        let scrollTop = window.pageYOffset;
+        if (contentSection) {
+            scrollTop = Math.max(scrollTop, contentSection.scrollTop);
+        }
+        
+        const maxOpacity = 1;
+        const fadeStart = 0;
+        const fadeEnd = 300;
+        
+        let opacity = maxOpacity - (scrollTop - fadeStart) / (fadeEnd - fadeStart);
+        opacity = Math.max(0, Math.min(maxOpacity, opacity));
+        
+        videoSection.style.opacity = opacity;
+    }
+
+    const handleScroll = throttle(() => {
+        updateScrollProgress();
+        handleLogoScroll();
+        handleNavbarScroll();
+        handleVideoScroll();
+    }, CONFIG.SCROLL_THROTTLE);
+
+    function initScrollEffects() {
+        // Window scroll
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        
+        // Content-section internal scroll (About's side-by-side layout)
+        const contentSection = document.querySelector('.content-section');
+        if (contentSection) {
+            contentSection.addEventListener('scroll', handleScroll, { passive: true });
+        }
+        
+        updateScrollProgress();
+        handleLogoScroll();
+        handleNavbarScroll();
+        handleVideoScroll();
+    }
+
+    /* ============================================================
+       6. LOGO ANIMATION
+       ============================================================ */
+    
+    function initLogoAnimation() {
+        setTimeout(() => {
+            if (elements.centerLogo) {
+                elements.centerLogo.classList.add('entry-done');
+                console.log('✅ Logo animation started');
+            }
+        }, CONFIG.LOGO_ENTRY_DELAY);
+    }
+
+    /* ============================================================
+       7. STATIC VIDEO LOADING
        ============================================================ */
     
     function loadStaticVideo() {
@@ -125,23 +295,22 @@
     }
 
     /* ============================================================
-       6. DYNAMIC CONTENT LOADING (API)
+       8. DYNAMIC CONTENT LOADING (API)
        ============================================================ */
     
     async function loadDynamicContent() {
         console.log('🌐 Fetching dynamic content from API...');
         
         try {
-            const apiUrl = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?t=${Date.now()}`;
-            console.log('🔗 API URL:', apiUrl);
-            
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Cache-Control': 'no-cache'
-                }
-            });
+            const response = await retryFetch(() => 
+                fetchWithTimeout(`${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                })
+            );
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -150,54 +319,43 @@
             const apiData = await response.json();
             console.log('📦 API Response:', apiData);
             
-            // Process data
             processApiData(apiData);
             
         } catch (error) {
             console.error('❌ API Error:', error);
-            
-            // Fallback content
             showFallbackContent();
         }
     }
 
     /* ============================================================
-       7. PROCESS API DATA
+       9. PROCESS API DATA
        ============================================================ */
     
     function processApiData(data) {
         console.log('🔧 Processing API data...');
         
-        // Format text: Replace \r\n with <br> for HTML
         function formatText(text) {
             if (!text) return '';
             return text.replace(/\r\n/g, '<br>');
         }
         
         const content = {
-            // Titles
             mainTitle: data.mainTitle || "OUR STORY",
-            subTitle: data.subTitle || "We create cinematic experiences", // əgər boşdursa default
-            
-            // Content sections
-            whoWeAreText: formatText(data.whoWeAreText) || "CineChord is a creative production studio",
-            ourMissionText: formatText(data.ourMissionText) || "Our mission is visual storytelling",
-            ourApproachText: formatText(data.ourApproachText) || "We approach projects with creativity",
-            
-            // Contact info
+            subTitle: data.subTitle || "We are passionate filmmakers dedicated to cinematic storytelling",
+            whoWeAreText: formatText(data.whoWeAreText) || "CineChord is a creative studio specializing in visual storytelling and film production.",
+            ourMissionText: formatText(data.ourMissionText) || "Our mission is to transform ideas into powerful visual experiences.",
+            ourApproachText: formatText(data.ourApproachText) || "We approach every project with creativity and technical excellence.",
             email: data.email || "cinechord@gmail.com",
             phone: data.phone || "+994 50 123 45 67",
             address: data.address || "Baku, Azerbaijan"
         };
         
         console.log('📝 Processed content:', content);
-        
-        // Populate HTML
         populateContent(content);
     }
 
     /* ============================================================
-       8. POPULATE HTML CONTENT
+       10. POPULATE HTML CONTENT
        ============================================================ */
     
     function populateContent(content) {
@@ -248,13 +406,9 @@
             const emailUpper = content.email.toUpperCase();
             
             if (elements.emailLink) {
-                // Set href
                 elements.emailLink.href = `mailto:${content.email}`;
-                
-                // Set data-text attribute for rolling effect
                 elements.emailLink.setAttribute('data-text', emailUpper);
                 
-                // Find or create span inside emailLink
                 let emailSpan = elements.emailLink.querySelector('span');
                 if (!emailSpan) {
                     emailSpan = document.createElement('span');
@@ -271,13 +425,9 @@
             const phoneDigits = content.phone.replace(/\D/g, '');
             
             if (elements.phoneLink) {
-                // Set href
                 elements.phoneLink.href = `tel:+${phoneDigits}`;
-                
-                // Set data-text attribute
                 elements.phoneLink.setAttribute('data-text', content.phone);
                 
-                // Find or create span inside phoneLink
                 let phoneSpan = elements.phoneLink.querySelector('span');
                 if (!phoneSpan) {
                     phoneSpan = document.createElement('span');
@@ -299,7 +449,7 @@
     }
 
     /* ============================================================
-       9. FALLBACK CONTENT
+       11. FALLBACK CONTENT
        ============================================================ */
     
     function showFallbackContent() {
@@ -320,7 +470,7 @@
     }
 
     /* ============================================================
-       10. SCROLL REVEAL ANIMATIONS
+       12. SCROLL REVEAL ANIMATIONS
        ============================================================ */
     
     function initRevealAnimations() {
@@ -347,93 +497,53 @@
     }
 
     /* ============================================================
-       11. LOGO ANIMATION
+       13. NAVIGATION & SCRAMBLE
        ============================================================ */
     
-    function initLogoAnimation() {
-        if (elements.centerLogo) {
-            setTimeout(() => {
-                elements.centerLogo.classList.add('entry-done');
-                console.log('✅ Logo animation started');
-            }, CONFIG.LOGO_ENTRY_DELAY);
-        }
-    }
-
-    /* ============================================================
-       12. SCROLL EFFECTS
-       ============================================================ */
-    
-    function initScrollEffects() {
-        let lastScrollTop = 0;
-        
-        window.addEventListener('scroll', function() {
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            
-            // Progress bar
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-            const progressBar = document.querySelector('.progress-bar-top');
-            if (progressBar) {
-                progressBar.style.width = scrollPercent + '%';
-            }
-            
-            // Logo hide/show
-            if (elements.centerLogo) {
-                if (scrollTop > CONFIG.SCROLL_THRESHOLD) {
-                    elements.centerLogo.classList.add('scroll-hidden');
-                } else {
-                    elements.centerLogo.classList.remove('scroll-hidden');
-                }
-            }
-            
-            // Header hide/show
-            if (elements.header) {
-                if (scrollTop > lastScrollTop && scrollTop > 100) {
-                    elements.header.style.transform = 'translateY(-100%)';
-                } else {
-                    elements.header.style.transform = 'translateY(0)';
-                }
-            }
-            
-            lastScrollTop = scrollTop;
-        });
-    }
-
-    /* ============================================================
-       13. NAVIGATION
-       ============================================================ */
-    
-    function setupNavigation() {
+    function setupNavButtons() {
         document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                
-                // Skip if same page or anchor
-                if (!href || href === '#' || href.includes('about')) {
-                    return;
-                }
-                
+            btn.addEventListener('click', (e) => {
+                const href = btn.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('#')) return;
+                if (href === window.location.pathname.split('/').pop()) return;
                 e.preventDefault();
-                console.log('🔗 Navigating to:', href);
-                
-                // Elementi birbaşa tap (cache issue üçün)
-                const transition = document.querySelector('.page-transition');
-                
-                if (transition) {
-                    // Transition-u force et
-                    transition.style.transition = 'transform 0.5s cubic-bezier(0.76, 0, 0.24, 1)';
-                    transition.classList.remove('page-loaded');
-                    // Force reflow
-                    transition.offsetHeight;
-                    transition.style.transform = 'translateY(0)';
-                }
-                
-                // Navigate after transition
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 600);
+                navigateWithTransition(href);
             });
         });
+    }
+
+    function initNavigation() {
+        setupNavButtons();
+        setTimeout(setupNavButtons, 100);
+
+        // Scramble effect (Desktop only)
+        if (window.innerWidth > 768) {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const originalText = btn.getAttribute('data-text');
+                if (!originalText) return;
+                const navText = btn.querySelector('.nav-text');
+                if (!navText) return;
+
+                btn.addEventListener('mouseenter', function() {
+                    if (this.classList.contains('active')) return;
+                    let iteration = 0;
+                    let interval = setInterval(() => {
+                        navText.innerText = originalText.split("").map((letter, index) => {
+                            if(index < iteration) return originalText[index];
+                            return letters[Math.floor(Math.random() * letters.length)];
+                        }).join("");
+                        if(iteration >= originalText.length) clearInterval(interval);
+                        iteration += 1/3;
+                    }, 30);
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    if (this.classList.contains('active')) return;
+                    navText.innerText = originalText;
+                });
+            });
+        }
     }
 
     /* ============================================================
@@ -441,43 +551,29 @@
        ============================================================ */
     
     function initMobileMenu() {
-        console.log('📱 Initializing mobile menu');
+        if (document.querySelector('.hamburger')) return;
         
-        // Check if already exists
-        if (document.querySelector('.hamburger')) {
-            console.log('ℹ️  Mobile menu already exists');
-            return;
-        }
-        
-        // Create hamburger
-        const hamburger = document.createElement('button');
+        const hamburger = document.createElement('div');
         hamburger.className = 'hamburger';
         hamburger.innerHTML = '<span></span><span></span><span></span>';
         hamburger.setAttribute('aria-label', 'Toggle menu');
         
-        // Create mobile menu
-        const mobileMenu = document.createElement('div');
-        mobileMenu.className = 'mobile-menu';
-        
-        // Create overlay
-        const overlay = document.createElement('div');
-        overlay.className = 'mobile-menu-overlay';
-        
-        // Clone nav buttons
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            const clone = btn.cloneNode(true);
-            mobileMenu.appendChild(clone);
-        });
-        
-        // Add to DOM
-        document.body.appendChild(overlay);
-        document.body.appendChild(mobileMenu);
-        
         if (elements.header) {
             elements.header.appendChild(hamburger);
         }
+
+        const mobileMenu = document.createElement('div');
+        mobileMenu.className = 'mobile-menu';
+        const overlay = document.createElement('div');
+        overlay.className = 'mobile-menu-overlay';
         
-        // Toggle function
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            mobileMenu.appendChild(btn.cloneNode(true));
+        });
+        
+        document.body.appendChild(overlay);
+        document.body.appendChild(mobileMenu);
+
         function toggleMenu() {
             const isActive = hamburger.classList.contains('active');
             hamburger.classList.toggle('active');
@@ -485,59 +581,54 @@
             overlay.classList.toggle('active');
             document.body.style.overflow = isActive ? '' : 'hidden';
         }
-        
-        // Event listeners
+
         hamburger.addEventListener('click', toggleMenu);
         overlay.addEventListener('click', toggleMenu);
-        
-        // Close menu on link click
-        mobileMenu.addEventListener('click', (e) => {
-            if (e.target.classList.contains('nav-btn')) {
+        mobileMenu.addEventListener('click', function(e) {
+            if (e.target.classList.contains('nav-btn') || e.target.closest('.nav-btn')) {
                 toggleMenu();
             }
         });
-        
-        // Close on resize to desktop
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
-                toggleMenu();
-            }
+
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                if (window.innerWidth > 768 && hamburger.classList.contains('active')) {
+                    toggleMenu();
+                }
+            }, CONFIG.RESIZE_DEBOUNCE);
         });
-        
-        console.log('✅ Mobile menu initialized');
     }
 
     /* ============================================================
-       15. DEBUG HELPER
+       15. INITIALIZATION
        ============================================================ */
     
-    function debugElements() {
-        console.log('🔍 Debugging elements:');
-        Object.keys(elements).forEach(key => {
-            console.log(`${key}:`, elements[key] ? '✅ Found' : '❌ Not found');
-        });
+    function init() {
+        console.log('🚀 About page initialized');
+        
+        initPageTransition();
+        initLogoAnimation();
+        loadStaticVideo();
+        loadDynamicContent();
+        initScrollEffects();
+        initNavigation();
+        initRevealAnimations();
+        
+        if (window.innerWidth <= 768) {
+            initMobileMenu();
+        }
     }
 
     /* ============================================================
        16. START APPLICATION
        ============================================================ */
     
-    // DOM ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📄 DOM fully loaded');
-            debugElements();
-            init();
-        });
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        console.log('⚡ DOM already loaded');
-        debugElements();
         init();
     }
-
-    // Global error handler
-    window.addEventListener('error', function(e) {
-        console.error('💥 Global error:', e.error);
-    });
 
 })();

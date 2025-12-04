@@ -16,7 +16,7 @@ const API = {
     WORKS: `${BASE_URL}/admin/works`,
     SERVICES: `${BASE_URL}/admin/services`,
     CONTACTS: `${BASE_URL}/admin/contacts`,
-    ABOUT: `${BASE_URL}/admin/about`  // ✅ FİKS: /api/about → /admin/about
+    ABOUT: `${BASE_URL}/admin/about`
 };
 
 // GLOBAL
@@ -201,8 +201,9 @@ function initCharts(works) {
     if (ctx) {
         if (worksChart) worksChart.destroy();
 
+        // Data üçün bir neçə məlumatın title-ını istifadə edək
         const labels = works.slice(0, 7).map(w => w.title.substring(0, 10));
-        const data = works.slice(0, 7).map(() => Math.floor(Math.random() * 10) + 1);
+        const data = works.slice(0, 7).map(() => Math.floor(Math.random() * 10) + 1); // Random data
 
         worksChart = new Chart(ctx, {
             type: 'line',
@@ -359,7 +360,7 @@ function editWorkById(id) {
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
-// --- SUBMIT WORK - ✅ FİKS: FormData campos birbir əlavə edilir ---
+// --- SUBMIT WORK - ✅ DÜZƏLİŞLƏR BURADA EDİLDİ ---
 async function submitWork() {
     const id = document.getElementById('workId').value;
     const fd = new FormData();
@@ -372,8 +373,12 @@ async function submitWork() {
         return;
     }
 
-    // ✅ FİKS: JSON stringi yerinə individual sahələri əlavə edin
-    // @ModelAttribute formdata-dan hər sahəni açar adı ilə axtarır
+    // 1. DÜZƏLİŞ: ID-ni FormData-ya əlavə edirik (ehtiyat üçün)
+    if(id) {
+        fd.append('id', id);
+    }
+    
+    // Sahələri əlavə edin (adlar DTO ilə eyni olmalıdır)
     fd.append('title', title);
     fd.append('category', category);
     fd.append('clientName', document.getElementById('wClient').value);
@@ -405,7 +410,8 @@ async function submitWork() {
     });
     
     try {
-        let url = id ? `${API.WORKS}/${id}` : `${API.WORKS}/createWork`;
+        // 2. DÜZƏLİŞ: Update URL-i Backend ilə uyğunlaşdırılır
+        let url = id ? `${API.WORKS}/updateWork/${id}` : `${API.WORKS}/createWork`;
         let method = id ? 'PUT' : 'POST';
 
         const xhr = new XMLHttpRequest();
@@ -428,7 +434,16 @@ async function submitWork() {
                 loadWorks(currentPage); 
                 loadDashboard();
             } else {
-                Swal.fire('Xəta', `Server xətası: ${xhr.status}`, 'error');
+                 let errorMsg = `Server xətası: ${xhr.status}`;
+                 if (xhr.responseText) {
+                    try {
+                         const errJson = JSON.parse(xhr.responseText);
+                         if(errJson.message) errorMsg = errJson.message;
+                    } catch(e) {
+                         errorMsg = xhr.responseText.substring(0, 100); // Kəskin cavabları kəsirik
+                    }
+                }
+                Swal.fire('Xəta', errorMsg, 'error');
             }
         };
 

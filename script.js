@@ -6,7 +6,13 @@
 
 // Global video configuration
 window.CONFIG = {
-    videos: ['videos/Showreel.mp4', 'videos/ABB TamGenc Card.mp4', 'videos/Bakcell 099.mp4', 'videos/Yaz furseti kampaniyasi!.mp4', 'videos/Yeni dovr.mp4'],
+    videos: [
+        'videos/Showreel.mp4',
+        'videos/ABB-TamGenc-Card.mp4',
+        'videos/Bakcell-099.mp4',
+        'videos/Yaz-furseti-kampaniyasi.mp4',
+        'videos/Yeni-dovr.mp4'
+    ],
     titles: ['SHOWREEL', 'ABB TAM GENC', 'BAKCELL 099', 'ABB YAZ FÜRSƏTİ', 'BAKCELL YENİ DÖVR']
 };
 window.currentIndex = 0;

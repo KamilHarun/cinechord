@@ -56,7 +56,7 @@ body {
 }
 
 /* =========================================
-   PAGE TRANSITION - SLIDE EFFECT (FIXED)
+   PAGE TRANSITION - SLIDE EFFECT (ARCHIVE PATTERN)
    ========================================= */
 .page-transition {
     position: fixed;
@@ -68,17 +68,14 @@ body {
     z-index: 9999;
     transform: translateY(0);
     pointer-events: all;
-    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* Səhifə yükləndikdən sonra yuxarı sürüşür */
 .page-transition.page-loaded {
     transform: translateY(-100%);
     pointer-events: none;
     transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* Başqa səhifəyə keçəndə - aşağı enir və qalır */
 .page-transition.active {
     transform: translateY(0) !important;
     pointer-events: all;
@@ -102,12 +99,36 @@ body {
 }
 
 @keyframes grain {
-    0%, 100% { transform: translate(0, 0); }
-    10% { transform: translate(-1%, -1%); }
-    20% { transform: translate(1%, 1%); }
-    30% { transform: translate(-1%, 1%); }
-    40% { transform: translate(1%, -1%); }
-    50% { transform: translate(-1%, 0); }
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    10% {
+        transform: translate(-1%, -1%);
+    }
+    20% {
+        transform: translate(1%, 1%);
+    }
+    30% {
+        transform: translate(-1%, 1%);
+    }
+    40% {
+        transform: translate(1%, -1%);
+    }
+    50% {
+        transform: translate(-1%, 0);
+    }
+    60% {
+        transform: translate(1%, 0);
+    }
+    70% {
+        transform: translate(0, -1%);
+    }
+    80% {
+        transform: translate(0, 1%);
+    }
+    90% {
+        transform: translate(-1%, -1%);
+    }
 }
 
 .progress-bar-top {
@@ -116,10 +137,9 @@ body {
     left: 0;
     width: 0%;
     height: 3px;
-    background: linear-gradient(90deg, #fff, rgba(255,255,255,0.5));
+    background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.5));
     z-index: 9997;
-    transition: width 0.1s ease;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    transition: width 0.1s linear;
 }
 
 /* =========================================
@@ -132,7 +152,7 @@ body {
     transform: translateX(-50%) scale(0.5) rotate(-180deg);
     z-index: 1001;
     opacity: 0;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.4s ease, opacity 0.4s ease;
     pointer-events: auto;
 }
 
@@ -162,7 +182,7 @@ body {
 }
 
 /* =========================================
-   HEADER / NAVBAR
+   HEADER / NAVBAR (ARCHIVE PATTERN)
    ========================================= */
 .header {
     position: fixed;
@@ -175,15 +195,36 @@ body {
     align-items: center;
     z-index: 1000;
     background: transparent;
-    transition: transform 0.4s ease;
+    transition: transform 0.4s ease, opacity 0.4s ease;
     transform: translateY(0);
+    animation: fadeInHeader 1s ease 0.2s both;
+    will-change: transform;
 }
 
-.nav-left, .nav-right {
+@keyframes fadeInHeader {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.header.scroll-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.nav-left,
+.nav-right {
     display: flex;
     gap: 15px;
 }
 
+/* =========================================
+   NAVIGATION BUTTONS (ARCHIVE PATTERN)
+   ========================================= */
 .nav-btn {
     padding: 12px 30px;
     background: transparent;
@@ -201,19 +242,42 @@ body {
     animation: fadeInUp 0.8s ease both;
     text-decoration: none;
     display: inline-block;
+    will-change: transform, opacity;
 }
 
-/* Nav delays */
-.nav-left .nav-btn:nth-child(1) { animation-delay: 0.1s; }
-.nav-left .nav-btn:nth-child(2) { animation-delay: 0.2s; }
-.nav-left .nav-btn:nth-child(3) { animation-delay: 0.25s; }
-.nav-right .nav-btn:nth-child(1) { animation-delay: 0.3s; }
-.nav-right .nav-btn:nth-child(2) { animation-delay: 0.35s; }
-.nav-right .nav-btn:nth-child(3) { animation-delay: 0.4s; }
-
 @keyframes fadeInUp {
-    0% { transform: translateY(50px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
+    0% {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.nav-left .nav-btn:nth-child(1) {
+    animation-delay: 0.3s;
+}
+
+.nav-left .nav-btn:nth-child(2) {
+    animation-delay: 0.4s;
+}
+
+.nav-left .nav-btn:nth-child(3) {
+    animation-delay: 0.5s;
+}
+
+.nav-right .nav-btn:nth-child(1) {
+    animation-delay: 0.6s;
+}
+
+.nav-right .nav-btn:nth-child(2) {
+    animation-delay: 0.7s;
+}
+
+.nav-right .nav-btn:nth-child(3) {
+    animation-delay: 0.8s;
 }
 
 .nav-btn::before {
@@ -275,7 +339,7 @@ body {
 }
 
 /* =========================================
-   HAMBURGER MENU (MOBILE) - ABOUT PATTERN
+   HAMBURGER MENU (MOBILE)
    ========================================= */
 .hamburger {
     display: none;
@@ -343,6 +407,7 @@ body {
     padding: 16px 20px;
     font-size: 14px;
     animation: none;
+    opacity: 1;
 }
 
 .mobile-menu-overlay {
@@ -380,6 +445,8 @@ body {
     height: 100vh;
     z-index: 3;
     background: #000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 .video-container {
@@ -687,7 +754,6 @@ body {
    RESPONSIVE - MOBILE
    ========================================= */
 @media (max-width: 768px) {
-    /* Header & Navigation */
     .header {
         padding: 15px 20px;
         background: rgba(5, 5, 5, 0.95);
@@ -695,23 +761,19 @@ body {
         justify-content: flex-end;
     }
     
-    /* DESKTOP NAVBAR GİZLƏT */
     .nav-left,
     .nav-right {
         display: none !important;
     }
     
-    /* HAMBURGER GÖSTƏR */
     .hamburger {
         display: flex !important;
     }
     
-    /* MOBILE MENU GÖSTƏR */
     .mobile-menu {
         display: flex !important;
     }
     
-    /* Logo */
     .center-logo {
         top: 15px;
         left: 20px;
@@ -731,7 +793,6 @@ body {
         height: 70px;
     }
     
-    /* Layout */
     .container {
         flex-direction: column;
     }
@@ -751,7 +812,6 @@ body {
         margin-bottom: 50px;
     }
     
-    /* Typography */
     .rolling-title {
         font-size: 2rem;
         letter-spacing: 1px;
@@ -770,7 +830,6 @@ body {
         font-size: 0.875rem;
     }
     
-    /* Contact Info */
     .contact-info {
         margin-top: 40px;
         gap: 20px;
@@ -793,7 +852,6 @@ body {
         font-size: 14px;
     }
     
-    /* Social Links */
     .social-links {
         margin-top: 40px;
         gap: 15px;
@@ -808,7 +866,6 @@ body {
         font-size: 20px;
     }
     
-    /* About Sections */
     .about-section {
         margin-bottom: 30px;
     }
@@ -900,7 +957,6 @@ body {
         height: 48px;
     }
     
-    /* Disable hover effects on touch */
     .rolling-title:hover span,
     .rolling-link:hover span {
         transform: none;

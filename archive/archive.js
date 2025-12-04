@@ -1,23 +1,16 @@
-/* ============================================================
-   CineChord Archive - Main JavaScript
-   Version: 3.1 - FIXED NULL PROBLEM + DYNAMIC URL
-   ============================================================ */
-
 (function() {
     'use strict';
 
     /* ============================================================
-       1. CONFIGURATION & CONSTANTS - DINAMIK URL
+       1. CONFIGURATION & CONSTANTS
        ============================================================ */
-    
-    // 🔧 Dinamik Backend URL
     const getBackendUrl = () => {
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             return 'http://localhost:8080';
         }
         return 'https://cinechord-admin-production.up.railway.app';
     };
-    
+
     const CONFIG = {
         BACKEND_URL: getBackendUrl(),
         ENDPOINTS: {
@@ -32,7 +25,8 @@
         PAGE_LOAD_DELAY: 100,
         NAVIGATION_DELAY: 600,
         FALLBACK_DELAY: 1600,
-        RESIZE_DEBOUNCE: 250
+        RESIZE_DEBOUNCE: 250,
+        INACTIVITY_DELAY: 2000
     };
 
     console.log('🔌 Backend URL:', CONFIG.BACKEND_URL);
@@ -54,7 +48,6 @@
     /* ============================================================
        2. DOM ELEMENT REFERENCES
        ============================================================ */
-    
     const elements = {
         tableBody: document.querySelector('.archive-table tbody'),
         previewContainer: document.getElementById('previewContainer'),
@@ -68,32 +61,27 @@
         pauseIcon: document.getElementById('pauseIcon'),
         skipBackBtn: document.getElementById('skipBackBtn'),
         skipForwardBtn: document.getElementById('skipForwardBtn'),
-        muteBtn: document.getElementById('muteBtn'),
-        volumeIcon: document.getElementById('volumeIcon'),
-        muteIcon: document.getElementById('muteIcon'),
         volumeSlider: document.getElementById('volumeSlider'),
         speedBtn: document.getElementById('speedBtn'),
         fullscreenBtn: document.getElementById('fullscreenBtn'),
         progressSlider: document.getElementById('progressSlider'),
         progressPlayed: document.getElementById('progressPlayed'),
-        progressBuffered: document.getElementById('progressBuffered'),
         currentTimeDisplay: document.getElementById('currentTime'),
         durationTimeDisplay: document.getElementById('durationTime'),
         pageTransition: document.querySelector('.page-transition'),
         progressBarTop: document.querySelector('.progress-bar-top'),
         centerLogo: document.querySelector('.center-logo'),
-        header: document.querySelector('.header')
+        header: document.querySelector('.header'),
+        modalPlayContainer: document.getElementById('modalPlayBtnContainer')
     };
 
     let lastScrollTop = 0;
-    
-    // Page transition lock
     let isTransitioning = false;
+    let activityTimeout = null;
 
     /* ============================================================
        3. UTILITY FUNCTIONS
        ============================================================ */
-    
     function throttle(func, delay) {
         let lastCall = 0;
         return function(...args) {
@@ -161,13 +149,11 @@
     /* ============================================================
        4. MOBILE NAVIGATION & HAMBURGER
        ============================================================ */
-    
     function initMobileMenu() {
         const hamburger = document.createElement('div');
         hamburger.className = 'hamburger';
         hamburger.innerHTML = '<span></span><span></span><span></span>';
         hamburger.setAttribute('aria-label', 'Toggle menu');
-        hamburger.setAttribute('role', 'button');
         
         if (elements.header) {
             elements.header.appendChild(hamburger);
@@ -210,13 +196,11 @@
                 }
             }, CONFIG.RESIZE_DEBOUNCE);
         });
-        
     }
 
     /* ============================================================
        5. SCROLL EFFECTS
        ============================================================ */
-    
     function updateScrollProgress() {
         if (!elements.progressBarTop) return;
         const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -268,20 +252,16 @@
     /* ============================================================
        6. PAGE TRANSITION SYSTEM
        ============================================================ */
-    
     function initPageTransition() {
         if (!elements.pageTransition) return;
         
         setTimeout(() => {
             elements.pageTransition.classList.add('page-loaded');
         }, CONFIG.PAGE_LOAD_DELAY);
-        
     }
 
     function navigateWithTransition(href) {
-        if (isTransitioning) {
-            return;
-        }
+        if (isTransitioning) return;
         
         isTransitioning = true;
         
@@ -301,27 +281,21 @@
     }
 
     /* ============================================================
-       7. DATA LOADING FROM BACKEND - ✅ FIXED
+       7. DATA LOADING FROM BACKEND
        ============================================================ */
-    
     async function loadArchiveData() {
-        if (!elements.tableBody) {
-            return;
-        }
+        if (!elements.tableBody) return;
 
         elements.tableBody.innerHTML = `
             <tr class="loading-row">
                 <td colspan="7" style="text-align: center; padding: 60px 20px; opacity: 0; animation: fadeIn 0.3s ease forwards;">
                     <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #FFA500; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                     <div style="margin-top: 15px; font-size: 13px;">Məlumatlar yüklənir...</div>
-                    <div style="margin-top: 5px; font-size: 11px; opacity: 0.5;">Serverlə əlaqə qurulur</div>
                 </td>
             </tr>
         `;
 
         try {
-            const startTime = performance.now();
-
             const response = await retryFetch(() => 
                 fetchWithTimeout(API_URLS.ARCHIVE, {
                     method: 'GET',
@@ -332,10 +306,8 @@
                 })
             );
 
-            const fetchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-
             if (!response.ok) {
-                throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP Error ${response.status}`);
             }
 
             const data = await response.json();
@@ -369,11 +341,8 @@
                 
                 batch.forEach((work, index) => {
                     const globalIndex = currentIndex + index;
-                    
-                    // ✅ DÜZƏLŞDŞ: Video URL - previewVideoUrl əvvəlcə, sonra videoUrl
                     const videoUrl = getFullVideoUrl(work.previewVideoUrl || work.videoUrl);
-                    const previewUrl = getFullVideoUrl(work.previewVideoUrl || work.videoUrl);
-                    const videoSrc = previewUrl || videoUrl || '';
+                    const videoSrc = videoUrl || '';
                     
                     const row = document.createElement('tr');
                     row.setAttribute('data-video', videoSrc);
@@ -404,8 +373,7 @@
                 } else {
                     initTableAnimations();
                     attachTableRowEffects();
-                    const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
-                    console.log(`✅ Archive loaded in ${totalTime}s`);
+                    console.log(`✅ Archive loaded successfully`);
                 }
             }
             
@@ -418,17 +386,14 @@
                     <td colspan="7" style="text-align: center; padding: 60px 20px;">
                         <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
                         <div style="color: #FFA500; margin-bottom: 10px; font-size: 16px; font-weight: 600;">Xəta baş verdi</div>
-                        <div style="opacity: 0.6; font-size: 12px; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                        <div style="opacity: 0.6; font-size: 12px; margin-bottom: 20px;">
                             ${error.message === 'Request timeout' 
-                                ? 'Server cavab vermək üçün çox uzun müddət tələb edir. İnternet bağlantınızı yoxlayın.'
-                                : 'Serverə qoşulma uğursuz oldu. Xahiş edirik bir az sonra yenidən cəhd edin.'}
+                                ? 'Server cavab vermək üçün çox uzun müddət tələb edir.'
+                                : 'Serverə qoşulma uğursuz oldu.'}
                         </div>
-                        <button onclick="location.reload()" style="padding: 12px 24px; background: #FFA500; border: none; border-radius: 25px; color: #000; cursor: pointer; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; letter-spacing: 1px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <button onclick="location.reload()" style="padding: 12px 24px; background: #FFA500; border: none; border-radius: 25px; color: #000; cursor: pointer; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; letter-spacing: 1px;">
                             🔄 YENİDƏN YÜKLƏ
                         </button>
-                        <div style="margin-top: 20px; font-size: 10px; opacity: 0.4;">
-                            Error: ${error.message}
-                        </div>
                     </td>
                 </tr>
             `;
@@ -438,7 +403,6 @@
     /* ============================================================
        8. SCROLL REVEAL (INTERSECTION OBSERVER)
        ============================================================ */
-    
     function initTableAnimations() {
         const observerOptions = {
             threshold: 0.15,
@@ -462,42 +426,36 @@
     /* ============================================================
        9. TABLE ROW EFFECTS & SCRAMBLE
        ============================================================ */
-    
     function attachTableRowEffects() {
         const rows = document.querySelectorAll('.archive-table tbody tr');
         const scrambleLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        const preserveChars = 'ƏəŞşÜüİıÖöĞğÇç ';
 
         rows.forEach(row => {
             const cells = row.querySelectorAll('td:not(.number-col)');
             cells.forEach(cell => {
                 const originalText = cell.getAttribute('data-original') || cell.textContent;
                 cell.setAttribute('data-original', originalText);
-                cell.innerHTML = originalText.split('').map(char => 
-                    char === ' ' ? ' ' : `<span>${char}</span>`
-                ).join('');
             });
 
             row.addEventListener('mouseenter', function() {
                 const hoverCells = this.querySelectorAll('td:not(.number-col)');
                 hoverCells.forEach(cell => {
-                    const spans = cell.querySelectorAll('span');
                     const originalText = cell.getAttribute('data-original') || '';
                     let iteration = 0;
                     const interval = setInterval(() => {
-                        spans.forEach((span, index) => {
-                            const originalChar = originalText[index];
-                            if (index < iteration) {
-                                span.textContent = originalChar;
-                            } else if (preserveChars.includes(originalChar)) {
-                                span.textContent = originalChar;
+                        let newText = '';
+                        for (let i = 0; i < originalText.length; i++) {
+                            if (i < iteration) {
+                                newText += originalText[i];
                             } else {
-                                span.textContent = scrambleLetters[Math.floor(Math.random() * scrambleLetters.length)];
+                                newText += scrambleLetters[Math.floor(Math.random() * scrambleLetters.length)];
                             }
-                        });
+                        }
+                        cell.textContent = newText;
                         iteration += 1 / 2.5;
                         if (iteration >= originalText.length) {
                             clearInterval(interval);
+                            cell.textContent = originalText;
                         }
                     }, 30);
                     cell.dataset.scrambleInterval = interval;
@@ -510,11 +468,7 @@
                     if (cell.dataset.scrambleInterval) {
                         clearInterval(parseInt(cell.dataset.scrambleInterval));
                     }
-                    const originalText = cell.getAttribute('data-original') || '';
-                    const spans = cell.querySelectorAll('span');
-                    spans.forEach((span, index) => {
-                        span.textContent = originalText[index] || '';
-                    });
+                    cell.textContent = cell.getAttribute('data-original') || '';
                 });
             });
 
@@ -524,18 +478,30 @@
                 const client = this.getAttribute('data-client');
                 const category = this.getAttribute('data-category');
                 const year = this.getAttribute('data-year');
-                if (!videoSrc || videoSrc === '') {
-                    return;
-                }
+                if (!videoSrc || videoSrc === '') return;
                 openVideoPreview(videoSrc, title, client, category, year);
             });
         });
     }
 
     /* ============================================================
-       10. VIDEO PREVIEW MODAL
+       10. USER INACTIVITY DETECTION
        ============================================================ */
-    
+    function handleUserActivity() {
+        if (!elements.previewContainer) return;
+        elements.previewContainer.classList.remove('user-inactive');
+        clearTimeout(activityTimeout);
+        
+        if (elements.videoElement && !elements.videoElement.paused) {
+            activityTimeout = setTimeout(() => {
+                elements.previewContainer.classList.add('user-inactive');
+            }, CONFIG.INACTIVITY_DELAY);
+        }
+    }
+
+    /* ============================================================
+       11. VIDEO PREVIEW MODAL
+       ============================================================ */
     function openVideoPreview(videoUrl, title, client, category, year) {
         if (!elements.previewContainer || !elements.videoElement) return;
 
@@ -547,6 +513,7 @@
         
         if (elements.previewTitle) {
             elements.previewTitle.textContent = `${client} - ${title}`;
+            elements.previewTitle.setAttribute('data-text', `${client} - ${title}`);
         }
         
         if (elements.previewMeta) {
@@ -565,37 +532,31 @@
             }
         };
 
-        elements.videoElement.onerror = function() {
-            if (elements.videoLoading) {
-                elements.videoLoading.style.display = 'none';
-            }
-            alert('Video yüklənmə xətası. Xahiş edirik bir az sonra yenidən cəhd edin.');
-        };
-
         setTimeout(() => {
             elements.previewContainer.classList.add('active');
+            elements.previewContainer.classList.add('is-paused');
             document.body.style.overflow = 'hidden';
-            elements.videoElement.play().catch(err => {
-            });
         }, 10);
-        
     }
 
     function closeVideoPreview() {
         if (!elements.previewContainer || !elements.videoElement) return;
         elements.previewContainer.classList.remove('active');
+        elements.previewContainer.classList.add('is-paused');
+        elements.previewContainer.classList.remove('user-inactive');
+        clearTimeout(activityTimeout);
         document.body.style.overflow = '';
+        
         setTimeout(() => {
             elements.videoElement.pause();
             elements.videoElement.currentTime = 0;
             elements.videoElement.src = '';
-        }, 600);
+        }, 500);
     }
 
     /* ============================================================
-       11. VIDEO PLAYER CONTROLS
+       12. VIDEO PLAYER CONTROLS
        ============================================================ */
-    
     function initVideoControls() {
         if (!elements.videoElement) return;
 
@@ -612,6 +573,7 @@
         if (elements.skipBackBtn) {
             elements.skipBackBtn.addEventListener('click', () => {
                 elements.videoElement.currentTime = Math.max(0, elements.videoElement.currentTime - 10);
+                handleUserActivity();
             });
         }
 
@@ -621,13 +583,7 @@
                     elements.videoElement.duration,
                     elements.videoElement.currentTime + 10
                 );
-            });
-        }
-
-        if (elements.muteBtn) {
-            elements.muteBtn.addEventListener('click', () => {
-                elements.videoElement.muted = !elements.videoElement.muted;
-                updateMuteButton();
+                handleUserActivity();
             });
         }
 
@@ -635,8 +591,7 @@
             elements.volumeSlider.addEventListener('input', (e) => {
                 const volume = e.target.value / 100;
                 elements.videoElement.volume = volume;
-                elements.videoElement.muted = volume === 0;
-                updateMuteButton();
+                handleUserActivity();
             });
         }
 
@@ -663,6 +618,7 @@
             elements.progressSlider.addEventListener('input', (e) => {
                 const time = (e.target.value / 100) * elements.videoElement.duration;
                 elements.videoElement.currentTime = time;
+                handleUserActivity();
             });
         }
 
@@ -670,8 +626,6 @@
         elements.videoElement.addEventListener('pause', updatePlayPauseButton);
         elements.videoElement.addEventListener('timeupdate', updateProgress);
         elements.videoElement.addEventListener('loadedmetadata', updateDuration);
-        elements.videoElement.addEventListener('progress', updateBuffered);
-        
     }
 
     function updatePlayPauseButton() {
@@ -679,20 +633,13 @@
         if (elements.videoElement.paused) {
             if (elements.playIcon) elements.playIcon.style.display = 'block';
             if (elements.pauseIcon) elements.pauseIcon.style.display = 'none';
+            elements.previewContainer.classList.add('is-paused');
+            clearTimeout(activityTimeout);
         } else {
             if (elements.playIcon) elements.playIcon.style.display = 'none';
             if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
-        }
-    }
-
-    function updateMuteButton() {
-        if (!elements.videoElement) return;
-        if (elements.videoElement.muted || elements.videoElement.volume === 0) {
-            if (elements.volumeIcon) elements.volumeIcon.style.display = 'none';
-            if (elements.muteIcon) elements.muteIcon.style.display = 'block';
-        } else {
-            if (elements.volumeIcon) elements.volumeIcon.style.display = 'block';
-            if (elements.muteIcon) elements.muteIcon.style.display = 'none';
+            elements.previewContainer.classList.remove('is-paused');
+            handleUserActivity();
         }
     }
 
@@ -713,20 +660,9 @@
         elements.durationTimeDisplay.textContent = formatTime(elements.videoElement.duration);
     }
 
-    function updateBuffered() {
-        if (!elements.videoElement || !elements.progressBuffered) return;
-        if (elements.videoElement.buffered.length > 0) {
-            const buffered = elements.videoElement.buffered.end(elements.videoElement.buffered.length - 1);
-            const duration = elements.videoElement.duration;
-            const bufferedPercent = (buffered / duration) * 100;
-            elements.progressBuffered.style.width = `${bufferedPercent}%`;
-        }
-    }
-
     /* ============================================================
-       12. NAVIGATION & SCRAMBLE
+       13. NAVIGATION & SCRAMBLE
        ============================================================ */
-    
     function setupNavButtons() {
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -743,7 +679,6 @@
         setupNavButtons();
         setTimeout(setupNavButtons, 100);
 
-        // Scramble effect (Desktop only)
         if (window.innerWidth > 768) {
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -771,17 +706,15 @@
                 });
             });
         }
-        
     }
 
     /* ============================================================
-       13. KEYBOARD SHORTCUTS
+       14. KEYBOARD SHORTCUTS
        ============================================================ */
-    
     function initKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
             if (!elements.previewContainer?.classList.contains('active')) return;
-            const handledKeys = ['Space', 'ArrowLeft', 'ArrowRight', 'KeyF', 'KeyM', 'Escape'];
+            const handledKeys = ['Space', 'ArrowLeft', 'ArrowRight', 'KeyF', 'Escape'];
             if (handledKeys.includes(e.code)) e.preventDefault();
 
             switch(e.code) {
@@ -794,21 +727,19 @@
                     break;
                 case 'ArrowLeft':
                     elements.videoElement.currentTime = Math.max(0, elements.videoElement.currentTime - 5);
+                    handleUserActivity();
                     break;
                 case 'ArrowRight':
                     elements.videoElement.currentTime = Math.min(
                         elements.videoElement.duration,
                         elements.videoElement.currentTime + 5
                     );
+                    handleUserActivity();
                     break;
                 case 'KeyF':
                     if (elements.videoElement.requestFullscreen) {
                         elements.videoElement.requestFullscreen();
                     }
-                    break;
-                case 'KeyM':
-                    elements.videoElement.muted = !elements.videoElement.muted;
-                    updateMuteButton();
                     break;
                 case 'Escape':
                     closeVideoPreview();
@@ -818,53 +749,40 @@
     }
 
     /* ============================================================
-       14. TOUCH OPTIMIZATION
-       ============================================================ */
-    
-    function initTouchOptimization() {
-        if ('ontouchstart' in window) {
-            document.querySelectorAll('.nav-btn, .archive-table tbody tr').forEach(el => {
-                el.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.95)';
-                }, { passive: true });
-                
-                el.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                }, { passive: true });
-            });
-        }
-
-        if (window.innerWidth <= 768) {
-            const debouncedScroll = debounce(handleScroll, 10);
-            window.removeEventListener('scroll', handleScroll);
-            window.addEventListener('scroll', debouncedScroll, { passive: true });
-        }
-        
-    }
-
-    /* ============================================================
        15. EVENT LISTENERS
        ============================================================ */
-    
     function initEventListeners() {
         if (elements.closeButton) {
             elements.closeButton.addEventListener('click', closeVideoPreview);
         }
 
         if (elements.previewContainer) {
+            ['mousemove', 'click', 'touchstart'].forEach(event => {
+                elements.previewContainer.addEventListener(event, handleUserActivity);
+            });
+            
             elements.previewContainer.addEventListener('click', (e) => {
                 if (e.target === elements.previewContainer) {
                     closeVideoPreview();
                 }
             });
         }
-        
+
+        if (elements.modalPlayContainer) {
+            elements.modalPlayContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (elements.videoElement.paused) {
+                    elements.videoElement.play();
+                } else {
+                    elements.videoElement.pause();
+                }
+            });
+        }
     }
 
     /* ============================================================
        16. LOGO ENTRY ANIMATION
        ============================================================ */
-    
     function initLogoAnimation() {
         setTimeout(() => { 
             if (elements.centerLogo) elements.centerLogo.classList.add('entry-done'); 
@@ -874,20 +792,16 @@
     /* ============================================================
        17. INITIALIZATION
        ============================================================ */
-    
     function init() {
-        
         initPageTransition();
         initScrollEffects();
         initMobileMenu();
         initNavigation();
         initVideoControls();
         initKeyboardShortcuts();
-        initTouchOptimization();
         initEventListeners();
         initLogoAnimation();
         loadArchiveData();
-        
     }
 
     if (document.readyState === 'loading') {
