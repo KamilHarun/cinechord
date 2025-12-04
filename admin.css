@@ -1,306 +1,250 @@
 /* ===============================================
-   LOGIN PAGE - PROFESSIONAL DESIGN (Yenilənmiş)
+   1. GLOBAL VARIABLES & RESET
    =============================================== */
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #8b5cf6;
+    
+    --bg-main: #f3f4f6;
+    --bg-card: #ffffff;
+    
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    
+    --border-color: #e5e7eb;
+    
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    
+    --sidebar-width: 260px;
+}
 
+body.dark-mode {
+    --bg-main: #111827;
+    --bg-card: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border-color: #374151;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+    height: 100vh;
+    overflow: hidden; /* Scroll idarəsi */
+}
+
+/* ===============================================
+   2. LOGIN PAGE DESIGN
+   =============================================== */
 #login-overlay {
     position: fixed;
     inset: 0;
-    /* Dərin, zərif gradient */
-    background: linear-gradient(135deg, #4f46e5 0%, #764ba2 100%); 
+    background: linear-gradient(135deg, #4f46e5 0%, #764ba2 100%);
     z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    overflow-y: auto; /* Kiçik ekranlar üçün scroll əlavə edildi */
 }
 
 .login-container {
     display: grid;
-    grid-template-columns: 1fr 1.2fr; /* Sağ tərəfə biraz daha genişlik verildi */
+    grid-template-columns: 1fr 1.2fr;
     width: 100%;
-    max-width: 1100px; /* Bir az daha geniş olmalıdır */
+    max-width: 900px;
     background: var(--bg-card);
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Daha dramatik kölgə */
-    animation: fadeInScale 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; /* Yaxşılaşdırılmış animasiya */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-/* LEFT SIDE - BRANDING */
 .login-left {
-    /* Dərinlik hissi üçün radial gradient */
     background: radial-gradient(circle at top left, #818cf8 0%, #4f46e5 100%);
-    padding: 4.5rem 3rem; /* Padding artırıldı */
+    padding: 3rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     color: white;
-    position: relative;
-    overflow: hidden;
     text-align: center;
 }
 
-/* Zərif arxa plan naxışları */
-.login-left::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.1'%3E%3Cpath d='M36 34L30 39.5l-6 5.5-6-5.5V33h-6v10.1l-6 5.5v12.2l-6-5.5V41.7l-6-5.5V29h-6v12.2l-6 5.5v12.2l-6-5.5V41.7l-6-5.5V29h-6v12.2l-6 5.5v12.2L0 55.5V41.7L-6 36v-6h6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 0.8;
-    z-index: 0;
-}
-
 .brand-logo {
-    position: relative; /* Naxışın üstündə olmaq üçün */
-    z-index: 1;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem; /* Boşluq artırıldı */
-    font-size: 2.2rem; /* Şrift böyüdüldü */
-    font-weight: 900;
-    margin-bottom: 2.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    gap: 10px;
 }
 
-.brand-logo i {
-    font-size: 3rem; /* İkon böyüdüldü */
-    padding: 12px;
-    border: 3px solid rgba(255, 255, 255, 0.7); /* Çərçivə gücləndirildi */
-    border-radius: 12px;
-    transition: transform 0.4s ease;
-}
-
-.brand-logo:hover i {
-    transform: rotateY(360deg);
-}
-
-.login-left h2 {
-    position: relative;
-    z-index: 1;
-    font-size: 2.8rem; /* Əsas başlıq daha böyük */
-    font-weight: 900;
-    margin-bottom: 0.75rem;
-    letter-spacing: 2px;
-}
-
-.login-left p {
-    position: relative;
-    z-index: 1;
-    font-size: 1.2rem; /* Mətn böyüdüldü */
-    line-height: 1.6;
-    opacity: 0.95;
-    max-width: 350px;
-    margin: 0 auto;
-}
-
-
-/* RIGHT SIDE - FORM */
 .login-right {
-    padding: 4.5rem 4rem; /* Padding artırıldı */
+    padding: 4rem;
     background: var(--bg-card);
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
 }
 
-/* Şifrə/Login hissəsinin arxa planı üçün zərif kölgə */
-.login-right::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--bg-card);
-    box-shadow: inset 5px 0 10px rgba(0, 0, 0, 0.03); /* Zərif daxili kölgə */
-}
-
-.login-form {
-    width: 100%;
-    max-width: 380px;
-    position: relative;
-    z-index: 2;
-}
-
-/* Form Başlığı */
-.login-form h3 {
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: var(--text-primary); /* Rəng primary-dən əsas mətn rənginə dəyişdirildi */
-    margin-bottom: 0.5rem;
-    position: relative;
-}
-
-.login-form h3::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 4px;
-    background: var(--primary);
-    margin-top: 5px;
-    border-radius: 2px;
-}
-
-.login-form .subtitle {
-    color: var(--text-secondary); /* Rəng daha görünən text-secondary-ə dəyişdirildi */
-    font-size: 1rem;
-    margin-bottom: 3rem;
-}
-
-
-.form-group {
-    margin-bottom: 2rem; /* Boşluq daha da artırıldı */
-}
-
-.form-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    transition: color 0.3s;
-}
-
+.login-form { width: 100%; max-width: 350px; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; }
 .form-group input {
-    background: var(--bg-main); /* Daha yumşaq bir background */
-    width: 100%;
-    padding: 1rem 1.25rem;
+    width: 100%; padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    font-size: 1rem;
+    border-radius: 8px;
+    background: var(--bg-main);
     color: var(--text-primary);
-    transition: all 0.3s;
+}
+.btn-login {
+    width: 100%; padding: 0.8rem;
+    background: var(--primary);
+    color: white; border: none;
+    border-radius: 8px; font-weight: 700;
+    cursor: pointer;
 }
 
-.form-group input:focus {
-    outline: none;
-    border-color: var(--primary);
+/* ===============================================
+   3. ADMIN DASHBOARD LAYOUT
+   =============================================== */
+.admin-wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
     background: var(--bg-card);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); /* Kölgə gücləndirildi */
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s;
 }
 
-.form-group input:focus + label {
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header .brand { font-size: 1.2rem; font-weight: 800; color: var(--primary); display: flex; gap: 8px; align-items: center; }
+
+.sidebar-nav { flex: 1; padding: 1.5rem; overflow-y: auto; }
+.nav-section { margin-bottom: 2rem; }
+.nav-title { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 0.8rem; letter-spacing: 0.5px; }
+
+.nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0.8rem 1rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 0.3rem;
+    transition: all 0.2s;
+}
+
+.nav-item:hover, .nav-item.active {
+    background: rgba(99, 102, 241, 0.1);
     color: var(--primary);
 }
 
-.form-group label i {
-    font-size: 1.1rem;
+.badge { margin-left: auto; background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; }
+.badge-danger { background: var(--danger); }
+
+.sidebar-footer { padding: 1rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
+.user-info { flex: 1; display: flex; gap: 10px; align-items: center; }
+.avatar { width: 36px; height: 36px; background: var(--bg-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.info .name { font-size: 0.9rem; font-weight: 600; }
+.info .role { font-size: 0.75rem; color: var(--text-secondary); }
+.btn-logout { background: none; border: none; color: var(--danger); cursor: pointer; }
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
 }
 
-.btn-login {
-    width: 100%; /* Tam eni tutur */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 0; /* Vertical padding artırıldı */
-    
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    color: white;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 800;
-    gap: 1rem;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
+.page-view { display: none; animation: fadeIn 0.3s ease; }
+.page-view.active { display: block; }
 
-.btn-login:hover {
-    transform: translateY(-5px); /* Hover effekti daha dramatik */
-    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.6);
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.btn-login i {
-    transition: transform 0.3s ease-in-out;
-}
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.page-title { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); }
+.page-subtitle { color: var(--text-secondary); }
 
-.btn-login:hover i {
-    transform: translateX(5px);
-}
+.btn-primary { background: var(--primary); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 
-/* Dark Mode üçün uyğunlaşdırma */
-body.dark-mode .login-container {
-    background: var(--bg-card);
-}
+/* Dashboard Stats */
+.dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.stat-card { background: var(--bg-card); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); }
+.stat-header { display: flex; align-items: center; gap: 1.5rem; }
+.stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.stat-icon.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.stat-icon.purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.stat-icon.pink { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+.stat-value { font-size: 1.8rem; font-weight: 800; margin-top: 5px; }
+.stat-label { color: var(--text-secondary); font-size: 0.9rem; }
 
-body.dark-mode .login-right {
-    background: var(--bg-card);
-}
+.dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+.dashboard-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.5rem; }
 
-body.dark-mode .login-right::before {
-    box-shadow: inset 5px 0 10px rgba(0, 0, 0, 0.1);
-}
+/* Works Grid */
+.works-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.work-card { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); transition: transform 0.2s; position: relative; }
+.work-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+.work-image { width: 100%; height: 160px; object-fit: cover; }
+.work-body { padding: 1rem; }
+.work-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.work-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem; }
+.work-actions { display: flex; gap: 8px; }
+.btn-edit, .btn-delete { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; background: transparent; }
+.btn-edit:hover { background: var(--bg-main); color: var(--primary); }
+.btn-delete:hover { background: #fee2e2; color: var(--danger); border-color: #fee2e2; }
 
-body.dark-mode .form-group input {
-    background: var(--bg-main);
-    border-color: var(--border-color);
-}
+/* Modal & Forms */
+.modal-content { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
+.modal-header, .modal-footer { border-color: var(--border-color); }
+.form-control, .form-select { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-primary); }
+.form-control:focus { background: var(--bg-card); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
 
-body.dark-mode .form-group input:focus {
-    background: var(--bg-card);
-}
+/* Dark Mode Switch */
+.theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; margin-left: auto; }
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+.theme-switch label { position: absolute; cursor: pointer; inset: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+.theme-switch label:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + label { background-color: var(--primary); }
+input:checked + label:before { transform: translateX(20px); }
 
-/* RESPONSIVE DÜZƏLİŞLƏR */
-@media (max-width: 1024px) {
-    .login-container {
-        grid-template-columns: 1fr;
-        max-width: 550px;
-    }
-    
-    .login-left {
-        padding: 3rem 2rem;
-        min-height: 250px; 
-        text-align: center;
-    }
-    
-    .login-left h2 {
-        font-size: 2.2rem;
-    }
-    
-    .login-left p {
-        font-size: 1.05rem;
-    }
-    
-    .login-right {
-        padding: 4rem 3rem;
-    }
-    
-    .login-right::before {
-        box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.03); /* Kölgə yuxarıdan gəlir */
-    }
-}
+/* Messages */
+.messages-list { display: flex; flex-direction: column; gap: 10px; }
+.filters-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+.search-box-inline { flex: 1; display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; gap: 10px; }
+.search-box-inline input { border: none; background: transparent; width: 100%; outline: none; color: var(--text-primary); }
+.bulk-actions-bar { background: var(--bg-card); padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
 
-@media (max-width: 480px) {
-    .login-container {
-        border-radius: 12px;
-    }
-    .login-right {
-        padding: 2.5rem 1.5rem;
-    }
-    .login-left {
-        padding: 2rem 1rem;
-    }
-    .login-form h3 {
-        font-size: 1.8rem;
-    }
-    .brand-logo {
-        font-size: 1.8rem;
-    }
-    .brand-logo i {
-        font-size: 2rem;
-    }
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-wrapper { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; transform: translateX(-100%); position: absolute; z-index: 1000; height: 100vh; }
+    .sidebar.active { transform: translateX(0); }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .login-container { grid-template-columns: 1fr; }
+    .login-left { display: none; }
 }
