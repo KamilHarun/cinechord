@@ -1,19 +1,25 @@
 /* ============================================================
    CineChord Archive - Main JavaScript
-   Version: 3.0 - ABOUT PATTERN + MOBILE OPTIMIZED
-   Description: Professional archive system with complete features
-   Author: Kamil
+   Version: 3.1 - FIXED NULL PROBLEM + DYNAMIC URL
    ============================================================ */
 
 (function() {
     'use strict';
 
     /* ============================================================
-       1. CONFIGURATION & CONSTANTS
+       1. CONFIGURATION & CONSTANTS - DINAMIK URL
        ============================================================ */
     
+    // 🔧 Dinamik Backend URL
+    const getBackendUrl = () => {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return 'http://localhost:8080';
+        }
+        return 'https://cinechord-admin-production.up.railway.app';
+    };
+    
     const CONFIG = {
-        BACKEND_URL: 'https://cinechord-admin-production.up.railway.app',
+        BACKEND_URL: getBackendUrl(),
         ENDPOINTS: {
             ARCHIVE: '/api/archive'
         },
@@ -28,6 +34,8 @@
         FALLBACK_DELAY: 1600,
         RESIZE_DEBOUNCE: 250
     };
+
+    console.log('🔌 Backend URL:', CONFIG.BACKEND_URL);
 
     const API_URLS = {
         ARCHIVE: `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ARCHIVE}`,
@@ -258,13 +266,12 @@
     }
 
     /* ============================================================
-       6. PAGE TRANSITION SYSTEM (FIXED SLIDE EFFECT)
+       6. PAGE TRANSITION SYSTEM
        ============================================================ */
     
     function initPageTransition() {
         if (!elements.pageTransition) return;
         
-        // Səhifə yükləndikdən sonra qara ekran yuxarı sürüşür
         setTimeout(() => {
             elements.pageTransition.classList.add('page-loaded');
         }, CONFIG.PAGE_LOAD_DELAY);
@@ -279,16 +286,13 @@
         isTransitioning = true;
         
         if (elements.pageTransition) {
-            // page-loaded silmək qara ekranı aşağı endirir
             elements.pageTransition.classList.remove('page-loaded');
         }
         
-        // Qara ekran tam endikdən sonra navigate et
         setTimeout(() => {
             window.location.href = href;
         }, CONFIG.NAVIGATION_DELAY);
         
-        // Fallback
         setTimeout(() => {
             if (!document.hidden) {
                 window.location.href = href;
@@ -297,7 +301,7 @@
     }
 
     /* ============================================================
-       7. DATA LOADING FROM BACKEND
+       7. DATA LOADING FROM BACKEND - ✅ FIXED
        ============================================================ */
     
     async function loadArchiveData() {
@@ -365,8 +369,10 @@
                 
                 batch.forEach((work, index) => {
                     const globalIndex = currentIndex + index;
-                    const videoUrl = getFullVideoUrl(work.videoUrl);
-                    const previewUrl = getFullVideoUrl(work.previewVideoUrl);
+                    
+                    // ✅ DÜZƏLŞDŞ: Video URL - previewVideoUrl əvvəlcə, sonra videoUrl
+                    const videoUrl = getFullVideoUrl(work.previewVideoUrl || work.videoUrl);
+                    const previewUrl = getFullVideoUrl(work.previewVideoUrl || work.videoUrl);
                     const videoSrc = previewUrl || videoUrl || '';
                     
                     const row = document.createElement('tr');
@@ -399,12 +405,14 @@
                     initTableAnimations();
                     attachTableRowEffects();
                     const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
+                    console.log(`✅ Archive loaded in ${totalTime}s`);
                 }
             }
             
             requestAnimationFrame(processBatch);
 
         } catch (error) {
+            console.error('Archive load error:', error);
             elements.tableBody.innerHTML = `
                 <tr style="animation: fadeIn 0.5s ease;">
                     <td colspan="7" style="text-align: center; padding: 60px 20px;">

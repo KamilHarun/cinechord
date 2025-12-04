@@ -1,17 +1,27 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 5.0 - FIXED FOR YOUR API RESPONSE
+   Version: 5.1 - FIXED URL SYNCHRONIZATION
    ============================================================ */
 
 (function() {
     'use strict';
 
     /* ============================================================
-       1. CONFIGURATION
+       1. CONFIGURATION - DINAMIK BACKEND URL
        ============================================================ */
     
+    // 🔧 Dinamik Backend URL - Local və Production üçün uyğun
+    const getBackendUrl = () => {
+        // Localhost varsa, localhost-dan istifadə et (development)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return 'http://localhost:8080';
+        }
+        // Production - Railway server
+        return 'https://cinechord-admin-production.up.railway.app';
+    };
+    
     const CONFIG = {
-        BACKEND_URL: 'https://cinechord-admin-production.up.railway.app',
+        BACKEND_URL: getBackendUrl(),
         ENDPOINTS: {
             ABOUT: '/api/about/getAbout'
         },
@@ -20,6 +30,8 @@
         LOGO_ENTRY_DELAY: 500,
         PAGE_LOAD_DELAY: 100
     };
+
+    console.log('🔌 Backend URL:', CONFIG.BACKEND_URL); // Debug
 
     /* ============================================================
        2. DOM ELEMENT REFERENCES
@@ -120,8 +132,8 @@
         console.log('🌐 Fetching dynamic content from API...');
         
         try {
-            const apiUrl = `${CONFIG.BACKEND_URL}/api/about/getAbout?t=${Date.now()}`;
-            console.log('API URL:', apiUrl);
+            const apiUrl = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?t=${Date.now()}`;
+            console.log('🔗 API URL:', apiUrl);
             
             const response = await fetch(apiUrl, {
                 method: 'GET',
@@ -404,15 +416,22 @@
                 e.preventDefault();
                 console.log('🔗 Navigating to:', href);
                 
-                // Page transition
-                if (elements.pageTransition) {
-                    elements.pageTransition.classList.remove('page-loaded');
+                // Elementi birbaşa tap (cache issue üçün)
+                const transition = document.querySelector('.page-transition');
+                
+                if (transition) {
+                    // Transition-u force et
+                    transition.style.transition = 'transform 0.5s cubic-bezier(0.76, 0, 0.24, 1)';
+                    transition.classList.remove('page-loaded');
+                    // Force reflow
+                    transition.offsetHeight;
+                    transition.style.transform = 'translateY(0)';
                 }
                 
                 // Navigate after transition
                 setTimeout(() => {
                     window.location.href = href;
-                }, 500);
+                }, 600);
             });
         });
     }
