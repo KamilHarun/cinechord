@@ -442,13 +442,15 @@ body {
     position: absolute;
     top: 60px;
     left: 60px;
-    z-index: 20;
+    z-index: 1010;
     pointer-events: none;
     display: flex;
     flex-direction: column;
     gap: 8px;
     transition: all 0.5s ease;
     will-change: opacity, transform;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .preview-container.user-inactive .preview-info {
@@ -496,6 +498,10 @@ body {
     font-size: 12px;
     opacity: 0.6;
     letter-spacing: 1px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 600px;
 }
 
 /* Close Button */
@@ -646,11 +652,11 @@ body {
     left: 0;
     width: 100%;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
-    padding: 0 40px 40px 40px;
+    padding: 0 40px 50px 40px;
     z-index: 1001;
     display: flex;
     flex-direction: column-reverse;
-    gap: 20px;
+    gap: 25px;
     opacity: 1;
     transform: translateY(0);
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -708,7 +714,7 @@ body {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 20px;
+    gap: 30px;
 }
 
 .ctrl-btn {
@@ -722,22 +728,32 @@ body {
     justify-content: center;
     transition: transform 0.2s ease, color 0.2s ease;
     opacity: 0.8;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
 }
 
 .ctrl-btn:hover {
     color: #FFA500;
-    transform: scale(1.1);
+    transform: scale(1.15);
     opacity: 1;
 }
 
 .ctrl-btn i {
-    font-size: 20px;
+    font-size: 24px;
+}
+
+.main-play-btn {
+    width: 60px;
+    height: 60px;
 }
 
 .main-play-btn i {
-    font-size: 32px;
+    font-size: 40px;
+}
+
+.skip-btn {
+    width: 50px;
+    height: 50px;
 }
 
 /* Time Display */
@@ -760,7 +776,7 @@ body {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 35px;
 }
 
 /* Volume Control */
@@ -779,11 +795,15 @@ body {
 /* Speed Button */
 .speed-btn {
     font-family: 'Courier New', monospace;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bold;
-    min-width: 45px;
+    min-width: 55px;
+    height: 50px;
     text-align: center;
-    padding: 8px 12px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ============================================================
@@ -903,6 +923,7 @@ body {
     font-size: 13px;
     letter-spacing: 1px;
     font-family: 'Courier New', monospace;
+    table-layout: fixed;
 }
 
 .archive-table thead {
@@ -934,10 +955,43 @@ body {
     text-transform: uppercase;
 }
 
+.archive-table thead .number-col {
+    width: 6%;
+    text-align: center;
+}
+
+.archive-table thead .client-col {
+    width: 14%;
+}
+
+.archive-table thead .title-col {
+    width: 23%;
+}
+
+.archive-table thead .type-col {
+    width: 13%;
+}
+
+.archive-table thead .location-col {
+    width: 15%;
+}
+
+.archive-table thead .agency-col {
+    width: 16%;
+}
+
+.archive-table thead .year-col {
+    width: 13%;
+    text-align: center;
+}
+
 .archive-table td {
     padding: 25px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 
 /* Row hover effects */
@@ -961,31 +1015,48 @@ body {
 /* Column specific styles */
 .number-col {
     opacity: 0.4;
-    width: 60px;
+    width: 6%;
     font-size: 11px;
     transition: opacity 0.3s ease;
+    text-align: center;
 }
 
 .client-col {
     opacity: 0.8;
     font-weight: 600;
     transition: color 0.3s ease;
+    width: 14%;
 }
 
 .title-col {
     font-weight: bold;
     color: #fff;
     transition: color 0.3s ease;
+    width: 23%;
 }
 
-.type-col, .location-col, .agency-col, .year-col {
+.type-col {
     opacity: 0.6;
     transition: color 0.3s ease;
+    width: 13%;
+}
+
+.location-col {
+    opacity: 0.6;
+    transition: color 0.3s ease;
+    width: 15%;
+}
+
+.agency-col {
+    opacity: 0.6;
+    transition: color 0.3s ease;
+    width: 16%;
 }
 
 .year-col {
-    text-align: right;
+    text-align: center;
     opacity: 0.7;
+    width: 13%;
 }
 
 /* Play icon indicator */
@@ -1158,15 +1229,25 @@ body {
     }
     
     .controls-buttons {
-        gap: 10px;
+        gap: 15px;
+    }
+    
+    .ctrl-btn {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .main-play-btn {
+        width: 55px;
+        height: 55px;
     }
     
     .ctrl-btn i {
-        font-size: 18px;
+        font-size: 21px;
     }
     
     .main-play-btn i {
-        font-size: 28px;
+        font-size: 36px;
     }
     
     .time-display {
