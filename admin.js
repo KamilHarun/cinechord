@@ -360,7 +360,7 @@ function editWorkById(id) {
     new bootstrap.Modal(document.getElementById('workModal')).show();
 }
 
-// --- SUBMIT WORK - ✅ DÜZƏLİŞLƏR BURADA EDİLDİ ---
+// ✅ DÜZELTILMIŞ submitWork() FONKSIYONU
 async function submitWork() {
     const id = document.getElementById('workId').value;
     const fd = new FormData();
@@ -373,24 +373,28 @@ async function submitWork() {
         return;
     }
 
-    // 1. DÜZƏLİŞ: ID-ni FormData-ya əlavə edirik (ehtiyat üçün)
-    if(id) {
-        fd.append('id', id);
-    }
+    // ✅ FİKS 1: ID'yi FormData'ya EKLEME - URL'de zaten var
     
-    // Sahələri əlavə edin (adlar DTO ilə eyni olmalıdır)
+    // ✅ Temel Alanlar
     fd.append('title', title);
-    fd.append('category', category);
+    fd.append('category', category);  // ✅ String gönder, Backend Enum'a parse eder
     fd.append('clientName', document.getElementById('wClient').value);
     fd.append('slug', document.getElementById('wSlug').value);
     fd.append('agency', document.getElementById('wAgency').value);
     fd.append('location', document.getElementById('wLocation').value);
     fd.append('productionYear', document.getElementById('wYear').value);
-    fd.append('isFeatured', document.getElementById('wFeatured').checked);
+    
+    // ✅ FİKS 2: Boolean'ı düzgün format'ta gönder
+    const isFeatured = document.getElementById('wFeatured').checked;
+    fd.append('isFeatured', isFeatured ? 'true' : 'false');
+    
+    // ✅ isActive'i de ekle
+    fd.append('isActive', 'true');
+    
     fd.append('videoUrl', document.getElementById('wVideoUrl').value);
     fd.append('description', document.getElementById('wDescription').value);
 
-    // Fayllar (imageFile və previewVideoFile)
+    // Fayllar (imageFile ve previewVideoFile)
     const img = document.getElementById('wImage').files[0];
     if(img) {
         fd.append('imageFile', img); 
@@ -410,7 +414,7 @@ async function submitWork() {
     });
     
     try {
-        // 2. DÜZƏLİŞ: Update URL-i Backend ilə uyğunlaşdırılır
+        // ✅ FİKS 3: Düzgün URL ve Method
         let url = id ? `${API.WORKS}/updateWork/${id}` : `${API.WORKS}/createWork`;
         let method = id ? 'PUT' : 'POST';
 
@@ -434,23 +438,44 @@ async function submitWork() {
                 loadWorks(currentPage); 
                 loadDashboard();
             } else {
-                 let errorMsg = `Server xətası: ${xhr.status}`;
-                 if (xhr.responseText) {
+                let errorMsg = `Server xətası: ${xhr.status}`;
+                if (xhr.responseText) {
                     try {
-                         const errJson = JSON.parse(xhr.responseText);
-                         if(errJson.message) errorMsg = errJson.message;
+                        const errJson = JSON.parse(xhr.responseText);
+                        if(errJson.message) errorMsg = errJson.message;
+                        if(errJson.error) errorMsg = errJson.error;
+                        // DTO validation errors
+                        if(errJson.details) {
+                            errorMsg = Object.entries(errJson.details)
+                                .map(([key, val]) => `${key}: ${val}`)
+                                .join(' | ');
+                        }
                     } catch(e) {
-                         errorMsg = xhr.responseText.substring(0, 100); // Kəskin cavabları kəsirik
+                        errorMsg = xhr.responseText.substring(0, 200);
                     }
                 }
+                console.error('❌ Error Response:', xhr.responseText);
                 Swal.fire('Xəta', errorMsg, 'error');
             }
         };
 
         xhr.onerror = () => Swal.fire('Xəta', 'Şəbəkə xətası', 'error');
+        
+        console.log('📤 Sending FormData:', {
+            title: title,
+            category: category,
+            isFeatured: isFeatured ? 'true' : 'false',
+            productionYear: document.getElementById('wYear').value,
+            method: method,
+            url: url
+        });
+        
         xhr.send(fd);
 
-    } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
+    } catch(e) { 
+        console.error('❌ submitWork Exception:', e);
+        Swal.fire('Xəta', e.message, 'error'); 
+    }
 }
 
 // Bulk & Search Functions
@@ -723,7 +748,7 @@ async function deleteMessage(id) {
 }
 
 // ============================================
-// 8. ABOUT (HAQQIMIZDA) - ✅ FİKS: API URL
+// 8. ABOUT (HAQQIMIZDA)
 // ============================================
 
 async function loadAbout() {
@@ -764,7 +789,7 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
         if(res && res.ok) {
             Swal.fire('Uğurlu!', 'Məlumatlar yeniləndi', 'success');
             loadAbout();
-        } else { Swal.fire('Xəta', 'Yadda saxlamaq olmadı', 'error'); }
+        } else { Swal.fire('Xəta', 'Yadda saxlamak olmadı', 'error'); }
     } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
 });
 
