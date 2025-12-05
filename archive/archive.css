@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Stylesheet (Works Design Style)
-   Version: 4.1 - WORKS MODAL + ARCHIVE TABLE (PLAY BUTTON FIXED)
+   Version: 4.3 - FIXED ARCHIVE VISIBILITY + BIGGER CONTROLS
    ============================================================ */
 
 /* ============================================================
@@ -709,7 +709,7 @@ body {
     appearance: none;
 }
 
-/* Control Buttons */
+/* --- UPDATED CONTROL BUTTONS (BIGGER SIZE) --- */
 .controls-buttons {
     display: flex;
     align-items: center;
@@ -728,33 +728,34 @@ body {
     justify-content: center;
     transition: transform 0.2s ease, color 0.2s ease;
     opacity: 0.8;
-    width: 50px;
-    height: 50px;
+    width: 60px; /* Increased from 50px */
+    height: 60px; /* Increased from 50px */
 }
 
 .ctrl-btn:hover {
     color: #FFA500;
-    transform: scale(1.15);
+    transform: scale(1.1);
     opacity: 1;
 }
 
 .ctrl-btn i {
-    font-size: 24px;
+    font-size: 30px; /* Increased from 24px */
 }
 
 .main-play-btn {
-    width: 60px;
-    height: 60px;
+    width: 85px; /* Increased from 60px */
+    height: 85px; /* Increased from 60px */
 }
 
 .main-play-btn i {
-    font-size: 40px;
+    font-size: 50px; /* Increased from 40px */
 }
 
 .skip-btn {
-    width: 50px;
-    height: 50px;
+    width: 65px; /* Increased from 50px */
+    height: 65px; /* Increased from 50px */
 }
+/* ------------------------------------------- */
 
 /* Time Display */
 .time-display {
@@ -940,7 +941,7 @@ body {
     transition: all 0.3s ease;
 }
 
-.archive-table tbody tr.visible {
+.archive-table tbody tr.active {
     animation: fadeInUp 0.5s ease forwards;
 }
 
@@ -1232,22 +1233,23 @@ body {
         gap: 15px;
     }
     
+    /* Slightly increase mobile button size too */
     .ctrl-btn {
-        width: 45px;
-        height: 45px;
+        width: 50px;
+        height: 50px;
     }
     
     .main-play-btn {
-        width: 55px;
-        height: 55px;
+        width: 65px;
+        height: 65px;
     }
     
     .ctrl-btn i {
-        font-size: 21px;
+        font-size: 24px;
     }
     
     .main-play-btn i {
-        font-size: 36px;
+        font-size: 40px;
     }
     
     .time-display {
