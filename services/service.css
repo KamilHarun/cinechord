@@ -718,7 +718,7 @@ body {
 }
 
 /* =========================================
-   11. CINEMATIC FOOTER (From Works Page)
+   CINEMATIC FOOTER (SERVICE STYLE)
    ========================================= */
 .main-footer {
     background: #050505;
@@ -727,41 +727,6 @@ body {
     z-index: 10;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
-}
-
-/* 11.1 Böyük Çağırış (CTA) */
-.footer-top-cta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 60px;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.cta-text {
-    font-family: 'NeueMetanaOutline', sans-serif;
-    font-size: clamp(30px, 5vw, 60px);
-    color: transparent;
-    -webkit-text-stroke: 1px #fff;
-    font-weight: 900;
-    text-transform: uppercase;
-    margin: 0;
-    letter-spacing: -1px;
-    transition: all 0.3s ease;
-}
-
-.footer-top-cta:hover .cta-text {
-    color: #fff;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-}
-
-/* 11.2 Sütunlar */
-.footer-divider {
-    width: 100%;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin-bottom: 60px;
 }
 
 .footer-wrapper {
@@ -801,7 +766,7 @@ body {
     line-height: 1.6;
 }
 
-/* 11.3 Mətn Linkləri (Mask Slide Effekti) */
+/* Mask Link Effect */
 .mask-link {
     display: inline-block;
     position: relative;
@@ -835,7 +800,7 @@ body {
     transform: translateY(-100%);
 }
 
-/* 11.4 Sosial İkonlar (Slide Effect) */
+/* Social Icons */
 .social-icons {
     display: flex;
     gap: 20px;
@@ -876,7 +841,7 @@ body {
     transform: translateY(-29px);
 }
 
-/* 11.5 Copyright */
+/* Copyright */
 .footer-bottom {
     margin-top: 80px;
     padding-top: 20px;
@@ -892,7 +857,7 @@ body {
 }
 
 /* =========================================
-   12. RESPONSIVE - TABLET
+   11. RESPONSIVE - TABLET
    ========================================= */
 @media (max-width: 1024px) {
     .page-wrapper {

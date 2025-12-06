@@ -16,6 +16,24 @@
     <div class="grain-overlay"></div>
     <div class="progress-bar-top"></div>
 
+    <!-- Hamburger & Mobile Menu -->
+    <button class="hamburger" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="mobile-menu-overlay"></div>
+    
+    <nav class="mobile-menu">
+        <a href="../index.html" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
+        <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
+        <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+        <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+        <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+        <a href="#" class="nav-btn active" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+    </nav>
+
     <header class="header">
         <div class="nav-left">
             <a href="../index.html" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
@@ -115,35 +133,69 @@
         </div>
     </section>
     
+    <!-- SERVICE FOOTER -->
     <footer class="main-footer reveal-item">
         <div class="footer-wrapper">
             <div class="footer-col">
-                <h3 class="footer-title">ADDRESS</h3>
+                <span class="footer-label">ADDRESS</span>
                 <div class="footer-content">
                     <p class="footer-text">Filmmaker LLC</p>
-                    <p class="footer-text">5th Floor, Suite 500</p>
-                    <p class="footer-text">123 Madison Avenue</p>
+                    <p class="footer-text">5th Floor, Suite 580</p>
                     <p class="footer-text">Baku, Azerbaijan</p>
                 </div>
             </div>
+            
             <div class="footer-col">
-                <h3 class="footer-title">GET IN TOUCH</h3>
+                <span class="footer-label">GET IN TOUCH</span>
                 <div class="footer-content">
-                    <a href="mailto:hi@filmmaker.com" class="footer-link">hi@filmmaker.com</a>
-                    <a href="tel:2125551234" class="footer-link">(212) 555-1234</a>
+                    <a href="mailto:hi@filmmaker.com" class="mask-link">
+                        <span data-text="hi@filmmaker.com">hi@filmmaker.com</span>
+                    </a>
+                    <a href="tel:+994500000000" class="mask-link">
+                        <span data-text="(+994) 50 000 00 00">(+994) 50 000 00 00</span>
+                    </a>
                 </div>
             </div>
+            
             <div class="footer-col">
-                <h3 class="footer-title">SOCIALS</h3>
+                <span class="footer-label">SOCIALS</span>
                 <div class="footer-content">
                     <div class="social-icons">
-                        <a href="#" class="social-icon-btn"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="social-icon-btn"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#" class="social-icon-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="mask-icon" aria-label="Instagram">
+                            <div class="icon-wrap">
+                                <i class="fa-brands fa-instagram main-icon"></i>
+                                <i class="fa-brands fa-instagram hover-icon"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="mask-icon" aria-label="YouTube">
+                            <div class="icon-wrap">
+                                <i class="fa-brands fa-youtube main-icon"></i>
+                                <i class="fa-brands fa-youtube hover-icon"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="mask-icon" aria-label="Facebook">
+                            <div class="icon-wrap">
+                                <i class="fa-brands fa-facebook-f main-icon"></i>
+                                <i class="fa-brands fa-facebook-f hover-icon"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="mask-icon" aria-label="Twitter">
+                            <div class="icon-wrap">
+                                <i class="fa-brands fa-twitter main-icon"></i>
+                                <i class="fa-brands fa-twitter hover-icon"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="mask-icon" aria-label="LinkedIn">
+                            <div class="icon-wrap">
+                                <i class="fa-brands fa-linkedin-in main-icon"></i>
+                                <i class="fa-brands fa-linkedin-in hover-icon"></i>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
+        
         <div class="footer-bottom">
             <p class="copyright">© 2025 Cine Chord. All rights reserved.</p>
         </div>
