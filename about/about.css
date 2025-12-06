@@ -774,23 +774,24 @@ body {
         display: flex !important;
     }
     
+    /* ✅ LOGO MƏRKƏZDƏ (WORKS PATTERN) */
     .center-logo {
-        top: 15px;
-        left: 20px;
-        transform: translateX(0) scale(0.5) rotate(-180deg);
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) scale(0.5) rotate(-180deg);
     }
     
     .center-logo.entry-done {
-        transform: translateX(0) scale(1) rotate(0deg);
+        transform: translateX(-50%) scale(1) rotate(0deg);
     }
     
     .center-logo.scroll-hidden {
-        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+        transform: translateX(-50%) translateY(-120px) scale(0.5) !important;
     }
     
     .logo-img {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
     }
     
     .container {

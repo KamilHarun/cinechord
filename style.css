@@ -1,6 +1,6 @@
 /* ================================================================
    CineChord Index (Home) - Main Stylesheet
-   Version: 2.0 - SLIDE EFFECT + MOBILE MENU
+   Version: 4.0 - FINAL STABLE (All Fixes Included)
    ================================================================ */
 
 /* ================================================================
@@ -29,7 +29,9 @@ body {
     background: #000;
     color: #fff;
     overflow: hidden;
+    /* FIX: Mobil brauzer paneli üçün dynamic height */
     height: 100vh;
+    height: 100dvh; 
     width: 100vw;
 }
 
@@ -48,7 +50,7 @@ body {
 }
 
 /* ================================================================
-   3. PAGE TRANSITION - SLIDE EFFECT (FIXED)
+   3. PAGE TRANSITION
    ================================================================ */
 .page-transition {
     position: fixed;
@@ -172,7 +174,9 @@ body {
 
 .hero-section {
     position: relative;
+    /* FIX: Tam ekran hündürlüyü */
     height: 100vh;
+    height: 100dvh;
     width: 100%;
     overflow: hidden;
     background: #000;
@@ -221,7 +225,7 @@ body {
     align-items: center;
     z-index: 1000;
     background: transparent;
-    pointer-events: none;
+    pointer-events: none; /* Header-in boş yerləri kliklənməsin */
 }
 
 .nav-left,
@@ -303,19 +307,24 @@ body {
 }
 
 /* ================================================================
-   7. HAMBURGER MENU (MOBILE) - ABOUT PATTERN
+   7. HAMBURGER MENU (MOBILE) - FIXED
    ================================================================ */
 .hamburger {
     display: none;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: 6px;
     cursor: pointer;
-    z-index: 1002;
+    z-index: 10002; /* FIX: Menyunu hər şeyin üzərinə gətirir */
     position: relative;
-    padding: 10px;
+    padding: 15px; /* Klik sahəsini artırdıq */
+    width: 60px;   
+    height: 60px;  
     background: transparent;
     border: none;
     pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger span {
@@ -325,6 +334,7 @@ body {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 2px;
     display: block;
+    pointer-events: none;
 }
 
 .hamburger.active span:nth-child(1) {
@@ -347,12 +357,12 @@ body {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 85%;
-    max-width: 320px;
-    height: 100vh;
+    width: 100%; 
+    max-width: 400px;
+    height: 100dvh;
     background: rgba(5, 5, 5, 0.98);
     backdrop-filter: blur(20px);
-    z-index: 1001;
+    z-index: 10001;
     transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     padding: 100px 30px 30px;
     display: none;
@@ -374,6 +384,7 @@ body {
     font-size: 14px;
     animation: none;
     opacity: 1;
+    visibility: visible;
 }
 
 /* Mobile Menu Overlay */
@@ -382,9 +393,9 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
+    z-index: 10000;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -396,7 +407,7 @@ body {
 }
 
 /* ================================================================
-   8. CENTER LOGO
+   8. CENTER LOGO - FIXED BLUR & POSITION
    ================================================================ */
 .center-logo {
     position: absolute;
@@ -412,6 +423,9 @@ body {
     height: 110px;
     object-fit: contain;
     filter: brightness(0) invert(1);
+    /* FIX: Logo keyfiyyəti üçün */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 /* ================================================================
@@ -452,7 +466,7 @@ body {
 }
 
 /* ================================================================
-   10. PLAY BUTTON
+   10. PLAY BUTTON - STYLE UPDATED
    ================================================================ */
 .play-button-container {
     position: absolute;
@@ -511,12 +525,13 @@ body {
     pointer-events: none;
 }
 
+/* FIX: Play Button Font Changed to Courier New */
 .play-button span,
 .play-text {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
+    font-family: 'Courier New', monospace; 
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     color: #fff;
     text-transform: uppercase;
     pointer-events: none;
@@ -547,7 +562,7 @@ body {
 }
 
 /* ================================================================
-   11. RIGHT NAV & SOCIALS
+   11. RIGHT NAV & SOCIALS - UPDATED (CLEAN & FLOATING)
    ================================================================ */
 .right-floating-nav {
     position: absolute;
@@ -615,38 +630,40 @@ body {
     color: #000;
 }
 
+/* FIX: Social Icons - Floating, Cleaner, No Border */
 .bottom-right-socials {
     position: absolute;
-    bottom: 40px;
-    right: 40px;
+    bottom: 50px;
+    right: 50px;
     z-index: 20;
     pointer-events: auto;
 }
 
 .social-icons-home {
     display: flex;
-    gap: 15px;
+    align-items: center;
+    gap: 30px; /* Ara məsafə */
 }
 
 .social-link-home {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 35px;
-    height: 35px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
+    width: auto;
+    height: auto;
+    border: none;
+    background: transparent;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
+    font-size: 20px;
     text-decoration: none;
-    transition: background 0.3s, color 0.3s;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .social-link-home:hover {
-    background: #fff;
-    color: #000;
-    border-color: #fff;
-    transform: translateY(-3px);
+    color: #FFA500;
+    background: transparent;
+    transform: translateY(-5px) scale(1.2);
+    filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.6));
 }
 
 .bottom-left-copyright {
@@ -981,82 +998,112 @@ body {
 }
 
 /* ================================================================
-   14. RESPONSIVE - MOBILE
+   14. RESPONSIVE - MOBILE (FULL FIXES)
    ================================================================ */
 @media (max-width: 768px) {
-    /* Header */
+    /* Header & Navigation */
     .header {
         padding: 15px 20px;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(10px);
+        background: transparent;
         justify-content: flex-end;
     }
     
-    /* DESKTOP NAVBAR GİZLƏT */
     .nav-left,
     .nav-right {
         display: none !important;
     }
     
-    /* HAMBURGER GÖSTƏR */
     .hamburger {
         display: flex !important;
     }
     
-    /* MOBILE MENU GÖSTƏR */
     .mobile-menu {
         display: flex !important;
     }
     
-    /* Logo */
+    /* Logo - Centered & Fixed */
     .center-logo {
-        top: 15px;
-        left: 20px;
-        transform: translateX(0);
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        display: flex;
+        justify-content: center;
     }
     
     .logo-img {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
     }
     
-    /* Split name */
+    /* Split name - Overlap Fix */
     .name-left,
     .name-right {
-        font-size: 60px;
+        font-size: clamp(32px, 10vw, 50px); 
+        letter-spacing: -1px;
     }
     
     .name-left {
-        left: 20px;
+        left: 5%;
     }
     
     .name-right {
-        right: 20px;
+        right: 5%;
+        letter-spacing: -4px;
+    }
+
+    /* Play Button */
+    .play-button-container {
+        width: 160px;
+        height: 80px;
     }
     
-    /* Floating nav */
+    .play-button {
+        width: 70px;
+        height: 28px;
+    }
+
+    .play-button span, .play-text {
+        font-size: 10px;
+    }
+    
+    /* Floating nav (Right controls) */
     .right-floating-nav {
-        bottom: 120px;
+        bottom: 100px;
         right: 50%;
         transform: translateX(50%);
         align-items: center;
+        width: 100%;
     }
     
-    /* Socials */
+    /* Socials - Centered in Mobile */
     .bottom-right-socials {
+        bottom: 40px;
         right: 50%;
         transform: translateX(50%);
-        bottom: 30px;
+        width: auto;
+    }
+
+    .social-icons-home {
+        gap: 35px; /* Mobildə barmaqla basmaq rahat olsun deyə aranı açırıq */
+    }
+
+    .social-link-home {
+        font-size: 24px;
     }
     
     .bottom-left-copyright {
         display: none;
     }
     
-    /* Modal */
+    /* Modal / Preview */
     .preview-info {
-        top: 30px;
-        left: 30px;
+        top: 70px;
+        left: 20px;
+    }
+
+    .preview-title {
+        font-size: 24px;
     }
     
     .close-preview {
@@ -1067,7 +1114,7 @@ body {
     }
     
     .custom-controls {
-        padding: 0 20px 20px;
+        padding: 0 20px 40px;
     }
 }
 
@@ -1076,40 +1123,24 @@ body {
    ================================================================ */
 @media (max-width: 480px) {
     .mobile-menu {
-        width: 85%;
-        padding: 70px 25px 25px;
+        width: 100%;
+        padding: 80px 20px 20px;
     }
     
     .name-left,
     .name-right {
-        font-size: 40px;
-        letter-spacing: -2px;
+        font-size: 34px;
     }
-    
-    .name-right {
-        letter-spacing: -8px;
+
+    .play-button-container {
+        transform: translate(-50%, -50%) scale(0.9);
     }
     
     .project-name-outline {
-        font-size: 16px;
+        font-size: 18px;
     }
     
     .counter-text {
         font-size: 12px;
     }
-}
-
-/* ================================================================
-   16. GSAP INITIAL STATES (will be animated by JS)
-   ================================================================ */
-.header,
-.center-logo,
-.name-left,
-.name-right,
-.play-button-container,
-.right-floating-nav,
-.bottom-right-socials,
-.bottom-left-copyright {
-    opacity: 0;
-    visibility: hidden;
 }

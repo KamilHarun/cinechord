@@ -1,5 +1,10 @@
 /* =========================================
-   GLOBAL & RESET
+   CineChord - Service Page Stylesheet
+   Version: 2.0 (Cinematic Footer & Mobile Fixes)
+   ========================================= */
+
+/* =========================================
+   1. GLOBAL & RESET
    ========================================= */
 * {
     margin: 0;
@@ -23,7 +28,7 @@ body {
 }
 
 /* =========================================
-   FONTS
+   2. FONTS
    ========================================= */
 @font-face {
     font-family: 'NeueMetanaOutline';
@@ -41,7 +46,7 @@ body {
 }
 
 /* =========================================
-   GPU ACCELERATION & PERFORMANCE
+   3. GPU ACCELERATION & PERFORMANCE
    ========================================= */
 .page-transition,
 .header,
@@ -56,7 +61,7 @@ body {
 }
 
 /* =========================================
-   PAGE TRANSITION - SLIDE EFFECT (FIXED)
+   4. PAGE TRANSITION & GRAIN
    ========================================= */
 .page-transition {
     position: fixed;
@@ -71,21 +76,18 @@ body {
     transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* Səhifə yükləndikdən sonra yuxarı sürüşür */
 .page-transition.page-loaded {
     transform: translateY(-100%);
     pointer-events: none;
     transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* Başqa səhifəyə keçəndə - aşağı enir və qalır */
 .page-transition.active {
     transform: translateY(0) !important;
     pointer-events: all;
     transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1) !important;
 }
 
-/* GRAIN & PROGRESS */
 .grain-overlay {
     position: fixed;
     top: 0;
@@ -110,7 +112,7 @@ body {
 }
 
 /* =========================================
-   HEADER / NAVBAR (Smooth Transition)
+   5. HEADER / NAVBAR
    ========================================= */
 .header {
     position: fixed;
@@ -158,7 +160,6 @@ body {
     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Navbar Button Delays */
 .nav-left .nav-btn:nth-child(1) { animation-delay: 0.3s; }
 .nav-left .nav-btn:nth-child(2) { animation-delay: 0.4s; }
 .nav-left .nav-btn:nth-child(3) { animation-delay: 0.5s; }
@@ -230,7 +231,7 @@ body {
 }
 
 /* =========================================
-   HAMBURGER MENU (MOBILE) - ABOUT PATTERN
+   6. HAMBURGER MENU (MOBILE)
    ========================================= */
 .hamburger {
     display: none;
@@ -268,7 +269,6 @@ body {
     background: #FFA500;
 }
 
-/* Mobile Menu */
 .mobile-menu {
     position: fixed;
     top: 0;
@@ -302,7 +302,6 @@ body {
     opacity: 1;
 }
 
-/* Mobile Menu Overlay */
 .mobile-menu-overlay {
     position: fixed;
     top: 0;
@@ -322,7 +321,7 @@ body {
 }
 
 /* =========================================
-   CENTER LOGO (Smooth Hide/Show)
+   7. CENTER LOGO
    ========================================= */
 .center-logo {
     position: fixed;
@@ -361,7 +360,7 @@ body {
 }
 
 /* =========================================
-   SCROLL REVEAL (Optimized)
+   8. SCROLL REVEAL & SERVICE LAYOUT
    ========================================= */
 .reveal-item {
     opacity: 0;
@@ -376,9 +375,6 @@ body {
     filter: blur(0);
 }
 
-/* =========================================
-   SERVICE PAGE LAYOUT
-   ========================================= */
 .services-title-container {
     position: relative;
     margin-bottom: 120px;
@@ -479,7 +475,6 @@ body {
     overflow: hidden;
 }
 
-/* VIDEO LAZY LOADING SKELETON */
 .media-content {
     width: 100%;
     height: 100%;
@@ -488,20 +483,6 @@ body {
     pointer-events: none;
     background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
     background-size: 200% 100%;
-}
-
-.media-content:not([src]) {
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-.media-content[src] {
-    animation: none;
-    background: #000;
 }
 
 .content-column {
@@ -580,30 +561,76 @@ body {
     background-color: #d6d6d6;
 }
 
+/* =========================================
+   9. GLOBAL CTA BUTTON (MASK EFFECT)
+   ========================================= */
 .cta-button {
-    display: block;
-    width: 100%;
-    padding: 16px 20px;
-    background: #FFA500;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
     color: #000;
-    text-align: center;
+    background: #FFA500;
+    padding: 16px 30px;
+    border-radius: 30px;
     text-decoration: none;
     font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
+    text-align: center;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    vertical-align: middle;
+    width: auto; /* Default auto width */
+}
+
+/* Səhifə daxilindəki düymələr full width olsun */
+.content-wrapper .cta-button {
+    width: 100%; 
+    border-radius: 0; /* Service section-da kvadrat */
     border: 1.5px solid #FFA500;
-    cursor: pointer;
-    font-family: 'Courier New', monospace;
+}
+
+/* Əgər Mask effekti üçün span istifadə olunubsa */
+.cta-button span {
+    display: block;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.cta-button span::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #000;
+}
+
+/* Sadə düymə (Span-sız) üçün Hover */
+.cta-button:not(:has(span)) {
+    transition: all 0.3s ease;
 }
 
 .cta-button:hover {
-    background: #FF8C00;
+    background: #fff;
     transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+    color: #000;
+    border-color: #fff;
+}
+
+.cta-button:hover span {
+    transform: translateY(-100%);
+}
+
+.content-wrapper .cta-button:hover {
+    background: #FF8C00;
+    border-color: #FF8C00;
+    color: #000;
 }
 
 /* =========================================
-   CHAT SECTION
+   10. CHAT SECTION
    ========================================= */
 .chat-section {
     position: relative;
@@ -691,105 +718,181 @@ body {
 }
 
 /* =========================================
-   FOOTER
+   11. CINEMATIC FOOTER (From Works Page)
    ========================================= */
 .main-footer {
-    background: #000;
-    padding: 80px 60px;
+    background: #050505;
+    padding: 80px 60px 40px;
     position: relative;
     z-index: 10;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+/* 11.1 Böyük Çağırış (CTA) */
+.footer-top-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.cta-text {
+    font-family: 'NeueMetanaOutline', sans-serif;
+    font-size: clamp(30px, 5vw, 60px);
+    color: transparent;
+    -webkit-text-stroke: 1px #fff;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: -1px;
+    transition: all 0.3s ease;
+}
+
+.footer-top-cta:hover .cta-text {
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* 11.2 Sütunlar */
+.footer-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 60px;
 }
 
 .footer-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
+    max-width: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
+    gap: 40px;
 }
 
-.footer-title {
-    font-size: 13px;
-    color: #fff;
-    text-transform: uppercase;
-    margin-bottom: 25px;
-    font-family: 'Courier New', monospace;
-    border-bottom: 1px solid #FFA500;
-    display: inline-block;
-    padding-bottom: 5px;
-}
-
-.footer-text {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 10px;
-}
-
-.footer-link {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    display: block;
-    margin-bottom: 10px;
-    transition: color 0.3s;
-}
-
-.footer-link:hover {
-    color: #FFA500;
-}
-
-.social-icons {
+.footer-col {
     display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-label {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #FFA500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
-.social-icon-btn {
+.footer-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+/* 11.3 Mətn Linkləri (Mask Slide Effekti) */
+.mask-link {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    line-height: 1.2;
+    padding-bottom: 2px;
+    cursor: pointer;
+}
+
+.mask-link span {
+    display: block;
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mask-link span::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    color: #FFA500;
+    font-weight: 600;
+}
+
+.mask-link:hover span {
+    transform: translateY(-100%);
+}
+
+/* 11.4 Sosial İkonlar (Slide Effect) */
+.social-icons {
+    display: flex;
+    gap: 20px;
+}
+
+.mask-icon {
+    display: block;
+    height: 24px;
+    overflow: hidden;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.icon-wrap {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mask-icon i {
+    font-size: 22px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50%;
-    color: #fff;
-    text-decoration: none;
-    transition: all 0.3s;
 }
 
-.social-icon-btn:hover {
-    background: #FFA500;
-    color: #000;
-    border-color: #FFA500;
+.main-icon {
+    color: rgba(255, 255, 255, 0.6);
 }
 
+.hover-icon {
+    color: #FFA500;
+    transform: translateY(5px);
+}
+
+.mask-icon:hover .icon-wrap {
+    transform: translateY(-29px);
+}
+
+/* 11.5 Copyright */
 .footer-bottom {
-    margin-top: 40px;
+    margin-top: 80px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
 }
 
 .copyright {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
     font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
 }
 
 /* =========================================
-   REDUCE MOTION (Accessibility)
-   ========================================= */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
-}
-
-/* =========================================
-   RESPONSIVE - TABLET
+   12. RESPONSIVE - TABLET
    ========================================= */
 @media (max-width: 1024px) {
     .page-wrapper {
@@ -804,29 +907,10 @@ body {
     .media-container {
         min-height: 400px;
     }
-    
-    .footer-wrapper {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 40px;
-    }
-    
-    .social-icons {
-        justify-content: center;
-    }
-    
-    .center-logo {
-        top: 20px;
-    }
-    
-    .logo-img {
-        width: 90px;
-        height: 90px;
-    }
 }
 
 /* =========================================
-   RESPONSIVE - MOBILE (ABOUT PATTERN)
+   13. RESPONSIVE - MOBILE (CENTER LOGO & FOOTER FIX)
    ========================================= */
 @media (max-width: 768px) {
     /* Header & Navigation */
@@ -837,40 +921,38 @@ body {
         justify-content: flex-end;
     }
     
-    /* DESKTOP NAVBAR GİZLƏT */
     .nav-left, 
     .nav-right { 
         display: none !important;
     }
     
-    /* HAMBURGER GÖSTƏR */
     .hamburger {
         display: flex !important;
     }
     
-    /* MOBILE MENU GÖSTƏR */
     .mobile-menu {
         display: flex !important;
     }
     
-    /* Logo adjustments */
+    /* --- LOGO FIXED CENTER --- */
     .center-logo {
-        top: 15px;
-        left: 20px;
-        transform: translateX(0) scale(0.5) rotate(-180deg);
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) scale(0.5) rotate(-180deg);
+        width: auto;
     }
     
     .center-logo.entry-done {
-        transform: translateX(0) scale(1) rotate(0deg);
+        transform: translateX(-50%) scale(1) rotate(0deg);
     }
     
     .center-logo.scroll-hidden {
-        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+        transform: translateX(-50%) translateY(-120px) scale(0.5) !important;
     }
     
     .logo-img {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
     }
     
     /* Services Title */
@@ -941,89 +1023,37 @@ body {
         font-size: 12px;
     }
     
-    /* Footer */
+    /* Footer Mobile */
     .main-footer {
-        padding: 60px 20px;
+        padding: 60px 20px 30px;
     }
-    
+
+    .footer-top-cta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .cta-text {
+        font-size: 32px;
+    }
+
     .footer-wrapper {
-        gap: 30px;
+        grid-template-columns: 1fr;
+        gap: 40px;
     }
-}
 
-/* =========================================
-   RESPONSIVE - SMALL MOBILE
-   ========================================= */
-@media (max-width: 480px) {
-    .services-title-container {
-        margin-top: 120px;
-        margin-bottom: 60px;
+    .footer-col {
+        align-items: flex-start;
     }
     
-    .container {
-        padding: 30px 15px;
+    .footer-divider {
+        margin-bottom: 40px;
     }
-    
-    .page-wrapper {
-        margin-bottom: 60px;
-    }
-    
-    .media-container {
-        min-height: 250px;
-    }
-    
-    .service-title {
-        font-size: 14px;
-    }
-    
-    .description {
-        font-size: 12px;
-    }
-    
-    .cta-button {
-        padding: 14px 15px;
-        font-size: 12px;
-    }
-    
-    .chat-video-container {
-        height: 250px;
-    }
-    
-    .chat-cta-button {
-        margin-top: 150px;
-    }
-    
-    .main-footer {
-        padding: 40px 15px;
-    }
-    
-    /* Mobile menu adjustments */
-    .mobile-menu {
-        width: 85%;
-        padding: 70px 25px 25px;
-    }
-}
 
-/* =========================================
-   TOUCH IMPROVEMENTS
-   ========================================= */
-@media (hover: none) and (pointer: coarse) {
-    .nav-btn {
-        padding: 14px 25px;
-        font-size: 14px;
-    }
-    
-    .social-icon-btn {
-        width: 48px;
-        height: 48px;
-    }
-    
-    /* Disable hover effects on touch */
-    .services-title:hover span {
-        transform: none;
-    }
-    
-    .services-title:hover::after {
-        transform: none;
+    .footer-bottom {
+        margin-top: 50px;
+        text-align: left;
     }
 }

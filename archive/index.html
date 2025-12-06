@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    <!-- ============================================
-         Meta Tags & Basic Configuration
-         ============================================ -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CineChord Video Archive - Bütün filmləri, reklam videolarını və layihələri keçin.">
@@ -12,125 +9,71 @@
     
     <title>CineChord - Archive | Video Archive</title>
     
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="../photos/CineChord.png">
     
-    <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Stylesheet -->
     <link rel="stylesheet" href="archive.css">
 </head>
 <body>
 
-    <!-- ============================================
-         Page Transition Overlay
-         ============================================ -->
     <div class="page-transition"></div>
     
-    <!-- ============================================
-         Grain Texture Overlay
-         ============================================ -->
     <div class="grain-overlay"></div>
     
-    <!-- ============================================
-         Scroll Progress Indicator
-         ============================================ -->
     <div class="progress-bar-top"></div>
 
-    <!-- ============================================
-         Video Preview Modal (Works Style)
-         ============================================ -->
+    <!-- ✅ WORKS STYLE VIDEO MODAL -->
     <div class="preview-container is-paused" id="previewContainer">
-        <!-- Close Button -->
-        <button class="close-preview" id="closePreview" aria-label="Close video">×</button>
+        <button class="close-preview" id="closePreview">×</button>
         
-        <!-- Video Info -->
         <div class="preview-info" id="previewInfo">
             <div class="text-mask">
-                <h2 class="preview-title" id="previewTitle" data-text="PROJECT">PROJECT</h2>
+                <div class="preview-title" id="previewTitle">PROJECT NAME</div>
             </div>
-            <div class="preview-meta" id="previewMeta"></div>
         </div>
-
-        <!-- Video Wrapper -->
+        
         <div class="video-wrapper" id="videoWrapper">
-            <!-- Loading Spinner -->
-            <div class="video-loading" aria-label="Loading video"></div>
+            <div class="video-loading"></div>
             
-            <!-- Play Button Overlay -->
             <div class="play-button-container modal-play-btn" id="modalPlayBtnContainer">
-                <button class="play-button" aria-label="Play video">
+                <button class="play-button">
                     <span class="play-text" data-text="PLAY">PLAY</span>
                 </button>
             </div>
             
-            <!-- Video Element -->
-            <video 
-                id="previewVideo" 
-                class="preview-video"
-                playsinline
-                preload="metadata">
-            </video>
-
-            <!-- Custom Video Controls -->
+            <video id="previewVideo" class="preview-video" playsinline preload="auto"></video>
+            
             <div class="custom-controls" id="customControls">
-                <!-- Progress Bar -->
-                <div class="progress-bar-container" id="progressBarContainer" role="slider" aria-label="Video progress">
+                <div class="progress-bar-container" id="progressBarContainer">
                     <div class="progress-played" id="progressPlayed"></div>
-                    <input 
-                        type="range" 
-                        class="progress-slider" 
-                        id="progressSlider" 
-                        value="0" 
-                        min="0" 
-                        max="100" 
-                        step="0.1"
-                        aria-label="Seek video">
+                    <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
                 </div>
                 
-                <!-- Control Buttons -->
                 <div class="controls-buttons">
-                    <!-- Skip Backward -->
-                    <button class="ctrl-btn skip-btn" id="skipBackBtn" title="10 saniyə geri">
+                    <button class="ctrl-btn skip-btn" id="rewindBtn" title="-5s">
                         <i class="fas fa-undo-alt"></i>
                     </button>
                     
-                    <!-- Play/Pause -->
-                    <button class="ctrl-btn main-play-btn" id="playPauseBtn" aria-label="Play/Pause">
+                    <button class="ctrl-btn main-play-btn" id="playPauseBtn">
                         <i class="fas fa-play" id="playIcon"></i>
                         <i class="fas fa-pause" id="pauseIcon" style="display:none;"></i>
                     </button>
                     
-                    <!-- Skip Forward -->
-                    <button class="ctrl-btn skip-btn" id="skipForwardBtn" title="10 saniyə irəli">
+                    <button class="ctrl-btn skip-btn" id="forwardBtn" title="+5s">
                         <i class="fas fa-redo-alt"></i>
                     </button>
                     
-                    <!-- Time Display -->
                     <div class="time-display">
                         <span id="currentTime">0:00</span> / <span id="durationTime">0:00</span>
                     </div>
                     
-                    <!-- Right Controls -->
                     <div class="right-controls-group">
-                        <!-- Volume -->
                         <div class="volume-wrapper">
-                            <input 
-                                type="range" 
-                                class="volume-slider" 
-                                id="volumeSlider" 
-                                value="100" 
-                                min="0" 
-                                max="100"
-                                aria-label="Volume control">
+                            <input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100">
                         </div>
-                        
-                        <!-- Speed -->
-                        <button class="ctrl-btn speed-btn" id="speedBtn" aria-label="Playback speed">1x</button>
-                        
-                        <!-- Fullscreen -->
-                        <button class="ctrl-btn" id="fullscreenBtn" aria-label="Fullscreen">
+                        <button class="ctrl-btn speed-btn" id="speedBtn">1x</button>
+                        <button class="ctrl-btn" id="fullscreenBtn">
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
@@ -139,9 +82,6 @@
         </div>
     </div>
 
-    <!-- ============================================
-         Header Navigation
-         ============================================ -->
     <header class="header" role="banner">
         <nav class="nav-left" aria-label="Primary navigation">
             <a href="../index.html" class="nav-btn" data-text="HOME">
@@ -168,28 +108,19 @@
         </nav>
     </header>
 
-    <!-- ============================================
-         Center Logo
-         ============================================ -->
     <div class="center-logo">
         <img src="../photos/CineChord.png" alt="CineChord Logo" class="logo-img">
     </div>
 
-    <!-- ============================================
-         Main Archive Section
-         ============================================ -->
     <main>
         <section class="archive-section" id="archiveSection">
-            <!-- Title Section -->
             <div class="split-titles">
-                <!-- Animated Category Words -->
                 <div class="video-title" aria-hidden="true">
                     <span class="video-word">FILM</span>
                     <span class="video-word">COMMERCIAL</span>
                     <span class="video-word">CLIPS</span>
                 </div>
                 
-                <!-- Archive Title -->
                 <div class="archive-title-container">
                     <h1 class="archive-title">ARCHIVE</h1>
                     <p class="archive-subtitle">
@@ -199,7 +130,6 @@
                 </div>
             </div>
 
-            <!-- Archive Table -->
             <table class="archive-table" role="table" aria-label="Video archive">
                 <thead>
                     <tr>
@@ -213,15 +143,74 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Content will be dynamically loaded by JavaScript -->
                 </tbody>
             </table>
         </section>
     </main>
+    
+    <footer class="main-footer" role="contentinfo">
+        <div class="footer-top-cta">
+            <h2 class="cta-text">LET'S START SOMETHING NEW</h2>
+            <a href="../contact/" class="cta-button">
+                <span data-text="GET IN TOUCH">GET IN TOUCH</span>
+            </a>
+        </div>
+        
+        <div class="footer-divider"></div>
 
-    <!-- ============================================
-         Scripts
-         ============================================ -->
+        <div class="footer-wrapper">
+            <div class="footer-col">
+                <span class="footer-label">CONTACT</span>
+                <div class="footer-content">
+                    <a href="mailto:hello@cinechord.com" class="mask-link">
+                        <span data-text="hello@cinechord.com">hello@cinechord.com</span>
+                    </a>
+                    <a href="tel:+99450XXXXXXX" class="mask-link">
+                        <span data-text="+994 (50) XXX XX XX">+994 (50) XXX XX XX</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <span class="footer-label">NAVIGATION</span>
+                <div class="footer-content">
+                    <a href="../works/" class="mask-link"><span data-text="Work">Work</span></a>
+                    <a href="../archive/" class="mask-link"><span data-text="Archive">Archive</span></a>
+                    <a href="../about/" class="mask-link"><span data-text="About">About</span></a>
+                    <a href="../contact/" class="mask-link"><span data-text="Contact">Contact</span></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <span class="footer-label">SOCIALS</span>
+                <div class="social-icons">
+                    <a href="#" target="_blank" class="mask-icon" aria-label="Instagram">
+                        <div class="icon-wrap">
+                            <i class="fab fa-instagram main-icon"></i>
+                            <i class="fab fa-instagram hover-icon"></i>
+                        </div>
+                    </a>
+                    <a href="#" target="_blank" class="mask-icon" aria-label="Vimeo">
+                        <div class="icon-wrap">
+                            <i class="fab fa-vimeo-v main-icon"></i>
+                            <i class="fab fa-vimeo-v hover-icon"></i>
+                        </div>
+                    </a>
+                    <a href="#" target="_blank" class="mask-icon" aria-label="LinkedIn">
+                        <div class="icon-wrap">
+                            <i class="fab fa-linkedin-in main-icon"></i>
+                            <i class="fab fa-linkedin-in hover-icon"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="copyright">© 2025 CINECHORD. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="archive.js"></script>
 </body>

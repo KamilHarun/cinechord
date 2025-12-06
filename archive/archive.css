@@ -1,11 +1,11 @@
 /* ============================================================
-   CineChord Archive - Stylesheet (Works Design Style)
-   Version: 4.3 - FIXED ARCHIVE VISIBILITY + BIGGER CONTROLS
-   ============================================================ */
+    CineChord Archive - Stylesheet (Works Design Style)
+    Version: 5.0 - WORKS MODAL INTEGRATED
+    ============================================================ */
 
 /* ============================================================
-   1. GLOBAL RESETS & BASE STYLES
-   ============================================================ */
+    1. GLOBAL RESETS & BASE STYLES
+    ============================================================ */
 * {
     margin: 0;
     padding: 0;
@@ -28,20 +28,20 @@ body {
 }
 
 /* ============================================================
-   2. CUSTOM FONTS
-   ============================================================ */
+    2. CUSTOM FONTS
+    ============================================================ */
 @font-face {
     font-family: 'NeueMetanaOutline';
     src: url('../fonts/NeueMetanaNextOutline-Black.woff2') format('woff2'),
-         url('../fonts/NeueMetanaNextOutline-Black.woff') format('woff');
+          url('../fonts/NeueMetanaNextOutline-Black.woff') format('woff');
     font-weight: 900;
     font-style: normal;
     font-display: swap;
 }
 
 /* ============================================================
-   3. GPU ACCELERATION
-   ============================================================ */
+    3. GPU ACCELERATION
+    ============================================================ */
 .page-transition,
 .header,
 .center-logo,
@@ -54,8 +54,8 @@ body {
 }
 
 /* ============================================================
-   4. PAGE TRANSITION - SLIDE EFFECT
-   ============================================================ */
+    4. PAGE TRANSITION - SLIDE EFFECT
+    ============================================================ */
 .page-transition {
     position: fixed;
     top: 0;
@@ -81,8 +81,8 @@ body {
 }
 
 /* ============================================================
-   5. GRAIN OVERLAY EFFECT
-   ============================================================ */
+    5. GRAIN OVERLAY EFFECT
+    ============================================================ */
 .grain-overlay {
     position: fixed;
     top: 0;
@@ -96,8 +96,8 @@ body {
 }
 
 /* ============================================================
-   6. SCROLL PROGRESS BAR
-   ============================================================ */
+    6. SCROLL PROGRESS BAR
+    ============================================================ */
 .progress-bar-top {
     position: fixed;
     top: 0;
@@ -110,8 +110,8 @@ body {
 }
 
 /* ============================================================
-   7. CENTER LOGO
-   ============================================================ */
+    7. CENTER LOGO
+    ============================================================ */
 .center-logo {
     position: fixed;
     top: 30px;
@@ -149,8 +149,8 @@ body {
 }
 
 /* ============================================================
-   8. HEADER & NAVIGATION
-   ============================================================ */
+    8. HEADER & NAVIGATION
+    ============================================================ */
 .header {
     position: fixed;
     top: 0;
@@ -180,8 +180,8 @@ body {
 }
 
 /* ============================================================
-   9. NAVIGATION BUTTONS
-   ============================================================ */
+    9. NAVIGATION BUTTONS
+    ============================================================ */
 .nav-btn {
     padding: 12px 30px;
     background: transparent;
@@ -221,7 +221,6 @@ body {
 .nav-right .nav-btn:nth-child(2) { animation-delay: 0.7s; }
 .nav-right .nav-btn:nth-child(3) { animation-delay: 0.8s; }
 
-/* Hover effect overlay */
 .nav-btn::before {
     content: attr(data-text);
     position: absolute;
@@ -270,19 +269,9 @@ body {
     color: #000;
 }
 
-.nav-btn.active .nav-text {
-    opacity: 1;
-    transform: none;
-}
-
-.nav-btn.active::before {
-    opacity: 0;
-    transform: translateY(10px);
-}
-
 /* ============================================================
-   10. HAMBURGER MENU (MOBILE)
-   ============================================================ */
+    10. HAMBURGER MENU (MOBILE)
+    ============================================================ */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -371,8 +360,8 @@ body {
 }
 
 /* ============================================================
-   11. VIDEO PREVIEW MODAL (Works Style)
-   ============================================================ */
+    11. VIDEO MODAL PLAYER (WORKS STYLE - EXACT COPY)
+    ============================================================ */
 .preview-container {
     position: fixed;
     top: 0;
@@ -381,7 +370,7 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.95);
     z-index: 99999;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
@@ -391,7 +380,6 @@ body {
 }
 
 .preview-container.active {
-    display: flex;
     opacity: 1;
     pointer-events: all;
 }
@@ -428,38 +416,22 @@ body {
     outline: none;
 }
 
-/* Video Loading Spinner */
-.video-loading {
-    display: none !important;
-}
-
-@keyframes spin {
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* Preview Info */
 .preview-info {
     position: absolute;
     top: 60px;
     left: 60px;
-    z-index: 1010;
+    z-index: 20;
     pointer-events: none;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
     transition: all 0.5s ease;
     will-change: opacity, transform;
-    opacity: 1;
-    transform: translateY(0);
 }
 
 .preview-container.user-inactive .preview-info {
     opacity: 0;
     transform: translateY(-40px);
-}
-
-.text-mask {
-    overflow: hidden;
 }
 
 .preview-title {
@@ -494,17 +466,6 @@ body {
     clip-path: inset(0 0% 0 0);
 }
 
-.preview-meta {
-    font-size: 12px;
-    opacity: 0.6;
-    letter-spacing: 1px;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    max-width: 600px;
-}
-
-/* Close Button */
 .close-preview {
     position: absolute;
     top: 40px;
@@ -529,6 +490,7 @@ body {
 .preview-container.user-inactive .close-preview {
     opacity: 0;
     transform: scale(0.8) rotate(90deg);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .close-preview:hover {
@@ -537,7 +499,6 @@ body {
     transform: rotate(90deg);
 }
 
-/* Modal Play Button */
 .modal-play-btn {
     position: fixed;
     top: 50%;
@@ -611,11 +572,15 @@ body {
     pointer-events: none;
 }
 
+.play-button i {
+    display: none !important;
+}
+
 .play-text {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     color: #fff;
     text-transform: uppercase;
     pointer-events: none;
@@ -645,18 +610,17 @@ body {
     height: 66px;
 }
 
-/* Custom Controls */
 .custom-controls {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
-    padding: 0 40px 50px 40px;
+    padding: 0 40px 30px 40px;
     z-index: 1001;
     display: flex;
     flex-direction: column-reverse;
-    gap: 25px;
+    gap: 15px;
     opacity: 1;
     transform: translateY(0);
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -675,10 +639,9 @@ body {
     pointer-events: auto !important;
 }
 
-/* Progress Bar */
 .progress-bar-container {
     width: 100%;
-    height: 6px;
+    height: 4px;
     background: rgba(255, 255, 255, 0.15);
     cursor: pointer;
     position: relative;
@@ -686,7 +649,7 @@ body {
 }
 
 .progress-bar-container:hover {
-    height: 8px;
+    height: 6px;
 }
 
 .progress-played {
@@ -709,12 +672,11 @@ body {
     appearance: none;
 }
 
-/* --- UPDATED CONTROL BUTTONS (BIGGER SIZE) --- */
 .controls-buttons {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 30px;
+    gap: 15px;
 }
 
 .ctrl-btn {
@@ -728,8 +690,6 @@ body {
     justify-content: center;
     transition: transform 0.2s ease, color 0.2s ease;
     opacity: 0.8;
-    width: 60px; /* Increased from 50px */
-    height: 60px; /* Increased from 50px */
 }
 
 .ctrl-btn:hover {
@@ -739,30 +699,62 @@ body {
 }
 
 .ctrl-btn i {
-    font-size: 30px; /* Increased from 24px */
-}
-
-.main-play-btn {
-    width: 85px; /* Increased from 60px */
-    height: 85px; /* Increased from 60px */
+    font-size: 47px !important;
 }
 
 .main-play-btn i {
-    font-size: 50px; /* Increased from 40px */
+    font-size: 35px !important;
 }
 
-.skip-btn {
-    width: 65px; /* Increased from 50px */
-    height: 65px; /* Increased from 50px */
+/* ✅ SUPER SPECIFIC SKIP BUTTONS - CANNOT BE OVERRIDDEN */
+.ctrl-btn.skip-btn i {
+    font-size: 47px !important;
 }
-/* ------------------------------------------- */
 
-/* Time Display */
+.skip-btn i {
+    font-size: 47px !important;
+}
+
+/* Rewind/Forward specific IDs - HIGHEST PRIORITY */
+#rewindBtn i,
+#forwardBtn i {
+    font-size: 47px !important;
+}
+
+button#rewindBtn i,
+button#forwardBtn i {
+    font-size: 47px !important;
+}
+
+.custom-controls #rewindBtn i,
+.custom-controls #forwardBtn i {
+    font-size: 47px !important;
+}
+
+/* FontAwesome icons specific */
+#rewindBtn i.fas,
+#forwardBtn i.fas,
+#rewindBtn i.fa-undo-alt,
+#forwardBtn i.fa-redo-alt {
+    font-size: 47px !important;
+}
+
+/* ✅ PLAY/PAUSE BUTTON - 35px */
+#playPauseBtn i,
+#playIcon,
+#pauseIcon {
+    font-size: 35px !important;
+}
+
+button#playPauseBtn i {
+    font-size: 35px !important;
+}
+
 .time-display {
     font-family: monospace;
-    font-size: 14px;
+    font-size: 13px;
     color: rgba(255, 255, 255, 0.6);
-    margin-left: 15px;
+    margin-left: 10px;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -772,44 +764,47 @@ body {
     color: #fff;
 }
 
-/* Right Controls Group */
 .right-controls-group {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 35px;
+    gap: 20px;
 }
 
-/* Volume Control */
 .volume-wrapper {
     display: flex;
     align-items: center;
 }
 
 .volume-slider {
-    width: 100px;
-    height: 3px;
+    width: 80px;
+    height: 2px;
     accent-color: #FFA500;
     cursor: pointer;
 }
 
-/* Speed Button */
-.speed-btn {
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    font-weight: bold;
-    min-width: 55px;
-    height: 50px;
-    text-align: center;
-    padding: 10px 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.video-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #FFA500;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10;
+    display: none;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* ============================================================
-   12. ARCHIVE SECTION
-   ============================================================ */
+    12. ARCHIVE SECTION
+    ============================================================ */
 .archive-section {
     min-height: 100vh;
     padding: 180px 40px 80px;
@@ -818,7 +813,6 @@ body {
     z-index: 100;
 }
 
-/* Split title layout */
 .split-titles {
     display: flex;
     justify-content: space-between;
@@ -826,7 +820,6 @@ body {
     margin-bottom: 60px;
 }
 
-/* Animated video category titles */
 .video-title {
     display: flex;
     flex-direction: column;
@@ -862,7 +855,6 @@ body {
     100% { opacity: 0; transform: translateY(-100px); }
 }
 
-/* Archive title section */
 .archive-title-container {
     text-align: right;
     opacity: 0;
@@ -916,8 +908,8 @@ body {
 }
 
 /* ============================================================
-   13. ARCHIVE TABLE
-   ============================================================ */
+    13. ARCHIVE TABLE
+    ============================================================ */
 .archive-table {
     width: 100%;
     border-collapse: collapse;
@@ -956,35 +948,13 @@ body {
     text-transform: uppercase;
 }
 
-.archive-table thead .number-col {
-    width: 6%;
-    text-align: center;
-}
-
-.archive-table thead .client-col {
-    width: 14%;
-}
-
-.archive-table thead .title-col {
-    width: 23%;
-}
-
-.archive-table thead .type-col {
-    width: 13%;
-}
-
-.archive-table thead .location-col {
-    width: 15%;
-}
-
-.archive-table thead .agency-col {
-    width: 16%;
-}
-
-.archive-table thead .year-col {
-    width: 13%;
-    text-align: center;
-}
+.archive-table thead .number-col { width: 6%; text-align: center; }
+.archive-table thead .client-col { width: 14%; }
+.archive-table thead .title-col { width: 23%; }
+.archive-table thead .type-col { width: 13%; }
+.archive-table thead .location-col { width: 15%; }
+.archive-table thead .agency-col { width: 16%; }
+.archive-table thead .year-col { width: 13%; text-align: center; }
 
 .archive-table td {
     padding: 25px 20px;
@@ -995,7 +965,6 @@ body {
     overflow-wrap: break-word;
 }
 
-/* Row hover effects */
 .archive-table tbody tr:hover {
     background: rgba(255, 165, 0, 0.03);
 }
@@ -1013,54 +982,14 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Column specific styles */
-.number-col {
-    opacity: 0.4;
-    width: 6%;
-    font-size: 11px;
-    transition: opacity 0.3s ease;
-    text-align: center;
-}
+.number-col { opacity: 0.4; width: 6%; font-size: 11px; transition: opacity 0.3s ease; text-align: center; }
+.client-col { opacity: 0.8; font-weight: 600; transition: color 0.3s ease; width: 14%; }
+.title-col { font-weight: bold; color: #fff; transition: color 0.3s ease; width: 23%; }
+.type-col { opacity: 0.6; transition: color 0.3s ease; width: 13%; }
+.location-col { opacity: 0.6; transition: color 0.3s ease; width: 15%; }
+.agency-col { opacity: 0.6; transition: color 0.3s ease; width: 16%; }
+.year-col { text-align: center; opacity: 0.7; width: 13%; }
 
-.client-col {
-    opacity: 0.8;
-    font-weight: 600;
-    transition: color 0.3s ease;
-    width: 14%;
-}
-
-.title-col {
-    font-weight: bold;
-    color: #fff;
-    transition: color 0.3s ease;
-    width: 23%;
-}
-
-.type-col {
-    opacity: 0.6;
-    transition: color 0.3s ease;
-    width: 13%;
-}
-
-.location-col {
-    opacity: 0.6;
-    transition: color 0.3s ease;
-    width: 15%;
-}
-
-.agency-col {
-    opacity: 0.6;
-    transition: color 0.3s ease;
-    width: 16%;
-}
-
-.year-col {
-    text-align: center;
-    opacity: 0.7;
-    width: 13%;
-}
-
-/* Play icon indicator */
 .archive-table tbody tr::after {
     content: '▶';
     position: absolute;
@@ -1078,7 +1007,6 @@ body {
     opacity: 0.6;
 }
 
-/* Enhanced hover effects */
 .archive-table tbody tr:hover .client-col,
 .archive-table tbody tr:hover .title-col,
 .archive-table tbody tr:hover .type-col,
@@ -1090,8 +1018,219 @@ body {
 }
 
 /* ============================================================
-   14. RESPONSIVE - TABLET
-   ============================================================ */
+    14. CINEMATIC FOOTER & CTA BUTTON
+    ============================================================ */
+.main-footer {
+    background: #050505;
+    padding: 80px 60px 40px;
+    position: relative;
+    z-index: 10;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.cta-button {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #000;
+    background: #FFA500;
+    padding: 15px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    vertical-align: middle;
+}
+
+.cta-button span {
+    display: block;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.cta-button span::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #000;
+}
+
+.cta-button:hover {
+    background: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+}
+
+.cta-button:hover span {
+    transform: translateY(-100%);
+}
+
+.footer-top-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.cta-text {
+    font-family: 'NeueMetanaOutline', sans-serif;
+    font-size: clamp(30px, 5vw, 60px);
+    color: transparent;
+    -webkit-text-stroke: 1px #fff;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: -1px;
+    transition: all 0.3s ease;
+}
+
+.footer-top-cta:hover .cta-text {
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.footer-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 60px;
+}
+
+.footer-wrapper {
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-label {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #FFA500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+.mask-link {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    line-height: 1.2;
+    padding-bottom: 2px;
+    cursor: pointer;
+}
+
+.mask-link span {
+    display: block;
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mask-link span::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    color: #FFA500;
+    font-weight: 600;
+}
+
+.mask-link:hover span {
+    transform: translateY(-100%);
+}
+
+.social-icons {
+    display: flex;
+    gap: 20px;
+}
+
+.mask-icon {
+    display: block;
+    height: 24px;
+    overflow: hidden;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.icon-wrap {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mask-icon i {
+    font-size: 22px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-icon {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.hover-icon {
+    color: #FFA500;
+    transform: translateY(5px);
+}
+
+.mask-icon:hover .icon-wrap {
+    transform: translateY(-29px);
+}
+
+.footer-bottom {
+    margin-top: 80px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+}
+
+.copyright {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+    15. RESPONSIVE - TABLET
+    ============================================================ */
 @media (max-width: 1200px) {
     .video-wrapper {
         width: 95%;
@@ -1112,19 +1251,14 @@ body {
         padding: 10px 20px;
     }
 
-    .center-logo {
-        top: 20px;
-    }
-
-    .logo-img {
-        width: 90px;
-        height: 90px;
+    .footer-wrapper {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 /* ============================================================
-   15. RESPONSIVE - MOBILE
-   ============================================================ */
+    16. RESPONSIVE - MOBILE
+    ============================================================ */
 @media (max-width: 768px) {
     .header {
         padding: 15px 20px;
@@ -1147,22 +1281,23 @@ body {
     }
     
     .center-logo {
-        top: 15px;
-        left: 20px;
-        transform: translateX(0) scale(0.5) rotate(-180deg);
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) scale(0.5) rotate(-180deg);
+        width: auto;
     }
     
     .center-logo.entry-done {
-        transform: translateX(0) scale(1) rotate(0deg);
+        transform: translateX(-50%) scale(1) rotate(0deg);
     }
     
     .center-logo.scroll-hidden {
-        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+        transform: translateX(-50%) translateY(-120px) scale(0.5) !important;
     }
     
     .logo-img {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
     }
 
     .video-wrapper {
@@ -1228,42 +1363,49 @@ body {
     .custom-controls {
         padding: 0 20px 20px 20px;
     }
-    
-    .controls-buttons {
-        gap: 15px;
+
+    .main-footer {
+        padding: 60px 20px 30px;
+    }
+
+    .footer-top-cta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .cta-text {
+        font-size: 32px;
+    }
+
+    .cta-button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .footer-col {
+        align-items: flex-start;
     }
     
-    /* Slightly increase mobile button size too */
-    .ctrl-btn {
-        width: 50px;
-        height: 50px;
+    .footer-divider {
+        margin-bottom: 40px;
     }
-    
-    .main-play-btn {
-        width: 65px;
-        height: 65px;
-    }
-    
-    .ctrl-btn i {
-        font-size: 24px;
-    }
-    
-    .main-play-btn i {
-        font-size: 40px;
-    }
-    
-    .time-display {
-        font-size: 11px;
-    }
-    
-    .volume-slider {
-        width: 60px;
+
+    .footer-bottom {
+        margin-top: 50px;
+        text-align: left;
     }
 }
 
 /* ============================================================
-   16. RESPONSIVE - SMALL MOBILE
-   ============================================================ */
+    17. RESPONSIVE - SMALL MOBILE
+    ============================================================ */
 @media (max-width: 480px) {
     .archive-section {
         padding: 140px 15px 60px;
@@ -1306,8 +1448,8 @@ body {
 }
 
 /* ============================================================
-   17. TOUCH IMPROVEMENTS
-   ============================================================ */
+    18. TOUCH IMPROVEMENTS
+    ============================================================ */
 @media (hover: none) and (pointer: coarse) {
     .nav-btn {
         padding: 14px 25px;
@@ -1316,5 +1458,9 @@ body {
     
     .archive-table tbody tr:active {
         background: rgba(255, 165, 0, 0.1);
+    }
+
+    .mask-link:hover span, .mask-icon:hover .icon-wrap {
+        transform: none;
     }
 }

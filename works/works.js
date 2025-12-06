@@ -167,7 +167,7 @@
     });
 
     // ============================================================
-    // 5. LOAD WORKS (Dynamic Grid)
+    // 5. LOAD WORKS (Dynamic Grid) - OPTIMIZED
     // ============================================================
     
     function cleanUrlPath(url) {
@@ -217,6 +217,7 @@
                 
                 const categoryClass = categoryMap[work.category] || 'other';
                 
+                // ✅ OPTIMIZED: preload="auto" + loading placeholder + onloadeddata event
                 const workHTML = `
                     <div class="project-card reveal-item" 
                         data-category="${categoryClass}" 
@@ -224,13 +225,18 @@
                         data-title="${work.title}"
                         style="transition-delay: ${index * 0.05}s;">
                         <div class="project-image-container">
+                            <div class="video-loading-placeholder" style="opacity: 0; pointer-events: none;">
+                                <div class="loading-spinner"></div>
+                            </div>
                             <video 
                                 muted loop playsinline 
                                 class="project-video" 
-                                preload="metadata" 
+                                preload="none"
                                 poster="${imageSrc || ''}"
+                                data-video-src="${videoSrc}"
+                                onloadeddata="this.style.opacity='1'"
+                                style="opacity: 1;"
                             >
-                                ${videoSrc ? `<source src="${videoSrc}" type="video/mp4">` : ''}
                             </video>
                             <div class="card-overlay"></div>
                             <div class="card-info">
@@ -286,31 +292,51 @@
     };
 
     /**
-     * Works-dəki videolar üçün Hover effektini tətbiq edir.
+     * ✅ LAZY LOADING: Yalnız hover zamanı video yüklənir
      */
     function attachHoverEffects() {
         document.querySelectorAll('.project-card').forEach(card => {
             const video = card.querySelector('video');
-            if (video) {
-                card.addEventListener('mouseenter', () => {
-                    if(video.readyState >= 2) { 
-                        video.play().catch(()=>{});
-                    } else {
-                        video.load(); 
-                        video.onloadedmetadata = () => video.play().catch(()=>{});
-                    }
-                });
+            if (!video) return;
 
-                card.addEventListener('mouseleave', () => { 
-                    video.pause(); 
-                    video.currentTime = 0; 
-                });
-            }
+            let isVideoLoaded = false;
+
+            card.addEventListener('mouseenter', () => {
+                // ✅ Hover zamanı video yüklə (lazy load)
+                if (!isVideoLoaded) {
+                    const videoSrc = video.getAttribute('data-video-src');
+                    if (videoSrc) {
+                        const source = document.createElement('source');
+                        source.src = videoSrc;
+                        source.type = 'video/mp4';
+                        video.appendChild(source);
+                        video.load(); // Yükləməyə başla
+                        isVideoLoaded = true;
+                    }
+                }
+
+                // Video hazırdırsa dərhal oynat
+                if (video.readyState >= 3) { 
+                    video.play().catch(() => {});
+                } else {
+                    // Video yüklənəndə oynat
+                    const playWhenReady = () => {
+                        video.play().catch(() => {});
+                        video.removeEventListener('canplay', playWhenReady);
+                    };
+                    video.addEventListener('canplay', playWhenReady);
+                }
+            });
+
+            card.addEventListener('mouseleave', () => { 
+                video.pause(); 
+                video.currentTime = 0; 
+            });
         });
     }
 
     // ============================================================
-    // 6. VIDEO MODAL LOGIC (TƏMİZLƏNİB)
+    // 6. VIDEO MODAL LOGIC (✅ PLAY/PAUSE ICONS ADDED)
     // ============================================================
     
     function formatTime(seconds) {
@@ -340,25 +366,30 @@
             previewTitleEl.setAttribute('data-text', title);
         }
         
+        // ✅ FAST VIDEO LOADING
+        previewContainer.style.display = 'flex';
+        previewContainer.classList.add('active');
+        previewContainer.classList.add('is-paused');
+        document.body.style.overflow = 'hidden';
+
+        // Set video src and force load immediately
         previewVideo.src = videoSrc;
+        previewVideo.load(); // ✅ Force immediate load
         
-        setTimeout(() => {
-            previewContainer.style.display = 'flex';
-            setTimeout(() => {
-                previewContainer.classList.add('active');
-                previewContainer.classList.add('is-paused');
-                document.body.style.overflow = 'hidden';
-                
-                previewVideo.onloadedmetadata = function() {
-                    if(durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
-                    const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
-                    if(modalPlayText) {
-                        modalPlayText.setAttribute('data-text', 'PLAY');
-                        modalPlayText.innerText = 'PLAY'; 
-                    }
-                };
-            }, 10);
-        }, 10);
+        previewVideo.onloadedmetadata = function() {
+            if(durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
+            const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
+            if(modalPlayText) {
+                modalPlayText.setAttribute('data-text', 'PLAY');
+                modalPlayText.innerText = 'PLAY'; 
+            }
+        };
+
+        // ✅ Auto-play when ready (faster UX)
+        previewVideo.oncanplay = function() {
+            // Video hazırdır, istəyirsənsə auto-play
+            // previewVideo.play(); // Bunu açsan avtomatik başlayar
+        };
     }
     
     function closeVideoPreview() {
@@ -380,13 +411,21 @@
 
     function updatePlayButtonUI() {
         const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
         
         if (previewVideo.paused) {
+            // Video dayandırılıb - PLAY göstər
+            if (playIcon) playIcon.style.display = 'block';
+            if (pauseIcon) pauseIcon.style.display = 'none';
             if(modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PLAY");
             previewContainer.classList.add('is-paused');
             previewContainer.classList.remove('user-inactive'); 
             clearTimeout(activityTimeout);
         } else {
+            // Video oynayır - PAUSE göstər
+            if (playIcon) playIcon.style.display = 'none';
+            if (pauseIcon) pauseIcon.style.display = 'block';
             if(modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PAUSE");
             previewContainer.classList.remove('is-paused');
             handleUserActivity(); 

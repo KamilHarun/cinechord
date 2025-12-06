@@ -1,5 +1,10 @@
 /* =========================================
-   GLOBAL & RESET
+   CineChord - Contact Page Stylesheet
+   Version: 2.1 - (Mobile Logo Centered)
+   ========================================= */
+
+/* =========================================
+   1. GLOBAL & RESET
    ========================================= */
 * {
     margin: 0;
@@ -23,7 +28,7 @@ body {
 }
 
 /* =========================================
-   FONTS
+   2. FONTS
    ========================================= */
 @font-face {
     font-family: 'NeueMetanaOutline';
@@ -41,7 +46,7 @@ body {
 }
 
 /* =========================================
-   PAGE TRANSITION - SLIDE EFFECT (FIXED)
+   3. PAGE TRANSITION - SLIDE EFFECT
    ========================================= */
 .page-transition {
     position: fixed;
@@ -56,28 +61,20 @@ body {
     transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* Səhifə yükləndikdən sonra yuxarı sürüşür */
 .page-transition.page-loaded {
     transform: translateY(-100%);
     pointer-events: none;
     transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* Başqa səhifəyə keçəndə - aşağı enir və qalır */
 .page-transition.active {
     transform: translateY(0) !important;
     pointer-events: all;
     transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1) !important;
 }
 
-/* --- ANIMATIONS (NAVBAR) --- */
-@keyframes fadeInUp {
-    0% { transform: translateY(40px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-}
-
 /* =========================================
-   GPU ACCELERATION & PERFORMANCE
+   4. GPU ACCELERATION & PERFORMANCE
    ========================================= */
 .page-transition,
 .header,
@@ -106,7 +103,7 @@ body {
 }
 
 /* =========================================
-   HEADER / NAVBAR
+   5. HEADER / NAVBAR
    ========================================= */
 .header {
     position: fixed; top: 0; left: 0; right: 0;
@@ -133,6 +130,11 @@ body {
     position: relative; overflow: hidden; text-decoration: none; display: inline-block;
     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     opacity: 0; 
+}
+
+@keyframes fadeInUp {
+    0% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
 }
 
 /* Animation Delays */
@@ -163,10 +165,10 @@ body {
 .nav-btn.active::before { opacity: 0; transform: translateY(10px); }
 
 /* =========================================
-   HAMBURGER MENU (MOBILE) - ABOUT PATTERN
+   6. HAMBURGER MENU (MOBILE)
    ========================================= */
 .hamburger {
-    display: none; /* Desktop-da gizli */
+    display: none;
     flex-direction: column;
     gap: 6px;
     cursor: pointer;
@@ -214,7 +216,7 @@ body {
     z-index: 1001;
     transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     padding: 100px 30px 30px;
-    display: none; /* Desktop-da gizli */
+    display: none;
     flex-direction: column;
     gap: 12px;
     overflow-y: auto;
@@ -235,7 +237,6 @@ body {
     opacity: 1;
 }
 
-/* Mobile Menu Overlay */
 .mobile-menu-overlay {
     position: fixed;
     top: 0;
@@ -255,7 +256,7 @@ body {
 }
 
 /* =========================================
-   CENTER LOGO
+   7. CENTER LOGO
    ========================================= */
 .center-logo {
     position: fixed; top: 30px; left: 50%;
@@ -287,7 +288,7 @@ body {
 }
 
 /* =========================================
-   CONTACT PAGE SPECIFIC STYLES
+   8. CONTACT PAGE SPECIFIC STYLES
    ========================================= */
 .hero {
     min-height: auto; display: flex; align-items: center; justify-content: center;
@@ -370,7 +371,7 @@ body {
 .send-btn-container:hover .rolling-text-btn span, 
 .send-btn-container:hover .rolling-text-btn::after { transform: translateY(-100%); }
 
-/* INFO & FOOTER (Matches Service Page) */
+/* INFO & FOOTER */
 .info-column { padding-top: 20px; }
 .contact-item { display: flex; flex-direction: column; margin-bottom: 40px; }
 .label-small {
@@ -467,7 +468,7 @@ body {
 }
 
 /* =========================================
-   RESPONSIVE - MOBILE (ABOUT PATTERN)
+   RESPONSIVE - MOBILE (CENTER LOGO FIX)
    ========================================= */
 @media (max-width: 768px) {
     /* Header & Navigation */
@@ -478,41 +479,40 @@ body {
         justify-content: flex-end;
     }
     
-    /* DESKTOP NAVBAR GİZLƏT */
     .nav-left, 
     .nav-right { 
         display: none !important;
     }
     
-    /* HAMBURGER GÖSTƏR */
     .hamburger {
         display: flex !important;
     }
     
-    /* MOBILE MENU GÖSTƏR */
     .mobile-menu {
         display: flex !important;
     }
     
-    /* Logo adjustments */
+    /* --- LOGO UPDATED TO CENTER --- */
     .center-logo {
-        top: 15px;
-        left: 20px;
-        transform: translateX(0) scale(0.5) rotate(-180deg);
+        top: 20px;
+        left: 50%; /* Center positioning */
+        transform: translateX(-50%) scale(0.5) rotate(-180deg); /* Adjust transform */
+        width: auto;
     }
     
     .center-logo.entry-done {
-        transform: translateX(0) scale(1) rotate(0deg);
+        transform: translateX(-50%) scale(1) rotate(0deg);
     }
     
     .center-logo.scroll-hidden {
-        transform: translateX(0) translateY(-120px) scale(0.5) !important;
+        transform: translateX(-50%) translateY(-120px) scale(0.5) !important;
     }
     
     .logo-img {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
     }
+    /* ------------------------------ */
     
     /* Hero adjustments */
     .hero {

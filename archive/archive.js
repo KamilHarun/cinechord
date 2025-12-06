@@ -13,11 +13,10 @@
     const header = document.querySelector('.header');
     const logo = document.querySelector('.center-logo');
 
-    // Modal DOM elements
+    // ✅ WORKS STYLE MODAL DOM ELEMENTS
     const previewContainer = document.getElementById('previewContainer');
     const previewVideo = document.getElementById('previewVideo');
     const previewTitleEl = document.getElementById('previewTitle');
-    const previewMeta = document.getElementById('previewMeta');
     const closePreview = document.getElementById('closePreview');
     const modalPlayContainer = document.getElementById('modalPlayBtnContainer');
     const progressBarContainer = document.getElementById('progressBarContainer');
@@ -25,15 +24,11 @@
     const currentTimeEl = document.getElementById('currentTime');
     const durationTimeEl = document.getElementById('durationTime');
     const volumeSlider = document.getElementById('volumeSlider');
-    const progressSlider = document.getElementById('progressSlider');
-    const playIcon = document.getElementById('playIcon');
-    const pauseIcon = document.getElementById('pauseIcon');
-    const skipBackBtn = document.getElementById('skipBackBtn');
-    const skipForwardBtn = document.getElementById('skipForwardBtn');
+    const rewindBtn = document.getElementById('rewindBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
     const speedBtn = document.getElementById('speedBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-    // Mouse Inactivity Timer
+    // ✅ MOUSE INACTIVITY TIMER
     let activityTimeout = null;
     const INACTIVITY_DELAY = 2000;
 
@@ -75,12 +70,10 @@
     function handleScroll() {
         const currentScroll = window.scrollY;
 
-        // Header hide/show
         if (header) {
             header.style.transform = (currentScroll > lastScroll && currentScroll > 50) ? 'translateY(-100%)' : 'translateY(0)';
         }
 
-        // Logo hide/show
         if (logo) {
             if (currentScroll > 50) {
                 logo.classList.add('scroll-hidden');
@@ -252,11 +245,9 @@
                 const videoSrc = this.getAttribute('data-video-src');
                 const title = this.getAttribute('data-title');
                 const client = this.getAttribute('data-client');
-                const category = this.getAttribute('data-category');
-                const year = this.getAttribute('data-year');
 
                 if (!videoSrc || videoSrc === '') return;
-                openModal(videoSrc, title, client, category, year);
+                openModal(videoSrc, `${client} - ${title}`);
             });
 
             // Scramble effect on hover
@@ -304,7 +295,7 @@
     }
 
     // ============================================================
-    // 7. VIDEO MODAL LOGIC
+    // 7. VIDEO MODAL LOGIC (WORKS STYLE - EXACT COPY)
     // ============================================================
 
     function formatTime(seconds) {
@@ -326,37 +317,38 @@
         }
     }
 
-    function openModal(videoSrc, title, client, category, year) {
+    function openModal(videoSrc, title) {
         if (!videoSrc) return;
 
         if (previewTitleEl) {
-            previewTitleEl.textContent = `${client} - ${title}`;
-            previewTitleEl.setAttribute('data-text', `${client} - ${title}`);
+            previewTitleEl.textContent = title;
+            previewTitleEl.setAttribute('data-text', title);
         }
 
-        if (previewMeta) {
-            previewMeta.textContent = `${category} • ${year}`;
-        }
+        // ✅ FAST VIDEO LOADING
+        previewContainer.style.display = 'flex';
+        previewContainer.classList.add('active');
+        previewContainer.classList.add('is-paused');
+        document.body.style.overflow = 'hidden';
 
+        // Set video src and force load immediately
         previewVideo.src = videoSrc;
+        previewVideo.load(); // ✅ Force immediate load
+        
+        previewVideo.onloadedmetadata = function() {
+            if (durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
+            const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
+            if (modalPlayText) {
+                modalPlayText.setAttribute('data-text', 'PLAY');
+                modalPlayText.innerText = 'PLAY';
+            }
+        };
 
-        setTimeout(() => {
-            previewContainer.style.display = 'flex';
-            setTimeout(() => {
-                previewContainer.classList.add('active');
-                previewContainer.classList.add('is-paused');
-                document.body.style.overflow = 'hidden';
-
-                previewVideo.onloadedmetadata = function() {
-                    if (durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
-                    const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
-                    if (modalPlayText) {
-                        modalPlayText.setAttribute('data-text', 'PLAY');
-                        modalPlayText.innerText = 'PLAY';
-                    }
-                };
-            }, 10);
-        }, 10);
+        // ✅ Auto-play when ready (faster UX)
+        previewVideo.oncanplay = function() {
+            // Video hazırdır, istəyirsənsə auto-play
+            // previewVideo.play(); // Bunu açsan avtomatik başlayar
+        };
     }
 
     function closeVideoPreview() {
@@ -378,13 +370,21 @@
 
     function updatePlayButtonUI() {
         const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
 
         if (previewVideo.paused) {
+            // Video dayandırılıb - PLAY göstər
+            if (playIcon) playIcon.style.display = 'block';
+            if (pauseIcon) pauseIcon.style.display = 'none';
             if (modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PLAY");
             previewContainer.classList.add('is-paused');
             previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
         } else {
+            // Video oynayır - PAUSE göstər
+            if (playIcon) playIcon.style.display = 'none';
+            if (pauseIcon) pauseIcon.style.display = 'block';
             if (modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PAUSE");
             previewContainer.classList.remove('is-paused');
             handleUserActivity();
@@ -396,7 +396,7 @@
         previewVideo.paused ? previewVideo.play() : previewVideo.pause();
     }
 
-    // Event Listeners
+    // ✅ EVENT LISTENERS
     document.addEventListener('click', (e) => {
         if (e.target.closest('#playPauseBtn') || e.target.closest('#modalPlayBtnContainer')) {
             e.stopPropagation();
@@ -446,49 +446,18 @@
         };
     }
 
-    if (skipBackBtn) {
-        skipBackBtn.onclick = () => {
-            previewVideo.currentTime -= 10;
+    if (rewindBtn) {
+        rewindBtn.onclick = () => {
+            previewVideo.currentTime -= 5;
             handleUserActivity();
         };
     }
 
-    if (skipForwardBtn) {
-        skipForwardBtn.onclick = () => {
-            previewVideo.currentTime += 10;
+    if (forwardBtn) {
+        forwardBtn.onclick = () => {
+            previewVideo.currentTime += 5;
             handleUserActivity();
         };
-    }
-
-    if (progressSlider) {
-        progressSlider.addEventListener('input', (e) => {
-            const time = (e.target.value / 100) * previewVideo.duration;
-            previewVideo.currentTime = time;
-            handleUserActivity();
-        });
-    }
-
-    if (speedBtn) {
-        const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-        let currentSpeedIndex = 2;
-        speedBtn.addEventListener('click', () => {
-            currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
-            const newSpeed = speeds[currentSpeedIndex];
-            previewVideo.playbackRate = newSpeed;
-            speedBtn.textContent = `${newSpeed}x`;
-            handleUserActivity();
-        });
-    }
-
-    if (fullscreenBtn) {
-        fullscreenBtn.addEventListener('click', () => {
-            if (previewVideo.requestFullscreen) {
-                previewVideo.requestFullscreen().catch(err => {
-                    console.log('Fullscreen request failed:', err);
-                });
-            }
-            handleUserActivity();
-        });
     }
 
     // Keyboard shortcuts
