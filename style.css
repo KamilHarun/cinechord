@@ -1,6 +1,6 @@
 /* ================================================================
    CineChord Index (Home) - Main Stylesheet
-   Version: 4.0 - FINAL STABLE (All Fixes Included)
+   Version: 4.1 - MOBILE FIXES (Logo + Play overlap, Hamburger)
    ================================================================ */
 
 /* ================================================================
@@ -29,7 +29,6 @@ body {
     background: #000;
     color: #fff;
     overflow: hidden;
-    /* FIX: Mobil brauzer paneli üçün dynamic height */
     height: 100vh;
     height: 100dvh; 
     width: 100vw;
@@ -174,7 +173,6 @@ body {
 
 .hero-section {
     position: relative;
-    /* FIX: Tam ekran hündürlüyü */
     height: 100vh;
     height: 100dvh;
     width: 100%;
@@ -225,7 +223,7 @@ body {
     align-items: center;
     z-index: 1000;
     background: transparent;
-    pointer-events: none; /* Header-in boş yerləri kliklənməsin */
+    pointer-events: none;
 }
 
 .nav-left,
@@ -307,7 +305,7 @@ body {
 }
 
 /* ================================================================
-   7. HAMBURGER MENU (MOBILE) - FIXED
+   7. HAMBURGER MENU (MOBILE) - FIXED DÜZƏLİŞ
    ================================================================ */
 .hamburger {
     display: none;
@@ -316,9 +314,11 @@ body {
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    z-index: 10002; /* FIX: Menyunu hər şeyin üzərinə gətirir */
-    position: relative;
-    padding: 15px; /* Klik sahəsini artırdıq */
+    z-index: 10002;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
     width: 60px;   
     height: 60px;  
     background: transparent;
@@ -407,7 +407,7 @@ body {
 }
 
 /* ================================================================
-   8. CENTER LOGO - FIXED BLUR & POSITION
+   8. CENTER LOGO
    ================================================================ */
 .center-logo {
     position: absolute;
@@ -423,7 +423,6 @@ body {
     height: 110px;
     object-fit: contain;
     filter: brightness(0) invert(1);
-    /* FIX: Logo keyfiyyəti üçün */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 }
@@ -466,7 +465,7 @@ body {
 }
 
 /* ================================================================
-   10. PLAY BUTTON - STYLE UPDATED
+   10. PLAY BUTTON
    ================================================================ */
 .play-button-container {
     position: absolute;
@@ -525,7 +524,6 @@ body {
     pointer-events: none;
 }
 
-/* FIX: Play Button Font Changed to Courier New */
 .play-button span,
 .play-text {
     font-family: 'Courier New', monospace; 
@@ -562,7 +560,7 @@ body {
 }
 
 /* ================================================================
-   11. RIGHT NAV & SOCIALS - UPDATED (CLEAN & FLOATING)
+   11. RIGHT NAV & SOCIALS
    ================================================================ */
 .right-floating-nav {
     position: absolute;
@@ -630,7 +628,6 @@ body {
     color: #000;
 }
 
-/* FIX: Social Icons - Floating, Cleaner, No Border */
 .bottom-right-socials {
     position: absolute;
     bottom: 50px;
@@ -642,7 +639,7 @@ body {
 .social-icons-home {
     display: flex;
     align-items: center;
-    gap: 30px; /* Ara məsafə */
+    gap: 30px;
 }
 
 .social-link-home {
@@ -998,7 +995,7 @@ body {
 }
 
 /* ================================================================
-   14. RESPONSIVE - MOBILE (FULL FIXES)
+   14. RESPONSIVE - MOBILE (768px)
    ================================================================ */
 @media (max-width: 768px) {
     /* Header & Navigation */
@@ -1021,7 +1018,7 @@ body {
         display: flex !important;
     }
     
-    /* Logo - Centered & Fixed */
+    /* Logo - Top Center */
     .center-logo {
         top: 20px;
         left: 50%;
@@ -1029,14 +1026,15 @@ body {
         width: auto;
         display: flex;
         justify-content: center;
+        z-index: 150;
     }
     
     .logo-img {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
     }
     
-    /* Split name - Overlap Fix */
+    /* Split name */
     .name-left,
     .name-right {
         font-size: clamp(32px, 10vw, 50px); 
@@ -1052,22 +1050,49 @@ body {
         letter-spacing: -4px;
     }
 
-    /* Play Button */
+    /* ✅ PLAY BUTTON - KİÇİLDİLMİŞ */
     .play-button-container {
-        width: 160px;
-        height: 80px;
+        width: 140px;
+        height: 70px;
+        top: 55%;
     }
     
     .play-button {
-        width: 70px;
-        height: 28px;
+        width: 60px;
+        height: 24px;
     }
 
-    .play-button span, .play-text {
-        font-size: 10px;
+    .play-button::before {
+        width: 90px;
+        height: 32px;
+    }
+
+    .play-button::after {
+        width: 120px;
+        height: 40px;
+    }
+
+    .play-button span, 
+    .play-text {
+        font-size: 9px;
+        letter-spacing: 0.5px;
+    }
+
+    .play-button-container:hover .play-button {
+        width: 64px;
+    }
+
+    .play-button-container:hover .play-button::before {
+        width: 95px;
+        height: 35px;
+    }
+
+    .play-button-container:hover .play-button::after {
+        width: 125px;
+        height: 43px;
     }
     
-    /* Floating nav (Right controls) */
+    /* Floating nav */
     .right-floating-nav {
         bottom: 100px;
         right: 50%;
@@ -1076,7 +1101,7 @@ body {
         width: 100%;
     }
     
-    /* Socials - Centered in Mobile */
+    /* Socials */
     .bottom-right-socials {
         bottom: 40px;
         right: 50%;
@@ -1085,7 +1110,7 @@ body {
     }
 
     .social-icons-home {
-        gap: 35px; /* Mobildə barmaqla basmaq rahat olsun deyə aranı açırıq */
+        gap: 35px;
     }
 
     .social-link-home {
@@ -1096,7 +1121,7 @@ body {
         display: none;
     }
     
-    /* Modal / Preview */
+    /* Modal */
     .preview-info {
         top: 70px;
         left: 20px;
@@ -1113,13 +1138,65 @@ body {
         height: 40px;
     }
     
+    /* ✅ MODAL PLAY BUTTON - KİÇİLDİLMİŞ VƏ MƏRKƏZLƏŞDİRİLMİŞ */
+    .modal-play-btn {
+        width: 120px !important;
+        height: 60px !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .preview-container.active .modal-play-btn,
+    .preview-container.is-paused .modal-play-btn {
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .preview-container.user-inactive .modal-play-btn {
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .modal-play-btn .play-button {
+        width: 55px;
+        height: 22px;
+    }
+
+    .modal-play-btn .play-button::before {
+        width: 85px;
+        height: 30px;
+    }
+
+    .modal-play-btn .play-button::after {
+        width: 110px;
+        height: 38px;
+    }
+
+    .modal-play-btn .play-text {
+        font-size: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    .modal-play-btn:hover .play-button {
+        width: 58px;
+    }
+
+    .modal-play-btn:hover .play-button::before {
+        width: 88px;
+        height: 32px;
+    }
+
+    .modal-play-btn:hover .play-button::after {
+        width: 115px;
+        height: 40px;
+    }
+    
     .custom-controls {
         padding: 0 20px 40px;
     }
 }
 
 /* ================================================================
-   15. RESPONSIVE - SMALL MOBILE
+   15. RESPONSIVE - SMALL MOBILE (480px)
    ================================================================ */
 @media (max-width: 480px) {
     .mobile-menu {
@@ -1127,20 +1204,69 @@ body {
         padding: 80px 20px 20px;
     }
     
+    .logo-img {
+        width: 60px;
+        height: 60px;
+    }
+    
     .name-left,
     .name-right {
-        font-size: 34px;
+        font-size: 28px;
     }
 
     .play-button-container {
-        transform: translate(-50%, -50%) scale(0.9);
+        width: 120px;
+        height: 60px;
+    }
+
+    .play-button {
+        width: 55px;
+        height: 22px;
+    }
+
+    .play-button span, 
+    .play-text {
+        font-size: 8px;
     }
     
     .project-name-outline {
-        font-size: 18px;
+        font-size: 16px;
     }
     
     .counter-text {
-        font-size: 12px;
+        font-size: 11px;
+    }
+
+    .social-icons-home {
+        gap: 25px;
+    }
+
+    .social-link-home {
+        font-size: 20px;
+    }
+
+    /* ✅ MODAL PLAY BUTTON - DAHA DA KİÇİK */
+    .modal-play-btn {
+        width: 100px !important;
+        height: 50px !important;
+    }
+
+    .modal-play-btn .play-button {
+        width: 50px;
+        height: 20px;
+    }
+
+    .modal-play-btn .play-button::before {
+        width: 75px;
+        height: 28px;
+    }
+
+    .modal-play-btn .play-button::after {
+        width: 95px;
+        height: 35px;
+    }
+
+    .modal-play-btn .play-text {
+        font-size: 7px;
     }
 }

@@ -1257,7 +1257,7 @@ button#playPauseBtn i {
 }
 
 /* ============================================================
-    16. RESPONSIVE - MOBILE
+    16. RESPONSIVE - MOBILE (768px)
     ============================================================ */
 @media (max-width: 768px) {
     .header {
@@ -1308,33 +1308,55 @@ button#playPauseBtn i {
         max-height: 50vh;
     }
 
+    /* ✅ ƏSAS DÜZƏLIŞ - ARCHİVE SECTION */
     .archive-section {
         width: 100%;
-        padding: 160px 20px 60px;
+        padding: 140px 15px 60px;
+        overflow-x: hidden;
     }
 
+    /* ✅ SPLIT TITLES - MOBIL RESPONSIVE */
     .split-titles {
         flex-direction: column;
-        gap: 30px;
+        gap: 20px;
         text-align: center;
+        margin-bottom: 40px;
+        width: 100%;
+        overflow: hidden;
+        padding: 0 5px;
     }
 
     .archive-title-container {
         text-align: center;
+        width: 100%;
     }
 
     .video-title {
         align-items: center;
+        width: 100%;
+        height: clamp(28px, 10vw, 40px);
     }
 
-    .video-word, .archive-title {
-        font-size: clamp(35px, 8vw, 60px);
-        -webkit-text-stroke: 1px #FFA500;
+    /* ✅ BÖYÜK YAZILARIN ÖLÇÜSÜNÜ AZALTMAQ */
+    .video-word, 
+    .archive-title {
+        font-size: clamp(26px, 10vw, 40px) !important;
+        -webkit-text-stroke: 0.8px #FFA500 !important;
+        letter-spacing: -1px;
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: visible;
+    }
+
+    .archive-subtitle {
+        font-size: 9px;
+        letter-spacing: 1px;
     }
 
     .archive-table {
         display: block;
         overflow-x: auto;
+        width: 100%;
     }
 
     .archive-table td {
@@ -1404,20 +1426,28 @@ button#playPauseBtn i {
 }
 
 /* ============================================================
-    17. RESPONSIVE - SMALL MOBILE
+    17. RESPONSIVE - SMALL MOBILE (480px)
     ============================================================ */
 @media (max-width: 480px) {
     .archive-section {
-        padding: 140px 15px 60px;
+        padding: 130px 10px 60px;
     }
 
-    .video-word, .archive-title {
-        font-size: clamp(30px, 10vw, 50px);
-        -webkit-text-stroke: 0.8px #FFA500;
+    .split-titles {
+        gap: 15px;
+        padding: 0;
+    }
+
+    /* ✅ ÇOX KIÇIK EKRANLAR ÜÇÜN DAHA KIÇIK ÖLÇÜ */
+    .video-word, 
+    .archive-title {
+        font-size: clamp(22px, 11vw, 35px) !important;
+        -webkit-text-stroke: 0.6px #FFA500 !important;
+        letter-spacing: 0px;
     }
 
     .archive-subtitle {
-        font-size: 10px;
+        font-size: 8px;
     }
 
     .archive-table {

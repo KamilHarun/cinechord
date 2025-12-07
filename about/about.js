@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 6.0 - ARCHIVE PATTERN + FULL SYNC
+   Version: 6.1 - FORCED VIDEO AUTOPLAY
    ============================================================ */
 
 (function() {
@@ -275,23 +275,106 @@
     }
 
     /* ============================================================
-       7. STATIC VIDEO LOADING
+       7. VIDEO FORCED AUTOPLAY (MOBILE & DESKTOP)
        ============================================================ */
     
-    function loadStaticVideo() {
-        if (elements.aboutVideo) {
-            console.log('📹 Loading static video:', CONFIG.STATIC_VIDEO);
-            elements.aboutVideo.src = CONFIG.STATIC_VIDEO;
-            elements.aboutVideo.load();
-            
-            elements.aboutVideo.addEventListener('loadeddata', function() {
-                console.log('✅ Static video loaded');
-            });
-            
-            elements.aboutVideo.addEventListener('error', function(e) {
-                console.error('❌ Video error:', e);
-            });
+    function forceVideoPlay() {
+        if (!elements.aboutVideo) return;
+        
+        elements.aboutVideo.muted = true;
+        elements.aboutVideo.playsInline = true;
+        elements.aboutVideo.autoplay = true;
+        
+        const playPromise = elements.aboutVideo.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✅ Video playing successfully');
+                })
+                .catch(error => {
+                    console.warn('⚠️ Autoplay blocked, retrying...', error);
+                    // Retry after a short delay
+                    setTimeout(() => {
+                        elements.aboutVideo.play().catch(err => {
+                            console.error('❌ Video play retry failed:', err);
+                        });
+                    }, 500);
+                });
         }
+    }
+    
+    function loadStaticVideo() {
+        if (!elements.aboutVideo) return;
+        
+        console.log('📹 Loading static video:', CONFIG.STATIC_VIDEO);
+        elements.aboutVideo.src = CONFIG.STATIC_VIDEO;
+        
+        // Remove controls attribute if exists
+        elements.aboutVideo.removeAttribute('controls');
+        
+        // Set required attributes for autoplay
+        elements.aboutVideo.muted = true;
+        elements.aboutVideo.loop = true;
+        elements.aboutVideo.playsInline = true;
+        elements.aboutVideo.autoplay = true;
+        
+        elements.aboutVideo.load();
+        
+        // Force play when loaded
+        elements.aboutVideo.addEventListener('loadeddata', function() {
+            console.log('✅ Static video loaded');
+            forceVideoPlay();
+        }, { once: true });
+        
+        // If video pauses for any reason, restart it immediately
+        elements.aboutVideo.addEventListener('pause', function() {
+            console.log('⚠️ Video paused, restarting...');
+            setTimeout(() => {
+                forceVideoPlay();
+            }, 100);
+        });
+        
+        // If video ends (shouldn't happen with loop, but just in case)
+        elements.aboutVideo.addEventListener('ended', function() {
+            console.log('⚠️ Video ended, restarting...');
+            elements.aboutVideo.currentTime = 0;
+            forceVideoPlay();
+        });
+        
+        // Handle errors
+        elements.aboutVideo.addEventListener('error', function(e) {
+            console.error('❌ Video error:', e);
+        });
+        
+        // Disable right-click menu on video
+        elements.aboutVideo.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // Play on visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && elements.aboutVideo) {
+                forceVideoPlay();
+            }
+        });
+        
+        // Fallback: Force play on user interaction (mobile devices)
+        const interactionEvents = ['click', 'touchstart', 'scroll'];
+        interactionEvents.forEach(eventType => {
+            document.addEventListener(eventType, function initVideoOnInteraction() {
+                forceVideoPlay();
+                // Remove listeners after first interaction
+                interactionEvents.forEach(type => {
+                    document.removeEventListener(type, initVideoOnInteraction);
+                });
+            }, { once: true, passive: true });
+        });
+        
+        // Force play after page load
+        setTimeout(() => {
+            forceVideoPlay();
+        }, 1000);
     }
 
     /* ============================================================
@@ -606,11 +689,11 @@
        ============================================================ */
     
     function init() {
-        console.log('🚀 About page initialized');
+        console.log('🚀 About page initialized - Video will autoplay continuously');
         
         initPageTransition();
         initLogoAnimation();
-        loadStaticVideo();
+        loadStaticVideo(); // ✅ Video forced autoplay included
         loadDynamicContent();
         initScrollEffects();
         initNavigation();
