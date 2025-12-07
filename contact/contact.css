@@ -222,9 +222,9 @@ body {
     transform: translateY(10px);
 }
 
-/* ================================================================
-   7. HAMBURGER MENU (MOBILE) - FIXED DÜZƏLİŞ
-   ================================================================ */
+/* =========================================
+   HAMBURGER MENU (MOBILE) - TOUCH TARGET FIX
+   ========================================= */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -232,16 +232,25 @@ body {
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    z-index: 10002;
+    z-index: 1002;
     position: fixed;
     top: 20px;
     right: 20px;
-    padding: 15px;
-    width: 60px;   
-    height: 60px;  
+    
+    /* ⬇️ DÜZƏLDİLMİŞ ÖLÇÜLƏR */
+    padding: 0; /* ⬅️ padding sıfırlandı */
+    width: 50px;  /* ⬅️ Daha kiçik, amma toxunmaq üçün kifayət */
+    height: 50px;
+    min-width: 50px; /* ⬅️ YENİ */
+    min-height: 50px; /* ⬅️ YENİ */
+    
     background: transparent;
     border: none;
-    pointer-events: auto;
+    
+    /* ⬇️ YENİ - Touch üçün təkmilləşdirmə */
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -252,7 +261,7 @@ body {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 2px;
     display: block;
-    pointer-events: none;
+    pointer-events: none; 
 }
 
 .hamburger.active span:nth-child(1) {
