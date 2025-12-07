@@ -232,26 +232,19 @@ body {
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    z-index: 1002;
+    z-index: 10002; /* style.css üçün */
+    /* z-index: 1002; contact.css üçün */
     position: fixed;
     top: 20px;
     right: 20px;
-    
-    /* ⬇️ DÜZƏLDİLMİŞ ÖLÇÜLƏR */
-    padding: 0; /* ⬅️ padding sıfırlandı */
-    width: 50px;  /* ⬅️ Daha kiçik, amma toxunmaq üçün kifayət */
-    height: 50px;
-    min-width: 50px; /* ⬅️ YENİ */
-    min-height: 50px; /* ⬅️ YENİ */
-    
+    padding: 15px; /* ⬅️ works.css kimi */
+    width: 60px; /* ⬅️ works.css kimi */
+    height: 60px; /* ⬅️ works.css kimi */
     background: transparent;
     border: none;
-    
-    /* ⬇️ YENİ - Touch üçün təkmilləşdirmə */
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
+    /* ⬇️ BU 2 SƏTİRİ SİLİN (əgər varsa) */
+    /* pointer-events: auto; - SİLİN */
+    /* -webkit-tap-highlight-color: transparent; - SİLİN */
 }
 
 .hamburger span {
@@ -261,7 +254,7 @@ body {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 2px;
     display: block;
-    pointer-events: none; 
+    pointer-events: none; /* ⬅️ BU QALSIN */
 }
 
 .hamburger.active span:nth-child(1) {
