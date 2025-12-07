@@ -304,27 +304,21 @@ body {
     transition: opacity 0.3s, transform 0.3s;
 }
 
-/* ================================================================
-   7. HAMBURGER MENU (MOBILE) - FIXED DÜZƏLİŞ
-   ================================================================ */
+/* =========================================
+   HAMBURGER MENU (MOBILE) - FIXED DÜZƏLİŞ
+   ========================================= */
 .hamburger {
     display: none;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     gap: 6px;
     cursor: pointer;
-    z-index: 10002;
+    z-index: 1002;
     position: fixed;
     top: 20px;
     right: 20px;
-    padding: 15px;
-    width: 60px;   
-    height: 60px;  
+    padding: 10px;
     background: transparent;
     border: none;
-    pointer-events: auto;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger span {
@@ -334,7 +328,6 @@ body {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 2px;
     display: block;
-    pointer-events: none;
 }
 
 .hamburger.active span:nth-child(1) {
@@ -352,28 +345,34 @@ body {
     background: #FFA500;
 }
 
-/* Mobile Menu */
+/* ✅ DÜZƏLDİLMİŞ MOBILE MENU */
 .mobile-menu {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 100%; 
-    max-width: 400px;
-    height: 100dvh;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
     background: rgba(5, 5, 5, 0.98);
     backdrop-filter: blur(20px);
-    z-index: 10001;
-    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1001;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                opacity 0.4s ease, 
+                visibility 0.4s ease;
     padding: 100px 30px 30px;
-    display: none;
+    display: flex; /* ⬅️ none-dan flex-ə dəyişdi */
     flex-direction: column;
     gap: 12px;
     overflow-y: auto;
     border-left: 1px solid rgba(255, 165, 0, 0.1);
+    visibility: hidden; /* ⬅️ Yeni əlavə */
+    opacity: 0; /* ⬅️ Yeni əlavə */
 }
 
 .mobile-menu.active {
     right: 0;
+    visibility: visible; /* ⬅️ Yeni əlavə */
+    opacity: 1; /* ⬅️ Yeni əlavə */
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -384,18 +383,16 @@ body {
     font-size: 14px;
     animation: none;
     opacity: 1;
-    visibility: visible;
 }
 
-/* Mobile Menu Overlay */
 .mobile-menu-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100dvh;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 10000;
+    z-index: 1000;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
