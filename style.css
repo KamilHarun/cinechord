@@ -304,9 +304,9 @@ body {
     transition: opacity 0.3s, transform 0.3s;
 }
 
-/* ================================================================
-   7. HAMBURGER MENU (MOBILE) - TOUCH TARGET FIX
-   ================================================================ */
+/* =========================================
+   HAMBURGER MENU (MOBILE) - TOUCH TARGET FIX
+   ========================================= */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -354,19 +354,19 @@ body {
     background: #FFA500;
 }
 
-/* ✅ DÜZƏLDİLMİŞ MOBILE MENU */
+/* ✅ DÜZƏLDİLMİŞ Mobile Menu */
 .mobile-menu {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 85%;
-    max-width: 320px;
-    height: 100vh;
+    width: 100%; 
+    max-width: 400px;
+    height: 100dvh;
     background: rgba(5, 5, 5, 0.98);
     backdrop-filter: blur(20px);
-    z-index: 1001;
-    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                opacity 0.4s ease, 
+    z-index: 10001;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.4s ease,
                 visibility 0.4s ease;
     padding: 100px 30px 30px;
     display: flex; /* ⬅️ none-dan flex-ə dəyişdi */
@@ -392,16 +392,18 @@ body {
     font-size: 14px;
     animation: none;
     opacity: 1;
+    visibility: visible;
 }
 
+/* Mobile Menu Overlay */
 .mobile-menu-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
+    z-index: 10000;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
