@@ -1347,20 +1347,31 @@ body {
         display: none !important;
     }
     
-    .hamburger {
+  .hamburger {
         display: flex !important;
+        position: relative;   /* Z-index işləməsi üçün vacibdir */
+        z-index: 10001;       /* Hər şeydən üstdə (ən yüksək qatda) olur */
     }
     
     .mobile-menu {
         display: flex !important;
     }
     
-    /* Logo */
     .center-logo {
         top: 20px;
         left: 50%;
         transform: translateX(-50%) scale(0.5) rotate(-180deg);
         width: auto;
+        
+        /* ✅ KLİKLƏNMƏ PROBLEMİ BURADA HƏLL EDİLİR */
+        position: absolute;      /* Mütləq yerləşmə z-index üçün lazımdır */
+        z-index: 10;             /* Hamburgerdən (10001) aşağıda qalsın */
+        pointer-events: none;    /* Loqonun boş sahələri klikləri bloklamasın */
+    }
+    
+    /* Əgər loqonun özü kliklənən linkdirsə, bu kodu əlavə edin: */
+    .center-logo a, .center-logo img {
+        pointer-events: auto;    
     }
     
     .center-logo.entry-done {

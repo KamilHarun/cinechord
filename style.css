@@ -1003,8 +1003,8 @@ body {
 }
 
 /* ================================================================
-   14. RESPONSIVE - MOBILE (768px)
-   ================================================================ */
+    14. RESPONSIVE - MOBILE (768px)
+    ================================================================ */
 @media (max-width: 768px) {
     /* Header & Navigation */
     .header {
@@ -1018,8 +1018,17 @@ body {
         display: none !important;
     }
     
+    /* ✅ HAMBURGER MENYU DÜZƏLİŞİ (Z-INDEX & HITBOX) */
     .hamburger {
         display: flex !important;
+        
+        /* KLİK SAHƏSİNİ BÖYÜT */
+        padding: 15px;          
+        margin-right: -15px;    /* Düyməni sağ tərəfə geri çəkir */
+        
+        /* ƏN ÜST QATDA OLMASINI TƏMİN ET */
+        position: relative;
+        z-index: 10001;
     }
     
     .mobile-menu {
@@ -1034,9 +1043,17 @@ body {
         width: auto;
         display: flex;
         justify-content: center;
+        /* Z-INDEX TƏMİNATI */
+        position: absolute;
         z-index: 150;
+        pointer-events: none; /* Loqo konteynerinin boş sahələri klikləri bloklamasın */
     }
     
+    /* Loqonun özünü (link/şəkil) kliklənən saxlayırıq */
+    .center-logo a, .center-logo img {
+        pointer-events: auto;
+    }
+
     .logo-img {
         width: 70px;
         height: 70px;
@@ -1204,8 +1221,8 @@ body {
 }
 
 /* ================================================================
-   15. RESPONSIVE - SMALL MOBILE (480px)
-   ================================================================ */
+    15. RESPONSIVE - SMALL MOBILE (480px)
+    ================================================================ */
 @media (max-width: 480px) {
     .mobile-menu {
         width: 100%;
@@ -1277,5 +1294,4 @@ body {
     .modal-play-btn .play-text {
         font-size: 7px;
     }
-    
 }
