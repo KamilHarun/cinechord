@@ -249,8 +249,53 @@ body {
     background: #FFA500;
 }
 
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 100000; /* ⬅️ HƏR ŞEYDƏN ÜSTDƏ */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    width: 60px;
+    height: 60px;
+    background: transparent;
+    border: none;
+    pointer-events: auto;
+}
+
+.hamburger span {
+    width: 28px;
+    height: 2.5px;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 2px;
+    display: block;
+    pointer-events: none;
+}
+
+/* Active */
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+    background: #FFA500;
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+    background: #FFA500;
+}
+
 /* =========================================
-   MOBILE MENU - VIDEO SAFE VERSION
+   MOBILE MENU - FIXED VERSION
    ========================================= */
 .mobile-menu {
     position: fixed;
@@ -261,7 +306,7 @@ body {
     height: 100dvh;
     background: rgba(5, 5, 5, 0.98);
     backdrop-filter: blur(20px);
-    z-index: 19999; /* ⬅️ Hamburgerdən bir alt layer */
+    z-index: 99999; /* ⬅️ Hamburgerdən bir alt layer */
     transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 0.4s ease,
                 visibility 0.4s ease;
@@ -300,7 +345,7 @@ body {
     width: 100%;
     height: 100dvh;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 19000; /* ⬅️ Menu və hamburgerdən aşağı */
+    z-index: 99998; /* ⬅️ Menu və hamburgerdən aşağı */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -1347,34 +1392,20 @@ body {
         display: none !important;
     }
     
-  .hamburger {
+    .hamburger {
         display: flex !important;
-        position: relative;   /* Z-index işləməsi üçün vacibdir */
-        z-index: 10001;       /* Hər şeydən üstdə (ən yüksək qatda) olur */
     }
     
-  .mobile-menu {
-    display: none;
-}
-.mobile-menu.active {
-    display: flex;
-}
+    .mobile-menu {
+        display: flex !important;
+    }
     
+    /* Logo */
     .center-logo {
         top: 20px;
         left: 50%;
         transform: translateX(-50%) scale(0.5) rotate(-180deg);
         width: auto;
-        
-        /* ✅ KLİKLƏNMƏ PROBLEMİ BURADA HƏLL EDİLİR */
-        position: absolute;      /* Mütləq yerləşmə z-index üçün lazımdır */
-        z-index: 10;             /* Hamburgerdən (10001) aşağıda qalsın */
-        pointer-events: none;    /* Loqonun boş sahələri klikləri bloklamasın */
-    }
-    
-    /* Əgər loqonun özü kliklənən linkdirsə, bu kodu əlavə edin: */
-    .center-logo a, .center-logo img {
-        pointer-events: auto;    
     }
     
     .center-logo.entry-done {
