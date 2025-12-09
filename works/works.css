@@ -1353,9 +1353,12 @@ body {
         z-index: 10001;       /* Hər şeydən üstdə (ən yüksək qatda) olur */
     }
     
-    .mobile-menu {
-        display: flex !important;
-    }
+  .mobile-menu {
+    display: none;
+}
+.mobile-menu.active {
+    display: flex;
+}
     
     .center-logo {
         top: 20px;

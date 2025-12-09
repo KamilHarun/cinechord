@@ -504,76 +504,80 @@
         }
     });
 
-    // ============================================================
-    // 7. MOBILE MENU
-    // ============================================================
-    
-    function initMobileMenu() {
-        if (document.querySelector('.hamburger')) return;
-        
-        const hamburger = document.createElement('button');
-        hamburger.className = 'hamburger';
-        hamburger.innerHTML = '<span></span><span></span><span></span>';
-        hamburger.setAttribute('aria-label', 'Toggle menu');
-        
-        const mobileMenu = document.createElement('div');
-        mobileMenu.className = 'mobile-menu';
-        
-        const overlay = document.createElement('div');
-        overlay.className = 'mobile-menu-overlay';
-        
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            const clone = btn.cloneNode(true);
-            mobileMenu.appendChild(clone);
-        });
-        
-        document.body.appendChild(overlay);
-        document.body.appendChild(mobileMenu);
-        
-        if (header) {
-            header.appendChild(hamburger);
-        }
-        
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = isActive ? '' : 'hidden';
-        }
-        
-        hamburger.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-        
-        mobileMenu.addEventListener('click', (e) => {
-            if (e.target.classList.contains('nav-btn')) {
-                toggleMenu();
-            }
-        });
-        
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
-                toggleMenu();
-            }
-        });
+// ============================================================
+// 7. MOBILE MENU
+// ============================================================
+
+function initMobileMenu() {
+
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    // Hamburger varsa silirik
+    const existingHamburger = document.querySelector('.hamburger');
+    if (existingHamburger) existingHamburger.remove();
+
+    const hamburger = document.createElement('button');
+    hamburger.className = 'hamburger';
+    hamburger.innerHTML = '<span></span><span></span><span></span>';
+
+    const mobileMenu = document.createElement('div');
+    mobileMenu.className = 'mobile-menu';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-menu-overlay';
+
+    // Nav btn-ləri klonlayırıq
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        const clone = btn.cloneNode(true);
+        clone.classList.add("mobile-item");
+        mobileMenu.appendChild(clone);
+    });
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(mobileMenu);
+    header.appendChild(hamburger);
+
+    function toggleMenu() {
+        const isActive = hamburger.classList.contains('active');
+
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        overlay.classList.toggle('active');
+
+        document.body.style.overflow = isActive ? '' : 'hidden';
     }
 
-    // ============================================================
-    // 8. INIT
-    // ============================================================
-    
-    function init() {
-        loadDynamicWorks();
-        
-        if (window.innerWidth <= 768) {
-            initMobileMenu();
+    hamburger.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+
+    mobileMenu.addEventListener('click', (e) => {
+        if (e.target.classList.contains('nav-btn')) {
+            toggleMenu();
         }
-    }
+    });
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
+            toggleMenu();
+        }
+    });
+}
 
-})();
+// ============================================================
+// 8. INIT
+// ============================================================
+
+function init() {
+    if (window.innerWidth <= 768) {
+        initMobileMenu();
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+}
+)
