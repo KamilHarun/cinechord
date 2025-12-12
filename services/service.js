@@ -1,105 +1,72 @@
-/* ============================================================
-   CineChord Service - Main JavaScript
-   Version: 2.0 - ARCHIVE PATTERN REFACTORED
-   Description: Professional service page with complete features
-   Author: Kamil
-   ============================================================ */
-
 (function() {
     'use strict';
 
     /* ============================================================
-       1. CONFIGURATION & CONSTANTS
-       ============================================================ */
+        1. CONFIGURATION & API
+        ============================================================ */
+    
+    // BACKEND URL
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
+    const API_SERVICES = `${BACKEND_URL}/api/services`;
+    const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
     
     const CONFIG = {
-        SCROLL_THRESHOLD: 50,
-        LOGO_ENTRY_DELAY: 200,
         PAGE_LOAD_DELAY: 100,
         NAVIGATION_DELAY: 600,
         FALLBACK_DELAY: 1600,
-        RESIZE_DEBOUNCE: 250,
         VIDEO_OBSERVE_THRESHOLD: 0.25,
         VIDEO_ROOT_MARGIN: '100px'
     };
 
     /* ============================================================
-       2. DOM ELEMENT REFERENCES
-       ============================================================ */
+        2. DOM ELEMENT REFERENCES
+        ============================================================ */
     
     const elements = {
         pageTransition: document.querySelector('.page-transition'),
         centerLogo: document.querySelector('.center-logo'),
-        header: document.querySelector('.header'),
         progressBar: document.querySelector('.progress-bar-top'),
         chatSection: document.querySelector('.chat-section'),
-        videos: document.querySelectorAll('video'),
-        revealItems: document.querySelectorAll('.reveal-item'),
-        pageWrappers: document.querySelectorAll('.page-wrapper')
+        servicesContainer: document.getElementById('services-list-container'),
+        
+        // Menu Elementləri
+        hamburger: document.getElementById('hamburgerBtn'),
+        hamburgerText: document.querySelector('.hamburger-text'),
+        mobileMenu: document.getElementById('mobileMenu'),
+        overlay: document.getElementById('mobileMenuOverlay'),
     };
 
     /* ============================================================
-       3. STATE VARIABLES
-       ============================================================ */
-    
-    let lastScrollTop = 0;
-    let isTransitioning = false;
-    let ticking = false;
-
-    /* ============================================================
-       4. UTILITY FUNCTIONS
-       ============================================================ */
-    
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    /* ============================================================
-       5. PAGE TRANSITION SYSTEM
-       ============================================================ */
+        3. PAGE TRANSITION SYSTEM
+        ============================================================ */
     
     function initPageTransition() {
         if (!elements.pageTransition) return;
         
-        // Səhifə yükləndikdən sonra qara ekran yuxarı sürüşür
         setTimeout(() => {
             elements.pageTransition.classList.add('page-loaded');
         }, CONFIG.PAGE_LOAD_DELAY);
-        
     }
 
     function navigateWithTransition(href) {
-        if (isTransitioning) {
+        if (href.startsWith('mailto') || href.startsWith('tel')) {
+            window.location.href = href;
             return;
         }
-        
-        isTransitioning = true;
-        
-        // Stop all videos
-        elements.videos.forEach(video => {
+
+        if (!elements.pageTransition || !elements.pageTransition.classList.contains('page-loaded')) return; 
+
+        document.querySelectorAll('video').forEach(video => {
             video.pause();
             video.currentTime = 0;
         });
         
-        if (elements.pageTransition) {
-            // page-loaded silmək qara ekranı aşağı endirir
-            elements.pageTransition.classList.remove('page-loaded');
-        }
+        elements.pageTransition.classList.remove('page-loaded');
         
-        // Qara ekran tam endikdən sonra navigate et
         setTimeout(() => {
             window.location.href = href;
         }, CONFIG.NAVIGATION_DELAY);
         
-        // Fallback
         setTimeout(() => {
             if (!document.hidden) {
                 window.location.href = href;
@@ -108,101 +75,121 @@
     }
 
     /* ============================================================
-       6. MOBILE NAVIGATION & HAMBURGER
-       ============================================================ */
-    
+        4. MOBILE MENU - FIX: JUMP PROBLEMİ HƏLLİ
+        ============================================================ */
+
+    function toggleMenu() {
+        const { hamburger, mobileMenu, overlay, hamburgerText, centerLogo } = elements;
+        if (!hamburger || !mobileMenu) return;
+
+        const isActive = hamburger.classList.contains('active');
+        
+        // FIX: Scrollbar genişliyini hesabla
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        if (overlay) overlay.classList.toggle('active');
+        
+        if (hamburgerText) {
+            hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+        }
+        
+        // FIX: Scrollbar compensation - Jump problemini həll edir
+        if (!isActive) {
+            // Menu açılır
+            document.body.style.overflow = 'hidden';
+            document.body.style.paddingRight = scrollbarWidth + 'px';
+            // Fixed elementləri də kompensasiya et
+            if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
+            if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
+        } else {
+            // Menu bağlanır
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            if (hamburger) hamburger.style.paddingRight = '';
+            if (centerLogo) centerLogo.style.paddingRight = '';
+        }
+    }
+
     function initMobileMenu() {
-        const hamburger = document.createElement('div');
-        hamburger.className = 'hamburger';
-        hamburger.innerHTML = '<span></span><span></span><span></span>';
-        hamburger.setAttribute('aria-label', 'Toggle menu');
-        hamburger.setAttribute('role', 'button');
+        const { hamburger, overlay, mobileMenu } = elements;
         
-        if (elements.header) {
-            elements.header.appendChild(hamburger);
+        if (hamburger) {
+            hamburger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMenu();
+            });
         }
 
-        const mobileMenu = document.createElement('div');
-        mobileMenu.className = 'mobile-menu';
-        const overlay = document.createElement('div');
-        overlay.className = 'mobile-menu-overlay';
-        
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            mobileMenu.appendChild(btn.cloneNode(true));
-        });
-        
-        document.body.appendChild(overlay);
-        document.body.appendChild(mobileMenu);
-
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = isActive ? '' : 'hidden';
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleMenu();
+            });
         }
 
-        hamburger.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-        mobileMenu.addEventListener('click', function(e) {
-            if (e.target.classList.contains('nav-btn') || e.target.closest('.nav-btn')) {
+        // ESC düyməsi
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && hamburger && hamburger.classList.contains('active')) {
                 toggleMenu();
             }
         });
-
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                if (window.innerWidth > 768 && hamburger.classList.contains('active')) {
-                    toggleMenu();
+        
+        // Mobil Menyudan Keçid Məntiqi:
+        const navLinks = mobileMenu ? mobileMenu.querySelectorAll('.nav-btn') : [];
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (!href || href === '#' || this.classList.contains('active')) {
+                    e.preventDefault();
+                    if (href !== '#') toggleMenu();
+                    return;
                 }
-            }, CONFIG.RESIZE_DEBOUNCE);
-        });
-        
-    }
 
-    /* ============================================================
-       7. SCROLL EFFECTS
-       ============================================================ */
-    
-    function updateScroll(currentScroll) {
-        // Header hide/show
-        if (currentScroll > lastScrollTop && currentScroll > CONFIG.SCROLL_THRESHOLD) {
-            if (elements.header) elements.header.style.transform = 'translateY(-100%)';
-        } else {
-            if (elements.header) elements.header.style.transform = 'translateY(0)';
-        }
-
-        // Logo hide/show
-        if (currentScroll > CONFIG.SCROLL_THRESHOLD) {
-            if (elements.centerLogo) elements.centerLogo.classList.add('scroll-hidden');
-        } else {
-            if (elements.centerLogo) elements.centerLogo.classList.remove('scroll-hidden');
-        }
-        
-        lastScrollTop = currentScroll;
-        ticking = false;
-    }
-
-    function handleScroll() {
-        const currentScroll = window.scrollY;
-        
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                updateScroll(currentScroll);
+                e.preventDefault(); 
+                toggleMenu();
+                
+                setTimeout(() => {
+                    navigateWithTransition(href);
+                }, 100);
             });
-            ticking = true;
-        }
-    }
-
-    function initScrollEffects() {
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        });
     }
 
     /* ============================================================
-       8. SCROLL REVEAL (INTERSECTION OBSERVER)
-       ============================================================ */
+        5. GLOBAL NAVİQASİYA (Menyu xaricindəki linklər)
+        ============================================================ */
+    
+    function setupNavButtons() {
+        const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
+        
+        internalLinks.forEach(link => {
+            if (link.closest('.mobile-menu')) return;
+
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (href.startsWith('mailto') || href.startsWith('tel')) return;
+                
+                const currentPath = window.location.pathname.replace(/\/$/, '');
+                const targetPath = href ? href.replace(/\.\./g, '').replace(/\/$/, '') : '';
+                
+                if (currentPath === targetPath || (currentPath === '/service' && targetPath === '/')) {
+                    return;
+                }
+                
+                e.preventDefault();
+                navigateWithTransition(href);
+            });
+        });
+    }
+
+    /* ============================================================
+        6. SCROLL REVEAL (Intersection Observer)
+        ============================================================ */
     
     function initScrollReveal() {
         const observerOptions = {
@@ -219,25 +206,16 @@
             });
         }, observerOptions);
 
-        // Observe reveal items
-        elements.revealItems.forEach(el => observer.observe(el));
+        document.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
         
-        // Observe page wrappers
-        elements.pageWrappers.forEach(el => {
-            el.classList.add('reveal-item');
-            observer.observe(el);
-        });
-        
-        // Observe chat section
         if (elements.chatSection) {
             observer.observe(elements.chatSection);
         }
-        
     }
 
     /* ============================================================
-       9. VIDEO LAZY LOADING
-       ============================================================ */
+        7. VIDEO LAZY LOADING
+        ============================================================ */
     
     function initVideoLazyLoad() {
         const videoObserverOptions = {
@@ -249,141 +227,148 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const video = entry.target;
-                    const videoSrc = video.getAttribute('data-src');
-                    
-                    if (videoSrc && !video.src) {
-                        
-                        video.style.background = 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)';
-                        video.src = videoSrc;
-                        video.load();
-                        
-                        video.addEventListener('loadeddata', () => {
-                            video.style.background = '#000';
-                            video.play().catch(err => {
-                            });
-                        });
-                        
-                        video.addEventListener('error', () => {
-                            video.style.background = '#1a1a1a';
-                        });
-                    }
-                    
-                    videoObserver.unobserve(video);
+                    video.play().catch(() => {});
+                } else {
+                    entry.target.pause();
                 }
             });
         }, videoObserverOptions);
 
-        document.querySelectorAll('video[data-src]').forEach(video => {
+        document.querySelectorAll('video').forEach(video => {
             videoObserver.observe(video);
         });
-        
     }
 
     /* ============================================================
-       10. NAVIGATION & SCRAMBLE EFFECT
-       ============================================================ */
-    
-    function setupNavButtons() {
-        document.querySelectorAll('.nav-btn, .footer-link, .chat-cta-button, .cta-button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const href = btn.getAttribute('href');
-                if (!href || href === '#' || href.startsWith('#')) return;
-                if (href === window.location.pathname.split('/').pop()) return;
-                e.preventDefault();
-                navigateWithTransition(href);
-            });
-        });
+        8. DİNAMİK SERVİS YÜKLƏMƏSİ
+        ============================================================ */
+
+    function cleanUrlPath(url) {
+        if (url && typeof url === 'string') {
+            if (url.startsWith('http')) return url;
+            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
+        }
+        return url;
     }
 
-    function initNavigation() {
-        setupNavButtons();
-        setTimeout(setupNavButtons, 100);
+    async function fetchAndRenderServices() {
+        const container = elements.servicesContainer;
+        if (!container) return;
 
-        // Scramble effect (Desktop only)
-        if (window.innerWidth > 768) {
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                const originalText = btn.getAttribute('data-text');
-                if (!originalText) return;
-                const navText = btn.querySelector('.nav-text');
-                if (!navText) return;
-
-                btn.addEventListener('mouseenter', function() {
-                    if (this.classList.contains('active')) return;
-                    let iteration = 0;
-                    let interval = setInterval(() => {
-                        navText.innerText = originalText.split("").map((letter, index) => {
-                            if (index < iteration) return originalText[index];
-                            return letters[Math.floor(Math.random() * letters.length)];
-                        }).join("");
-                        if (iteration >= originalText.length) clearInterval(interval);
-                        iteration += 1 / 3;
-                    }, 30);
-                });
+        try {
+            const response = await fetch(API_SERVICES);
+            if (!response.ok) throw new Error(`API error! Status: ${response.status}`);
+            
+            const data = await response.json();
+            const services = data.content ? data.content : data;
+            
+            if (!services || services.length === 0) {
+                container.innerHTML = '<p style="text-align:center; padding: 100px; color: rgba(255,255,255,0.5);">No services available.</p>';
+                return;
+            }
+            
+            let htmlContent = '';
+            
+            services.forEach((service, index) => {
+                let videoSrc = service.videoUrl || '';
+                if (videoSrc) {
+                    videoSrc = cleanUrlPath(videoSrc);
+                    if (!videoSrc.startsWith('http')) {
+                        videoSrc = UPLOADS_URL + videoSrc;
+                    }
+                }
                 
-                btn.addEventListener('mouseleave', function() {
-                    if (this.classList.contains('active')) return;
-                    navText.innerText = originalText;
-                });
-            });
-        }
-        
-    }
-
-    /* ============================================================
-       11. TOUCH OPTIMIZATION
-       ============================================================ */
-    
-    function initTouchOptimization() {
-        if ('ontouchstart' in window) {
-            document.querySelectorAll('.nav-btn, .cta-button, .chat-cta-button, .social-icon-btn').forEach(el => {
-                el.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.95)';
-                }, { passive: true });
+                const bulletListHtml = service.bulletPoints && Array.isArray(service.bulletPoints)
+                    ? service.bulletPoints.map(item => `<li>${item}</li>`).join('')
+                    : '';
                 
-                el.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                }, { passive: true });
-            });
-        }
+                const processStepsHtml = service.processSteps && Array.isArray(service.processSteps)
+                    ? service.processSteps.map((item, i) => `<li>${i + 1}. ${item}</li>`).join('')
+                    : '';
+                
+                const titleText = (service.title || '').toUpperCase();
 
-        // Mobile video optimization
-        if (window.innerWidth <= 768) {
-            elements.videos.forEach(video => {
-                video.setAttribute('preload', 'metadata');
+                const mediaColumn = `
+                    <div class="media-column">
+                        <div class="media-container">
+                            <div class="media-frame">
+                                <video class="media-content" 
+                                    muted loop playsinline preload="auto"
+                                    src="${videoSrc}"> 
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                const contentColumn = `
+                    <div class="content-column">
+                        <div class="content-wrapper">
+                            <div class="service-header">
+                                <div class="icon-container">
+                                    <i class="${service.iconClass || 'fas fa-cogs'}"></i>
+                                </div>
+                                <h2 class="service-title" data-text="${titleText}">
+                                    <span>${titleText}</span>
+                                </h2>
+                            </div>
+                            <p class="description">${service.description || ''}</p>
+                            ${bulletListHtml ? `<ul class="bullet-list">${bulletListHtml}</ul>` : ''}
+                            ${bulletListHtml && processStepsHtml ? '<div class="divider"></div>' : ''}
+                            ${processStepsHtml ? `<ol class="numbered-list">${processStepsHtml}</ol>` : ''}
+                            <a href="../contact/" class="cta-button">
+                                CONTACT <i class="fas fa-long-arrow-alt-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                if (index % 2 === 0) {
+                    htmlContent += `<section class="page-wrapper reveal-item">${mediaColumn}${contentColumn}</section>`;
+                } else { 
+                    htmlContent += `<section class="page-wrapper reveal-item">${contentColumn}${mediaColumn}</section>`;
+                }
             });
+
+            container.innerHTML = htmlContent;
+            
+            initScrollReveal();
+            initVideoLazyLoad();
+            
+        } catch (error) {
+            console.error('Xidmətlər yüklənərkən xəta:', error);
+            container.innerHTML = `
+                <p style="text-align:center; padding: 100px; color: #FF8C00;">
+                    Xidmətlər hazırda mövcud deyil.<br>
+                    <small style="color: rgba(255,255,255,0.4);">API: ${API_SERVICES}</small>
+                </p>
+            `;
         }
-        
     }
 
     /* ============================================================
-       12. LOGO ENTRY ANIMATION
-       ============================================================ */
-    
-    function initLogoAnimation() {
-        setTimeout(() => {
-            if (elements.centerLogo) elements.centerLogo.classList.add('entry-done');
-        }, CONFIG.LOGO_ENTRY_DELAY);
-    }
-
-    /* ============================================================
-       13. INITIALIZATION
-       ============================================================ */
+        9. INITIALIZATION
+        ============================================================ */
     
     function init() {
-        
         initPageTransition();
         initMobileMenu();
-        initScrollEffects();
-        initScrollReveal();
-        initVideoLazyLoad();
-        initNavigation();
-        initTouchOptimization();
-        initLogoAnimation();
+        fetchAndRenderServices(); 
+        setupNavButtons(); 
         
+        if (elements.chatSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+            observer.observe(elements.chatSection);
+        }
     }
 
-    // Start initialization
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

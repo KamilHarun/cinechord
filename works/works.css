@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - Works Page Stylesheet
-   Version: 5.2 - MOBILE VIDEO MODAL FIXES
+   Version: 6.0 - INDEX İLƏ EYNİLƏŞDİRİLMİŞ
    ========================================= */
 
 /* =========================================
@@ -20,9 +20,9 @@ body {
 }
 
 body {
+    font-family: 'Gabarito', sans-serif;
     background: #050505;
     color: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 400;
     line-height: 1.5;
     overflow-x: hidden;
@@ -30,22 +30,16 @@ body {
 }
 
 /* =========================================
-   2. FONTS
+   2. GPU & TRANSITIONS
    ========================================= */
-@font-face {
-    font-family: 'NeueMetanaOutline';
-    src: url('../fonts/NeueMetanaNextOutline-Black.woff2') format('woff2'),
-         url('../fonts/NeueMetanaNextOutline-Black.woff') format('woff');
-    font-weight: 900;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'NeueMetanaSolid';
-    src: url('../fonts/NeueMetanaNext-SemiBold.woff2') format('woff2'),
-         url('../fonts/NeueMetanaNext-SemiBold.woff') format('woff');
-    font-weight: 600;
-    font-style: normal;
+.page-transition,
+.center-logo,
+.nav-btn,
+.hero-video {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 /* =========================================
@@ -58,11 +52,10 @@ body {
     width: 100%;
     height: 100%;
     background: #000;
-    z-index: 9999;
+    z-index: 999999;
     transform: translateY(0);
     pointer-events: all;
     transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
-    will-change: transform;
 }
 
 .page-transition.page-loaded {
@@ -72,7 +65,332 @@ body {
 }
 
 /* =========================================
-   3.5. SCROLL REVEAL ANIMATION (ABOUT PATTERN)
+   4. GRAIN OVERLAY
+   ========================================= */
+.grain-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
+    pointer-events: none;
+    z-index: 20002;
+    opacity: 0.08;
+    animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-1%, -1%); }
+}
+
+/* =========================================
+   5. PROGRESS BAR
+   ========================================= */
+.progress-bar-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, #FFA500, rgba(255, 165, 0, 0.5));
+    z-index: 9997;
+    transition: width 0.1s linear;
+}
+
+/* ============================================================
+   6. HAMBURGER MENU BUTTON
+   ============================================================ */
+
+.hamburger {
+    position: fixed;
+    top: 38px;
+    right: 40px;
+    z-index: 30000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 15px;
+    width: auto;
+    height: auto;
+}
+
+.hamburger * {
+    pointer-events: none;
+}
+
+.hamburger-text {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    width: 32px;
+    height: 20px;
+}
+
+.hamburger-line {
+    display: block;
+    height: 2px;
+    background: #fff;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
+}
+
+.hamburger-line:nth-child(1) {
+    width: 32px;
+}
+
+.hamburger-line:nth-child(2) {
+    width: 24px;
+}
+
+/* HOVER */
+.hamburger:hover .hamburger-text {
+    color: #FFA500;
+}
+
+.hamburger:hover .hamburger-line {
+    width: 32px;
+    background: #FFA500;
+}
+
+/* ACTIVE */
+.hamburger.active .hamburger-line:nth-child(1) {
+    width: 32px;
+    transform: translateY(5px) rotate(45deg);
+}
+
+.hamburger.active .hamburger-line:nth-child(2) {
+    width: 32px;
+    transform: translateY(-5px) rotate(-45deg);
+}
+
+.hamburger.active:hover .hamburger-text {
+    color: #FFA500;
+}
+
+.hamburger.active:hover .hamburger-line {
+    background: #FFA500;
+}
+
+/* ============================================================
+   7. MOBILE MENU OVERLAY
+   ============================================================ */
+
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 29000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ============================================================
+   8. MOBILE MENU
+   ============================================================ */
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 35%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 29999;
+    transition: right 1.1s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    padding: 0 20px;
+    gap: 0;
+    visibility: hidden;
+    opacity: 0;
+    box-shadow: -10px 0 50px rgba(0,0,0,0.5);
+}
+
+.mobile-menu.active {
+    right: 0;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* NAV BUTTONS */
+.nav-btn {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    margin: -1vh 0;
+    line-height: 0.95;
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: 4.5vw;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    color: transparent;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(150px);
+    transition: opacity 0.8s ease, transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mobile-menu.active .nav-btn {
+    opacity: 1;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mobile-menu.active .nav-btn:nth-child(odd) {
+    transform: translateX(-10px);
+}
+
+.mobile-menu.active .nav-btn:nth-child(even) {
+    transform: translateX(10px);
+}
+
+.mobile-menu.active .nav-btn:nth-child(1) { transition-delay: 0.3s; }
+.mobile-menu.active .nav-btn:nth-child(2) { transition-delay: 0.4s; }
+.mobile-menu.active .nav-btn:nth-child(3) { transition-delay: 0.5s; }
+.mobile-menu.active .nav-btn:nth-child(4) { transition-delay: 0.6s; }
+.mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
+.mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
+
+.nav-text {
+    display: block;
+    color: #fff;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-btn::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #FFA500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-btn:hover .nav-text {
+    transform: translateY(-100%) skewY(5deg);
+}
+
+.nav-btn:hover::after {
+    transform: translateY(-100%) skewY(0deg);
+}
+
+.menu-footer {
+    margin-top: 60px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mobile-menu.active .menu-footer {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
+}
+
+.menu-socials {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.menu-socials a {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: color 0.3s;
+    letter-spacing: 1px;
+}
+
+.menu-socials a:hover {
+    color: #FFA500;
+}
+
+.menu-contact-info p {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   9. LOGO
+   ============================================================ */
+
+.center-logo {
+    position: absolute;
+    top: 5px;
+    left: 40px;
+    z-index: 100;
+    pointer-events: auto;
+    text-decoration: none;
+}
+
+.logo-img {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    transition: opacity 0.3s ease;
+}
+
+.center-logo:hover .logo-img {
+    opacity: 0.8;
+}
+/* =========================================
+   10. SCROLL REVEAL ANIMATION
    ========================================= */
 .reveal-item {
     opacity: 0;
@@ -89,342 +407,8 @@ body {
 }
 
 /* =========================================
-   4. HEADER / NAVBAR
+   11. HERO SECTION (FIXED: WORKS MASK EFFECT)
    ========================================= */
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-    background: transparent;
-    transition: transform 0.4s ease;
-    transform: translateY(0);
-    animation: fadeInHeader 1s ease 0.2s both;
-    will-change: transform, opacity;
-    pointer-events: none;
-}
-
-@keyframes fadeInHeader {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.nav-left,
-.nav-right {
-    display: flex;
-    gap: 15px;
-    pointer-events: auto;
-}
-
-.nav-btn {
-    padding: 12px 30px;
-    background: transparent;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    border-radius: 25px;
-    color: #fff;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: capitalize;
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    opacity: 0;
-    will-change: transform, opacity;
-    text-decoration: none;
-}
-
-@keyframes fadeInUp {
-    0% { transform: translateY(40px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-}
-
-.nav-left .nav-btn:nth-child(1) { animation-delay: 0.3s; }
-.nav-left .nav-btn:nth-child(2) { animation-delay: 0.4s; }
-.nav-left .nav-btn:nth-child(3) { animation-delay: 0.5s; }
-.nav-right .nav-btn:nth-child(1) { animation-delay: 0.6s; }
-.nav-right .nav-btn:nth-child(2) { animation-delay: 0.7s; }
-.nav-right .nav-btn:nth-child(3) { animation-delay: 0.8s; }
-
-.nav-btn::before {
-    content: attr(data-text);
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #000;
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    letter-spacing: 1px;
-    border-radius: 25px;
-    background: #FFA500;
-    font-size: 13px;
-    font-family: 'Courier New', monospace;
-    transform: translateY(10px);
-}
-
-.nav-btn:hover {
-    background: #FFA500;
-    border-color: #FFA500;
-    color: #000;
-}
-
-.nav-btn:hover .nav-text {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-.nav-btn:hover::before {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.nav-text {
-    display: inline-block;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.nav-btn.active {
-    background: #FFA500;
-    border-color: #FFA500;
-    color: #000;
-}
-
-/* =========================================
-   HAMBURGER MENU (MOBILE) - VIDEO SAFE VERSION
-   ========================================= */
-.hamburger {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    z-index: 20000; /* ⬅️ Video layer-dən tam üstdə */
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px;
-    width: 60px;
-    height: 60px;
-    background: transparent;
-    border: none;
-}
-
-.hamburger span {
-    width: 28px;
-    height: 2.5px;
-    background: #fff;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    border-radius: 2px;
-    display: block;
-    pointer-events: none;
-}
-
-/* Active */
-.hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px);
-    background: #FFA500;
-}
-
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-    transform: translateX(20px);
-}
-
-.hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(8px, -8px);
-    background: #FFA500;
-}
-
-.hamburger {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    z-index: 100000; /* ⬅️ HƏR ŞEYDƏN ÜSTDƏ */
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px;
-    width: 60px;
-    height: 60px;
-    background: transparent;
-    border: none;
-    pointer-events: auto;
-}
-
-.hamburger span {
-    width: 28px;
-    height: 2.5px;
-    background: #fff;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    border-radius: 2px;
-    display: block;
-    pointer-events: none;
-}
-
-/* Active */
-.hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px);
-    background: #FFA500;
-}
-
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-    transform: translateX(20px);
-}
-
-.hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(8px, -8px);
-    background: #FFA500;
-}
-
-/* =========================================
-   MOBILE MENU - FIXED VERSION
-   ========================================= */
-.mobile-menu {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 100%;
-    max-width: 400px;
-    height: 100dvh;
-    background: rgba(5, 5, 5, 0.98);
-    backdrop-filter: blur(20px);
-    z-index: 99999; /* ⬅️ Hamburgerdən bir alt layer */
-    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.4s ease,
-                visibility 0.4s ease;
-    padding: 100px 30px 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-    border-left: 1px solid rgba(255, 165, 0, 0.1);
-    visibility: hidden;
-    opacity: 0;
-}
-
-.mobile-menu.active {
-    right: 0;
-    visibility: visible;
-    opacity: 1;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
-}
-
-/* Nav buttons */
-.mobile-menu .nav-btn {
-    width: 100%;
-    text-align: center;
-    padding: 16px 20px;
-    font-size: 14px;
-}
-
-/* =========================================
-   MENU OVERLAY - VIDEO SAFE VERSION
-   ========================================= */
-.mobile-menu-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100dvh;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 99998; /* ⬅️ Menu və hamburgerdən aşağı */
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.mobile-menu-overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-
-/* =========================================
-   6. CENTER LOGO
-   ========================================= */
-.center-logo {
-    position: fixed;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%) scale(0.5) rotate(-180deg);
-    z-index: 1001;
-    opacity: 0;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: auto;
-    will-change: transform, opacity;
-}
-
-.center-logo.entry-done {
-    animation: fadeInScale 0.8s ease forwards;
-}
-
-@keyframes fadeInScale {
-    to {
-        opacity: 1;
-        transform: translateX(-50%) scale(1) rotate(0deg);
-    }
-}
-
-.center-logo.scroll-hidden {
-    transform: translateX(-50%) translateY(-120px) scale(0.5) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    visibility: hidden;
-}
-
-.logo-img {
-    width: 110px;
-    height: 110px;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-}
-
-/* =========================================
-   7. HERO & GRAIN
-   ========================================= */
-.grain-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
-    pointer-events: none;
-    z-index: 9998;
-    opacity: 0.1;
-}
-
-.progress-bar-top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 0%;
-    height: 3px;
-    background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.5));
-    z-index: 9997;
-    transition: width 0.1s linear; 
-}
-
 .hero-section {
     min-height: 100vh;
     min-height: 100dvh;
@@ -464,25 +448,66 @@ body {
     z-index: 1;
 }
 
+/* Başlıq Konteyneri - Daşmanı gizlətmək üçün */
 .hero-left-title {
     position: absolute;
     left: 60px;
     top: 45%;
     transform: translateY(-50%);
     z-index: 5;
+    overflow: hidden; /* Animasiya zamanı kənara çıxmasın */
 }
 
+/* Əsas Başlıq - WORKS */
 .title-main {
-    font-family: 'NeueMetanaOutline', sans-serif;
-    font-size: clamp(40px, 6vw, 80px);
+    font-family: 'Gabarito', sans-serif;
+    /* Ölçü böyüdüldü */
+    font-size: clamp(2rem, 6vw, 6rem); 
     font-weight: 900;
-    letter-spacing: -3px;
-    line-height: 0.9;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    -webkit-text-stroke: 1.5px #fff;
-    color: transparent;
+    letter-spacing: -2px;
+    line-height: 1;
     text-transform: uppercase;
     margin: 0;
+    
+    display: inline-block;
+    position: relative;
+    cursor: default;
+
+    /* MASK OFF (Başlanğıc: İçi boş, kənarı ağ) */
+    color: transparent;
+    -webkit-text-stroke: 1.5px #fff;
+    text-shadow: none;
+}
+
+/* Orijinal Mətnin Hərəkəti */
+.title-main span {
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* MASK ON (Hover: İçi dolu narıncı) */
+.title-main::after {
+    content: attr(data-text); /* HTML-dən data-text oxuyur */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    color: #FFA500;
+    -webkit-text-stroke: 0;
+    
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+/* Hover Animasiyası */
+.title-main:hover span {
+    transform: translateY(-100%);
+}
+
+.title-main:hover::after {
+    transform: translateY(-100%);
 }
 
 .hero-right-content {
@@ -495,10 +520,10 @@ body {
 }
 
 .hero-description {
+    font-family: 'Gabarito', sans-serif;
     font-size: 14px;
     line-height: 1.8;
     color: rgba(255, 255, 255, 0.8);
-    font-family: 'Courier New', monospace;
     text-align: left;
 }
 
@@ -517,7 +542,7 @@ body {
 }
 
 .scroll-down-arrow .arrow-text {
-    font-family: 'Courier New', monospace;
+    font-family: 'Gabarito', sans-serif;
     font-size: 11px;
     color: rgba(255, 255, 255, 0.7);
     letter-spacing: 2px;
@@ -550,8 +575,28 @@ body {
     z-index: 2;
 }
 
+/* RESPONSIVE HERO */
+@media (max-width: 768px) {
+    .hero-left-title {
+        left: 20px;
+        top: 40%;
+    }
+    
+    .title-main {
+        font-size: 12vw; /* Mobildə də böyük olsun */
+    }
+    
+    .hero-right-content {
+        right: auto;
+        left: 20px;
+        top: 60%;
+        transform: translateY(0);
+        max-width: 90%;
+    }
+}
+
 /* =========================================
-   8. CATEGORIES & GRID
+   12. CATEGORIES & GRID
    ========================================= */
 .category-section {
     background-color: #050505;
@@ -575,8 +620,8 @@ body {
     border: none;
     cursor: pointer;
     padding: 0;
-    font-family: 'NeueMetanaOutline', sans-serif;
-    font-size: clamp(18px, 2.5vw, 40px);
+    font-family: 'Gabarito', sans-serif;
+    font-size: clamp(19px, 3.5vw, 55px);
     font-weight: 900;
     letter-spacing: -1.5px;
     line-height: 0.9;
@@ -719,7 +764,7 @@ body {
 }
 
 .card-title {
-    font-family: 'NeueMetanaOutline', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     font-size: 32px;
     color: #fff;
     font-weight: 900;
@@ -770,7 +815,7 @@ body {
 }
 
 /* =========================================
-   9. MODAL VIDEO PLAYER
+   13. MODAL VIDEO PLAYER
    ========================================= */
 .preview-container {
     position: fixed;
@@ -786,7 +831,6 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease;
-    will-change: opacity;
 }
 
 .preview-container.active {
@@ -809,7 +853,6 @@ body {
     transform: translateY(100%);
     opacity: 0;
     transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
-    will-change: transform, opacity;
 }
 
 .preview-container.active .video-wrapper {
@@ -835,102 +878,71 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    transition: all 0.5s ease;
-    will-change: opacity, transform;
 }
 
-.preview-container.user-inactive .preview-info {
-    opacity: 0;
-    transform: translateY(-40px);
+.text-mask {
+    overflow: hidden;
+    position: relative;
 }
 
 .preview-title {
-    font-family: 'NeueMetanaOutline', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     font-weight: 900;
-    color: transparent;
-    -webkit-text-stroke: 1px #fff;
+    color: #fff;
+    -webkit-text-stroke: 0;
     font-size: clamp(24px, 4vw, 50px);
     margin: 0;
     text-transform: uppercase;
     transform: translateY(105%);
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-}
-
-.preview-title::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    color: #fff;
-    -webkit-text-stroke: 0;
-    clip-path: inset(0 100% 0 0);
-    transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
 
 .preview-container.active .preview-title {
     transform: translateY(0);
 }
 
-.preview-container.active .preview-title::after {
-    clip-path: inset(0 0% 0 0);
-}
-
-.close-preview {
-    position: absolute;
-    top: 40px;
-    right: 40px;
-    width: 50px;
-    height: 50px;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 2001;
-    pointer-events: auto;
-    will-change: transform, opacity;
-}
-
-.preview-container.user-inactive .close-preview {
-    opacity: 0;
-    transform: scale(0.8) rotate(90deg);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.close-preview:hover {
-    border-color: #FFA500;
-    color: #FFA500;
-    transform: rotate(90deg);
+.preview-container.user-inactive .preview-title {
+    transform: translateY(105%);
 }
 
 .modal-play-btn {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
     z-index: 1002;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
     opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: auto !important;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.preview-container.is-paused .modal-play-btn,
-.preview-container:not(.is-paused):not(.user-inactive) .modal-play-btn {
+.preview-container.active .modal-play-btn,
+.preview-container.user-active .modal-play-btn,
+.preview-container.is-paused .modal-play-btn {
+    visibility: visible;
     opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate(-50%, -50%);
 }
 
-.preview-container:not(.is-paused).user-inactive .modal-play-btn {
+.preview-container.user-inactive .modal-play-btn {
+    visibility: hidden;
     opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transform: translate(-50%, -50%);
 }
+
+.preview-container.active .modal-play-btn:hover .play-button {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    width: 98px;
+}
+
+/* ============================================================
+   14. PLAY BUTTON
+   ============================================================ */
 
 .play-button-container {
     width: 250px;
@@ -938,6 +950,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    --ring-x: 0px;
+    --ring-y: 0px;
 }
 
 .play-button {
@@ -959,12 +974,12 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% + var(--ring-x)), calc(-50% + var(--ring-y)));
     width: 135px;
     height: 46px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 100px;
-    transition: all 0.4s ease;
+    transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
     pointer-events: none;
 }
 
@@ -973,28 +988,25 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% + var(--ring-x) * 1.5), calc(-50% + var(--ring-y) * 1.5));
     width: 180px;
     height: 58px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 100px;
-    transition: all 0.4s ease;
+    transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
     pointer-events: none;
 }
 
-.play-button i {
-    display: none !important;
-}
-
+.play-button span,
 .play-text {
-    font-family: 'Courier New', monospace;
+    font-family: 'Gabarito', sans-serif;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 1px;
     color: #fff;
     text-transform: uppercase;
     pointer-events: none;
-    transition: color 0.3s ease, letter-spacing 0.3s ease;
+    transition: color 0.3s ease;
 }
 
 .play-button-container:hover .play-button {
@@ -1034,7 +1046,6 @@ body {
     opacity: 1;
     transform: translateY(0);
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
 }
 
 .preview-container.user-inactive .custom-controls {
@@ -1078,8 +1089,6 @@ body {
     height: 100%;
     opacity: 0;
     cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
 }
 
 .controls-buttons {
@@ -1117,7 +1126,7 @@ body {
 }
 
 .time-display {
-    font-family: monospace;
+    font-family: 'Gabarito', sans-serif;
     font-size: 13px;
     color: rgba(255, 255, 255, 0.6);
     margin-left: 10px;
@@ -1149,6 +1158,32 @@ body {
     cursor: pointer;
 }
 
+.close-preview {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2001;
+    pointer-events: auto;
+}
+
+.close-preview:hover {
+    border-color: #FFA500;
+    color: #FFA500;
+    transform: rotate(90deg);
+}
+
 .video-loading {
     position: absolute;
     top: 50%;
@@ -1169,7 +1204,7 @@ body {
 }
 
 /* =========================================
-   10. CINEMATIC FOOTER
+   15. CINEMATIC FOOTER
    ========================================= */
 .main-footer {
     background: #050505;
@@ -1197,7 +1232,7 @@ body {
 }
 
 .cta-text {
-    font-family: 'NeueMetanaOutline', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     font-size: clamp(24px, 4vw, 48px);
     color: transparent;
     -webkit-text-stroke: 1px #fff;
@@ -1218,7 +1253,7 @@ body {
     width: 100%;
     color: #FFA500;
     -webkit-text-stroke: 0;
-    font-family: 'NeueMetanaSolid', sans-serif;
+    font-family: 'Gabarito', sans-serif;
 }
 
 .cta-text-link:hover .cta-text {
@@ -1226,7 +1261,7 @@ body {
 }
 
 .cta-button {
-    font-family: 'Courier New', monospace;
+    font-family: 'Gabarito', sans-serif;
     font-size: 14px;
     color: #000;
     background: #FFA500;
@@ -1265,7 +1300,7 @@ body {
 }
 
 .footer-label {
-    font-family: 'Courier New', monospace;
+    font-family: 'Gabarito', sans-serif;
     font-size: 12px;
     color: #FFA500;
     letter-spacing: 2px;
@@ -1282,7 +1317,7 @@ body {
 }
 
 .footer-text {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     font-size: 16px;
     color: rgba(255, 255, 255, 0.7);
     line-height: 1.6;
@@ -1302,7 +1337,7 @@ body {
     display: block;
     position: relative;
     transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     font-size: 16px;
     color: rgba(255, 255, 255, 0.7);
 }
@@ -1369,51 +1404,76 @@ body {
 }
 
 .copyright {
-    font-family: 'Courier New', monospace;
+    font-family: 'Gabarito', sans-serif;
     font-size: 11px;
     color: rgba(255, 255, 255, 0.3);
     letter-spacing: 1px;
 }
 
 /* =========================================
-   11. RESPONSIVE - MOBILE (768px)
+   16. RESPONSIVE - TABLET (1024px)
+   ========================================= */
+@media (max-width: 1024px) {
+    .mobile-menu {
+        width: 50%;
+    }
+}
+
+/* =========================================
+   17. RESPONSIVE - MOBILE (768px)
    ========================================= */
 @media (max-width: 768px) {
-    /* Header & Navigation */
-    .header {
-        padding: 15px 20px;
-        background: rgba(5, 5, 5, 0.95);
-        backdrop-filter: blur(10px);
-        justify-content: flex-end;
-    }
-    
-    .nav-left,
-    .nav-right {
-        display: none !important;
-    }
-    
     .hamburger {
-        display: flex !important;
+        top: 20px;
+        right: 20px;
+        gap: 12px;
+        padding: 12px;
+    }
+    
+    .hamburger-text {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
+    
+    .hamburger-icon {
+        width: 28px;
+        height: 18px;
+        gap: 6px;
+    }
+    
+    .hamburger-line:nth-child(1) {
+        width: 28px;
+    }
+    
+    .hamburger-line:nth-child(2) {
+        width: 20px;
+    }
+    
+    .hamburger:hover .hamburger-line,
+    .hamburger.active .hamburger-line {
+        width: 28px;
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(2) {
+        transform: translateY(-4px) rotate(-45deg);
     }
     
     .mobile-menu {
-        display: flex !important;
+        width: 100%;
     }
     
-    /* Logo */
+    .nav-btn {
+        font-size: 13vw;
+        margin: -5px 0;
+    }
+    
     .center-logo {
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) scale(0.5) rotate(-180deg);
-        width: auto;
-    }
-    
-    .center-logo.entry-done {
-        transform: translateX(-50%) scale(1) rotate(0deg);
-    }
-    
-    .center-logo.scroll-hidden {
-        transform: translateX(-50%) translateY(-120px) scale(0.5) !important;
+        top: 15px;
+        left: 20px;
     }
     
     .logo-img {
@@ -1439,7 +1499,7 @@ body {
         max-width: 100vw;
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; 
+        scrollbar-width: none;
         -ms-overflow-style: none;
     }
     
@@ -1466,11 +1526,6 @@ body {
         gap: 30px;
     }
 
-    .nav-btn {
-        font-size: 11px;
-        padding: 10px 20px;
-    }
-    
     /* Footer */
     .main-footer {
         padding: 60px 20px 30px;
@@ -1510,10 +1565,22 @@ body {
         text-align: left;
     }
 
-    /* ✅ MODAL PLAY BUTTON - KİÇİLDİLMİŞ */
+    /* MODAL PLAY BUTTON */
     .modal-play-btn {
         width: 120px !important;
         height: 60px !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .preview-container.active .modal-play-btn,
+    .preview-container.is-paused .modal-play-btn {
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .preview-container.user-inactive .modal-play-btn {
+        transform: translate(-50%, -50%) !important;
     }
 
     .play-button-container {
@@ -1555,11 +1622,10 @@ body {
         height: 40px;
     }
 
-    /* ✅ VIDEO MODAL CONTROLS - DÜZƏLDİLMİŞ */
+    /* VIDEO MODAL CONTROLS */
     .preview-info {
-        top: 80px;
+        top: 70px;
         left: 20px;
-        right: 20px;
     }
 
     .preview-title {
@@ -1571,63 +1637,33 @@ body {
         right: 20px;
         width: 40px;
         height: 40px;
-        font-size: 20px;
     }
 
     .custom-controls {
-        padding: 0 15px 25px 15px;
-        gap: 10px;
+        padding: 0 20px 40px;
     }
 
-    /* ✅ CONTROLS BUTTONS - KOMPAKT */
-    .controls-buttons {
-        gap: 8px;
-        flex-wrap: nowrap;
-    }
-
-    /* ✅ İCONLAR KİÇİLDİ */
-    .ctrl-btn i {
-        font-size: 16px !important;
-    }
-
-    .main-play-btn i {
-        font-size: 24px !important;
-    }
-
-    /* ✅ TIME DISPLAY - KİÇİLDİLMİŞ */
-    .time-display {
-        font-size: 10px;
-        margin-left: 5px;
-        gap: 3px;
-        flex-shrink: 0;
-    }
-
-    /* ✅ RIGHT CONTROLS - KOMPAKT */
-    .right-controls-group {
-        gap: 10px;
-        margin-left: auto;
-    }
-
-    /* ✅ VOLUME GİZLƏDİLDİ */
+    /* Volume gizlət */
     .volume-wrapper {
         display: none;
-    }
-
-    /* ✅ PROGRESS BAR */
-    .progress-bar-container {
-        height: 3px;
-    }
-
-    .progress-bar-container:hover {
-        height: 4px;
     }
 }
 
 /* =========================================
-   12. RESPONSIVE - SMALL MOBILE (480px)
+   18. RESPONSIVE - SMALL MOBILE (480px)
    ========================================= */
 @media (max-width: 480px) {
-    /* ✅ MODAL PLAY BUTTON - DAHA DA KİÇİK */
+    .center-logo {
+        top: 12px;
+        left: 15px;
+    }
+    
+    .logo-img {
+        width: 65px;
+        height: 65px;
+    }
+
+    /* MODAL PLAY BUTTON - DAHA KİÇİK */
     .modal-play-btn,
     .play-button-container {
         width: 100px !important;
@@ -1653,7 +1689,6 @@ body {
         font-size: 7px;
     }
 
-    /* ✅ CONTROLS - DAHA KOMPAKT */
     .custom-controls {
         padding: 0 10px 20px 10px;
     }
@@ -1677,10 +1712,5 @@ body {
 
     .right-controls-group {
         gap: 8px;
-    }
-
-    /* ✅ Fullscreen button gizlə */
-    #fullscreenBtn {
-        display: none;
     }
 }

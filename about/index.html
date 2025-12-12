@@ -1,55 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
-    <meta name="description" content="Learn about CINE CHORD - Our story, mission, and approach to cinematic storytelling">
-    <meta name="theme-color" content="#050505">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Chord — About</title>
     
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <title>Cine Chord - About</title>
-    
-    <!-- FAVICON -->
     <link rel="icon" type="image/png" href="../photos/CineChord.png">
-    <link rel="shortcut icon" type="image/png" href="../photos/CineChord.png">
-    <link rel="apple-touch-icon" href="../photos/CineChord.png">
     
-    <link rel="preload" href="../fonts/NeueMetanaNextOutline-Black.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="../fonts/NeueMetanaNext-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="about.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="grain-overlay"></div>
+
     <div class="page-transition"></div>
-    <div class="progress-bar-top"></div>
+    <div class="grain-overlay"></div>
 
-    <header class="header">
-        <div class="nav-left">
-            <a href="../index.html" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
-            <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
-            <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
-        </div>
-        <div class="nav-right">
-            <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
-            <a href="#" class="nav-btn active" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
-            <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
-        </div>
-        
-        <!-- Hamburger menu will be dynamically created by about.js -->
-    </header>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span class="hamburger-text">MENU</span>
+        <span class="hamburger-icon">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </span>
+    </button>
 
-    <div class="center-logo">
-        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <nav class="mobile-menu" id="mobileMenu">
+    <a href="../" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+    <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+    
+    <a href="#" class="nav-btn active" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+    
+    <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+
+    <div class="menu-footer">
+        <div class="menu-socials">
+            <a href="#">INSTAGRAM</a>
+            <a href="#">YOUTUBE</a>
+            <a href="#">VIMEO</a>
+        </div>
+        <div class="menu-contact-info">
+            <p>hello@cinechord.com</p>
+            <p>+994 50 123 45 67</p>
+        </div>
     </div>
+</nav>
+    
+    <a href="../" class="center-logo">
+        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    </a>
 
     <div class="container">
+        
         <section class="video-section">
             <div class="video-container">
-                <video id="about-video" class="fullscreen-video" autoplay muted loop playsinline preload="auto">
+                <video id="about-video" class="fullscreen-video" autoplay muted loop playsinline>
+                    <source src="../videos/Showreel.mp4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
                 <div class="video-overlay"></div>
@@ -58,66 +71,60 @@
 
         <section class="content-section">
             <div class="main-content">
-                <div class="title-wrapper reveal-item">
-                    <h1 id="main-title" class="rolling-title" data-text="OUR STORY">
-                        <span>OUR STORY</span>
-                    </h1>
-                </div>
+                
+   <div class="title-wrapper reveal-item">
+    <h1 id="main-title" class="hero-rolling-text" data-text="OUR STORY">
+        <span>OUR STORY</span>
+    </h1>
+</div>
 
                 <p id="subtitle" class="subtitle reveal-item">Loading...</p>
 
-                <div class="about-content">
-                    <div class="about-section reveal-item">
-                        <h2 class="section-title">WHO WE ARE</h2>
-                        <p id="who-we-are" class="section-text">Loading...</p>
+                <div class="about-text-blocks">
+                    <div class="about-block reveal-item">
+                        <h2 class="block-title">WHO WE ARE</h2>
+                        <div id="who-we-are" class="block-text">Loading...</div>
                     </div>
 
-                    <div class="about-section reveal-item">
-                        <h2 class="section-title">OUR MISSION</h2>
-                        <p id="our-mission" class="section-text">Loading...</p>
+                    <div class="about-block reveal-item">
+                        <h2 class="block-title">OUR MISSION</h2>
+                        <div id="our-mission" class="block-text">Loading...</div>
                     </div>
 
-                    <div class="about-section reveal-item">
-                        <h2 class="section-title">OUR APPROACH</h2>
-                        <p id="our-approach" class="section-text">Loading...</p>
+                    <div class="about-block reveal-item">
+                        <h2 class="block-title">OUR APPROACH</h2>
+                        <div id="our-approach" class="block-text">Loading...</div>
                     </div>
                 </div>
 
-                <div class="contact-info">
-                    <div class="contact-item reveal-item">
-                        <span class="contact-label">EMAIL</span>
+                <div class="info-grid reveal-item">
+                    <div class="info-item">
+                        <span class="label-small">EMAIL</span>
                         <a id="email-link" href="mailto:" class="rolling-link" data-text="">
-                            <span id="email-text"></span>
+                            <span></span>
                         </a>
                     </div>
 
-                    <div class="contact-item reveal-item">
-                        <span class="contact-label">ADDRESS</span>
+                    <div class="info-item">
+                        <span class="label-small">ADDRESS</span>
                         <span id="address" class="static-value">Loading...</span>
                     </div>
 
-                    <div class="contact-item reveal-item">
-                        <span class="contact-label">PHONE</span>
+                    <div class="info-item">
+                        <span class="label-small">PHONE</span>
                         <a id="phone-link" href="tel:" class="rolling-link" data-text="">
-                            <span id="phone-text"></span>
+                            <span></span>
                         </a>
                     </div>
                 </div>
 
-                <div class="social-links reveal-item">
-                    <a href="#" class="social-link" title="INSTAGRAM" aria-label="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="social-link" title="LINKEDIN" aria-label="LinkedIn">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                    <a href="#" class="social-link" title="VIMEO" aria-label="Vimeo">
-                        <i class="fab fa-vimeo"></i>
-                    </a>
-                    <a href="#" class="social-link" title="BEHANCE" aria-label="Behance">
-                        <i class="fab fa-behance"></i>
-                    </a>
+                <div class="social-icons-minimal reveal-item">
+                    <a href="#" class="minimal-social">INSTAGRAM</a>
+                    <a href="#" class="minimal-social">LINKEDIN</a>
+                    <a href="#" class="minimal-social">VIMEO</a>
+                    <a href="#" class="minimal-social">BEHANCE</a>
                 </div>
+
             </div>
         </section>
     </div>

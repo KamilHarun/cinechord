@@ -1,42 +1,25 @@
 /* ================================================================
-   CineChord Index (Home) - Main Stylesheet
-   Version: 4.1 - MOBILE FIXES (Logo + Play overlap, Hamburger)
+   CineChord Index - COMPLETE CSS
    ================================================================ */
 
-/* ================================================================
-   1. RESET & FONTS
-   ================================================================ */
-@font-face {
-    font-family: 'NeueMetanaOutline';
-    src: url('fonts/NeueMetanaNextOutline-Black.woff2') format('woff2'),
-         url('fonts/NeueMetanaNextOutline-Black.woff') format('woff');
-    font-weight: 900;
-    font-style: normal;
+/* 1. RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-
-@font-face {
-    font-family: 'NeueMetanaSolid';
-    src: url('fonts/NeueMetanaNext-SemiBold.woff2') format('woff2'),
-         url('fonts/NeueMetanaNext-SemiBold.woff') format('woff');
-    font-weight: 600;
-    font-style: normal;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     background: #000;
     color: #fff;
     overflow: hidden;
     height: 100vh;
-    height: 100dvh; 
+    height: 100dvh;
     width: 100vw;
 }
 
-/* ================================================================
-   2. GPU ACCELERATION
-   ================================================================ */
+/* 2. GPU & TRANSITIONS */
 .page-transition,
 .header,
 .center-logo,
@@ -48,9 +31,6 @@ body {
     -webkit-backface-visibility: hidden;
 }
 
-/* ================================================================
-   3. PAGE TRANSITION
-   ================================================================ */
 .page-transition {
     position: fixed;
     top: 0;
@@ -70,9 +50,7 @@ body {
     transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* ================================================================
-   4. LOADING SCREEN
-   ================================================================ */
+/* 3. LOADING SCREEN */
 .loading-screen {
     position: fixed;
     top: 0;
@@ -121,7 +99,8 @@ body {
 }
 
 .loader-percentage {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 500;
     font-size: 12px;
     color: #FFA500;
     letter-spacing: 2px;
@@ -134,8 +113,8 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-family: 'NeueMetanaSolid', sans-serif;
-    font-size: 8px;
+    font-family: 'Gabarito', sans-serif;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 2px;
     color: #FFA500;
@@ -150,9 +129,7 @@ body {
     object-fit: contain;
 }
 
-/* ================================================================
-   5. UI STYLES
-   ================================================================ */
+/* 4. GRAIN OVERLAY */
 .grain-overlay {
     position: fixed;
     top: 0;
@@ -161,8 +138,8 @@ body {
     height: 100%;
     background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
     pointer-events: none;
-    z-index: 9998;
-    opacity: 0.1;
+    z-index: 20002;
+    opacity: 0.08;
     animation: grain 8s steps(10) infinite;
 }
 
@@ -171,6 +148,7 @@ body {
     10% { transform: translate(-1%, -1%); }
 }
 
+/* 5. HERO SECTION */
 .hero-section {
     position: relative;
     height: 100vh;
@@ -209,203 +187,113 @@ body {
     pointer-events: none;
 }
 
-/* ================================================================
-   6. HEADER / NAVBAR
-   ================================================================ */
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-    background: transparent;
-    pointer-events: none;
-}
+/* ============================================================
+   6. HAMBURGER MENU BUTTON
+   ============================================================ */
 
-.nav-left,
-.nav-right {
-    display: flex;
-    gap: 15px;
-    pointer-events: auto;
-}
-
-.nav-btn {
-    padding: 12px 30px;
-    background: transparent;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    border-radius: 25px;
-    color: #fff;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    text-decoration: none;
-    transition: background 0.3s, border-color 0.3s, color 0.3s;
-}
-
-.nav-btn::before {
-    content: attr(data-text);
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #000;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    border-radius: 25px;
-    background: #FFA500;
-    transform: translateY(10px);
-}
-
-.nav-btn:hover {
-    background: #FFA500;
-    border-color: #FFA500;
-    color: #000;
-}
-
-.nav-btn:hover .nav-text {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-.nav-btn:hover::before {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.nav-btn.active {
-    background: #FFA500;
-    border-color: #FFA500;
-    color: #000;
-}
-
-.nav-btn.active .nav-text {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-.nav-btn.active::before {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.nav-text {
-    display: inline-block;
-    transition: opacity 0.3s, transform 0.3s;
-}
-
-/* =========================================
-   HAMBURGER MENU (MOBILE) - VIDEO SAFE VERSION
-   ========================================= */
 .hamburger {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    z-index: 20000; /* ⬅️ Video layer-dən tam üstdə */
     position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px;
-    width: 60px;
-    height: 60px;
+    top: 38px;
+    right: 40px;
+    z-index: 30000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
     background: transparent;
     border: none;
+    cursor: pointer;
+    padding: 15px;
+    width: auto;
+    height: auto;
 }
 
-.hamburger span {
-    width: 28px;
-    height: 2.5px;
-    background: #fff;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    border-radius: 2px;
-    display: block;
+.hamburger * {
     pointer-events: none;
 }
 
-/* Active */
-.hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px);
-    background: #FFA500;
+.hamburger-text {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    white-space: nowrap;
 }
 
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-    transform: translateX(20px);
-}
-
-.hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(8px, -8px);
-    background: #FFA500;
-}
-
-/* =========================================
-   MOBILE MENU - VIDEO SAFE VERSION
-   ========================================= */
-.mobile-menu {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 100%;
-    max-width: 400px;
-    height: 100dvh;
-    background: rgba(5, 5, 5, 0.98);
-    backdrop-filter: blur(20px);
-    z-index: 19999; /* ⬅️ Hamburgerdən bir alt layer */
-    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.4s ease,
-                visibility 0.4s ease;
-    padding: 100px 30px 30px;
+.hamburger-icon {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-    border-left: 1px solid rgba(255, 165, 0, 0.1);
-    visibility: hidden;
-    opacity: 0;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    width: 32px;
+    height: 20px;
 }
 
-.mobile-menu.active {
-    right: 0;
-    visibility: visible;
-    opacity: 1;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+.hamburger-line {
+    display: block;
+    height: 2px;
+    background: #fff;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
 }
 
-/* Nav buttons */
-.mobile-menu .nav-btn {
-    width: 100%;
-    text-align: center;
-    padding: 16px 20px;
-    font-size: 14px;
+.hamburger-line:nth-child(1) {
+    width: 32px;
 }
 
-/* =========================================
-   MENU OVERLAY - VIDEO SAFE VERSION
-   ========================================= */
+.hamburger-line:nth-child(2) {
+    width: 24px;
+}
+
+/* HOVER */
+.hamburger:hover .hamburger-text {
+    color: #FFA500;
+}
+
+.hamburger:hover .hamburger-line {
+    width: 32px;
+    background: #FFA500;
+}
+
+/* ACTIVE */
+.hamburger.active .hamburger-line:nth-child(1) {
+    width: 32px;
+    transform: translateY(5px) rotate(45deg);
+}
+
+.hamburger.active .hamburger-line:nth-child(2) {
+    width: 32px;
+    transform: translateY(-5px) rotate(-45deg);
+}
+
+.hamburger.active:hover .hamburger-text {
+    color: #FFA500;
+}
+
+.hamburger.active:hover .hamburger-line {
+    background: #FFA500;
+}
+
+/* ============================================================
+   7. MOBILE MENU OVERLAY
+   ============================================================ */
+
 .mobile-menu-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
+    height: 100vh;
     height: 100dvh;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 19000; /* ⬅️ Menu və hamburgerdən aşağı */
+    backdrop-filter: blur(5px);
+    z-index: 29000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.5s ease;
 }
 
 .mobile-menu-overlay.active {
@@ -413,68 +301,186 @@ body {
     pointer-events: all;
 }
 
+/* ============================================================
+   8. MOBILE MENU
+   ============================================================ */
 
-/* ================================================================
-   8. CENTER LOGO
-   ================================================================ */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 35%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 29999;
+    transition: right 1.1s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    padding: 0 20px;
+    gap: 0;
+    visibility: hidden;
+    opacity: 0;
+    box-shadow: -10px 0 50px rgba(0,0,0,0.5);
+}
+
+.mobile-menu.active {
+    right: 0;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* NAV BUTTONS */
+.nav-btn {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    margin: -1vh 0;
+    line-height: 0.95;
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: 4.5vw;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    color: transparent;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(150px);
+    transition: opacity 0.8s ease, transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mobile-menu.active .nav-btn {
+    opacity: 1;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mobile-menu.active .nav-btn:nth-child(odd) {
+    transform: translateX(-10px);
+}
+
+.mobile-menu.active .nav-btn:nth-child(even) {
+    transform: translateX(10px);
+}
+
+.mobile-menu.active .nav-btn:nth-child(1) { transition-delay: 0.3s; }
+.mobile-menu.active .nav-btn:nth-child(2) { transition-delay: 0.4s; }
+.mobile-menu.active .nav-btn:nth-child(3) { transition-delay: 0.5s; }
+.mobile-menu.active .nav-btn:nth-child(4) { transition-delay: 0.6s; }
+.mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
+.mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
+
+.nav-text {
+    display: block;
+    color: #fff;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-btn::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #FFA500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-btn:hover .nav-text {
+    transform: translateY(-100%) skewY(5deg);
+}
+
+.nav-btn:hover::after {
+    transform: translateY(-100%) skewY(0deg);
+}
+
+.menu-footer {
+    margin-top: 60px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mobile-menu.active .menu-footer {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
+}
+
+.menu-socials {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.menu-socials a {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: color 0.3s;
+    letter-spacing: 1px;
+}
+
+.menu-socials a:hover {
+    color: #FFA500;
+}
+
+.menu-contact-info p {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   9. LOGO
+   ============================================================ */
+
 .center-logo {
     position: absolute;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 5px;
+    left: 40px;
     z-index: 100;
-    pointer-events: none;
+    pointer-events: auto;
+    text-decoration: none;
 }
 
 .logo-img {
-    width: 110px;
-    height: 110px;
+    width: 140px;
+    height: 140px;
     object-fit: contain;
     filter: brightness(0) invert(1);
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
+    transition: opacity 0.3s ease;
 }
 
-/* ================================================================
-   9. SPLIT NAME
-   ================================================================ */
-.split-name {
-    position: absolute;
-    width: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    pointer-events: none;
+.center-logo:hover .logo-img {
+    opacity: 0.8;
 }
-
-.name-left,
-.name-right {
-    position: absolute;
-    top: 0;
-    font-family: 'NeueMetanaOutline', sans-serif;
-    font-size: clamp(60px, 8vw, 120px);
-    font-weight: 900;
-    letter-spacing: -4px;
-    line-height: 0.9;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.name-left {
-    left: 40px;
-    -webkit-text-stroke: 1.5px #fff;
-    color: transparent;
-}
-
-.name-right {
-    right: 40px;
-    font-family: 'NeueMetanaSolid', sans-serif;
-    letter-spacing: -16px;
-    color: #fff;
-}
-
-/* ================================================================
+/* ============================================================
    10. PLAY BUTTON
-   ================================================================ */
+   ============================================================ */
+
 .play-button-container {
     position: absolute;
     top: 50%;
@@ -488,6 +494,8 @@ body {
     width: 250px;
     height: 120px;
     pointer-events: auto !important;
+    --ring-x: 0px;
+    --ring-y: 0px;
 }
 
 .play-button {
@@ -509,12 +517,12 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% + var(--ring-x)), calc(-50% + var(--ring-y)));
     width: 135px;
     height: 46px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 100px;
-    transition: all 0.4s ease;
+    transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
     pointer-events: none;
 }
 
@@ -523,20 +531,20 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% + var(--ring-x) * 1.5), calc(-50% + var(--ring-y) * 1.5));
     width: 180px;
     height: 58px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 100px;
-    transition: all 0.4s ease;
+    transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
     pointer-events: none;
 }
 
 .play-button span,
 .play-text {
-    font-family: 'Courier New', monospace; 
+    font-family: 'Gabarito', sans-serif;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 1px;
     color: #fff;
     text-transform: uppercase;
@@ -567,9 +575,72 @@ body {
     height: 66px;
 }
 
-/* ================================================================
-   11. RIGHT NAV & SOCIALS
-   ================================================================ */
+/* ============================================================
+   11. SOL ALT - EXPLORE WORKS
+   ============================================================ */
+
+.bottom-left-explore {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
+    z-index: 20;
+    pointer-events: auto;
+}
+
+.explore-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 15px 0;
+}
+
+.explore-line {
+    width: 60px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.explore-text {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.explore-arrow {
+    font-size: 18px;
+    color: #fff;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.explore-btn:hover .explore-line {
+    width: 40px;
+    background: #FFA500;
+}
+
+.explore-btn:hover .explore-text {
+    color: #FFA500;
+    letter-spacing: 3px;
+}
+
+.explore-btn:hover .explore-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    color: #FFA500;
+}
+
+/* ============================================================
+   12. RIGHT FLOATING NAV
+   ============================================================ */
+
 .right-floating-nav {
     position: absolute;
     top: auto;
@@ -590,16 +661,16 @@ body {
 }
 
 .counter-text {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     font-size: 14px;
     color: #FFA500;
     letter-spacing: 2px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .project-name-outline {
-    font-family: 'NeueMetanaOutline', sans-serif;
-    font-size: 22px;
+    font-family: 'Gabarito', sans-serif;
+    font-size: 24px;
     font-weight: 900;
     color: transparent;
     text-transform: uppercase;
@@ -636,6 +707,10 @@ body {
     color: #000;
 }
 
+/* ============================================================
+   13. BOTTOM RIGHT SOCIALS
+   ============================================================ */
+
 .bottom-right-socials {
     position: absolute;
     bottom: 50px;
@@ -651,44 +726,66 @@ body {
 }
 
 .social-link-home {
+    position: relative;
+    display: block;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.social-icon,
+.social-icon-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: auto;
-    height: auto;
-    border: none;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.7);
     font-size: 20px;
-    text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.social-link-home:hover {
+.social-icon {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.social-icon-hover {
     color: #FFA500;
-    background: transparent;
-    transform: translateY(-5px) scale(1.2);
-    filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.6));
+    transform: translateY(100%);
 }
 
-.bottom-left-copyright {
-    position: absolute;
-    bottom: 40px;
-    left: 40px;
-    z-index: 20;
+.social-link-home:hover .social-icon {
+    transform: translateY(-100%);
 }
 
-.bottom-left-copyright span {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: rgba(255, 255, 255, 0.5);
-    font-weight: 600;
+.social-link-home:hover .social-icon-hover {
+    transform: translateY(0);
 }
 
-/* ================================================================
-   12. VIDEO PLAYER MODAL
-   ================================================================ */
+/* MOBILE */
+@media (max-width: 768px) {
+    .bottom-right-socials {
+        bottom: 40px;
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    .social-icons-home {
+        gap: 35px;
+    }
+
+    .social-icon,
+    .social-icon-hover {
+        font-size: 22px;
+    }
+}
+/* ============================================================
+   14. VIDEO MODAL
+   ============================================================ */
+
 .preview-container {
     position: fixed;
     top: 0;
@@ -758,10 +855,10 @@ body {
 }
 
 .preview-title {
-    font-family: 'NeueMetanaOutline', sans-serif;
+    font-family: 'Gabarito', sans-serif;
     font-weight: 900;
-    color: transparent;
-    -webkit-text-stroke: 1px #fff;
+    color: #fff;
+    -webkit-text-stroke: 0;
     font-size: clamp(24px, 4vw, 50px);
     margin: 0;
     text-transform: uppercase;
@@ -906,7 +1003,7 @@ body {
 }
 
 .time-display {
-    font-family: monospace;
+    font-family: 'Gabarito', sans-serif;
     font-size: 13px;
     color: rgba(255, 255, 255, 0.6);
     margin-left: 10px;
@@ -983,82 +1080,79 @@ body {
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* ================================================================
-   13. RESPONSIVE - TABLET
-   ================================================================ */
+/* ============================================================
+   15. RESPONSIVE - TABLET
+   ============================================================ */
+
 @media (max-width: 1024px) {
-    .header {
-        padding: 15px 30px;
-    }
-    
-    .nav-btn {
-        padding: 10px 20px;
-        font-size: 12px;
-    }
-    
-    .name-left,
-    .name-right {
-        font-size: clamp(50px, 7vw, 100px);
+    .right-floating-nav {
+        right: 5%;
     }
 }
 
-/* ================================================================
-   14. RESPONSIVE - MOBILE (768px)
-   ================================================================ */
+/* ============================================================
+   16. RESPONSIVE - MOBILE (768px)
+   ============================================================ */
+
 @media (max-width: 768px) {
-    /* Header & Navigation */
-    .header {
-        padding: 15px 20px;
-        background: transparent;
-        justify-content: flex-end;
-    }
-    
-    .nav-left,
-    .nav-right {
-        display: none !important;
-    }
-    
     .hamburger {
-        display: flex !important;
+        top: 20px;
+        right: 20px;
+        gap: 12px;
+        padding: 12px;
+    }
+    
+    .hamburger-text {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
+    
+    .hamburger-icon {
+        width: 28px;
+        height: 18px;
+        gap: 6px;
+    }
+    
+    .hamburger-line:nth-child(1) {
+        width: 28px;
+    }
+    
+    .hamburger-line:nth-child(2) {
+        width: 20px;
+    }
+    
+    .hamburger:hover .hamburger-line,
+    .hamburger.active .hamburger-line {
+        width: 28px;
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(2) {
+        transform: translateY(-4px) rotate(-45deg);
     }
     
     .mobile-menu {
-        display: flex !important;
+        width: 100%;
     }
     
-    /* Logo - Top Center */
+    .nav-btn {
+        font-size: 13vw;
+        margin: -5px 0;
+    }
+    
     .center-logo {
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        display: flex;
-        justify-content: center;
-        z-index: 150;
+        top: 15px;
+        left: 20px;
     }
     
     .logo-img {
-        width: 70px;
-        height: 70px;
-    }
-    
-    /* Split name */
-    .name-left,
-    .name-right {
-        font-size: clamp(32px, 10vw, 50px); 
-        letter-spacing: -1px;
-    }
-    
-    .name-left {
-        left: 5%;
-    }
-    
-    .name-right {
-        right: 5%;
-        letter-spacing: -4px;
+        width: 80px;
+        height: 80px;
     }
 
-    /* ✅ PLAY BUTTON - KİÇİLDİLMİŞ */
     .play-button-container {
         width: 140px;
         height: 70px;
@@ -1100,7 +1194,24 @@ body {
         height: 43px;
     }
     
-    /* Floating nav */
+    .bottom-left-explore {
+        bottom: 40px;
+        left: 20px;
+    }
+    
+    .explore-line {
+        width: 40px;
+    }
+    
+    .explore-text {
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+    
+    .explore-btn:hover .explore-line {
+        width: 30px;
+    }
+    
     .right-floating-nav {
         bottom: 100px;
         right: 50%;
@@ -1109,7 +1220,6 @@ body {
         width: 100%;
     }
     
-    /* Socials */
     .bottom-right-socials {
         bottom: 40px;
         right: 50%;
@@ -1125,11 +1235,6 @@ body {
         font-size: 24px;
     }
     
-    .bottom-left-copyright {
-        display: none;
-    }
-    
-    /* Modal */
     .preview-info {
         top: 70px;
         left: 20px;
@@ -1146,7 +1251,6 @@ body {
         height: 40px;
     }
     
-    /* ✅ MODAL PLAY BUTTON - KİÇİLDİLMİŞ VƏ MƏRKƏZLƏŞDİRİLMİŞ */
     .modal-play-btn {
         width: 120px !important;
         height: 60px !important;
@@ -1203,23 +1307,19 @@ body {
     }
 }
 
-/* ================================================================
-   15. RESPONSIVE - SMALL MOBILE (480px)
-   ================================================================ */
+/* ============================================================
+   17. RESPONSIVE - SMALL MOBILE (480px)
+   ============================================================ */
+
 @media (max-width: 480px) {
-    .mobile-menu {
-        width: 100%;
-        padding: 80px 20px 20px;
+    .center-logo {
+        top: 12px;
+        left: 15px;
     }
     
     .logo-img {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .name-left,
-    .name-right {
-        font-size: 28px;
+        width: 65px;
+        height: 65px;
     }
 
     .play-button-container {
@@ -1232,44 +1332,12 @@ body {
         height: 22px;
     }
 
-    .play-button span, 
-    .play-text {
-        font-size: 8px;
-    }
-    
-    .project-name-outline {
-        font-size: 16px;
-    }
-    
-    .counter-text {
-        font-size: 11px;
-    }
-
-    .social-icons-home {
-        gap: 25px;
-    }
-
-    .social-link-home {
-        font-size: 20px;
-    }
-
-    /* ✅ MODAL PLAY BUTTON - DAHA DA KİÇİK */
-    .modal-play-btn {
-        width: 100px !important;
-        height: 50px !important;
-    }
-
-    .modal-play-btn .play-button {
-        width: 50px;
-        height: 20px;
-    }
-
-    .modal-play-btn .play-button::before {
+    .play-button::before {
         width: 75px;
         height: 28px;
     }
 
-    .modal-play-btn .play-button::after {
+    .play-button::after {
         width: 95px;
         height: 35px;
     }
@@ -1278,4 +1346,16 @@ body {
         font-size: 7px;
     }
     
+    .bottom-left-explore {
+        bottom: 30px;
+        left: 15px;
+    }
+    
+    .explore-text {
+        font-size: 10px;
+    }
+    
+    .explore-line {
+        width: 30px;
+    }
 }

@@ -10,6 +10,12 @@
     <title>CineChord - Archive | Video Archive</title>
     
     <link rel="icon" type="image/png" href="../photos/CineChord.png">
+    <link rel="shortcut icon" type="image/png" href="../photos/CineChord.png">
+    <link rel="apple-touch-icon" href="../photos/CineChord.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -18,12 +24,9 @@
 <body>
 
     <div class="page-transition"></div>
-    
     <div class="grain-overlay"></div>
-    
-    <div class="progress-bar-top"></div>
 
-    <!-- ✅ WORKS STYLE VIDEO MODAL -->
+    <!-- VIDEO MODAL (WORKS STYLE) -->
     <div class="preview-container is-paused" id="previewContainer">
         <button class="close-preview" id="closePreview">×</button>
         
@@ -52,7 +55,7 @@
                 
                 <div class="controls-buttons">
                     <button class="ctrl-btn skip-btn" id="rewindBtn" title="-5s">
-                        <i class="fas fa-undo-alt"></i>
+                        <i class="fa-solid fa-rotate-left"></i>
                     </button>
                     
                     <button class="ctrl-btn main-play-btn" id="playPauseBtn">
@@ -61,7 +64,7 @@
                     </button>
                     
                     <button class="ctrl-btn skip-btn" id="forwardBtn" title="+5s">
-                        <i class="fas fa-redo-alt"></i>
+                        <i class="fa-solid fa-rotate-right"></i>
                     </button>
                     
                     <div class="time-display">
@@ -82,35 +85,46 @@
         </div>
     </div>
 
-    <header class="header" role="banner">
-        <nav class="nav-left" aria-label="Primary navigation">
-            <a href="../index.html" class="nav-btn" data-text="HOME">
-                <span class="nav-text">HOME</span>
-            </a>
-            <a href="../works/" class="nav-btn" data-text="WORK">
-                <span class="nav-text">WORK</span>
-            </a>
-            <a href="../services/" class="nav-btn" data-text="SERVICE">
-                <span class="nav-text">SERVICE</span>
-            </a>
-        </nav>
-        
-        <nav class="nav-right" aria-label="Secondary navigation">
-            <a href="#" class="nav-btn active" data-text="ARCHIVE" aria-current="page">
-                <span class="nav-text">ARCHIVE</span>
-            </a>
-            <a href="../about/" class="nav-btn" data-text="ABOUT">
-                <span class="nav-text">ABOUT</span>
-            </a>
-            <a href="../contact/" class="nav-btn" data-text="CONTACT">
-                <span class="nav-text">CONTACT</span>
-            </a>
-        </nav>
-    </header>
+    <!-- HAMBURGER BUTTON -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span class="hamburger-text">MENU</span>
+        <span class="hamburger-icon">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </span>
+    </button>
 
-    <div class="center-logo">
-        <img src="../photos/CineChord.png" alt="CineChord Logo" class="logo-img">
+    <!-- OVERLAY -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- MOBILE MENU -->
+   <nav class="mobile-menu" id="mobileMenu">
+    <a href="../" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+    
+    <a href="#" class="nav-btn active" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+    
+    <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+    <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+
+    <div class="menu-footer">
+        <div class="menu-socials">
+            <a href="#">INSTAGRAM</a>
+            <a href="#">YOUTUBE</a>
+            <a href="#">VIMEO</a>
+        </div>
+        <div class="menu-contact-info">
+            <p>hello@cinechord.com</p>
+            <p>+994 50 123 45 67</p>
+        </div>
     </div>
+</nav>
+
+    <!-- LOGO -->
+<a href="../" class="center-logo">
+    <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+</a>
 
     <main>
         <section class="archive-section" id="archiveSection">
@@ -147,10 +161,7 @@
             </table>
         </section>
     </main>
-    
 
-
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="archive.js"></script>
 </body>
 </html>

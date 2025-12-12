@@ -1,442 +1,347 @@
 /* ============================================================
-   CineChord Contact - Main JavaScript
-   Version: 2.1 - MOBILE MENU FIX
-   Description: Professional contact page with form submission
-   Author: Kamil
-   ============================================================ */
+    CineChord Contact - Main JavaScript
+    Version: 3.3 - MENU JUMP FIX
+    ============================================================ */
 
 (function() {
-    'use strict';
+    'use strict';
 
-    /* ============================================================
-       1. CONFIGURATION & CONSTANTS
-       ============================================================ */
-    
-    const CONFIG = {
-        BACKEND_URL: 'https://cinechord-admin-production.up.railway.app',
-        ENDPOINTS: {
-            CONTACT: '/api/createMessage'
-        },
-        SCROLL_THRESHOLD: 50,
-        LOGO_ENTRY_DELAY: 500,
-        PAGE_LOAD_DELAY: 100,
-        NAVIGATION_DELAY: 600,
-        FALLBACK_DELAY: 1600,
-        RESIZE_DEBOUNCE: 250,
-        BUTTON_RESET_DELAY: 3000
-    };
+    /* ============================================================
+        1. CONFIGURATION & CONSTANTS
+        ============================================================ */
+    
+    const CONFIG = {
+        BACKEND_URL: 'https://cinechord-admin-production.up.railway.app',
+        ENDPOINTS: {
+            CONTACT: '/api/createMessage'
+        },
+        SCROLL_THRESHOLD: 50,
+        PAGE_LOAD_DELAY: 100,
+        NAVIGATION_DELAY: 600,
+        FALLBACK_DELAY: 1600,
+        BUTTON_RESET_DELAY: 3000
+    };
 
-    const API_URLS = {
-        CONTACT: `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.CONTACT}`
-    };
+    const API_URLS = {
+        CONTACT: `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.CONTACT}`
+    };
 
-    const BUTTON_STATES = {
-        DEFAULT: 'SEND MESSAGE',
-        SENDING: 'SENDING...',
-        SUCCESS: 'MESSAGE SENT!',
-        ERROR: 'ERROR! TRY AGAIN'
-    };
+    const BUTTON_STATES = {
+        DEFAULT: 'SEND MESSAGE',
+        SENDING: 'SENDING...',
+        SUCCESS: 'MESSAGE SENT!',
+        ERROR: 'ERROR! TRY AGAIN'
+    };
 
-    /* ============================================================
-       2. DOM ELEMENT REFERENCES
-       ============================================================ */
-    
-    const elements = {
-        pageTransition: document.querySelector('.page-transition'),
-        centerLogo: document.querySelector('.center-logo'),
-        header: document.querySelector('.header'),
-        progressBar: document.querySelector('.progress-bar-top'),
-        contactForm: document.getElementById('contactForm'),
-        nameInput: document.getElementById('name'),
-        emailInput: document.getElementById('email'),
-        messageInput: document.getElementById('message'),
-        newsletterCheckbox: document.getElementById('newsletter'),
-        textareas: document.querySelectorAll('.textarea-mode')
-    };
+    /* ============================================================
+        2. DOM ELEMENT REFERENCES
+        ============================================================ */
+    
+    const elements = {
+        pageTransition: document.querySelector('.page-transition'),
+        centerLogo: document.querySelector('.center-logo'),
+        contactForm: document.getElementById('contactForm'),
+        nameInput: document.getElementById('name'),
+        emailInput: document.getElementById('email'),
+        messageInput: document.getElementById('message'),
+        newsletterCheckbox: document.getElementById('newsletter'),
+        textareas: document.querySelectorAll('.textarea-mode'),
 
-    /* ============================================================
-       3. STATE VARIABLES
-       ============================================================ */
-    
-    let lastScrollTop = 0;
-    let isTransitioning = false;
+        // Menu Elementləri
+        hamburger: document.getElementById('hamburgerBtn'),
+        hamburgerText: document.querySelector('.hamburger-text'),
+        mobileMenu: document.getElementById('mobileMenu'),
+        overlay: document.getElementById('mobileMenuOverlay'),
+    };
 
-    /* ============================================================
-       4. UTILITY FUNCTIONS
-       ============================================================ */
-    
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
+    /* ============================================================
+        3. UTILITY FUNCTIONS
+        ============================================================ */
+    
+    function updateButtonState(state) {
+        if (!elements.contactForm) return;
+        
+        const btnTextContainer = elements.contactForm.querySelector('.rolling-text-btn');
+        if (!btnTextContainer) return;
+        
+        const visibleSpan = btnTextContainer.querySelector('span');
+        if (visibleSpan) {
+            visibleSpan.textContent = state;
+        }
+        btnTextContainer.setAttribute('data-text', state);
+    }
 
-    function updateButtonState(state) {
-        if (!elements.contactForm) return;
-        
-        const btnTextContainer = elements.contactForm.querySelector('.rolling-text-btn');
-        if (!btnTextContainer) return;
-        
-        const visibleSpan = btnTextContainer.querySelector('span');
-        if (visibleSpan) {
-            visibleSpan.textContent = state;
-        }
-        btnTextContainer.setAttribute('data-text', state);
-    }
+    /* ============================================================
+        4. PAGE TRANSITION SYSTEM
+        ============================================================ */
+    
+    function initPageTransition() {
+        if (!elements.pageTransition) return;
+        
+        setTimeout(() => {
+            elements.pageTransition.classList.add('page-loaded');
+        }, CONFIG.PAGE_LOAD_DELAY);
+    }
 
-    /* ============================================================
-       5. PAGE TRANSITION SYSTEM
-       ============================================================ */
-    
-    function initPageTransition() {
-        if (!elements.pageTransition) return;
-        
-        // Səhifə yükləndikdən sonra qara ekran yuxarı sürüşür
-        setTimeout(() => {
-            elements.pageTransition.classList.add('page-loaded');
-        }, CONFIG.PAGE_LOAD_DELAY);
-        
-    }
+    function navigateWithTransition(href) {
+        if (href.startsWith('mailto') || href.startsWith('tel')) {
+            window.location.href = href;
+            return;
+        }
 
-    function navigateWithTransition(href) {
-        if (isTransitioning) {
-            return;
-        }
-        
-        isTransitioning = true;
-        
-        if (elements.pageTransition) {
-            // page-loaded silmək qara ekranı aşağı endirir
-            elements.pageTransition.classList.remove('page-loaded');
-        }
-        
-        // Qara ekran tam endikdən sonra navigate et
-        setTimeout(() => {
-            window.location.href = href;
-        }, CONFIG.NAVIGATION_DELAY);
-        
-        // Fallback
-        setTimeout(() => {
-            if (!document.hidden) {
-                window.location.href = href;
-            }
-        }, CONFIG.FALLBACK_DELAY);
-    }
+        if (!elements.pageTransition || !elements.pageTransition.classList.contains('page-loaded')) return; 
 
-    /* ============================================================
-       6. MOBILE NAVIGATION & HAMBURGER (DÜZƏLDİLMİŞ)
-       ============================================================ */
-    
-    function initMobileMenu() {
-        // HTML-də mövcud olan elementləri siniflərinə görə seçirik
-        const hamburger = document.querySelector('.hamburger');
-        const mobileMenu = document.querySelector('.mobile-menu');
-        const overlay = document.querySelector('.mobile-menu-overlay');
+        elements.pageTransition.classList.remove('page-loaded');
+        
+        setTimeout(() => {
+            window.location.href = href;
+        }, CONFIG.NAVIGATION_DELAY);
+        
+        setTimeout(() => {
+            if (!document.hidden) {
+                window.location.href = href;
+            }
+        }, CONFIG.FALLBACK_DELAY);
+    }
 
-        // Əgər elementlər tapılmasa, funksiyanı dayandır
-        if (!hamburger || !mobileMenu || !overlay) {
-            console.warn("Mobile menu elements not found in HTML.");
-            return;
-        }
+    /* ============================================================
+        5. MOBILE MENU - FIX: JUMP PROBLEMİ HƏLLİ
+        ============================================================ */
 
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            // Menyu açılanda body scroll-u bloklanır (CSS-dəki .menu-open sinfi istifadə edilir).
-            document.body.classList.toggle('menu-open', !isActive);
-        }
+    function initMobileMenu() {
+        const { hamburger, mobileMenu, overlay, hamburgerText, centerLogo } = elements;
+        
+        if (!hamburger || !mobileMenu) {
+            console.error('Menu elementləri tapılmadı!');
+            return;
+        }
 
-        // 1. Hamburgerə klik hadisəsini əlavə edirik
-        hamburger.addEventListener('click', toggleMenu);
-        
-        // 2. Overlay-ə klik hadisəsini əlavə edirik
-        overlay.addEventListener('click', toggleMenu);
-        
-        // 3. Menyu içindəki linklərə klik hadisəsini əlavə edirik
-        mobileMenu.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                // Keçid olarsa (və # yoxdursa) menyunu bağla və səhifəni dəyiş
-                if (href && href !== '#') {
-                    e.preventDefault();
-                    toggleMenu();
-                    setTimeout(() => navigateWithTransition(href), 100); 
-                } else {
-                    // Yalnız #dirsə, menyunu bağla
-                    toggleMenu();
+        function toggleMenu() {
+            const isActive = hamburger.classList.contains('active');
+            
+            // FIX: Scrollbar genişliyini hesabla
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+            
+            if (hamburgerText) {
+                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+            }
+            
+            // FIX: Scrollbar compensation - Jump problemini həll edir
+            if (!isActive) {
+                // Menu açılır
+                document.body.style.overflow = 'hidden';
+                document.body.style.paddingRight = scrollbarWidth + 'px';
+                // Fixed elementləri də kompensasiya et
+                if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
+                if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
+            } else {
+                // Menu bağlanır
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                if (hamburger) hamburger.style.paddingRight = '';
+                if (centerLogo) centerLogo.style.paddingRight = '';
+            }
+        }
+
+        // Hamburger və Overlay üçün Event Listeners
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleMenu();
+            });
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && hamburger.classList.contains('active')) {
+                toggleMenu();
+            }
+        });
+
+        // Mobil Menyu Linkləri üçün Xüsusi Məntiq
+        const navLinks = mobileMenu.querySelectorAll('.nav-btn');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (!href || href === '#' || this.classList.contains('active')) {
+                    e.preventDefault();
+                    if (href !== '#') toggleMenu();
+                    return;
                 }
-            });
-        });
 
+                e.preventDefault(); 
+                toggleMenu();
+                
+                setTimeout(() => {
+                    navigateWithTransition(href);
+                }, 100); 
+            });
+        });
+    }
 
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                if (window.innerWidth > 768 && hamburger.classList.contains('active')) {
-                    toggleMenu();
-                }
-            }, CONFIG.RESIZE_DEBOUNCE);
-        });
-        
-    }
+    /* ============================================================
+        6. SCROLL REVEAL (INTERSECTION OBSERVER)
+        ============================================================ */
+    
+    function initScrollReveal() {
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
 
-    /* ============================================================
-       7. SCROLL EFFECTS
-       ============================================================ */
-    
-    function handleScroll() {
-        const currentScroll = window.scrollY;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
 
-        // Header hide/show
-        if (currentScroll > lastScrollTop && currentScroll > CONFIG.SCROLL_THRESHOLD) {
-            if (elements.header) elements.header.style.transform = 'translateY(-100%)';
-        } else {
-            if (elements.header) elements.header.style.transform = 'translateY(0)';
-        }
+        document.querySelectorAll('.reveal-item').forEach((el) => {
+            observer.observe(el);
+        });
+    }
 
-        // Logo hide/show
-        if (currentScroll > CONFIG.SCROLL_THRESHOLD) {
-            if (elements.centerLogo) elements.centerLogo.classList.add('scroll-hidden');
-        } else {
-            if (elements.centerLogo) elements.centerLogo.classList.remove('scroll-hidden');
-        }
-        
-        lastScrollTop = currentScroll;
-    }
+    /* ============================================================
+        7. TEXTAREA AUTO RESIZE
+        ============================================================ */
+    
+    function initTextareaResize() {
+        elements.textareas.forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    }
 
-    function updateProgressBar() {
-        if (!elements.progressBar) return;
-        
-        const scrollTop = window.scrollY;
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-        const scrollPercent = scrollTop / docHeight;
-        elements.progressBar.style.width = (scrollPercent * 100) + '%';
-    }
+    function resetTextareas() {
+        elements.textareas.forEach(textarea => {
+            textarea.style.height = 'auto';
+        });
+    }
 
-    function initScrollEffects() {
-        const scrollHandler = () => {
-            handleScroll();
-            updateProgressBar();
-        };
+    /* ============================================================
+        8. FORM SUBMISSION
+        ============================================================ */
+    
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        
+        updateButtonState(BUTTON_STATES.SENDING);
+        
+        const formData = {
+            name: elements.nameInput?.value || '',
+            email: elements.emailInput?.value || '',
+            message: elements.messageInput?.value || '',
+            subject: "Saytdan Müraciət",
+            newsletter: elements.newsletterCheckbox?.checked || false
+        };
 
-        if (window.innerWidth <= 768) {
-            const debouncedScroll = debounce(scrollHandler, 10);
-            window.addEventListener('scroll', debouncedScroll, { passive: true });
-        } else {
-            window.addEventListener('scroll', scrollHandler, { passive: true });
-        }
-        
-    }
+        try {
+            const response = await fetch(API_URLS.CONTACT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
 
-    /* ============================================================
-       8. SCROLL REVEAL (INTERSECTION OBSERVER)
-       ============================================================ */
-    
-    function initScrollReveal() {
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: "0px 0px -50px 0px"
-        };
+            if (response.ok) {
+                updateButtonState(BUTTON_STATES.SUCCESS);
+                elements.contactForm.reset();
+                resetTextareas();
+            } else {
+                throw new Error(`Server response failed: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            updateButtonState(BUTTON_STATES.ERROR);
+        }
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
+        setTimeout(() => {
+            updateButtonState(BUTTON_STATES.DEFAULT);
+        }, CONFIG.BUTTON_RESET_DELAY);
+    }
 
-        document.querySelectorAll('.reveal-item').forEach((el) => {
-            observer.observe(el);
-        });
-        
-    }
+    function initFormSubmission() {
+        if (!elements.contactForm) return;
+        elements.contactForm.addEventListener('submit', handleFormSubmit);
+    }
 
-    /* ============================================================
-       9. NAVIGATION & SCRAMBLE EFFECT
-       ============================================================ */
-    
-    function setupNavButtons() {
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const href = btn.getAttribute('href');
-                if (!href || href === '#' || href.startsWith('#')) return;
-                if (href === window.location.pathname.split('/').pop()) return;
-                e.preventDefault();
-                navigateWithTransition(href);
-            });
-        });
-    }
+    /* ============================================================
+        9. TOUCH OPTIMIZATION
+        ============================================================ */
+    
+    function initTouchOptimization() {
+        if ('ontouchstart' in window) {
+            document.querySelectorAll('.nav-btn, .send-btn-container, .rolling-link').forEach(el => {
+                el.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                }, { passive: true });
+                
+                el.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                }, { passive: true });
+            });
+        }
+    }
 
-    function initNavigation() {
-        setupNavButtons();
-        setTimeout(setupNavButtons, 100);
+    /* ============================================================
+        10. GLOBAL NAVİQASİYA (Logo və Footer üçün)
+        ============================================================ */
 
-        // Scramble effect (Desktop only)
-        if (window.innerWidth > 768) {
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                const originalText = btn.getAttribute('data-text');
-                if (!originalText) return;
-                const navText = btn.querySelector('.nav-text');
-                if (!navText) return;
+    function setupNavLinks() {
+        const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
+        
+        internalLinks.forEach(link => {
+            if (link.closest('.mobile-menu')) return;
 
-                btn.addEventListener('mouseenter', function() {
-                    if (this.classList.contains('active')) return;
-                    let iteration = 0;
-                    let interval = setInterval(() => {
-                        navText.innerText = originalText.split("").map((letter, index) => {
-                            if (index < iteration) return originalText[index];
-                            return letters[Math.floor(Math.random() * letters.length)];
-                        }).join("");
-                        if (iteration >= originalText.length) clearInterval(interval);
-                        iteration += 1 / 3;
-                    }, 30);
-                });
-                
-                btn.addEventListener('mouseleave', function() {
-                    if (this.classList.contains('active')) return;
-                    navText.innerText = originalText;
-                });
-            });
-        }
-        
-    }
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (href.startsWith('mailto') || href.startsWith('tel')) return;
+                
+                const currentPath = window.location.pathname.replace(/\/$/, '').split('/').pop();
+                const targetPath = href ? href.replace(/\.\./g, '').replace(/\/$/, '').split('/').pop() : '';
+                
+                if (currentPath === targetPath || (currentPath === 'contact' && targetPath === '')) {
+                    return;
+                }
+                
+                e.preventDefault();
+                navigateWithTransition(href);
+            });
+        });
+    }
 
-    /* ============================================================
-       10. TEXTAREA AUTO RESIZE
-       ============================================================ */
-    
-    function initTextareaResize() {
-        elements.textareas.forEach(textarea => {
-            textarea.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-        });
-        
-    }
+    /* ============================================================
+        11. INITIALIZATION
+        ============================================================ */
+    
+    function init() {
+        initPageTransition();
+        initMobileMenu();
+        initScrollReveal();
+        initTextareaResize();
+        initFormSubmission();
+        initTouchOptimization();
+        setupNavLinks();
+    }
 
-    function resetTextareas() {
-        elements.textareas.forEach(textarea => {
-            textarea.style.height = 'auto';
-        });
-    }
-
-    /* ============================================================
-       11. FORM SUBMISSION
-       ============================================================ */
-    
-    async function handleFormSubmit(e) {
-        e.preventDefault();
-        
-        // Loading state
-        updateButtonState(BUTTON_STATES.SENDING);
-        
-        const formData = {
-            name: elements.nameInput?.value || '',
-            email: elements.emailInput?.value || '',
-            message: elements.messageInput?.value || '',
-            subject: "Saytdan Müraciət",
-            newsletter: elements.newsletterCheckbox?.checked || false
-        };
-
-        try {
-            const response = await fetch(API_URLS.CONTACT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
-            if (response.ok) {
-                // Success
-                updateButtonState(BUTTON_STATES.SUCCESS);
-                elements.contactForm.reset();
-                resetTextareas();
-                
-            } else {
-                const errorData = await response.text();
-                throw new Error(`Server response failed: ${response.status}`);
-            }
-        } catch (error) {
-            updateButtonState(BUTTON_STATES.ERROR);
-        }
-
-        // Reset button after delay
-        setTimeout(() => {
-            updateButtonState(BUTTON_STATES.DEFAULT);
-        }, CONFIG.BUTTON_RESET_DELAY);
-    }
-
-    function initFormSubmission() {
-        if (!elements.contactForm) return;
-        
-        elements.contactForm.addEventListener('submit', handleFormSubmit);
-        
-    }
-
-    /* ============================================================
-       12. TOUCH OPTIMIZATION
-       ============================================================ */
-    
-    function initTouchOptimization() {
-        if ('ontouchstart' in window) {
-            document.querySelectorAll('.nav-btn, .send-btn-container, .rolling-link').forEach(el => {
-                el.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.95)';
-                }, { passive: true });
-                
-                el.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                }, { passive: true });
-            });
-        }
-        
-    }
-
-    /* ============================================================
-       13. LOGO ENTRY ANIMATION
-       ============================================================ */
-    
-    function initLogoAnimation() {
-        setTimeout(() => {
-            if (elements.centerLogo) elements.centerLogo.classList.add('entry-done');
-        }, CONFIG.LOGO_ENTRY_DELAY);
-    }
-
-    /* ============================================================
-       14. INITIALIZATION
-       ============================================================ */
-    
-    function init() {
-        
-        initPageTransition();
-        initMobileMenu();
-        initScrollEffects();
-        initScrollReveal();
-        initNavigation();
-        initTextareaResize();
-        initFormSubmission();
-        initTouchOptimization();
-        initLogoAnimation();
-        
-    }
-
-    // Start initialization
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
 })();

@@ -1,95 +1,226 @@
+/* ============================================================
+   CineChord Archive - Main JavaScript
+   Version: 6.3 - LOGO CLICK FIX
+   ============================================================ */
+
 (function() {
     'use strict';
 
-    // ============================================================
-    // 0. API & GLOBAL VARS
-    // ============================================================
-    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
-    const API_ARCHIVE = `${BACKEND_URL}/api/archive`;
-    const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
-
-    const tableBody = document.querySelector('.archive-table tbody');
-    const pageTransition = document.querySelector('.page-transition');
-    const header = document.querySelector('.header');
-    const logo = document.querySelector('.center-logo');
-
-    // ✅ WORKS STYLE MODAL DOM ELEMENTS
-    const previewContainer = document.getElementById('previewContainer');
-    const previewVideo = document.getElementById('previewVideo');
-    const previewTitleEl = document.getElementById('previewTitle');
-    const closePreview = document.getElementById('closePreview');
-    const modalPlayContainer = document.getElementById('modalPlayBtnContainer');
-    const progressBarContainer = document.getElementById('progressBarContainer');
-    const progressPlayed = document.getElementById('progressPlayed');
-    const currentTimeEl = document.getElementById('currentTime');
-    const durationTimeEl = document.getElementById('durationTime');
-    const volumeSlider = document.getElementById('volumeSlider');
-    const rewindBtn = document.getElementById('rewindBtn');
-    const forwardBtn = document.getElementById('forwardBtn');
-    const speedBtn = document.getElementById('speedBtn');
-
-    // ✅ MOUSE INACTIVITY TIMER
-    let activityTimeout = null;
-    const INACTIVITY_DELAY = 2000;
-
-    // Category mapping
-    const categoryMap = {
-        'FILM': 'FILM',
-        'COMMERCIAL': 'COMMERCIAL',
-        'CLIP': 'CLIP',
-        'MUSIC_VIDEO': 'MUSIC VIDEO',
-        'DOCUMENTARY': 'DOCUMENTARY',
-        'SOCIAL': 'SOCIAL'
+    /* ============================================================
+       1. CONFIGURATION & CONSTANTS
+       ============================================================ */
+    
+    const CONFIG = {
+        BACKEND_URL: 'https://cinechord-admin-production.up.railway.app',
+        UPLOADS_URL: 'https://cinechord-admin-production.up.railway.app/uploads/',
+        PAGE_LOAD_DELAY: 100,
+        NAVIGATION_DELAY: 600,
+        FALLBACK_DELAY: 1600,
+        INACTIVITY_DELAY: 2000
     };
 
-    // ============================================================
-    // 1. PAGE LOAD & TRANSITION LOGIC
-    // ============================================================
+    const API_URLS = {
+        ARCHIVE: `${CONFIG.BACKEND_URL}/api/archive`
+    };
 
-    if (pageTransition) {
+    const categoryMap = {
+        'FILM': 'FILM', 'COMMERCIAL': 'COMMERCIAL', 'CLIP': 'CLIP',
+        'MUSIC_VIDEO': 'MUSIC VIDEO', 'DOCUMENTARY': 'DOCUMENTARY', 'SOCIAL': 'SOCIAL'
+    };
+
+    /* ============================================================
+       2. DOM ELEMENT REFERENCES
+       ============================================================ */
+    
+    const elements = {
+        pageTransition: document.querySelector('.page-transition'),
+        centerLogo: document.querySelector('.center-logo'),
+        tableBody: document.querySelector('.archive-table tbody'),
+        // Video Modal
+        previewContainer: document.getElementById('previewContainer'),
+        previewVideo: document.getElementById('previewVideo'),
+        previewTitleEl: document.getElementById('previewTitle'),
+        closePreview: document.getElementById('closePreview'),
+        modalPlayContainer: document.getElementById('modalPlayBtnContainer'),
+        progressBarContainer: document.getElementById('progressBarContainer'),
+        progressPlayed: document.getElementById('progressPlayed'),
+        currentTimeEl: document.getElementById('currentTime'),
+        durationTimeEl: document.getElementById('durationTime'),
+        volumeSlider: document.getElementById('volumeSlider'),
+        rewindBtn: document.getElementById('rewindBtn'),
+        forwardBtn: document.getElementById('forwardBtn'),
+        speedBtn: document.getElementById('speedBtn'),
+        playPauseBtn: document.getElementById('playPauseBtn'),
+        playIcon: document.getElementById('playIcon'),
+        pauseIcon: document.getElementById('pauseIcon'),
+        fullscreenBtn: document.getElementById('fullscreenBtn')
+    };
+
+    /* ============================================================
+       3. STATE VARIABLES
+       ============================================================ */
+    
+    let activityTimeout = null;
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    /* ============================================================
+       4. PAGE TRANSITION SYSTEM
+       ============================================================ */
+    
+    function initPageTransition() {
+        if (!elements.pageTransition) return;
+        
         setTimeout(() => {
-            pageTransition.classList.add('page-loaded');
-        }, 100);
+            elements.pageTransition.classList.add('page-loaded');
+        }, CONFIG.PAGE_LOAD_DELAY);
     }
 
     function navigateWithTransition(href) {
-        if (pageTransition) {
-            pageTransition.classList.remove('page-loaded');
+        if (!href) return;
+        
+        if (href.startsWith('mailto') || href.startsWith('tel')) {
+            window.location.href = href;
+            return;
         }
-        setTimeout(() => { window.location.href = href; }, 600);
+        
+        if (elements.pageTransition) {
+            elements.pageTransition.classList.remove('page-loaded');
+        }
+        
+        setTimeout(() => {
+            window.location.href = href;
+        }, CONFIG.NAVIGATION_DELAY);
+        
+        setTimeout(() => {
+            if (!document.hidden) {
+                window.location.href = href;
+            }
+        }, CONFIG.FALLBACK_DELAY);
     }
 
-    // ============================================================
-    // 2. NAVBAR & LOGO SCROLL LOGIC
-    // ============================================================
+    /* ============================================================
+       5. MOBILE MENU - Jump fix daxil
+       ============================================================ */
 
-    let lastScroll = 0;
+    function initMobileMenu() {
+        const hamburger = document.getElementById('hamburgerBtn');
+        const hamburgerText = hamburger?.querySelector('.hamburger-text');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        const centerLogo = document.querySelector('.center-logo');
 
-    setTimeout(() => { if (logo) logo.classList.add('entry-done'); }, 200);
-
-    function handleScroll() {
-        const currentScroll = window.scrollY;
-
-        if (header) {
-            header.style.transform = (currentScroll > lastScroll && currentScroll > 50) ? 'translateY(-100%)' : 'translateY(0)';
+        if (!hamburger || !mobileMenu) {
+            console.error('Menu elementləri tapılmadı!');
+            return;
         }
 
-        if (logo) {
-            if (currentScroll > 50) {
-                logo.classList.add('scroll-hidden');
+        function toggleMenu() {
+            const isActive = hamburger.classList.contains('active');
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+            
+            if (hamburgerText) {
+                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+            }
+            
+            if (!isActive) {
+                document.body.style.overflow = 'hidden';
+                document.body.style.paddingRight = scrollbarWidth + 'px';
+                if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
+                if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
             } else {
-                logo.classList.remove('scroll-hidden');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                if (hamburger) hamburger.style.paddingRight = '';
+                if (centerLogo) centerLogo.style.paddingRight = '';
             }
         }
-        lastScroll = currentScroll;
+
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleMenu();
+            });
+        }
+
+        const navLinks = mobileMenu.querySelectorAll('.nav-btn');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const href = this.getAttribute('href');
+                
+                if (!href || href === '#' || this.classList.contains('active')) {
+                    toggleMenu();
+                    return;
+                }
+
+                toggleMenu();
+                
+                setTimeout(() => {
+                    navigateWithTransition(href);
+                }, 200);
+            });
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (elements.previewContainer && elements.previewContainer.classList.contains('active')) {
+                    closeVideoPreview();
+                    return;
+                }
+                if (hamburger.classList.contains('active')) {
+                    toggleMenu();
+                }
+            }
+        });
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    /* ============================================================
+       6. LOGO KLİK - AYRICA FUNKSIYA
+       ============================================================ */
+    
+    function initLogoClick() {
+        const logo = document.querySelector('.center-logo');
+        
+        if (logo) {
+            // Əvvəlki event listener-ləri silmək üçün clone
+            const newLogo = logo.cloneNode(true);
+            logo.parentNode.replaceChild(newLogo, logo);
+            
+            newLogo.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const href = this.getAttribute('href') || '../';
+                console.log('Logo clicked! Navigating to:', href);
+                navigateWithTransition(href);
+            });
+            
+            // Img-yə də click əlavə et
+            const logoImg = newLogo.querySelector('.logo-img');
+            if (logoImg) {
+                logoImg.style.pointerEvents = 'none'; // Img click-i parent-ə ötürsün
+            }
+            
+            console.log('Logo click initialized successfully');
+        } else {
+            console.error('Logo element not found!');
+        }
+    }
 
-    // ============================================================
-    // 3. SCROLL REVEAL (Intersection Observer)
-    // ============================================================
-
+    /* ============================================================
+       7. SCROLL REVEAL (INTERSECTION OBSERVER)
+       ============================================================ */
+    
     const observerOptions = {
         threshold: 0.1,
         rootMargin: "0px 0px -50px 0px"
@@ -104,11 +235,31 @@
         });
     }, observerOptions);
 
-    // ============================================================
-    // 4. SCRAMBLE EFFECT & NAVIGATION
-    // ============================================================
+    function initScrollReveal() {
+        document.querySelectorAll('.reveal-item').forEach((el) => {
+            observer.observe(el);
+        });
+    }
 
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    /* ============================================================
+       8. UTILITY FUNCTIONS
+       ============================================================ */
+
+    function cleanUrlPath(url) {
+        if (url && typeof url === 'string') {
+            if (url.startsWith('http')) return url;
+            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
+            if (!url.startsWith('/') && url.includes('.')) return url;
+        }
+        return url;
+    }
+
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
 
     function applyScrambleEffect(element, textElement, originalText) {
         let iteration = 0;
@@ -123,67 +274,25 @@
         }, 30);
     }
 
-    document.querySelectorAll('.nav-btn, .footer-link').forEach(btn => {
-        const href = btn.getAttribute('href');
-        const isExternal = href && !href.startsWith('#') && !href.startsWith('..');
-
-        if (btn.classList.contains('nav-btn')) {
-            const originalText = btn.getAttribute('data-text');
-            const navText = btn.querySelector('.nav-text');
-
-            btn.addEventListener('mouseenter', function() {
-                if (this.classList.contains('active')) return;
-                applyScrambleEffect(btn, navText, originalText);
-            });
-
-            btn.addEventListener('mouseleave', function() {
-                if (this.classList.contains('active')) return;
-                clearInterval(btn.interval);
-                navText.innerText = originalText;
-            });
-        }
-
-        btn.addEventListener('click', (e) => {
-            if (isExternal || href.startsWith('mailto') || href.startsWith('tel')) return;
-            if (!href || href === '#') { e.preventDefault(); return; }
-
-            const linkPath = href.split('/').pop();
-            const currentPath = window.location.pathname.split('/').pop();
-            if (linkPath === currentPath) return;
-
-            e.preventDefault();
-            navigateWithTransition(href);
-        });
-    });
-
-    // ============================================================
-    // 5. LOAD ARCHIVE DATA
-    // ============================================================
-
-    function cleanUrlPath(url) {
-        if (url && typeof url === 'string') {
-            if (url.startsWith('http')) return url;
-            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
-            if (!url.startsWith('/') && url.includes('.')) return url;
-        }
-        return url;
-    }
+    /* ============================================================
+       9. LOAD ARCHIVE DATA
+       ============================================================ */
 
     async function loadArchiveData() {
-        if (!tableBody) return;
+        if (!elements.tableBody) return;
 
         try {
-            const response = await fetch(API_ARCHIVE);
+            const response = await fetch(API_URLS.ARCHIVE);
             if (!response.ok) {
                 throw new Error(`Network response was not ok: ${response.status}`);
             }
 
             const data = await response.json();
             const works = data.content ? data.content : data;
-            tableBody.innerHTML = '';
+            elements.tableBody.innerHTML = '';
 
             if (works.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7" style="color:white; text-align:center; padding:60px; opacity:0.5;">No archive data found.</td></tr>';
+                elements.tableBody.innerHTML = '<tr><td colspan="7" style="color:white; text-align:center; padding:60px; opacity:0.5;">No archive data found.</td></tr>';
                 return;
             }
 
@@ -193,7 +302,7 @@
                 if (videoSrc) {
                     videoSrc = cleanUrlPath(videoSrc);
                     if (!videoSrc.startsWith('http')) {
-                        videoSrc = UPLOADS_URL + videoSrc;
+                        videoSrc = CONFIG.UPLOADS_URL + videoSrc;
                     }
                 }
 
@@ -217,17 +326,17 @@
                     <td class="year-col">${work.productionYear || '-'}</td>
                 `;
 
-                tableBody.appendChild(row);
+                elements.tableBody.appendChild(row);
             });
 
-            const newRows = tableBody.querySelectorAll('tr');
+            const newRows = elements.tableBody.querySelectorAll('tr');
             newRows.forEach(row => observer.observe(row));
 
             attachTableRowEffects();
 
         } catch (error) {
             console.error("Error loading archive:", error);
-            tableBody.innerHTML = `
+            elements.tableBody.innerHTML = `
                 <tr><td colspan="7" style="color:red; text-align:center; padding:60px;">
                     API connection failed. Please check the backend server connection.
                 </td></tr>
@@ -235,9 +344,9 @@
         }
     }
 
-    // ============================================================
-    // 6. TABLE ROW EFFECTS & SCRAMBLE
-    // ============================================================
+    /* ============================================================
+       10. TABLE ROW EFFECTS
+       ============================================================ */
 
     function attachTableRowEffects() {
         document.querySelectorAll('.archive-table tbody tr').forEach(row => {
@@ -250,7 +359,6 @@
                 openModal(videoSrc, `${client} - ${title}`);
             });
 
-            // Scramble effect on hover
             row.addEventListener('mouseenter', function() {
                 const cells = this.querySelectorAll('td:not(.number-col)');
                 const originalTexts = {};
@@ -294,246 +402,209 @@
         });
     }
 
-    // ============================================================
-    // 7. VIDEO MODAL LOGIC (WORKS STYLE - EXACT COPY)
-    // ============================================================
-
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return '0:00';
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
+    /* ============================================================
+       11. VIDEO MODAL LOGIC
+       ============================================================ */
 
     function handleUserActivity() {
-        if (!previewContainer) return;
-        previewContainer.classList.remove('user-inactive');
+        if (!elements.previewContainer) return;
+        elements.previewContainer.classList.remove('user-inactive');
         clearTimeout(activityTimeout);
 
-        if (previewVideo && !previewVideo.paused) {
+        if (elements.previewVideo && !elements.previewVideo.paused) {
             activityTimeout = setTimeout(() => {
-                previewContainer.classList.add('user-inactive');
-            }, INACTIVITY_DELAY);
+                elements.previewContainer.classList.add('user-inactive');
+            }, CONFIG.INACTIVITY_DELAY);
         }
     }
 
     function openModal(videoSrc, title) {
         if (!videoSrc) return;
 
-        if (previewTitleEl) {
-            previewTitleEl.textContent = title;
-            previewTitleEl.setAttribute('data-text', title);
+        if (elements.previewTitleEl) {
+            elements.previewTitleEl.textContent = title;
+            elements.previewTitleEl.setAttribute('data-text', title);
         }
 
-        // ✅ FAST VIDEO LOADING
-        previewContainer.style.display = 'flex';
-        previewContainer.classList.add('active');
-        previewContainer.classList.add('is-paused');
+        elements.previewContainer.style.display = 'flex';
+        elements.previewContainer.classList.add('active');
+        elements.previewContainer.classList.add('is-paused');
         document.body.style.overflow = 'hidden';
 
-        // Set video src and force load immediately
-        previewVideo.src = videoSrc;
-        previewVideo.load(); // ✅ Force immediate load
+        elements.previewVideo.src = videoSrc;
+        elements.previewVideo.load();
         
-        previewVideo.onloadedmetadata = function() {
-            if (durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
-            const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
+        elements.previewVideo.onloadedmetadata = function() {
+            if (elements.durationTimeEl) elements.durationTimeEl.textContent = formatTime(elements.previewVideo.duration);
+            const modalPlayText = elements.modalPlayContainer ? elements.modalPlayContainer.querySelector('.play-text') : null;
             if (modalPlayText) {
                 modalPlayText.setAttribute('data-text', 'PLAY');
                 modalPlayText.innerText = 'PLAY';
             }
         };
-
-        // ✅ Auto-play when ready (faster UX)
-        previewVideo.oncanplay = function() {
-            // Video hazırdır, istəyirsənsə auto-play
-            // previewVideo.play(); // Bunu açsan avtomatik başlayar
-        };
     }
 
     function closeVideoPreview() {
-        if (!previewContainer) return;
-        previewContainer.classList.remove('active');
-        previewContainer.classList.add('is-paused');
-        previewContainer.classList.remove('user-inactive');
+        if (!elements.previewContainer) return;
+        elements.previewContainer.classList.remove('active');
+        elements.previewContainer.classList.add('is-paused');
+        elements.previewContainer.classList.remove('user-inactive');
         clearTimeout(activityTimeout);
         document.body.style.overflow = 'auto';
 
         setTimeout(() => {
-            previewVideo.pause();
-            previewVideo.currentTime = 0;
-            previewVideo.removeAttribute('src');
-            if (durationTimeEl) durationTimeEl.textContent = '0:00';
-            previewContainer.style.display = 'none';
+            elements.previewVideo.pause();
+            elements.previewVideo.currentTime = 0;
+            elements.previewVideo.removeAttribute('src');
+            if (elements.durationTimeEl) elements.durationTimeEl.textContent = '0:00';
+            elements.previewContainer.style.display = 'none';
         }, 500);
     }
 
     function updatePlayButtonUI() {
-        const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
-        const playIcon = document.getElementById('playIcon');
-        const pauseIcon = document.getElementById('pauseIcon');
+        const modalPlayText = elements.modalPlayContainer ? elements.modalPlayContainer.querySelector('.play-text') : null;
 
-        if (previewVideo.paused) {
-            // Video dayandırılıb - PLAY göstər
-            if (playIcon) playIcon.style.display = 'block';
-            if (pauseIcon) pauseIcon.style.display = 'none';
-            if (modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PLAY");
-            previewContainer.classList.add('is-paused');
-            previewContainer.classList.remove('user-inactive');
+        if (elements.previewVideo.paused) {
+            if (elements.playIcon) elements.playIcon.style.display = 'block';
+            if (elements.pauseIcon) elements.pauseIcon.style.display = 'none';
+            if (modalPlayText) applyScrambleEffect(elements.modalPlayContainer, modalPlayText, "PLAY");
+            elements.previewContainer.classList.add('is-paused');
+            elements.previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
         } else {
-            // Video oynayır - PAUSE göstər
-            if (playIcon) playIcon.style.display = 'none';
-            if (pauseIcon) pauseIcon.style.display = 'block';
-            if (modalPlayText) applyScrambleEffect(modalPlayContainer, modalPlayText, "PAUSE");
-            previewContainer.classList.remove('is-paused');
+            if (elements.playIcon) elements.playIcon.style.display = 'none';
+            if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
+            if (modalPlayText) applyScrambleEffect(elements.modalPlayContainer, modalPlayText, "PAUSE");
+            elements.previewContainer.classList.remove('is-paused');
             handleUserActivity();
         }
     }
 
     function togglePlay(e) {
         if (e) e.stopPropagation();
-        previewVideo.paused ? previewVideo.play() : previewVideo.pause();
+        elements.previewVideo.paused ? elements.previewVideo.play() : elements.previewVideo.pause();
     }
 
-    // ✅ EVENT LISTENERS
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('#playPauseBtn') || e.target.closest('#modalPlayBtnContainer')) {
-            e.stopPropagation();
-            togglePlay();
-        }
-    });
+    function initVideoModal() {
+        if (!elements.previewContainer || !elements.previewVideo) return;
 
-    if (previewContainer) {
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#playPauseBtn') || e.target.closest('#modalPlayBtnContainer')) {
+                e.stopPropagation();
+                togglePlay();
+            }
+        });
+
         ['mousemove', 'click', 'touchstart'].forEach(event => {
-            previewContainer.addEventListener(event, handleUserActivity);
-        });
-    }
-
-    if (previewVideo) {
-        previewVideo.addEventListener('click', togglePlay);
-        previewVideo.addEventListener('play', updatePlayButtonUI);
-        previewVideo.addEventListener('pause', updatePlayButtonUI);
-        previewVideo.addEventListener('ended', () => {
-            previewVideo.pause();
-            previewVideo.currentTime = 0;
+            elements.previewContainer.addEventListener(event, handleUserActivity);
         });
 
-        previewVideo.addEventListener('timeupdate', () => {
-            const percent = (previewVideo.currentTime / previewVideo.duration) * 100;
-            if (progressPlayed) progressPlayed.style.width = percent + '%';
-            if (currentTimeEl) currentTimeEl.textContent = formatTime(previewVideo.currentTime);
-        });
-    }
-
-    if (closePreview) closePreview.onclick = closeVideoPreview;
-
-    if (progressBarContainer) {
-        progressBarContainer.addEventListener('click', (e) => {
-            const rect = progressBarContainer.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const width = progressBarContainer.clientWidth;
-            const percentage = clickX / width;
-            previewVideo.currentTime = previewVideo.duration * percentage;
-            handleUserActivity();
-        });
-    }
-
-    if (volumeSlider) {
-        volumeSlider.oninput = function(e) {
-            previewVideo.volume = e.target.value / 100;
-            handleUserActivity();
-        };
-    }
-
-    if (rewindBtn) {
-        rewindBtn.onclick = () => {
-            previewVideo.currentTime -= 5;
-            handleUserActivity();
-        };
-    }
-
-    if (forwardBtn) {
-        forwardBtn.onclick = () => {
-            previewVideo.currentTime += 5;
-            handleUserActivity();
-        };
-    }
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        if (previewContainer && previewContainer.classList.contains('active')) {
-            if (e.key === 'Escape') closeVideoPreview();
-            if (e.key === ' ') { e.preventDefault(); togglePlay(); }
-            if (e.key === 'ArrowLeft') { previewVideo.currentTime -= 5; handleUserActivity(); }
-            if (e.key === 'ArrowRight') { previewVideo.currentTime += 5; handleUserActivity(); }
-        }
-    });
-
-    // ============================================================
-    // 8. MOBILE MENU
-    // ============================================================
-
-    function initMobileMenu() {
-        if (document.querySelector('.hamburger')) return;
-
-        const hamburger = document.createElement('button');
-        hamburger.className = 'hamburger';
-        hamburger.innerHTML = '<span></span><span></span><span></span>';
-        hamburger.setAttribute('aria-label', 'Toggle menu');
-
-        const mobileMenu = document.createElement('div');
-        mobileMenu.className = 'mobile-menu';
-
-        const overlay = document.createElement('div');
-        overlay.className = 'mobile-menu-overlay';
-
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            const clone = btn.cloneNode(true);
-            mobileMenu.appendChild(clone);
+        elements.previewVideo.addEventListener('click', togglePlay);
+        elements.previewVideo.addEventListener('play', updatePlayButtonUI);
+        elements.previewVideo.addEventListener('pause', updatePlayButtonUI);
+        elements.previewVideo.addEventListener('ended', () => {
+            elements.previewVideo.pause();
+            elements.previewVideo.currentTime = 0;
         });
 
-        document.body.appendChild(overlay);
-        document.body.appendChild(mobileMenu);
+        elements.previewVideo.addEventListener('timeupdate', () => {
+            const percent = (elements.previewVideo.currentTime / elements.previewVideo.duration) * 100;
+            if (elements.progressPlayed) elements.progressPlayed.style.width = percent + '%';
+            if (elements.currentTimeEl) elements.currentTimeEl.textContent = formatTime(elements.previewVideo.currentTime);
+        });
 
-        if (header) {
-            header.appendChild(hamburger);
+        if (elements.closePreview) elements.closePreview.onclick = closeVideoPreview;
+
+        if (elements.progressBarContainer) {
+            elements.progressBarContainer.addEventListener('click', (e) => {
+                const rect = elements.progressBarContainer.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const width = elements.progressBarContainer.clientWidth;
+                const percentage = clickX / width;
+                elements.previewVideo.currentTime = elements.previewVideo.duration * percentage;
+                handleUserActivity();
+            });
         }
 
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = isActive ? '' : 'hidden';
+        if (elements.volumeSlider) {
+            elements.volumeSlider.oninput = function(e) {
+                elements.previewVideo.volume = e.target.value / 100;
+                handleUserActivity();
+            };
         }
 
-        hamburger.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
+        if (elements.rewindBtn) {
+            elements.rewindBtn.onclick = () => {
+                elements.previewVideo.currentTime -= 5;
+                handleUserActivity();
+            };
+        }
 
-        mobileMenu.addEventListener('click', (e) => {
-            if (e.target.classList.contains('nav-btn')) {
-                toggleMenu();
-            }
-        });
+        if (elements.forwardBtn) {
+            elements.forwardBtn.onclick = () => {
+                elements.previewVideo.currentTime += 5;
+                handleUserActivity();
+            };
+        }
 
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
-                toggleMenu();
+        if (elements.fullscreenBtn) {
+            elements.fullscreenBtn.onclick = () => {
+                if (elements.previewVideo.requestFullscreen) {
+                    elements.previewVideo.requestFullscreen();
+                } else if (elements.previewVideo.webkitRequestFullscreen) {
+                    elements.previewVideo.webkitRequestFullscreen();
+                }
+            };
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (elements.previewContainer && elements.previewContainer.classList.contains('active')) {
+                if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+                if (e.key === 'ArrowLeft') { elements.previewVideo.currentTime -= 5; handleUserActivity(); }
+                if (e.key === 'ArrowRight') { elements.previewVideo.currentTime += 5; handleUserActivity(); }
             }
         });
     }
 
-    // ============================================================
-    // 9. INITIALIZATION
-    // ============================================================
+    /* ============================================================
+       12. DİGƏR LİNKLƏR (Footer və s.)
+       ============================================================ */
+    
+    function setupOtherLinks() {
+        // Yalnız footer və digər linkləri (logo və menu xaricində)
+        const otherLinks = document.querySelectorAll('a:not(.center-logo):not(.nav-btn):not([href^="#"]):not([target="_blank"])');
+        
+        otherLinks.forEach(link => {
+            if (link.closest('.mobile-menu')) return;
+            if (link.closest('.menu-socials')) return;
+            if (link.closest('.menu-contact-info')) return;
 
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (!href) return;
+                if (href.startsWith('mailto') || href.startsWith('tel')) return;
+                
+                e.preventDefault();
+                navigateWithTransition(href);
+            });
+        });
+    }
+
+    /* ============================================================
+       13. INITIALIZATION - TEK BİR DƏFƏ
+       ============================================================ */
+    
     function init() {
+        console.log('Archive JS initialized'); // Debug
+        
+        initPageTransition();
+        initMobileMenu();
+        initLogoClick(); // <-- Logo üçün ayrıca funksiya
+        initScrollReveal();
+        initVideoModal();
         loadArchiveData();
-
-        if (window.innerWidth <= 768) {
-            initMobileMenu();
-        }
+        setupOtherLinks();
     }
 
     if (document.readyState === 'loading') {

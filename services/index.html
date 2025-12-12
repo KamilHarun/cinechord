@@ -3,52 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional video production services - Film shooting, commercials, documentaries, and music videos by CINE CHORD">
-    <meta name="theme-color" content="#050505">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
+    <meta name="description" content="Professional video production services">
     <title>Cine Chord - Service</title>
     
-    <!-- FAVICON -->
     <link rel="icon" type="image/png" href="../photos/CineChord.png">
     <link rel="shortcut icon" type="image/png" href="../photos/CineChord.png">
     <link rel="apple-touch-icon" href="../photos/CineChord.png">
     
-    <link rel="preload" href="../fonts/NeueMetanaNextOutline-Black.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="../fonts/NeueMetanaNext-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
-    
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="service.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="service.css">
 </head>
 <body>
     <div class="page-transition"></div> 
     <div class="grain-overlay"></div>
     <div class="progress-bar-top"></div>
 
-    <header class="header">
-        <nav class="nav-left">
-            <a href="../index.html" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
-            <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
-            <a href="#" class="nav-btn active" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
-        </nav>
-        <nav class="nav-right">
-            <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
-            <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
-            <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
-        </nav>
-    </header>
+    <!-- HAMBURGER BUTTON -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span class="hamburger-text">MENU</span>
+        <span class="hamburger-icon">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </span>
+    </button>
 
-    <div class="center-logo">
-        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    <!-- OVERLAY -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- MOBILE MENU -->
+    <nav class="mobile-menu" id="mobileMenu">
+    <a href="../" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
+    
+    <a href="#" class="nav-btn active" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+    
+    <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+    <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+    <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+
+    <div class="menu-footer">
+        <div class="menu-socials">
+            <a href="#">INSTAGRAM</a>
+            <a href="#">YOUTUBE</a>
+            <a href="#">VIMEO</a>
+        </div>
+        <div class="menu-contact-info">
+            <p>hello@cinechord.com</p>
+            <p>+994 50 123 45 67</p>
+        </div>
     </div>
+</nav>
+
+    <!-- LOGO -->
+    <a href="../" class="center-logo">
+        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    </a>
 
     <main class="container">
 
@@ -58,191 +71,30 @@
             </h1>
         </div>
 
-        <section class="page-wrapper reveal-item">
-            <div class="media-column">
-                <div class="media-container">
-                    <div class="media-frame">
-                        <video class="media-content" 
-                               muted loop playsinline autoplay
-                               src="../videos/we_create.mp4"> </video>
-                    </div>
-                </div>
+        <!-- DİNAMİK SERVİS CONTAINER -->
+        <div id="services-list-container">
+            <!-- Loading state -->
+            <div class="services-loading" style="text-align: center; padding: 100px 20px;">
+                <div class="loading-spinner" style="width: 50px; height: 50px; border: 3px solid rgba(255,165,0,0.1); border-top-color: #FFA500; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <p style="color: rgba(255,255,255,0.5); font-family: 'Gabarito', sans-serif;">Loading services...</p>
             </div>
-            
-            <div class="content-column">
-                <div class="content-wrapper">
-                    <div class="service-header">
-                        <div class="icon-container">
-                            <i class="fas fa-film"></i>
-                        </div>
-                        <h2 class="service-title" data-text="FILM SHOOTING">
-                            <span>FILM SHOOTING</span>
-                        </h2>
-                    </div>
-                    <p class="description">Professional narrative filmmaking that brings stories to life through cinematic excellence and creative vision.</p>
-                    <ul class="bullet-list">
-                        <li>Feature films and short films</li>
-                        <li>Cinematic storytelling approach</li>
-                        <li>Professional cinematography and lighting</li>
-                        <li>Experienced production crew</li>
-                    </ul>
-                    <div class="divider"></div>
-                    <ol class="numbered-list">
-                        <li>Script analysis and creative development</li>
-                        <li>Pre-production planning and storyboarding</li>
-                        <li>Principal photography with cinema cameras</li>
-                        <li>Post-production and color grading</li>
-                    </ol>
-                    <a href="../contact/" class="cta-button">
-                        CONTACT <i class="fas fa-long-arrow-alt-right"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section class="page-wrapper reveal-item">
-            <div class="content-column">
-                <div class="content-wrapper">
-                    <div class="service-header">
-                        <div class="icon-container">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <h2 class="service-title" data-text="COMMERCIAL SHOOTING">
-                            <span>COMMERCIAL SHOOTING</span>
-                        </h2>
-                    </div>
-                    <p class="description">High-impact commercial content that elevates your brand and drives engagement across all platforms.</p>
-                    <ul class="bullet-list">
-                        <li>Brand commercials and advertisements</li>
-                        <li>Product showcases and demos</li>
-                        <li>Corporate videos and presentations</li>
-                        <li>Social media content creation</li>
-                    </ul>
-                    <div class="divider"></div>
-                    <ol class="numbered-list">
-                        <li>Brand strategy consultation</li>
-                        <li>Concept development and scripting</li>
-                        <li>Professional studio or location shooting</li>
-                        <li>Fast turnaround editing and delivery</li>
-                    </ol>
-                    <a href="../contact/" class="cta-button">
-                        CONTACT <i class="fas fa-long-arrow-alt-right"></i>
-                    </a>
-                </div>
-            </div>
-             <div class="media-column">
-                <div class="media-container">
-                    <div class="media-frame">
-                        <video class="media-content" 
-                               muted loop playsinline autoplay
-                               src="/videos/we_inspire.mp4"> </video>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="page-wrapper reveal-item">
-            <div class="media-column">
-                <div class="media-container">
-                    <div class="media-frame">
-                        <video class="media-content" 
-                               muted loop playsinline autoplay
-                               src="../videos/we_document.mp4"> </video>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="content-column">
-                <div class="content-wrapper">
-                    <div class="service-header">
-                        <div class="icon-container">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <h2 class="service-title" data-text="DOCUMENTARY">
-                            <span>DOCUMENTARY</span>
-                        </h2>
-                    </div>
-                    <p class="description">Authentic documentary filmmaking that captures real stories with depth, sensitivity, and journalistic integrity.</p>
-                    <ul class="bullet-list">
-                        <li>Feature-length and short documentaries</li>
-                        <li>Interview and testimonial filming</li>
-                        <li>Observational cinema techniques</li>
-                        <li>Archival research and integration</li>
-                    </ul>
-                    <div class="divider"></div>
-                    <ol class="numbered-list">
-                        <li>Subject research and story development</li>
-                        <li>Interview coordination and location scouting</li>
-                        <li>Multi-camera documentary production</li>
-                        <li>Editing with narrative structure</li>
-                    </ol>
-                    <a href="../contact/" class="cta-button">
-                        CONTACT <i class="fas fa-long-arrow-alt-right"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section class="page-wrapper reveal-item">
-             <div class="content-column">
-                <div class="content-wrapper">
-                    <div class="service-header">
-                        <div class="icon-container">
-                            <i class="fas fa-music"></i>
-                        </div>
-                        <h2 class="service-title" data-text="MUSIC VIDEOS">
-                            <span>MUSIC VIDEOS</span>
-                        </h2>
-                    </div>
-                    <p class="description">Visually stunning music videos that amplify your sound with creative concepts and dynamic cinematography.</p>
-                    <ul class="bullet-list">
-                        <li>Narrative and performance music videos</li>
-                        <li>Creative concept development</li>
-                        <li>Dynamic camera movement and choreography</li>
-                        <li>Visual effects and color grading</li>
-                    </ul>
-                    <div class="divider"></div>
-                    <ol class="numbered-list">
-                        <li>Creative treatment and mood boarding</li>
-                        <li>Location scouting and talent coordination</li>
-                        <li>High-energy multi-camera production</li>
-                        <li>Advanced post-production and VFX</li>
-                    </ol>
-                    <a href="../contact/" class="cta-button">
-                        CONTACT <i class="fas fa-long-arrow-alt-right"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="media-column">
-                <div class="media-container">
-                    <div class="media-frame">
-                        <video class="media-content" 
-                               muted loop playsinline autoplay
-                               src="../videos/Fin_us.mp4"> </video>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
 
         <section class="chat-section">
             <h2 class="chat-title">LET'S CHAT</h2>
-            
             <div class="chat-video-container">
                 <video class="chat-video" autoplay muted loop playsinline preload="auto">
                     <source src="../videos/loopvideo.mp4" type="video/mp4">
                 </video>
-                
                 <div class="chat-content">
-                    <a href="../contact/" class="chat-cta-button">
-                        CONTACT <i class="fas fa-long-arrow-alt-right"></i>
-                    </a>
+                    <a href="../contact/" class="chat-cta-button">CONTACT <i class="fas fa-long-arrow-alt-right"></i></a>
                 </div>
             </div>
         </section>
 
     </main>
 
-   <footer class="main-footer">
+    <footer class="main-footer">
         <div class="footer-wrapper">
             <div class="footer-col">
                 <span class="footer-label">ADDRESS</span>
@@ -252,60 +104,45 @@
                     <p class="footer-text">Baku, Azerbaijan</p>
                 </div>
             </div>
-            
             <div class="footer-col">
                 <span class="footer-label">GET IN TOUCH</span>
                 <div class="footer-content">
-                    <a href="mailto:hi@filmmaker.com" class="mask-link">
-                        <span data-text="hi@filmmaker.com">hi@filmmaker.com</span>
-                    </a>
-                    <a href="tel:+994500000000" class="mask-link">
-                        <span data-text="(+994) 50 000 00 00">(+994) 50 000 00 00</span>
-                    </a>
+                    <a href="mailto:hi@filmmaker.com" class="mask-link"><span data-text="hi@filmmaker.com">hi@filmmaker.com</span></a>
+                    <a href="tel:+994500000000" class="mask-link"><span data-text="(+994) 50 000 00 00">(+994) 50 000 00 00</span></a>
                 </div>
             </div>
-            
             <div class="footer-col">
-                <span class="footer-label">SOCIALS</span>
-                <div class="footer-content">
-                    <div class="social-icons">
-                        <a href="#" class="mask-icon" aria-label="Instagram">
-                            <div class="icon-wrap">
-                                <i class="fa-brands fa-instagram main-icon"></i>
-                                <i class="fa-brands fa-instagram hover-icon"></i>
-                            </div>
-                        </a>
-                        <a href="#" class="mask-icon" aria-label="YouTube">
-                            <div class="icon-wrap">
-                                <i class="fa-brands fa-youtube main-icon"></i>
-                                <i class="fa-brands fa-youtube hover-icon"></i>
-                            </div>
-                        </a>
-                        <a href="#" class="mask-icon" aria-label="Facebook">
-                            <div class="icon-wrap">
-                                <i class="fa-brands fa-facebook-f main-icon"></i>
-                                <i class="fa-brands fa-facebook-f hover-icon"></i>
-                            </div>
-                        </a>
-                        <a href="#" class="mask-icon" aria-label="Twitter">
-                            <div class="icon-wrap">
-                                <i class="fa-brands fa-twitter main-icon"></i>
-                                <i class="fa-brands fa-twitter hover-icon"></i>
-                            </div>
-                        </a>
-                        <a href="#" class="mask-icon" aria-label="LinkedIn">
-                            <div class="icon-wrap">
-                                <i class="fa-brands fa-linkedin-in main-icon"></i>
-                                <i class="fa-brands fa-linkedin-in hover-icon"></i>
-                            </div>
-                        </a>
-                    </div>
+                <span class="footer-label">FOLLOW US</span>
+                <div class="social-icons">
+                    <a href="#" class="mask-icon">
+                        <span class="icon-wrap">
+                            <i class="fa-brands fa-instagram main-icon"></i>
+                            <i class="fa-brands fa-instagram hover-icon"></i>
+                        </span>
+                    </a>
+                    <a href="#" class="mask-icon">
+                        <span class="icon-wrap">
+                            <i class="fa-brands fa-youtube main-icon"></i>
+                            <i class="fa-brands fa-youtube hover-icon"></i>
+                        </span>
+                    </a>
+                    <a href="#" class="mask-icon">
+                        <span class="icon-wrap">
+                            <i class="fa-brands fa-vimeo-v main-icon"></i>
+                            <i class="fa-brands fa-vimeo-v hover-icon"></i>
+                        </span>
+                    </a>
+                    <a href="#" class="mask-icon">
+                        <span class="icon-wrap">
+                            <i class="fa-brands fa-linkedin-in main-icon"></i>
+                            <i class="fa-brands fa-linkedin-in hover-icon"></i>
+                        </span>
+                    </a>
                 </div>
             </div>
         </div>
-        
         <div class="footer-bottom">
-            <p class="copyright">© 2025 Cine Chord. All rights reserved.</p>
+            <span class="copyright">© 2025 CINE CHORD. ALL RIGHTS RESERVED.</span>
         </div>
     </footer>
 

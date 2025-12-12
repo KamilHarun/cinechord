@@ -1,311 +1,331 @@
 /* ============================================================
-   CineChord Index (Home) - Main JavaScript
-   Version: 2.2 - MOBILE MENU & AUTOPLAY FIXES
-   Description: Professional home page with video slider
-   ============================================================ */
+   CineChord Index - Main JavaScript
+   Version: 4.3 - ALL FIXES APPLIED
+   ============================================================ */
 
 // Global video configuration
 window.CONFIG = {
-    videos: [
-        'videos/Showreel.mp4',
-        'videos/ABB-TamGenc-Card.mp4',
-        'videos/Bakcell-099.mp4',
-        'videos/Yaz-furseti-kampaniyasi.mp4',
-        'videos/Yeni-dovr.mp4'
-    ],
-    titles: ['SHOWREEL', 'ABB TAM GENC', 'BAKCELL 099', 'ABB YAZ FÜRSƏTİ', 'BAKCELL YENİ DÖVR']
+    videos: [
+        'videos/Showreel.mp4',
+        'videos/ABB-TamGenc-Card.mp4',
+        'videos/Bakcell-099.mp4',
+        'videos/Yaz-furseti-kampaniyasi.mp4',
+        'videos/Yeni-dovr.mp4'
+    ],
+    titles: ['SHOWREEL', 'ABB TAM GENC', 'BAKCELL 099', 'ABB YAZ FÜRSƏTİ', 'BAKCELL YENİ DÖVR']
 };
 window.currentIndex = 0;
 
 // Global function for main play button
 window.openMainVideo = function() {
-    const previewContainer = document.getElementById('previewContainer');
-    const previewVideo = document.getElementById('previewVideo');
-    const videoLoading = document.querySelector('.video-loading');
-    const previewTitle = document.getElementById('previewTitle');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewVideo = document.getElementById('previewVideo');
+    const videoLoading = document.querySelector('.video-loading');
+    const previewTitle = document.getElementById('previewTitle');
 
-    if (previewContainer && previewVideo) {
-        if (videoLoading) videoLoading.style.display = 'block';
-        
-        previewVideo.src = window.CONFIG.videos[window.currentIndex];
-        if (previewTitle) previewTitle.textContent = window.CONFIG.titles[window.currentIndex];
-        
-        previewContainer.classList.remove('is-paused');
-        previewContainer.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    if (previewContainer && previewVideo) {
+        if (videoLoading) videoLoading.style.display = 'block';
+        
+        previewVideo.src = window.CONFIG.videos[window.currentIndex];
+        if (previewTitle) previewTitle.textContent = window.CONFIG.titles[window.currentIndex];
+        
+        previewContainer.classList.remove('is-paused');
+        previewContainer.classList.add('active');
+        document.body.style.overflow = 'hidden';
 
-        const playPromise = previewVideo.play();
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                if (videoLoading) videoLoading.style.display = 'none';
-            }).catch(() => {
-                if (videoLoading) videoLoading.style.display = 'none';
-            });
-        }
-    }
+        const playPromise = previewVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                if (videoLoading) videoLoading.style.display = 'none';
+            }).catch(() => {
+                if (videoLoading) videoLoading.style.display = 'none';
+            });
+        }
+    }
 };
 
 (function() {
-    'use strict';
+    'use strict';
 
-    /* ============================================================
-       1. CONFIGURATION & CONSTANTS
-       ============================================================ */
-    
-    const CONFIG = {
-        PAGE_LOAD_DELAY: 100,
-        NAVIGATION_DELAY: 600,
-        FALLBACK_DELAY: 1600,
-        RESIZE_DEBOUNCE: 250,
-        INACTIVITY_DELAY: 2000
-    };
+    /* ============================================================
+       1. CONFIGURATION & CONSTANTS
+       ============================================================ */
+    
+    const CONFIG = {
+        PAGE_LOAD_DELAY: 100,
+        NAVIGATION_DELAY: 600,
+        FALLBACK_DELAY: 1600,
+        RESIZE_DEBOUNCE: 250,
+        INACTIVITY_DELAY: 2000
+    };
 
-    /* ============================================================
-       2. DOM ELEMENT REFERENCES
-       ============================================================ */
-    
-    const elements = {
-        pageTransition: document.querySelector('.page-transition'),
-        loadingScreen: document.querySelector('.loading-screen'),
-        loaderContent: document.querySelector('.loader-content'),
-        loaderFill: document.querySelector('.loader-bar-fill'),
-        loaderText: document.querySelector('.loader-percentage'),
-        loaderLogo: document.querySelector('.loader-logo'),
-        loaderAuthor: document.querySelector('.loader-author'),
-        header: document.querySelector('.header'),
-        centerLogo: document.querySelector('.center-logo'),
-        // Video Elementləri
-        videoContainer: document.getElementById('videoContainer'),
-        heroBgVideo: document.getElementById('heroBgVideo'), 
-        projectCounter: document.getElementById('projectCounter'),
-        projectName: document.getElementById('projectName'),
-        prevBtn: document.getElementById('prevVideoBtn'),
-        nextBtn: document.getElementById('nextVideoBtn'),
-        previewContainer: document.getElementById('previewContainer'),
-        previewVideo: document.getElementById('previewVideo'),
-        closePreview: document.getElementById('closePreview'),
-        modalPlayContainer: document.getElementById('modalPlayBtnContainer'),
-        playPauseBtn: document.getElementById('playPauseBtn'),
-        playIcon: document.getElementById('playIcon'),
-        pauseIcon: document.getElementById('pauseIcon'),
-        rewindBtn: document.getElementById('rewindBtn'),
-        forwardBtn: document.getElementById('forwardBtn'),
-        progressSlider: document.getElementById('progressSlider'),
-        progressPlayed: document.getElementById('progressPlayed'),
-        currentTimeEl: document.getElementById('currentTime'),
-        durationTimeEl: document.getElementById('durationTime'),
-        volumeSlider: document.getElementById('volumeSlider'),
-        fullscreenBtn: document.getElementById('fullscreenBtn')
-    };
+    /* ============================================================
+       2. DOM ELEMENT REFERENCES
+       ============================================================ */
+    
+    const elements = {
+        pageTransition: document.querySelector('.page-transition'),
+        loadingScreen: document.querySelector('.loading-screen'),
+        loaderContent: document.querySelector('.loader-content'),
+        loaderFill: document.querySelector('.loader-bar-fill'),
+        loaderText: document.querySelector('.loader-percentage'),
+        loaderLogo: document.querySelector('.loader-logo'),
+        loaderAuthor: document.querySelector('.loader-author'),
+        header: document.querySelector('.header'),
+        centerLogo: document.querySelector('.center-logo'),
+        videoContainer: document.getElementById('videoContainer'),
+        heroBgVideo: document.getElementById('heroBgVideo'), 
+        projectCounter: document.getElementById('projectCounter'),
+        projectName: document.getElementById('projectName'),
+        prevBtn: document.getElementById('prevVideoBtn'),
+        nextBtn: document.getElementById('nextVideoBtn'),
+        previewContainer: document.getElementById('previewContainer'),
+        previewVideo: document.getElementById('previewVideo'),
+        closePreview: document.getElementById('closePreview'),
+        modalPlayContainer: document.getElementById('modalPlayBtnContainer'),
+        playPauseBtn: document.getElementById('playPauseBtn'),
+        playIcon: document.getElementById('playIcon'),
+        pauseIcon: document.getElementById('pauseIcon'),
+        rewindBtn: document.getElementById('rewindBtn'),
+        forwardBtn: document.getElementById('forwardBtn'),
+        progressSlider: document.getElementById('progressSlider'),
+        progressPlayed: document.getElementById('progressPlayed'),
+        currentTimeEl: document.getElementById('currentTime'),
+        durationTimeEl: document.getElementById('durationTime'),
+        volumeSlider: document.getElementById('volumeSlider'),
+        fullscreenBtn: document.getElementById('fullscreenBtn')
+    };
 
-    const UI_ELEMENTS = [
-        ".header", ".center-logo", ".name-left", ".name-right",
-        ".play-button-container", ".right-floating-nav", ".bottom-right-socials", ".bottom-left-copyright"
-    ];
+    const UI_ELEMENTS = [
+        ".center-logo", 
+        ".play-button-container", 
+        ".right-floating-nav", 
+        ".bottom-right-socials", 
+        ".bottom-left-explore"
+    ];
 
-    /* ============================================================
-       3. STATE VARIABLES
-       ============================================================ */
-    
-    let isTransitioning = false;
-    let isAnimating = false;
-    let activityTimeout = null;
-    let currentVideoEl = elements.heroBgVideo;
+    /* ============================================================
+       3. STATE VARIABLES
+       ============================================================ */
+    
+    let isAnimating = false;
+    let activityTimeout = null;
+    let currentVideoEl = elements.heroBgVideo;
 
-    /* ============================================================
-       4. UTILITY FUNCTIONS
-       ============================================================ */
-    
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return '0:00';
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
+    /* ============================================================
+       4. UTILITY FUNCTIONS
+       ============================================================ */
+    
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
 
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    function applyScrambleEffect(element, textElement, originalText) {
-        let iteration = 0;
-        clearInterval(element.interval);
-        element.interval = setInterval(() => {
-            textElement.innerText = originalText.split("").map((letter, index) => {
-                if (index < iteration) return originalText[index];
-                return letters[Math.floor(Math.random() * letters.length)];
-            }).join("");
-            if (iteration >= originalText.length) clearInterval(element.interval);
-            iteration += 1 / 3;
-        }, 30);
-    }
+    /* ============================================================
+       5. PAGE TRANSITION SYSTEM - FIX: Sadələşdirilmiş
+       ============================================================ */
+    
+    function initPageTransition() {
+        if (!elements.pageTransition) return;
+        
+        setTimeout(() => {
+            elements.pageTransition.classList.add('page-loaded');
+        }, CONFIG.PAGE_LOAD_DELAY);
+    }
 
-    /* ============================================================
-       5. PAGE TRANSITION SYSTEM (SLIDE EFFECT)
-       ============================================================ */
-    
-    function initPageTransition() {
-        if (!elements.pageTransition) return;
-        
-        setTimeout(() => {
-            elements.pageTransition.classList.add('page-loaded');
-        }, CONFIG.PAGE_LOAD_DELAY);
-    }
+    // FIX: isTransitioning silindi, sadə navigasiya
+    function navigateWithTransition(href) {
+        if (!href) return;
+        
+        if (href.startsWith('mailto') || href.startsWith('tel')) {
+            window.location.href = href;
+            return;
+        }
 
-    function navigateWithTransition(href) {
-        if (isTransitioning) return;
-        
-        isTransitioning = true;
-        
-        if (elements.pageTransition) {
-            elements.pageTransition.classList.remove('page-loaded');
-        }
-        
-        setTimeout(() => {
-            window.location.href = href;
-        }, CONFIG.NAVIGATION_DELAY);
-        
-        setTimeout(() => {
-            if (!document.hidden) {
-                window.location.href = href;
-            }
-        }, CONFIG.FALLBACK_DELAY);
-    }
+        if (elements.pageTransition) {
+            elements.pageTransition.classList.remove('page-loaded');
+        }
+        
+        document.querySelectorAll('video').forEach(v => v.pause());
+        
+        setTimeout(() => {
+            window.location.href = href;
+        }, CONFIG.NAVIGATION_DELAY);
+        
+        setTimeout(() => {
+            if (!document.hidden) {
+                window.location.href = href;
+            }
+        }, CONFIG.FALLBACK_DELAY);
+    }
 
-    /* ============================================================
-       6. MOBILE NAVIGATION & HAMBURGER
-       ============================================================ */
-    
-    function initMobileMenu() {
-        // HTML-də mövcud olan elementləri ID ilə seçirik
-        const hamburger = document.getElementById('hamburgerBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const overlay = document.getElementById('mobileMenuOverlay');
+    /* ============================================================
+       6. MOBILE MENU - FIX: Jump problemi həll edildi
+       ============================================================ */
 
-        if (!hamburger || !mobileMenu || !overlay) {
-            // Desktop versiyada bu elementlər olmaya bilər. Yalnız mobil media sorğularında görünür.
-            return;
-        }
+    function initMobileMenu() {
+        const hamburger = document.getElementById('hamburgerBtn');
+        const hamburgerText = hamburger?.querySelector('.hamburger-text');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        const centerLogo = document.querySelector('.center-logo');
 
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            // Menyu açılanda body scroll-u bloklanır.
-            document.body.classList.toggle('menu-open', !isActive);
-        }
+        if (!hamburger || !mobileMenu) {
+            console.error('Menu elementləri tapılmadı!');
+            return;
+        }
 
-        hamburger.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-        
-        // Menyudakı linklərə kliklənəndə menyunu bağlamaq və keçid etmək
-        mobileMenu.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                const linkPath = href ? href.split('/').pop() : '';
-                const currentPath = window.location.pathname.split('/').pop();
+        function toggleMenu() {
+            const isActive = hamburger.classList.contains('active');
+            
+            // FIX: Scrollbar genişliyini hesabla
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+            
+            if (hamburgerText) {
+                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+            }
+            
+            // FIX: Scrollbar compensation
+            if (!isActive) {
+                document.body.style.overflow = 'hidden';
+                document.body.style.paddingRight = scrollbarWidth + 'px';
+                if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
+                if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
+            } else {
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                if (hamburger) hamburger.style.paddingRight = '';
+                if (centerLogo) centerLogo.style.paddingRight = '';
+            }
+        }
 
-                if (!href || href === '#') {
-                    toggleMenu(); 
-                    return;
-                }
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        });
 
-                if (linkPath === currentPath) return;
-                
-                e.preventDefault();
-                toggleMenu(); 
-                setTimeout(() => navigateWithTransition(href), 100); 
-            });
-        });
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleMenu();
+            });
+        }
 
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                if (window.innerWidth > 768 && hamburger.classList.contains('active')) {
-                    toggleMenu();
-                }
-            }, CONFIG.RESIZE_DEBOUNCE);
-        });
-    }
+        // FIX: Mobil Menyu Linkləri - yeni məntiq
+        const navLinks = mobileMenu.querySelectorAll('.nav-btn');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const href = this.getAttribute('href');
+                
+                if (!href || href === '#' || this.classList.contains('active')) {
+                    toggleMenu();
+                    return;
+                }
 
-    /* ============================================================
-       7. GSAP ANIMATIONS
-       ============================================================ */
-    
-    function initGSAP() {
-        if (typeof gsap === 'undefined') return;
-        
-        gsap.set(".hero-section", { autoAlpha: 1 });
-        gsap.set(UI_ELEMENTS, { y: 50, autoAlpha: 0 });
-    }
+                toggleMenu();
+                
+                setTimeout(() => {
+                    navigateWithTransition(href);
+                }, 200);
+            });
+        });
 
-    function runLoadingAnimation() {
-        if (typeof gsap === 'undefined') {
-            revealSite();
-            return;
-        }
+        // ESC düyməsi - video modal prioriteti
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (elements.previewContainer && elements.previewContainer.classList.contains('active')) {
+                    closeVideoPreview();
+                    return;
+                }
+                if (hamburger.classList.contains('active')) {
+                    toggleMenu();
+                }
+            }
+        });
+    }
 
-        const tl = gsap.timeline();
-        tl.fromTo(elements.loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1, ease: "power2.out" }, 0)
-          .to(elements.loaderAuthor, { opacity: 1, duration: 0.4 }, "-=0.8")
-          .to(elements.loaderFill, {
-            width: "100%",
-            duration: 1.8,
-            ease: "power2.inOut",
-            onUpdate: function() {
-                let prog = Math.round(this.progress() * 100);
-                if (elements.loaderText) elements.loaderText.textContent = prog + "%";
-            },
-            onComplete: () => {
-                gsap.to(elements.loadingScreen, {
-                    y: "-100%",
-                    duration: 1,
-                    ease: "power4.inOut",
-                    onComplete: () => {
-                        if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
-                        revealSite();
-                    }
-                });
-            }
-        });
-    }
+    /* ============================================================
+       7. GSAP ANIMATIONS
+       ============================================================ */
+    
+    function initGSAP() {
+        if (typeof gsap === 'undefined') return;
+        
+        gsap.set(".hero-section", { autoAlpha: 1 });
+        gsap.set(UI_ELEMENTS, { y: 50, autoAlpha: 0 });
+    }
 
-    function revealSite(isPageTransition = false) {
-        if (typeof gsap === 'undefined') return;
-        
-        const mainTl = gsap.timeline();
-        
-        if (isPageTransition && elements.loadingScreen) {
-            mainTl.to(elements.loadingScreen, {
-                y: "100%",
-                duration: 0.9,
-                ease: "expo.inOut"
-            }, 0);
-        }
-        
-        const startDelay = isPageTransition ? "-=0.7" : 0;
+    function runLoadingAnimation() {
+        if (typeof gsap === 'undefined') {
+            revealSite();
+            return;
+        }
 
-        mainTl.to(".header", { y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out" }, startDelay);
-        mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
-        mainTl.to(".name-left", { y: 0, autoAlpha: 1, duration: 1, ease: "power2.out" }, startDelay + 0.05);
-        mainTl.to(".name-right", { y: 0, autoAlpha: 1, duration: 1, ease: "power2.out" }, startDelay + 0.1);
-        mainTl.to(".play-button-container", { y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out" }, startDelay + 0.1);
-        mainTl.to(".right-floating-nav", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.15);
-        mainTl.to(".bottom-right-socials", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.2);
-        mainTl.to(".bottom-left-copyright", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.25);
-    }
+        const tl = gsap.timeline();
+        tl.fromTo(elements.loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1, ease: "power2.out" }, 0)
+          .to(elements.loaderAuthor, { opacity: 1, duration: 0.4 }, "-=0.8")
+          .to(elements.loaderFill, {
+            width: "100%",
+            duration: 1.8,
+            ease: "power2.inOut",
+            onUpdate: function() {
+                let prog = Math.round(this.progress() * 100);
+                if (elements.loaderText) elements.loaderText.textContent = prog + "%";
+            },
+            onComplete: () => {
+                gsap.to(elements.loadingScreen, {
+                    y: "-100%",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    onComplete: () => {
+                        if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
+                        revealSite();
+                    }
+                });
+            }
+        });
+    }
+
+    function revealSite(isPageTransition = false) {
+        if (typeof gsap === 'undefined') return;
+        
+        const mainTl = gsap.timeline();
+        
+        if (isPageTransition && elements.loadingScreen) {
+            mainTl.to(elements.loadingScreen, {
+                y: "100%",
+                duration: 0.9,
+                ease: "expo.inOut"
+            }, 0);
+        }
+        
+        const startDelay = isPageTransition ? "-=0.7" : 0;
+
+        mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
+        mainTl.to(".play-button-container", { y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out" }, startDelay + 0.1);
+        mainTl.to(".right-floating-nav", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.15);
+        mainTl.to(".bottom-right-socials", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.2);
+        mainTl.to(".bottom-left-explore", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.25);
+    }
     
     /* ============================================================
-       7.5. VIDEO AUTOPLAY CHECK (ƏLAVƏ EDİLDİ)
-       ============================================================ */
+       8. VIDEO AUTOPLAY CHECK
+       ============================================================ */
     function initVideoAutoplay() {
         if (elements.heroBgVideo) {
-            
-            // 1. Loadedmetadata gözləyib oynatmağa çalışırıq
             elements.heroBgVideo.addEventListener('loadedmetadata', () => {
                 const playPromise = elements.heroBgVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(() => {
-                        // Əgər bloklanırsa, səssiz olduğundan əmin olub yenidən cəhd edirik (əsasən Safari/Chrome üçün)
                         elements.heroBgVideo.muted = true;
                         elements.heroBgVideo.play().catch(error => {
                             console.warn("Autoplay failed even after muting:", error);
@@ -313,334 +333,356 @@ window.openMainVideo = function() {
                     });
                 }
             });
-            
-            // 2. Birbaşa başlatmağa cəhd (bəzən dərhal işləyir)
-            elements.heroBgVideo.play().catch(() => {
-                // İlkin cəhd uğursuz olarsa, loadedmetadata hadisəsi işi davam etdirəcək.
-            });
+            elements.heroBgVideo.play().catch(() => {});
         }
     }
 
+    /* ============================================================
+       9. LOADING SCREEN LOGIC
+       ============================================================ */
+    
+    function initLoadingScreen() {
+        const hasIntroShown = sessionStorage.getItem('introShown');
 
-    /* ============================================================
-       8. LOADING SCREEN LOGIC
-       ============================================================ */
-    
-    function initLoadingScreen() {
-        const hasIntroShown = sessionStorage.getItem('introShown');
+        if (hasIntroShown) {
+            if (elements.loaderContent) {
+                elements.loaderContent.style.display = "none";
+                if (typeof gsap !== 'undefined') {
+                    gsap.set(elements.loaderContent, { autoAlpha: 0 });
+                }
+            }
+            if (elements.loadingScreen && typeof gsap !== 'undefined') {
+                gsap.set(elements.loadingScreen, { y: "0%", display: "flex", opacity: 1 });
+            }
+            setTimeout(() => revealSite(true), 50);
+        } else {
+            sessionStorage.setItem('introShown', 'true');
+            if (elements.loaderContent && typeof gsap !== 'undefined') {
+                gsap.set(elements.loaderContent, { autoAlpha: 1, visibility: "visible" });
+                gsap.set(elements.loaderLogo, { opacity: 1 });
+                gsap.set(elements.loaderAuthor, { visibility: "visible" });
+            }
+            runLoadingAnimation();
+        }
+    }
 
-        if (hasIntroShown) {
-            if (elements.loaderContent) {
-                elements.loaderContent.style.display = "none";
-                if (typeof gsap !== 'undefined') {
-                    gsap.set(elements.loaderContent, { autoAlpha: 0 });
-                }
-            }
-            if (elements.loadingScreen && typeof gsap !== 'undefined') {
-                gsap.set(elements.loadingScreen, { y: "0%", display: "flex", opacity: 1 });
-            }
-            setTimeout(() => revealSite(true), 50);
-        } else {
-            sessionStorage.setItem('introShown', 'true');
-            if (elements.loaderContent && typeof gsap !== 'undefined') {
-                gsap.set(elements.loaderContent, { autoAlpha: 1, visibility: "visible" });
-                gsap.set(elements.loaderLogo, { opacity: 1 });
-                gsap.set(elements.loaderAuthor, { visibility: "visible" });
-            }
-            runLoadingAnimation();
-        }
-    }
+    /* ============================================================
+       10. NAVIGATION - Menyu xaricindəki linklər
+       ============================================================ */
+    
+    function setupNavButtons() {
+        const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
+        
+        internalLinks.forEach(link => {
+            if (link.closest('.mobile-menu')) return;
 
-    /* ============================================================
-       9. NAVIGATION & SCRAMBLE EFFECT
-       ============================================================ */
-    
-    function setupNavButtons() {
-        const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
-        internalLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                const linkPath = href ? href.split('/').pop() : '';
-                const currentPath = window.location.pathname.split('/').pop();
-                
-                if (!href || href === '#' || linkPath === currentPath) return;
-                
-                e.preventDefault();
-                navigateWithTransition(href);
-            });
-        });
-    }
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (!href || href === '#') return;
+                if (href.startsWith('mailto') || href.startsWith('tel')) return;
+                
+                e.preventDefault();
+                navigateWithTransition(href);
+            });
+        });
+    }
 
-    function initNavigation() {
-        setupNavButtons();
+    function initNavigation() {
+        setupNavButtons();
+    }
 
-        // Scramble effect
-        document.querySelectorAll(".nav-btn").forEach(btn => {
-            btn.addEventListener("mouseenter", () => {
-                if (btn.classList.contains('active')) return;
-                const textSpan = btn.querySelector(".nav-text");
-                const originalText = btn.getAttribute("data-text");
-                if (textSpan && originalText) applyScrambleEffect(btn, textSpan, originalText);
-            });
-        });
+    /* ============================================================
+       11. VIDEO SLIDER 
+       ============================================================ */
+    
+    function initVideoSlider() {
+        if (!elements.videoContainer || !currentVideoEl) return;
 
-        // Main play button scramble
-        const mainPlayBtn = document.getElementById('mainPlayBtnContainer');
-        if (mainPlayBtn) {
-            const playTextSpan = mainPlayBtn.querySelector('.play-text');
-            mainPlayBtn.addEventListener("mouseenter", () => {
-                if (playTextSpan) applyScrambleEffect(mainPlayBtn, playTextSpan, "PLAY");
-            });
-        }
-    }
+        currentVideoEl.loop = true; 
 
-    /* ============================================================
-       10. VIDEO SLIDER
-       ============================================================ */
-    
-    function initVideoSlider() {
-        if (!elements.videoContainer || !currentVideoEl) return;
+        function changeVideo(direction) {
+            if (isAnimating) return;
+            isAnimating = true;
 
-        currentVideoEl.loop = false;
-        currentVideoEl.onended = () => changeVideo('next');
+            if (direction === 'next') {
+                window.currentIndex = (window.currentIndex + 1) % window.CONFIG.videos.length;
+            } else {
+                window.currentIndex = (window.currentIndex - 1 + window.CONFIG.videos.length) % window.CONFIG.videos.length;
+            }
 
-        function changeVideo(direction) {
-            if (isAnimating) return;
-            isAnimating = true;
+            const nextVideoEl = document.createElement('video');
+            nextVideoEl.className = 'hero-bg';
+            nextVideoEl.src = window.CONFIG.videos[window.currentIndex];
+            nextVideoEl.autoplay = true;
+            nextVideoEl.muted = true;
+            nextVideoEl.loop = true; 
+            nextVideoEl.playsInline = true;
 
-            if (direction === 'next') {
-                window.currentIndex = (window.currentIndex + 1) % window.CONFIG.videos.length;
-            } else {
-                window.currentIndex = (window.currentIndex - 1 + window.CONFIG.videos.length) % window.CONFIG.videos.length;
-            }
+            if (typeof gsap !== 'undefined') {
+                gsap.set(nextVideoEl, { autoAlpha: 1 });
+                elements.videoContainer.insertBefore(nextVideoEl, document.querySelector('.hero-overlay'));
+                const startX = direction === 'next' ? "100%" : "-100%";
+                const endXOld = direction === 'next' ? "-100%" : "100%";
+                gsap.set(nextVideoEl, { x: startX });
 
-            const nextVideoEl = document.createElement('video');
-            nextVideoEl.className = 'hero-bg';
-            nextVideoEl.src = window.CONFIG.videos[window.currentIndex];
-            nextVideoEl.autoplay = true;
-            nextVideoEl.muted = true;
-            nextVideoEl.loop = false;
-            nextVideoEl.playsInline = true;
-            nextVideoEl.onended = () => changeVideo('next');
+                nextVideoEl.onloadeddata = () => {
+                    const tl = gsap.timeline({
+                        onComplete: () => {
+                            if (currentVideoEl) currentVideoEl.remove();
+                            currentVideoEl = nextVideoEl;
+                            isAnimating = false;
+                        }
+                    });
+                    tl.to(currentVideoEl, { x: endXOld, duration: 1.2, ease: "power3.inOut" }, 0)
+                      .to(nextVideoEl, { x: "0%", duration: 1.2, ease: "power3.inOut" }, 0);
+                    updateInfoUI(window.currentIndex);
+                };
+            } else {
+                elements.videoContainer.insertBefore(nextVideoEl, document.querySelector('.hero-overlay'));
+                if (currentVideoEl) currentVideoEl.remove();
+                currentVideoEl = nextVideoEl;
+                isAnimating = false;
+                updateInfoUI(window.currentIndex);
+            }
+        }
 
-            if (typeof gsap !== 'undefined') {
-                gsap.set(nextVideoEl, { autoAlpha: 1 });
-                elements.videoContainer.insertBefore(nextVideoEl, document.querySelector('.hero-overlay'));
-                const startX = direction === 'next' ? "100%" : "-100%";
-                const endXOld = direction === 'next' ? "-100%" : "100%";
-                gsap.set(nextVideoEl, { x: startX });
+        function updateInfoUI(index = window.currentIndex) {
+            const total = String(window.CONFIG.videos.length).padStart(2, '0');
+            const current = String(index + 1).padStart(2, '0');
+            if (elements.projectCounter && elements.projectName) {
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo([elements.projectCounter, elements.projectName], 
+                        { y: 15, autoAlpha: 0 }, 
+                        { y: 0, autoAlpha: 1, duration: 0.4 }
+                    );
+                }
+                elements.projectCounter.textContent = `${current} — ${total}`;
+                elements.projectName.textContent = window.CONFIG.titles[index];
+            }
+        }
 
-                nextVideoEl.onloadeddata = () => {
-                    const tl = gsap.timeline({
-                        onComplete: () => {
-                            if (currentVideoEl) currentVideoEl.remove();
-                            currentVideoEl = nextVideoEl;
-                            isAnimating = false;
-                        }
-                    });
-                    tl.to(currentVideoEl, { x: endXOld, duration: 1.2, ease: "power3.inOut" }, 0)
-                      .to(nextVideoEl, { x: "0%", duration: 1.2, ease: "power3.inOut" }, 0);
-                    updateInfoUI(window.currentIndex);
-                };
-            } else {
-                elements.videoContainer.insertBefore(nextVideoEl, document.querySelector('.hero-overlay'));
-                if (currentVideoEl) currentVideoEl.remove();
-                currentVideoEl = nextVideoEl;
-                isAnimating = false;
-                updateInfoUI(window.currentIndex);
-            }
-        }
+        updateInfoUI();
 
-        function updateInfoUI(index = window.currentIndex) {
-            const total = String(window.CONFIG.videos.length).padStart(2, '0');
-            const current = String(index + 1).padStart(2, '0');
-            if (elements.projectCounter && elements.projectName) {
-                if (typeof gsap !== 'undefined') {
-                    gsap.fromTo([elements.projectCounter, elements.projectName], 
-                        { y: 15, autoAlpha: 0 }, 
-                        { y: 0, autoAlpha: 1, duration: 0.4 }
-                    );
-                }
-                elements.projectCounter.textContent = `${current} — ${total}`;
-                elements.projectName.textContent = window.CONFIG.titles[index];
-            }
-        }
+        if (elements.nextBtn) elements.nextBtn.addEventListener('click', () => changeVideo('next'));
+        if (elements.prevBtn) elements.prevBtn.addEventListener('click', () => changeVideo('prev'));
+        
+        document.addEventListener('keydown', (e) => {
+            if (!elements.previewContainer || !elements.previewContainer.classList.contains('active')) {
+                if (e.key === 'ArrowRight') changeVideo('next');
+                if (e.key === 'ArrowLeft') changeVideo('prev');
+            }
+        });
+    }
 
-        updateInfoUI();
+    /* ============================================================
+       12. VIDEO MODAL
+       ============================================================ */
+    
+    function handleUserActivity() {
+        if (!elements.previewContainer) return;
+        elements.previewContainer.classList.remove('user-inactive');
+        clearTimeout(activityTimeout);
+        
+        if (elements.previewVideo && !elements.previewVideo.paused) {
+            activityTimeout = setTimeout(() => {
+                elements.previewContainer.classList.add('user-inactive');
+            }, CONFIG.INACTIVITY_DELAY);
+        }
+    }
 
-        if (elements.nextBtn) elements.nextBtn.addEventListener('click', () => changeVideo('next'));
-        if (elements.prevBtn) elements.prevBtn.addEventListener('click', () => changeVideo('prev'));
-        
-        document.addEventListener('keydown', (e) => {
-            if (!elements.previewContainer || !elements.previewContainer.classList.contains('active')) {
-                if (e.key === 'ArrowRight') changeVideo('next');
-                if (e.key === 'ArrowLeft') changeVideo('prev');
-            }
-        });
-    }
+    function updatePlayButtonUI() {
+        const modalPlayText = document.querySelector('#modalPlayBtnContainer .play-text');
+        
+        if (elements.previewVideo.paused) {
+            if (elements.playIcon) elements.playIcon.style.display = 'block';
+            if (elements.pauseIcon) elements.pauseIcon.style.display = 'none';
+            elements.previewContainer.classList.add('is-paused');
+            elements.previewContainer.classList.remove('user-inactive');
+            clearTimeout(activityTimeout);
+            if (modalPlayText) modalPlayText.textContent = 'PLAY';
+        } else {
+            if (elements.playIcon) elements.playIcon.style.display = 'none';
+            if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
+            elements.previewContainer.classList.remove('is-paused');
+            handleUserActivity();
+            if (modalPlayText) modalPlayText.textContent = 'PAUSE';
+        }
+    }
 
-    /* ============================================================
-       11. VIDEO MODAL
-       ============================================================ */
-    
-    function handleUserActivity() {
-        if (!elements.previewContainer) return;
-        elements.previewContainer.classList.remove('user-inactive');
-        clearTimeout(activityTimeout);
-        
-        if (elements.previewVideo && !elements.previewVideo.paused) {
-            activityTimeout = setTimeout(() => {
-                elements.previewContainer.classList.add('user-inactive');
-            }, CONFIG.INACTIVITY_DELAY);
-        }
-    }
+    function togglePlay(e) {
+        if (e) e.stopPropagation();
+        if (!elements.previewVideo) return;
+        elements.previewVideo.paused ? elements.previewVideo.play() : elements.previewVideo.pause();
+    }
 
-    function updatePlayButtonUI() {
-        const modalPlayText = elements.modalPlayContainer ? elements.modalPlayContainer.querySelector('.play-text') : null;
-        
-        if (elements.previewVideo.paused) {
-            if (elements.playIcon) elements.playIcon.style.display = 'block';
-            if (elements.pauseIcon) elements.pauseIcon.style.display = 'none';
-            elements.previewContainer.classList.add('is-paused');
-            elements.previewContainer.classList.remove('user-inactive');
-            clearTimeout(activityTimeout);
-            
-            if (modalPlayText && modalPlayText.innerText !== "PLAY") {
-                applyScrambleEffect(elements.modalPlayContainer, modalPlayText, "PLAY");
-            }
-        } else {
-            if (elements.playIcon) elements.playIcon.style.display = 'none';
-            if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
-            elements.previewContainer.classList.remove('is-paused');
-            handleUserActivity();
-            
-            if (modalPlayText && modalPlayText.innerText !== "PAUSE") {
-                applyScrambleEffect(elements.modalPlayContainer, modalPlayText, "PAUSE");
-            }
-        }
-    }
+    function closeVideoPreview() {
+        if (!elements.previewContainer) return;
+        
+        elements.previewContainer.classList.remove('active');
+        elements.previewContainer.classList.add('is-paused');
+        
+        if (!document.getElementById('mobileMenu')?.classList.contains('active')) {
+            document.body.classList.remove('menu-open');
+        } else {
+            document.body.style.overflow = '';
+        }
+        
+        setTimeout(() => {
+            elements.previewVideo.pause();
+            elements.previewVideo.currentTime = 0;
+            elements.previewVideo.src = '';
+            document.body.style.overflow = '';
+        }, 500);
+    }
 
-    function togglePlay(e) {
-        if (e) e.stopPropagation();
-        if (!elements.previewVideo) return;
-        
-        if (elements.previewVideo.paused) {
-            elements.previewVideo.play();
-        } else {
-            elements.previewVideo.pause();
-        }
-    }
+    function initVideoModal() {
+        if (!elements.previewContainer || !elements.previewVideo) return;
 
-    function closeVideoPreview() {
-        if (!elements.previewContainer) return;
-        
-        elements.previewContainer.classList.remove('active');
-        elements.previewContainer.classList.add('is-paused');
-        
-        // Menyu bağlananda body scroll-u bərpa edilir (əgər menyu açıq deyilsə)
-        if (!document.getElementById('mobileMenu')?.classList.contains('active')) {
-            document.body.classList.remove('menu-open');
-        }
-        
-        setTimeout(() => {
-            elements.previewVideo.pause();
-            elements.previewVideo.currentTime = 0;
-            elements.previewVideo.src = '';
-        }, 500);
-    }
+        elements.previewContainer.addEventListener('mousemove', handleUserActivity);
+        elements.previewContainer.addEventListener('click', handleUserActivity);
 
-    function initVideoModal() {
-        if (!elements.previewContainer || !elements.previewVideo) return;
+        if (elements.playPauseBtn) elements.playPauseBtn.onclick = togglePlay;
+        elements.previewVideo.onclick = togglePlay;
 
-        elements.previewContainer.addEventListener('mousemove', handleUserActivity);
-        elements.previewContainer.addEventListener('click', handleUserActivity);
+        if (elements.modalPlayContainer) {
+            elements.modalPlayContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                togglePlay();
+            });
+        }
 
-        if (elements.playPauseBtn) elements.playPauseBtn.onclick = togglePlay;
-        elements.previewVideo.onclick = togglePlay;
+        elements.previewVideo.addEventListener('play', updatePlayButtonUI);
+        elements.previewVideo.addEventListener('pause', updatePlayButtonUI);
 
-        if (elements.modalPlayContainer) {
-            elements.modalPlayContainer.addEventListener('click', (e) => {
-                e.stopPropagation();
-                togglePlay();
-            });
-            
-            const modalPlayTextSpan = elements.modalPlayContainer.querySelector('.play-text');
-            elements.modalPlayContainer.addEventListener("mouseenter", () => {
-                const currentText = elements.previewVideo.paused ? "PLAY" : "PAUSE";
-                if (modalPlayTextSpan) applyScrambleEffect(elements.modalPlayContainer, modalPlayTextSpan, currentText);
-            });
-        }
+        elements.previewVideo.addEventListener('timeupdate', () => {
+            const percent = (elements.previewVideo.currentTime / elements.previewVideo.duration) * 100;
+            if (elements.progressPlayed) elements.progressPlayed.style.width = percent + '%';
+            if (elements.progressSlider) elements.progressSlider.value = percent;
+            if (elements.currentTimeEl) elements.currentTimeEl.textContent = formatTime(elements.previewVideo.currentTime);
+        });
 
-        elements.previewVideo.addEventListener('play', updatePlayButtonUI);
-        elements.previewVideo.addEventListener('pause', updatePlayButtonUI);
+        elements.previewVideo.addEventListener('loadedmetadata', () => {
+            if (elements.durationTimeEl) elements.durationTimeEl.textContent = formatTime(elements.previewVideo.duration);
+        });
 
-        elements.previewVideo.addEventListener('timeupdate', () => {
-            const percent = (elements.previewVideo.currentTime / elements.previewVideo.duration) * 100;
-            if (elements.progressPlayed) elements.progressPlayed.style.width = percent + '%';
-            if (elements.progressSlider) elements.progressSlider.value = percent;
-            if (elements.currentTimeEl) elements.currentTimeEl.textContent = formatTime(elements.previewVideo.currentTime);
-        });
+        if (elements.rewindBtn) elements.rewindBtn.onclick = (e) => { e.stopPropagation(); elements.previewVideo.currentTime -= 5; };
+        if (elements.forwardBtn) elements.forwardBtn.onclick = (e) => { e.stopPropagation(); elements.previewVideo.currentTime += 5; };
 
-        elements.previewVideo.addEventListener('loadedmetadata', () => {
-            if (elements.durationTimeEl) elements.durationTimeEl.textContent = formatTime(elements.previewVideo.duration);
-        });
+        if (elements.progressSlider) {
+            elements.progressSlider.oninput = function(e) {
+                e.stopPropagation();
+                elements.previewVideo.currentTime = (this.value / 100) * elements.previewVideo.duration;
+            };
+        }
 
-        if (elements.rewindBtn) elements.rewindBtn.onclick = (e) => { e.stopPropagation(); elements.previewVideo.currentTime -= 5; };
-        if (elements.forwardBtn) elements.forwardBtn.onclick = (e) => { e.stopPropagation(); elements.previewVideo.currentTime += 5; };
+        if (elements.volumeSlider) {
+            elements.volumeSlider.oninput = function(e) {
+                e.stopPropagation();
+                elements.previewVideo.volume = this.value / 100;
+            };
+        }
 
-        if (elements.progressSlider) {
-            elements.progressSlider.oninput = function(e) {
-                e.stopPropagation();
-                elements.previewVideo.currentTime = (this.value / 100) * elements.previewVideo.duration;
-            };
-        }
+        if (elements.fullscreenBtn) {
+            elements.fullscreenBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (document.fullscreenElement) document.exitFullscreen();
+                else if (elements.previewVideo.requestFullscreen) elements.previewVideo.requestFullscreen();
+            };
+        }
 
-        if (elements.volumeSlider) {
-            elements.volumeSlider.oninput = function(e) {
-                e.stopPropagation();
-                elements.previewVideo.volume = this.value / 100;
-            };
-        }
+        if (elements.closePreview) elements.closePreview.onclick = closeVideoPreview;
 
-        if (elements.fullscreenBtn) {
-            elements.fullscreenBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (document.fullscreenElement) document.exitFullscreen();
-                else if (elements.previewVideo.requestFullscreen) elements.previewVideo.requestFullscreen();
-            };
-        }
+        // Video modal keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (elements.previewContainer.classList.contains('active')) {
+                if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+                if (e.key === 'ArrowLeft') elements.previewVideo.currentTime -= 5;
+                if (e.key === 'ArrowRight') elements.previewVideo.currentTime += 5;
+            }
+        });
+    }
 
-        if (elements.closePreview) elements.closePreview.onclick = closeVideoPreview;
+    /* ============================================================
+       13. PLAY BUTTON MOUSE FOLLOW EFFECT
+       ============================================================ */
 
-        document.addEventListener('keydown', (e) => {
-            if (elements.previewContainer.classList.contains('active')) {
-                if (e.key === 'Escape') closeVideoPreview();
-                if (e.key === ' ') { e.preventDefault(); togglePlay(); }
-                if (e.key === 'ArrowLeft') elements.previewVideo.currentTime -= 5;
-                if (e.key === 'ArrowRight') elements.previewVideo.currentTime += 5;
-            }
-        });
-    }
+    function initPlayButtonFollow() {
+        const playBtn = document.getElementById('mainPlayBtnContainer');
+        const heroSection = document.querySelector('.hero-section');
+        
+        if (!playBtn || !heroSection) return;
+        
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        const maxMove = 15;
+        const ease = 0.08;
+        const activationRadius = 250;
+        
+        heroSection.addEventListener('mousemove', (e) => {
+            const btnRect = playBtn.getBoundingClientRect();
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+            
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            const distance = Math.sqrt(
+                Math.pow(mouseX - btnCenterX, 2) + 
+                Math.pow(mouseY - btnCenterY, 2)
+            );
+            
+            if (distance < activationRadius) {
+                const strength = 1 - (distance / activationRadius);
+                targetX = ((mouseX - btnCenterX) / activationRadius) * maxMove * strength;
+                targetY = ((mouseY - btnCenterY) / activationRadius) * maxMove * strength;
+            } else {
+                targetX = 0;
+                targetY = 0;
+            }
+        });
+        
+        heroSection.addEventListener('mouseleave', () => {
+            targetX = 0;
+            targetY = 0;
+        });
+        
+        function animate() {
+            currentX += (targetX - currentX) * ease;
+            currentY += (targetY - currentY) * ease;
+            
+            playBtn.style.setProperty('--ring-x', `${currentX}px`);
+            playBtn.style.setProperty('--ring-y', `${currentY}px`);
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    }
 
-    /* ============================================================
-       12. INITIALIZATION
-       ============================================================ */
-    
-    function init() {
-        initGSAP();
-        initPageTransition();
-        initMobileMenu();
-        initLoadingScreen();
-        initVideoAutoplay(); // ✅ Autoplay burada çağırılır
-        initNavigation();
-        initVideoSlider();
-        initVideoModal();
-    }
+    /* ============================================================
+       14. INITIALIZATION
+       ============================================================ */
+    
+    function init() {
+        initGSAP();
+        initPageTransition();
+        initMobileMenu();
+        initLoadingScreen();
+        initVideoAutoplay();
+        initNavigation();
+        initVideoSlider();
+        initVideoModal();
+        initPlayButtonFollow();
+    }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
 })();

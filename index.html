@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cine Chord - Home</title>
     
-    <!-- FAVICON -->
     <link rel="icon" type="image/png" href="photos/CineChord.png">
     <link rel="shortcut icon" type="image/png" href="photos/CineChord.png">
     <link rel="apple-touch-icon" href="photos/CineChord.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -40,125 +40,120 @@
         
         <div id="videoContainer">
             <video autoplay muted loop playsinline class="hero-bg" id="heroBgVideo">
-                <source src="/videos/Showreel.mp4" type="video/mp4">
+                <source src="videos/Showreel.mp4" type="video/mp4">
             </video>
             <div class="hero-overlay"></div>
         </div>
 
-        <!-- ✅ HAMBURGER BUTTON ƏLAVƏ EDİLDİ -->
-        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
-            <span></span>
-            <span></span>
-            <span></span>
+        <!-- HAMBURGER BUTTON -->
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+            <span class="hamburger-text">MENU</span>
+            <span class="hamburger-icon">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </span>
         </button>
 
-        <!-- ✅ MOBILE MENU OVERLAY -->
+        <!-- OVERLAY -->
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
-        <!-- ✅ MOBILE MENU -->
-        <nav class="mobile-menu" id="mobileMenu">
+        <!-- MOBILE MENU -->
+    <nav class="mobile-menu" id="mobileMenu">
             <a href="#" class="nav-btn active" data-text="HOME"><span class="nav-text">HOME</span></a>
+            
             <a href="works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
             <a href="services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
             <a href="archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
             <a href="about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
             <a href="contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+
+            <div class="menu-footer">
+                <div class="menu-socials">
+                    <a href="#">INSTAGRAM</a>
+                    <a href="#">YOUTUBE</a>
+                    <a href="#">VIMEO</a>
+                </div>
+                <div class="menu-contact-info">
+                    <p>hello@cinechord.com</p>
+                    <p>+994 50 123 45 67</p>
+                </div>
+            </div>
         </nav>
 
-        <header class="header">
-            <div class="nav-left">
-                <a href="#" class="nav-btn active" data-text="HOME"><span class="nav-text">HOME</span></a>
-                <a href="works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
-                <a href="services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
-            </div>
-            <div class="nav-right">
-                <a href="archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
-                <a href="about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
-                <a href="contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
-            </div>
-        </header>
-
-        <div class="center-logo">
+        <!-- LOGO -->
+        <a href="/" class="center-logo">
             <img src="photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
-        </div>
+        </a>
 
-        <div class="split-name">
-            <div class="name-left">CINE</div>
-            <div class="name-right">CHORD</div>
-        </div>
-
+        <!-- PLAY BUTTON -->
         <div class="play-button-container" id="mainPlayBtnContainer" onclick="openMainVideo()">
             <button class="play-button">
                 <span class="play-text" data-text="PLAY">PLAY</span>
             </button>
         </div>
 
-        <div class="right-floating-nav">
-            <div class="nav-info-row">
-                <span class="project-name-outline" id="projectName">KONTAKT</span>
-                <span class="counter-text" id="projectCounter">01 — 05</span>
-            </div>
-            <div class="nav-arrows">
-                <button class="arrow-btn prev" id="prevVideoBtn">←</button>
-                <button class="arrow-btn next" id="nextVideoBtn">→</button>
-            </div>
+        <!-- BOTTOM LEFT - Explore Works -->
+        <div class="bottom-left-explore">
+            <a href="works/" class="explore-btn">
+                <span class="explore-line"></span>
+                <span class="explore-text">EXPLORE OUR WORKS</span>
+                <span class="explore-arrow">→</span>
+            </a>
         </div>
 
+        <!-- BOTTOM RIGHT SOCIALS -->
         <div class="bottom-right-socials">
             <div class="social-icons-home">
-                <a href="#" class="social-link-home"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" class="social-link-home"><i class="fa-brands fa-youtube"></i></a>
-                <a href="#" class="social-link-home"><i class="fa-brands fa-vimeo-v"></i></a>
-                <a href="#" class="social-link-home"><i class="fa-brands fa-linkedin-in"></i></a>
+                <a href="#" class="social-link-home">
+                    <span class="social-icon"><i class="fa-brands fa-instagram"></i></span>
+                    <span class="social-icon-hover"><i class="fa-brands fa-instagram"></i></span>
+                </a>
+                <a href="#" class="social-link-home">
+                    <span class="social-icon"><i class="fa-brands fa-youtube"></i></span>
+                    <span class="social-icon-hover"><i class="fa-brands fa-youtube"></i></span>
+                </a>
+                <a href="#" class="social-link-home">
+                    <span class="social-icon"><i class="fa-brands fa-vimeo-v"></i></span>
+                    <span class="social-icon-hover"><i class="fa-brands fa-vimeo-v"></i></span>
+                </a>
+                <a href="#" class="social-link-home">
+                    <span class="social-icon"><i class="fa-brands fa-linkedin-in"></i></span>
+                    <span class="social-icon-hover"><i class="fa-brands fa-linkedin-in"></i></span>
+                </a>
             </div>
         </div>
         
     </div>
 
+    <!-- VIDEO PREVIEW MODAL -->
     <div class="preview-container is-paused" id="previewContainer">
         <button class="close-preview" id="closePreview">×</button>
-        
         <div class="preview-info" id="previewInfo">
             <div class="text-mask">
                 <div class="preview-title" id="previewTitle"></div>
             </div>
         </div>
-
         <div class="video-wrapper" id="videoWrapper">
             <div class="video-loading"></div>
-            
             <div class="play-button-container modal-play-btn" id="modalPlayBtnContainer">
-                <button class="play-button">
-                    <span class="play-text" data-text="PLAY">PLAY</span>
-                </button>
+                <button class="play-button"><span class="play-text" data-text="PLAY">PLAY</span></button>
             </div>
-
             <video id="previewVideo" class="preview-video" playsinline preload="metadata"></video>
-            
             <div class="custom-controls" id="customControls">
                 <div class="progress-bar-container" id="progressBarContainer">
                     <div class="progress-played" id="progressPlayed"></div>
                     <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
                 </div>
-                
                 <div class="controls-buttons">
                     <button class="ctrl-btn skip-btn" id="rewindBtn"><i class="fa-solid fa-rotate-left"></i></button>
-                    
                     <button class="ctrl-btn main-play-btn" id="playPauseBtn">
                         <i class="fa-solid fa-play" id="playIcon"></i>
                         <i class="fa-solid fa-pause" id="pauseIcon" style="display:none;"></i>
                     </button>
-                    
                     <button class="ctrl-btn skip-btn" id="forwardBtn"><i class="fa-solid fa-rotate-right"></i></button>
-                    
-                    <div class="time-display">
-                        <span id="currentTime">0:00</span> / <span id="durationTime">0:00</span>
-                    </div>
-
+                    <div class="time-display"><span id="currentTime">0:00</span> / <span id="durationTime">0:00</span></div>
                     <div class="right-controls-group">
-                        <div class="volume-wrapper">
-                            <input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100">
-                        </div>
+                        <div class="volume-wrapper"><input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100"></div>
                         <button class="ctrl-btn" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
                     </div>
                 </div>
