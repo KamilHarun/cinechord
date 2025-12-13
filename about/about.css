@@ -293,9 +293,24 @@ body {
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
     font-size: 13px;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
+}
+
+/* Telefon numarası için özel stil - mavi renk görünmesin */
+.menu-contact-info p,
+.menu-contact-info p a,
+.menu-contact-info a {
+    color: rgba(255,255,255,0.4) !important;
+    text-decoration: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-contact-info p:visited,
+.menu-contact-info p a:visited,
+.menu-contact-info a:visited {
+    color: rgba(255,255,255,0.4) !important;
 }
 
 /* =========================================
@@ -389,7 +404,9 @@ body {
 .title-wrapper { 
     margin-bottom: 50px; 
     /* Bu vacibdir: Yazı yuxarı qalxanda kənara daşmasın deyə gizlədirik */
-    overflow: hidden; 
+    overflow: hidden;
+    position: relative;
+    width: 100%;
 }
 
 /* MASK EFFEKTİ BURADA YARANIR:
@@ -430,6 +447,8 @@ body {
     
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
+    opacity: 0; /* Başlangıçta tamamen gizli */
+    visibility: hidden; /* Görünmez */
 }
 
 /* --- HOVER ANIMASIYASI --- */
@@ -439,6 +458,8 @@ body {
 
 .hero-rolling-text:hover::after {
     transform: translateY(-100%); /* Narıncı yazı aşağıdan gəlir */
+    opacity: 1; /* Hover'da görünür */
+    visibility: visible; /* Hover'da görünür */
 }
 
 /* Subtitle */
@@ -638,7 +659,19 @@ body {
     .content-section { padding: 40px 20px; }
     
     /* Typography */
-    .hero-rolling-text { font-size: 12vw; margin-bottom: 30px; }
+    .hero-rolling-text { 
+        font-size: 12vw; 
+        margin-bottom: 30px;
+    }
+    
+    /* Mobilde mask efektini tamamen gizle */
+    .hero-rolling-text::after {
+        display: none !important;
+    }
+    
+    .title-wrapper {
+        overflow: visible; /* Mobilde overflow gizleme */
+    }
     .subtitle { font-size: 18px; margin-bottom: 40px; }
     .block-text { font-size: 16px; }
     

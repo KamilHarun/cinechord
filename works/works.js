@@ -65,7 +65,7 @@
     }
 
     // ============================================================
-    // 2. MENU SİSTEMİ (Mobil Menyu) - FIX: JUMP PROBLEMİ HƏLLİ
+    // 2. MENU SİSTEMİ (Mobil Menyu)
     // ============================================================
 
     function toggleMenu() {
@@ -73,7 +73,7 @@
 
         const isActive = hamburger.classList.contains('active');
         
-        // Scrollbar genişliyini hesabla
+        // Scrollbar genişliyini hesabla (Jump probleminin həlli)
         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
         
         hamburger.classList.toggle('active');
@@ -84,16 +84,13 @@
             hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
         }
         
-        // FIX: Scrollbar compensation - Jump problemini həll edir
+        // Scrollbar compensation 
         if (!isActive) {
-            // Menu açılır
             document.body.style.overflow = 'hidden';
             document.body.style.paddingRight = scrollbarWidth + 'px';
-            // Fixed elementləri də kompensasiya et
             if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
             if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
         } else {
-            // Menu bağlanır
             document.body.style.overflow = '';
             document.body.style.paddingRight = '';
             if (hamburger) hamburger.style.paddingRight = '';
@@ -115,22 +112,20 @@
         });
     }
 
-    // FIX 2: ESC düyməsi - Əvvəl video modal, sonra menu
+    // ESC düyməsi
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            // Əvvəl video modal yoxla
             if (previewContainer && previewContainer.classList.contains('active')) {
                 closeVideoPreview();
                 return;
             }
-            // Sonra menu
             if (hamburger && hamburger.classList.contains('active')) {
                 toggleMenu();
             }
         }
     });
 
-    // MENU LİNKLƏRİ - XÜSUSİ EVENT
+    // Menu linkləri
     navBtns.forEach(link => {
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
@@ -158,13 +153,26 @@
     // 3. WORKS API & GRID
     // ============================================================
     
-    function cleanUrlPath(url) {
-        if (url && typeof url === 'string') {
-            if (url.startsWith('http')) return url;
-            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
-            if (!url.startsWith('/') && url.includes('.')) return url;
+    // URL təmizləyən və birləşdirən köməkçi funksiya (Cloudinary və Local üçün)
+    function getFullMediaUrl(path) {
+        if (!path) return '';
+        
+        // Əgər tam linkdirsə (http/https), olduğu kimi qaytar
+        if (path.startsWith('http')) return path;
+
+        let cleanPath = path;
+
+        // Yolun əvvəlindəki "/" işarəsini silirik
+        while (cleanPath.startsWith('/')) {
+            cleanPath = cleanPath.substring(1);
         }
-        return url;
+
+        // Əgər yol "uploads/" sözü ilə başlayırsa, onu silirik
+        if (cleanPath.startsWith('uploads/')) {
+            cleanPath = cleanPath.substring(8);
+        }
+
+        return UPLOADS_URL + cleanPath;
     }
 
     async function loadDynamicWorks() {
@@ -184,20 +192,16 @@
             }
 
             works.forEach((work, index) => {
-                let videoSrc = work.previewVideoUrl || work.videoUrl;
-                let imageSrc = work.imageUrl;
+                const rawVideoPath = work.previewVideoUrl || work.videoUrl;
+                const rawImagePath = work.thumbnailUrl || work.imageUrl; 
                 
-                if (videoSrc) {
-                    videoSrc = cleanUrlPath(videoSrc);
-                    if (!videoSrc.startsWith('http')) videoSrc = UPLOADS_URL + videoSrc;
-                }
-                if (imageSrc) {
-                    imageSrc = cleanUrlPath(imageSrc);
-                    if (!imageSrc.startsWith('http')) imageSrc = UPLOADS_URL + imageSrc;
-                }
+                const videoSrc = getFullMediaUrl(rawVideoPath);
+                const imageSrc = getFullMediaUrl(rawImagePath);
                 
                 const categoryClass = categoryMap[work.category] || 'other';
                 
+                if (!videoSrc) return; 
+
                 const workHTML = `
                     <div class="project-card reveal-item" 
                         data-category="${categoryClass}" 
@@ -205,10 +209,15 @@
                         data-title="${work.title}"
                         style="transition-delay: ${index * 0.05}s;">
                         <div class="project-image-container">
-                            <video muted loop playsinline class="project-video" preload="none"
-                                poster="${imageSrc || ''}" data-video-src="${videoSrc}"
-                                onloadeddata="this.style.opacity='1'" style="opacity: 1;">
+                            
+                            ${imageSrc ? `<img src="${imageSrc}" class="project-poster-img" alt="${work.title} poster">` : ''}
+
+                            <video muted loop playsinline class="project-video" preload="metadata"
+                                data-video-src="${videoSrc}"
+                                ${imageSrc ? `poster="${imageSrc}"` : ''}
+                                src="${videoSrc}">
                             </video>
+                            
                             <div class="card-overlay"></div>
                             <div class="card-info">
                                 <h3 class="card-title">${work.title}</h3>
@@ -224,35 +233,101 @@
             const newCards = container.querySelectorAll('.project-card');
             newCards.forEach(card => observer.observe(card));
 
+            // Video'ların ilk frame'ini göster
+            setTimeout(() => {
+                document.querySelectorAll('.project-video').forEach(video => {
+                    const videoSrc = video.getAttribute('data-video-src') || video.src;
+                    if (videoSrc && !video.src) {
+                        video.src = videoSrc;
+                    }
+                    // Video metadata yüklendiğinde ilk frame'i göster
+                    if (video.readyState >= 1) {
+                        video.currentTime = 0.1;
+                        video.pause();
+                    } else {
+                        video.addEventListener('loadedmetadata', () => {
+                            video.currentTime = 0.1;
+                            video.pause();
+                        }, { once: true });
+                    }
+                });
+            }, 100);
+
             attachHoverEffects();
             
         } catch (error) {
             console.error("API Error:", error);
+            container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
         }
     }
 
     function attachHoverEffects() {
         document.querySelectorAll('.project-card').forEach(card => {
-            const video = card.querySelector('video');
+            const video = card.querySelector('.project-video');
+            const posterImg = card.querySelector('.project-poster-img');
+            
             if (!video) return;
 
-            let isVideoLoaded = false;
+            // Video elementini başlangıçta görünür yap (poster frame'i gösterilsin)
+            // Video'nun ilk frame'ini göstermek için currentTime = 0.1 yapıyoruz
+            video.style.opacity = '1';
+            video.style.pointerEvents = 'none';
+            
+            // Video yüklendiğinde ilk frame'i göster
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = 0.1; // İlk frame'i göster
+                video.pause(); // Oynatma
+            });
+
+            // Poster img varsa gizle (video frame'i gösterilecek)
+            if (posterImg) {
+                posterImg.style.opacity = '0';
+                posterImg.style.display = 'none';
+            }
+
+            let isVideoPlaying = false;
 
             card.addEventListener('mouseenter', () => {
-                if (!isVideoLoaded) {
-                    const videoSrc = video.getAttribute('data-video-src');
-                    if (videoSrc) {
-                        video.src = videoSrc;
-                        video.load();
-                        isVideoLoaded = true;
-                    }
+                const videoSrc = video.getAttribute('data-video-src') || video.src;
+                
+                if (!videoSrc) return; 
+
+                // Video src'i ayarla (eğer yoksa)
+                if (!video.src || video.src !== videoSrc) {
+                    video.src = videoSrc;
+                    video.load();
                 }
-                video.play().catch(() => {});
+                
+                // Poster img'i gizle (varsa)
+                if (posterImg) {
+                    posterImg.style.opacity = '0';
+                    posterImg.style.display = 'none';
+                }
+
+                // Video görünür olsun ve oynat
+                video.style.opacity = '1';
+                video.style.pointerEvents = 'auto';
+
+                // Video olanda hover üzərində avtomatik oynatma
+                video.play().then(() => {
+                    isVideoPlaying = true;
+                }).catch(error => {
+                     console.log("Auto-play prevented or loading:", error);
+                });
             });
 
             card.addEventListener('mouseleave', () => { 
                 video.pause(); 
-                video.currentTime = 0; 
+                video.currentTime = 0.1; // İlk frame'e geri dön
+                video.style.opacity = '1'; // Video görünür kalsın (frame gösterilsin)
+                video.style.pointerEvents = 'none';
+                isVideoPlaying = false;
+                
+                // Poster img varsa gizli kalsın (video frame'i gösterilecek)
+                if (posterImg) {
+                    posterImg.style.opacity = '0';
+                    posterImg.style.display = 'none';
+                }
             });
         });
     }
@@ -387,9 +462,11 @@
         previewVideo.addEventListener('play', updatePlayButtonUI);
         previewVideo.addEventListener('pause', updatePlayButtonUI);
         previewVideo.addEventListener('timeupdate', () => {
-            const percent = (previewVideo.currentTime / previewVideo.duration) * 100;
-            if(progressPlayed) progressPlayed.style.width = percent + '%';
-            if(currentTimeEl) currentTimeEl.textContent = formatTime(previewVideo.currentTime);
+             if (previewVideo.duration) {
+                const percent = (previewVideo.currentTime / previewVideo.duration) * 100;
+                if(progressPlayed) progressPlayed.style.width = percent + '%';
+                if(currentTimeEl) currentTimeEl.textContent = formatTime(previewVideo.currentTime);
+            }
         });
         previewVideo.addEventListener('loadedmetadata', () => {
              if(durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
@@ -401,7 +478,9 @@
     if(progressBarContainer) progressBarContainer.addEventListener('click', (e) => {
         const rect = progressBarContainer.getBoundingClientRect();
         const percent = (e.clientX - rect.left) / progressBarContainer.clientWidth;
-        previewVideo.currentTime = previewVideo.duration * percent;
+         if (previewVideo.duration) {
+             previewVideo.currentTime = previewVideo.duration * percent;
+         }
     });
 
     if (previewContainer) {

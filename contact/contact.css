@@ -358,9 +358,24 @@ body {
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
     font-size: 13px;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
+}
+
+/* Telefon numarası için özel stil - mavi renk görünmesin */
+.menu-contact-info p,
+.menu-contact-info p a,
+.menu-contact-info a {
+    color: rgba(255,255,255,0.4) !important;
+    text-decoration: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-contact-info p:visited,
+.menu-contact-info p a:visited,
+.menu-contact-info a:visited {
+    color: rgba(255,255,255,0.4) !important;
 }
 
 /* ============================================================

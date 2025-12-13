@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Main JavaScript
-   Version: 6.3 - LOGO CLICK FIX
+   Version: 6.4 - LOGO CLICK FIXED
    ============================================================ */
 
 (function() {
@@ -32,8 +32,9 @@
        2. DOM ELEMENT REFERENCES
        ============================================================ */
     
+    const pageTransition = document.querySelector('.page-transition');
+    
     const elements = {
-        pageTransition: document.querySelector('.page-transition'),
         centerLogo: document.querySelector('.center-logo'),
         tableBody: document.querySelector('.archive-table tbody'),
         // Video Modal
@@ -68,10 +69,10 @@
        ============================================================ */
     
     function initPageTransition() {
-        if (!elements.pageTransition) return;
+        if (!pageTransition) return;
         
         setTimeout(() => {
-            elements.pageTransition.classList.add('page-loaded');
+            pageTransition.classList.add('page-loaded');
         }, CONFIG.PAGE_LOAD_DELAY);
     }
 
@@ -83,8 +84,8 @@
             return;
         }
         
-        if (elements.pageTransition) {
-            elements.pageTransition.classList.remove('page-loaded');
+        if (pageTransition) {
+            pageTransition.classList.remove('page-loaded');
         }
         
         setTimeout(() => {
@@ -99,7 +100,42 @@
     }
 
     /* ============================================================
-       5. MOBILE MENU - Jump fix daxil
+       5. LOGO CLICK - AYRICA HANDLE
+       ============================================================ */
+
+    function initLogoClick() {
+        const logo = document.querySelector('.center-logo');
+        
+        if (!logo) {
+            console.warn('Logo element tapılmadı!');
+            return;
+        }
+
+        logo.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const href = this.getAttribute('href');
+            
+            if (!href) {
+                // Əgər href yoxdursa, default olaraq ana səhifəyə yönləndir
+                navigateWithTransition('../');
+                return;
+            }
+            
+            navigateWithTransition(href);
+        });
+
+        // Touch event üçün də əlavə et (mobile üçün)
+        logo.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href') || '../';
+            navigateWithTransition(href);
+        }, { passive: false });
+    }
+
+    /* ============================================================
+       6. MOBILE MENU
        ============================================================ */
 
     function initMobileMenu() {
@@ -139,11 +175,35 @@
             }
         }
 
-        hamburger.addEventListener('click', function(e) {
+        // Event Delegation ilə hamburger click - ikonlara basanda da işləyir
+        function handleHamburgerClick(e) {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
-        });
+        }
+
+        // Click event
+        hamburger.addEventListener('click', handleHamburgerClick);
+        
+        // Touch event - mobile üçün daha etibarlı
+        hamburger.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        }, { passive: false });
+
+        // Həmçinin document səviyyəsində event delegation
+        document.addEventListener('click', function(e) {
+            // Hamburger və ya onun child-larına basılıbsa
+            if (e.target.id === 'hamburgerBtn' || e.target.closest('#hamburgerBtn')) {
+                // Artıq yuxarıdakı listener handle edib, amma əgər etməyibsə:
+                if (!e.defaultPrevented) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleMenu();
+                }
+            }
+        }, true); // Capture phase-də tutmaq üçün
 
         if (overlay) {
             overlay.addEventListener('click', function(e) {
@@ -183,38 +243,6 @@
                 }
             }
         });
-    }
-
-    /* ============================================================
-       6. LOGO KLİK - AYRICA FUNKSIYA
-       ============================================================ */
-    
-    function initLogoClick() {
-        const logo = document.querySelector('.center-logo');
-        
-        if (logo) {
-            // Əvvəlki event listener-ləri silmək üçün clone
-            const newLogo = logo.cloneNode(true);
-            logo.parentNode.replaceChild(newLogo, logo);
-            
-            newLogo.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const href = this.getAttribute('href') || '../';
-                console.log('Logo clicked! Navigating to:', href);
-                navigateWithTransition(href);
-            });
-            
-            // Img-yə də click əlavə et
-            const logoImg = newLogo.querySelector('.logo-img');
-            if (logoImg) {
-                logoImg.style.pointerEvents = 'none'; // Img click-i parent-ə ötürsün
-            }
-            
-            console.log('Logo click initialized successfully');
-        } else {
-            console.error('Logo element not found!');
-        }
     }
 
     /* ============================================================
@@ -567,17 +595,16 @@
     }
 
     /* ============================================================
-       12. DİGƏR LİNKLƏR (Footer və s.)
+       12. DİGƏR LİNKLƏR (Logo xaric)
        ============================================================ */
     
     function setupOtherLinks() {
-        // Yalnız footer və digər linkləri (logo və menu xaricində)
-        const otherLinks = document.querySelectorAll('a:not(.center-logo):not(.nav-btn):not([href^="#"]):not([target="_blank"])');
+        // Logo xaric bütün internal linklər
+        const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"]):not(.center-logo)');
         
-        otherLinks.forEach(link => {
+        internalLinks.forEach(link => {
+            // Mobil menunun içindəki linklərə toxunmuruq (ayrıca handle olunur)
             if (link.closest('.mobile-menu')) return;
-            if (link.closest('.menu-socials')) return;
-            if (link.closest('.menu-contact-info')) return;
 
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
@@ -586,25 +613,25 @@
                 if (href.startsWith('mailto') || href.startsWith('tel')) return;
                 
                 e.preventDefault();
+                e.stopPropagation();
+                
                 navigateWithTransition(href);
             });
         });
     }
 
     /* ============================================================
-       13. INITIALIZATION - TEK BİR DƏFƏ
+       13. INITIALIZATION
        ============================================================ */
     
     function init() {
-        console.log('Archive JS initialized'); // Debug
-        
         initPageTransition();
+        initLogoClick();       // Logo ayrıca handle olunur
         initMobileMenu();
-        initLogoClick(); // <-- Logo üçün ayrıca funksiya
         initScrollReveal();
         initVideoModal();
         loadArchiveData();
-        setupOtherLinks();
+        setupOtherLinks();     // Digər linklər
     }
 
     if (document.readyState === 'loading') {

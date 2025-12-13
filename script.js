@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Index - Main JavaScript
-   Version: 4.3 - ALL FIXES APPLIED
+   Version: 4.4 - HAMBURGER ICON FIX
    ============================================================ */
 
 // Global video configuration
@@ -124,7 +124,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       5. PAGE TRANSITION SYSTEM - FIX: Sadələşdirilmiş
+       5. PAGE TRANSITION SYSTEM
        ============================================================ */
     
     function initPageTransition() {
@@ -135,7 +135,6 @@ window.openMainVideo = function() {
         }, CONFIG.PAGE_LOAD_DELAY);
     }
 
-    // FIX: isTransitioning silindi, sadə navigasiya
     function navigateWithTransition(href) {
         if (!href) return;
         
@@ -162,7 +161,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       6. MOBILE MENU - FIX: Jump problemi həll edildi
+       6. MOBILE MENU - HAMBURGER ICON FIX
        ============================================================ */
 
     function initMobileMenu() {
@@ -179,8 +178,6 @@ window.openMainVideo = function() {
 
         function toggleMenu() {
             const isActive = hamburger.classList.contains('active');
-            
-            // FIX: Scrollbar genişliyini hesabla
             const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
             
             hamburger.classList.toggle('active');
@@ -191,7 +188,6 @@ window.openMainVideo = function() {
                 hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
             }
             
-            // FIX: Scrollbar compensation
             if (!isActive) {
                 document.body.style.overflow = 'hidden';
                 document.body.style.paddingRight = scrollbarWidth + 'px';
@@ -205,11 +201,35 @@ window.openMainVideo = function() {
             }
         }
 
-        hamburger.addEventListener('click', function(e) {
+        // Event handler function
+        function handleHamburgerClick(e) {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
-        });
+        }
+
+        // Click event
+        hamburger.addEventListener('click', handleHamburgerClick);
+        
+        // Touch event - mobile üçün daha etibarlı
+        hamburger.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        }, { passive: false });
+
+        // Document səviyyəsində event delegation - child elementlərə basılanda da işləyir
+        document.addEventListener('click', function(e) {
+            // Hamburger və ya onun child-larına basılıbsa
+            if (e.target.id === 'hamburgerBtn' || e.target.closest('#hamburgerBtn')) {
+                // Artıq yuxarıdakı listener handle edib, amma əgər etməyibsə:
+                if (!e.defaultPrevented) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleMenu();
+                }
+            }
+        }, true); // Capture phase-də tutmaq üçün
 
         if (overlay) {
             overlay.addEventListener('click', function(e) {
@@ -218,7 +238,7 @@ window.openMainVideo = function() {
             });
         }
 
-        // FIX: Mobil Menyu Linkləri - yeni məntiq
+        // Mobil Menyu Linkləri
         const navLinks = mobileMenu.querySelectorAll('.nav-btn');
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
@@ -318,23 +338,68 @@ window.openMainVideo = function() {
     }
     
     /* ============================================================
-       8. VIDEO AUTOPLAY CHECK
+       8. VIDEO AUTOPLAY CHECK - Mobil uyumlu
        ============================================================ */
     function initVideoAutoplay() {
-        if (elements.heroBgVideo) {
-            elements.heroBgVideo.addEventListener('loadedmetadata', () => {
-                const playPromise = elements.heroBgVideo.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                        elements.heroBgVideo.muted = true;
-                        elements.heroBgVideo.play().catch(error => {
-                            console.warn("Autoplay failed even after muting:", error);
+        if (!elements.heroBgVideo) return;
+        
+        const video = elements.heroBgVideo;
+        
+        // Video ayarlarını garanti altına al
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('x-webkit-airplay', 'allow');
+        
+        // Controls'u kaldır (ekstra Play butonu görünmesin)
+        video.removeAttribute('controls');
+        video.controls = false;
+        
+        // Autoplay için birden fazla yöntem dene
+        function attemptPlay() {
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.warn("Autoplay failed:", error);
+                    // Kullanıcı etkileşimi sonrası tekrar dene
+                    const interactionEvents = ['click', 'touchstart', 'scroll', 'touchend'];
+                    const tryPlayOnce = () => {
+                        video.play().catch(() => {});
+                        interactionEvents.forEach(type => {
+                            document.removeEventListener(type, tryPlayOnce);
                         });
+                    };
+                    interactionEvents.forEach(type => {
+                        document.addEventListener(type, tryPlayOnce, { once: true, passive: true });
                     });
-                }
-            });
-            elements.heroBgVideo.play().catch(() => {});
+                });
+            }
         }
+        
+        // Video yüklendiğinde oynat
+        if (video.readyState >= 3) {
+            attemptPlay();
+        } else {
+            video.addEventListener('loadeddata', attemptPlay, { once: true });
+            video.addEventListener('canplay', attemptPlay, { once: true });
+            video.addEventListener('loadedmetadata', attemptPlay, { once: true });
+        }
+        
+        // Sayfa görünür olduğunda oynat
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && video.paused) {
+                attemptPlay();
+            }
+        });
+        
+        // Video duraklarsa tekrar oynat
+        video.addEventListener('pause', () => {
+            if (!document.hidden && video.currentTime > 0) {
+                setTimeout(() => attemptPlay(), 100);
+            }
+        });
     }
 
     /* ============================================================

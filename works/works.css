@@ -358,9 +358,24 @@ body {
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
     font-size: 13px;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
+}
+
+/* Telefon numarası için özel stil - mavi renk görünmesin */
+.menu-contact-info p,
+.menu-contact-info p a,
+.menu-contact-info a {
+    color: rgba(255,255,255,0.4) !important;
+    text-decoration: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-contact-info p:visited,
+.menu-contact-info p a:visited,
+.menu-contact-info a:visited {
+    color: rgba(255,255,255,0.4) !important;
 }
 
 /* ============================================================
@@ -456,6 +471,7 @@ body {
     transform: translateY(-50%);
     z-index: 5;
     overflow: hidden; /* Animasiya zamanı kənara çıxmasın */
+    padding-right: 30px; /* ✅ DÜZƏLİŞ: S hərfi kəsilməsin deyə sağ boşluq əlavə edildi */
 }
 
 /* Əsas Başlıq - WORKS */
@@ -580,6 +596,8 @@ body {
     .hero-left-title {
         left: 20px;
         top: 40%;
+        /* Mobildə də padding-i qoruyuruq */
+        padding-right: 20px; 
     }
     
     .title-main {
@@ -594,7 +612,6 @@ body {
         max-width: 90%;
     }
 }
-
 /* =========================================
    12. CATEGORIES & GRID
    ========================================= */
@@ -682,38 +699,11 @@ body {
     width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: #000;
+    background: #000; /* Poster yoksa siyah görünsün */
     border-radius: 2px;
 }
 
-.video-loading-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-    opacity: 1;
-    transition: opacity 0.5s ease;
-    pointer-events: none;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(255, 165, 0, 0.1);
-    border-top-color: #FFA500;
-    border-radius: 50%;
-    animation: videoSpin 1s linear infinite;
-}
-
-@keyframes videoSpin {
-    to { transform: rotate(360deg); }
-}
+/* ⚠️ KÖHNƏ: video-loading-placeholder SİLİNMİŞDİR (Lazımsız idi) */
 
 .project-video {
     width: 100%;
@@ -723,12 +713,19 @@ body {
     transform: scale(1);
     transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
-    position: relative;
-    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2; /* Poster img'in üstünde olsun */
+    opacity: 1; /* Başlanğıcda görünür - video frame'i gösterilsin */
+    visibility: visible;
+    pointer-events: none; /* Hover olmadan tıklanamaz */
 }
 
 .project-card:hover .project-video {
     transform: scale(1.05);
+    opacity: 1; /* Hover'da görünür ve oynatılır */
+    pointer-events: auto; /* Hover'da tıklanabilir */
 }
 
 .card-overlay {
@@ -737,14 +734,15 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    opacity: 0;
+    background: rgba(0, 0, 0, 0.0); /* ✅ DÜZƏLİŞ: Başlanğıcda tam şəffaf örtük */
+    opacity: 1; /* ✅ DÜZƏLİŞ: Opacity həmişə 1 saxlanılır, hoverdə fon qaralır */
     transition: opacity 0.4s ease;
     z-index: 3;
 }
 
 .project-card:hover .card-overlay {
     opacity: 1;
+    background: rgba(0, 0, 0, 0.4); /* Hoverdə qaranlıqlaşma */
 }
 
 .card-info {
@@ -812,6 +810,43 @@ body {
 
 .fullscreen-btn:hover::before {
     color: #000;
+}
+
+/* =========================================
+   12.5. POSTER & VIDEO LAYER DÜZƏLİŞİ (YENİ JS MƏNTİQİ ÜÇÜN)
+   ========================================= */
+
+/* 1. Şəkil (Poster) stili - Artık video frame'i kullanılıyor, bu sadece fallback */
+.project-poster-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1; /* Video'nun altında olsun (fallback için) */
+    opacity: 0; /* Varsayılan olarak gizli - video frame'i gösterilecek */
+    transition: opacity 0.3s ease;
+    display: none; /* Varsayılan olarak gizli */
+    pointer-events: none;
+}
+
+/* 2. Poster img artık kullanılmıyor - video frame'i gösteriliyor */
+
+/* 4. Poster img yoksa bile container görünür olsun */
+.project-image-container:has(.project-poster-img) {
+    background: transparent;
+}
+
+/* 5. Overlay - hoverdə qaralmanı təmin etmək üçün dəyişiklik */
+.card-overlay {
+    background: rgba(0, 0, 0, 0.0); /* Başlanğıcda tam şəffaf */
+    opacity: 1; /* Görünür, lakin şəffaf */
+}
+
+.project-card:hover .card-overlay {
+    background: rgba(0, 0, 0, 0.4); /* Hoverdə qara pərdə gəlir */
+    opacity: 1;
 }
 
 /* =========================================

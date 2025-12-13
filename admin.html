@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineChord Admin Pro</title>
+    <title>CineChord Admin</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
-<link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
@@ -24,7 +24,7 @@
                     <span>CineChord</span>
                 </div>
                 <h2>Admin Panel</h2>
-                <p>Professional Content Management System</p>
+                <p>Content Management System</p>
             </div>
             <div class="login-right">
                 <form id="loginForm" class="login-form">
@@ -122,6 +122,7 @@
                 </div>
                 <button class="btn-logout" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
+                    <span>Çıxış</span>
                 </button>
             </div>
         </aside>
@@ -134,7 +135,7 @@
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Dashboard</h1>
-                        <p class="page-subtitle">Xoş gəldiniz! Statistikanıza baxın</p>
+                        <p class="page-subtitle">Ümumi statistika və məlumatlar</p>
                     </div>
                     <div class="page-actions">
                         <button class="btn-primary" onclick="loadDashboard()">
@@ -179,7 +180,7 @@
                             <h3 class="card-title"><i class="fas fa-chart-line"></i> Son 7 Günün Statistikası</h3>
                         </div>
                         <div class="card-body">
-                            <canvas id="worksChart" style="max-height: 300px;"></canvas>
+                            <canvas id="worksChart" style="max-height: 250px;"></canvas>
                         </div>
                     </div>
                     <div class="dashboard-card">
@@ -187,7 +188,7 @@
                             <h3 class="card-title"><i class="fas fa-chart-pie"></i> Kateqoriya Bölgüsü</h3>
                         </div>
                         <div class="card-body">
-                            <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+                            <canvas id="categoryChart" style="max-height: 250px;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -250,7 +251,7 @@
                 <div class="services-grid" id="servicesGrid"></div>
             </div>
 
-            <!-- MESSAGES VIEW -->
+            <!-- MESSAGES VIEW - REDESIGNED -->
             <div class="page-view" id="view-messages">
                 <div class="page-header">
                     <div>
@@ -258,12 +259,15 @@
                         <p class="page-subtitle">Müştəri mesajlarını idarə edin</p>
                     </div>
                 </div>
-                <div class="content-card">
-                    <div class="messages-list" id="messagesList"></div>
+                <div class="messages-list" id="messagesList">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Yüklənir...</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- ABOUT VIEW -->
+            <!-- ABOUT VIEW - REDESIGNED -->
             <div class="page-view" id="view-about">
                 <div class="page-header">
                     <div>
@@ -272,8 +276,11 @@
                     </div>
                 </div>
                 <form id="aboutForm" class="about-form">
+                    <!-- Video & Titles Section -->
                     <div class="content-card">
-                        <h3 class="card-title"><i class="fas fa-video"></i> Video və Başlıqlar</h3>
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-video"></i> Video və Başlıqlar</h3>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Əsas Başlıq</label>
@@ -285,28 +292,60 @@
                             </div>
                             <div class="form-group full-width">
                                 <label>Alt Başlıq</label>
-                                <textarea id="aSubTitle" rows="2"></textarea>
+                                <textarea id="aSubTitle" rows="2" placeholder="Alt başlıq mətni..."></textarea>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Content Section -->
                     <div class="content-card">
-                        <h3 class="card-title"><i class="fas fa-align-left"></i> Məzmun</h3>
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-align-left"></i> Məzmun</h3>
+                        </div>
                         <div class="form-grid">
-                            <div class="form-group full-width"><label>Biz Kimik</label><textarea id="aWho" rows="3"></textarea></div>
-                            <div class="form-group full-width"><label>Missiyamız</label><textarea id="aMission" rows="3"></textarea></div>
-                            <div class="form-group full-width"><label>Yanaşmamız</label><textarea id="aApproach" rows="3"></textarea></div>
+                            <div class="form-group full-width">
+                                <label>Biz Kimik</label>
+                                <textarea id="aWho" rows="3" placeholder="Şirkət haqqında məlumat..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Missiyamız</label>
+                                <textarea id="aMission" rows="3" placeholder="Missiya mətni..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Yanaşmamız</label>
+                                <textarea id="aApproach" rows="3" placeholder="Yanaşma mətni..."></textarea>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Contact Section -->
                     <div class="content-card">
-                        <h3 class="card-title"><i class="fas fa-address-card"></i> Əlaqə</h3>
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-address-card"></i> Əlaqə Məlumatları</h3>
+                        </div>
                         <div class="form-grid">
-                            <div class="form-group"><label>Email</label><input type="email" id="aEmail"></div>
-                            <div class="form-group"><label>Telefon</label><input type="text" id="aPhone"></div>
-                            <div class="form-group"><label>Ünvan</label><input type="text" id="aAddress"></div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="aEmail" placeholder="email@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon</label>
+                                <input type="text" id="aPhone" placeholder="+994 XX XXX XX XX">
+                            </div>
+                            <div class="form-group">
+                                <label>Ünvan</label>
+                                <input type="text" id="aAddress" placeholder="Şəhər, Ölkə">
+                            </div>
                         </div>
                     </div>
+
                     <div class="form-actions">
-                        <button type="button" id="saveAboutBtn" class="btn-primary"><i class="fas fa-save"></i> Yadda Saxla</button>
+                        <button type="button" class="btn-secondary" onclick="loadAbout()">
+                            <i class="fas fa-undo"></i> Sıfırla
+                        </button>
+                        <button type="button" id="saveAboutBtn" class="btn-primary">
+                            <i class="fas fa-save"></i> Yadda Saxla
+                        </button>
                     </div>
                 </form>
             </div>
@@ -319,7 +358,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="workModalTitle">İş Formu</h5>
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="workForm">
@@ -395,8 +434,10 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
-                    <button type="button" class="btn btn-primary w-100" onclick="submitWork()">Yadda Saxla</button>
+                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                    <button type="button" class="btn-primary" onclick="submitWork()">
+                        <i class="fas fa-save"></i> Yadda Saxla
+                    </button>
                 </div>
             </div>
         </div>
@@ -408,7 +449,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Xidmət Formu</h5>
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="serviceForm">
@@ -432,7 +473,10 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary w-100" onclick="submitService()">Yadda Saxla</button>
+                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                    <button type="button" class="btn-primary" onclick="submitService()">
+                        <i class="fas fa-save"></i> Yadda Saxla
+                    </button>
                 </div>
             </div>
         </div>

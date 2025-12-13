@@ -1,5 +1,6 @@
 /* ================================================================
    CineChord Index - COMPLETE CSS
+   Version: 4.4 - HAMBURGER ICON FIX
    ================================================================ */
 
 /* 1. RESET */
@@ -174,6 +175,30 @@ body {
     height: 100%;
     object-fit: cover;
     z-index: 0;
+    /* Native video controls'u gizle */
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Video native controls'u tamamen gizle */
+.hero-bg::-webkit-media-controls {
+    display: none !important;
+}
+
+.hero-bg::-webkit-media-controls-enclosure {
+    display: none !important;
+}
+
+.hero-bg::-webkit-media-controls-panel {
+    display: none !important;
+}
+
+.hero-bg::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+.hero-bg::-webkit-media-controls-start-playback-button {
+    display: none !important;
 }
 
 .hero-overlay {
@@ -188,7 +213,7 @@ body {
 }
 
 /* ============================================================
-   6. HAMBURGER MENU BUTTON
+   6. HAMBURGER MENU BUTTON - FIXED
    ============================================================ */
 
 .hamburger {
@@ -205,10 +230,22 @@ body {
     padding: 15px;
     width: auto;
     height: auto;
+    /* Touch target üçün minimum ölçü */
+    min-width: 48px;
+    min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
-.hamburger * {
-    pointer-events: none;
+/* Bütün child elementlər üçün pointer-events: none */
+.hamburger > * {
+    pointer-events: none !important;
+}
+
+.hamburger-text,
+.hamburger-icon,
+.hamburger-line {
+    pointer-events: none !important;
 }
 
 .hamburger-text {
@@ -446,9 +483,24 @@ body {
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
     font-size: 13px;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
+}
+
+/* Telefon numarası için özel stil - mavi renk görünmesin */
+.menu-contact-info p,
+.menu-contact-info p a,
+.menu-contact-info a {
+    color: rgba(255,255,255,0.4) !important;
+    text-decoration: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-contact-info p:visited,
+.menu-contact-info p a:visited,
+.menu-contact-info a:visited {
+    color: rgba(255,255,255,0.4) !important;
 }
 
 /* ============================================================
@@ -1156,7 +1208,8 @@ body {
     .play-button-container {
         width: 140px;
         height: 70px;
-        top: 55%;
+        top: 45%; /* Daha yukarı taşındı - alt elementlerle çakışmasın */
+        z-index: 10000 !important; /* Play button en üstte olsun */
     }
     
     .play-button {
@@ -1197,6 +1250,7 @@ body {
     .bottom-left-explore {
         bottom: 40px;
         left: 20px;
+        z-index: 15; /* Play button'dan düşük ama görünür */
     }
     
     .explore-line {
@@ -1225,6 +1279,7 @@ body {
         right: 50%;
         transform: translateX(50%);
         width: auto;
+        z-index: 15; /* Play button'dan düşük ama görünür */
     }
 
     .social-icons-home {
@@ -1325,6 +1380,8 @@ body {
     .play-button-container {
         width: 120px;
         height: 60px;
+        top: 40% !important; /* Küçük ekranlarda daha yukarı */
+        z-index: 10000 !important;
     }
 
     .play-button {
@@ -1349,6 +1406,7 @@ body {
     .bottom-left-explore {
         bottom: 30px;
         left: 15px;
+        z-index: 15; /* Play button'dan düşük */
     }
     
     .explore-text {
@@ -1357,5 +1415,12 @@ body {
     
     .explore-line {
         width: 30px;
+    }
+    
+    .bottom-right-socials {
+        bottom: 30px;
+        right: 50%;
+        transform: translateX(50%);
+        z-index: 15; /* Play button'dan düşük */
     }
 }

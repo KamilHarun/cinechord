@@ -214,8 +214,70 @@
     }
 
     /* ============================================================
-        7. VIDEO LAZY LOADING
+        7. VIDEO AUTOPLAY - Mobil uyumlu (Home sayfasındaki gibi)
         ============================================================ */
+    
+    function initVideoAutoplay() {
+        const videos = document.querySelectorAll('video');
+        
+        videos.forEach(video => {
+            // Video ayarlarını garanti altına al
+            video.muted = true;
+            video.loop = true;
+            video.playsInline = true;
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('webkit-playsinline', 'true');
+            video.setAttribute('x-webkit-airplay', 'allow');
+            
+            // Controls'u kaldır (ekstra Play butonu görünmesin)
+            video.removeAttribute('controls');
+            video.controls = false;
+            
+            // Autoplay için birden fazla yöntem dene
+            function attemptPlay() {
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn("Autoplay failed:", error);
+                        // Kullanıcı etkileşimi sonrası tekrar dene
+                        const interactionEvents = ['click', 'touchstart', 'scroll', 'touchend'];
+                        const tryPlayOnce = () => {
+                            video.play().catch(() => {});
+                            interactionEvents.forEach(type => {
+                                document.removeEventListener(type, tryPlayOnce);
+                            });
+                        };
+                        interactionEvents.forEach(type => {
+                            document.addEventListener(type, tryPlayOnce, { once: true, passive: true });
+                        });
+                    });
+                }
+            }
+            
+            // Video yüklendiğinde oynat
+            if (video.readyState >= 3) {
+                attemptPlay();
+            } else {
+                video.addEventListener('loadeddata', attemptPlay, { once: true });
+                video.addEventListener('canplay', attemptPlay, { once: true });
+                video.addEventListener('loadedmetadata', attemptPlay, { once: true });
+            }
+            
+            // Sayfa görünür olduğunda oynat
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && video.paused) {
+                    attemptPlay();
+                }
+            });
+            
+            // Video duraklarsa tekrar oynat
+            video.addEventListener('pause', () => {
+                if (!document.hidden && video.currentTime > 0) {
+                    setTimeout(() => attemptPlay(), 100);
+                }
+            });
+        });
+    }
     
     function initVideoLazyLoad() {
         const videoObserverOptions = {
@@ -334,6 +396,7 @@
             
             initScrollReveal();
             initVideoLazyLoad();
+            initVideoAutoplay(); // Yeni yüklenen videolar için autoplay
             
         } catch (error) {
             console.error('Xidmətlər yüklənərkən xəta:', error);
@@ -353,6 +416,7 @@
     function init() {
         initPageTransition();
         initMobileMenu();
+        initVideoAutoplay(); // Video autoplay'i başlat
         fetchAndRenderServices(); 
         setupNavButtons(); 
         
