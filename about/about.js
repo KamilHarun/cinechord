@@ -20,7 +20,7 @@
     const CONFIG = {
         BACKEND_URL: getBackendUrl(),
         ENDPOINTS: {
-            ABOUT: '/api/about/getAbout'
+            ABOUT: '/api/about'
         },
         STATIC_VIDEO: '../videos/Showreel.mp4',
         

@@ -656,14 +656,24 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    /* --- DÜZƏLİŞ BAŞLADI --- */
     opacity: 0;
+    visibility: hidden; /* Klik problemini həll edən əsas kod */
     pointer-events: none;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    /* --- DÜZƏLİŞ BİTDİ --- */
+    
     will-change: opacity;
 }
 
 .preview-container.active {
     opacity: 1;
+    
+    /* --- DÜZƏLİŞ --- */
+    visibility: visible;
+    /* --- */
+    
     pointer-events: all;
 }
 

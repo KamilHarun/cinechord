@@ -1,6 +1,6 @@
 /* ================================================================
    CineChord Index - COMPLETE CSS
-   Version: 4.4 - HAMBURGER ICON FIX
+   Version: 4.6 - WORKS İLƏ EYNİLƏŞDİRİLMİŞ
    ================================================================ */
 
 /* 1. RESET */
@@ -175,12 +175,10 @@ body {
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    /* Native video controls'u gizle */
     pointer-events: none;
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Video native controls'u tamamen gizle */
 .hero-bg::-webkit-media-controls {
     display: none !important;
 }
@@ -213,7 +211,7 @@ body {
 }
 
 /* ============================================================
-   6. HAMBURGER MENU BUTTON - FIXED
+   6. HAMBURGER MENU BUTTON 
    ============================================================ */
 
 .hamburger {
@@ -228,24 +226,15 @@ body {
     border: none;
     cursor: pointer;
     padding: 15px;
-    width: auto;
-    height: auto;
-    /* Touch target üçün minimum ölçü */
-    min-width: 48px;
-    min-height: 48px;
+    min-width: 90px;
+    min-height: 40px;
+    pointer-events: auto;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
 
-/* Bütün child elementlər üçün pointer-events: none */
-.hamburger > * {
-    pointer-events: none !important;
-}
-
-.hamburger-text,
-.hamburger-icon,
-.hamburger-line {
-    pointer-events: none !important;
+.hamburger * {
+    pointer-events: none;
 }
 
 .hamburger-text {
@@ -488,19 +477,12 @@ body {
     letter-spacing: 1px;
 }
 
-/* Telefon numarası için özel stil - mavi renk görünmesin */
 .menu-contact-info p,
 .menu-contact-info p a,
 .menu-contact-info a {
     color: rgba(255,255,255,0.4) !important;
     text-decoration: none !important;
     -webkit-tap-highlight-color: transparent;
-}
-
-.menu-contact-info p:visited,
-.menu-contact-info p a:visited,
-.menu-contact-info a:visited {
-    color: rgba(255,255,255,0.4) !important;
 }
 
 /* ============================================================
@@ -529,6 +511,7 @@ body {
 .center-logo:hover .logo-img {
     opacity: 0.8;
 }
+
 /* ============================================================
    10. PLAY BUTTON
    ============================================================ */
@@ -817,23 +800,6 @@ body {
     transform: translateY(0);
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-    .bottom-right-socials {
-        bottom: 40px;
-        right: 50%;
-        transform: translateX(50%);
-    }
-
-    .social-icons-home {
-        gap: 35px;
-    }
-
-    .social-icon,
-    .social-icon-hover {
-        font-size: 22px;
-    }
-}
 /* ============================================================
    14. VIDEO MODAL
    ============================================================ */
@@ -849,13 +815,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    /* DƏYİŞİKLİK BURADADIR */
     opacity: 0;
+    visibility: hidden; /* Elementi tam gizlədir ki, kliklərə mane olmasın */
     pointer-events: none;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 .preview-container.active {
+    /* DƏYİŞİKLİK BURADADIR */
     opacity: 1;
+    visibility: visible;
     pointer-events: all;
 }
 
@@ -953,12 +924,6 @@ body {
     opacity: 0;
     clip-path: inset(100% 0 0 0);
     transform: translate(-50%, -50%);
-}
-
-.preview-container.active .modal-play-btn:hover .play-button {
-    border-color: #ffffff;
-    background: rgba(255, 255, 255, 0.15);
-    width: 98px;
 }
 
 .custom-controls {
@@ -1133,12 +1098,16 @@ body {
 }
 
 /* ============================================================
-   15. RESPONSIVE - TABLET
+   15. RESPONSIVE - TABLET (1024px)
    ============================================================ */
 
 @media (max-width: 1024px) {
     .right-floating-nav {
         right: 5%;
+    }
+    
+    .mobile-menu {
+        width: 50%;
     }
 }
 
@@ -1208,8 +1177,8 @@ body {
     .play-button-container {
         width: 140px;
         height: 70px;
-        top: 45%; /* Daha yukarı taşındı - alt elementlerle çakışmasın */
-        z-index: 10000 !important; /* Play button en üstte olsun */
+        top: 45%;
+        z-index: 10000 !important;
     }
     
     .play-button {
@@ -1232,25 +1201,11 @@ body {
         font-size: 9px;
         letter-spacing: 0.5px;
     }
-
-    .play-button-container:hover .play-button {
-        width: 64px;
-    }
-
-    .play-button-container:hover .play-button::before {
-        width: 95px;
-        height: 35px;
-    }
-
-    .play-button-container:hover .play-button::after {
-        width: 125px;
-        height: 43px;
-    }
     
     .bottom-left-explore {
-        bottom: 40px;
+        bottom: 100px;
         left: 20px;
-        z-index: 15; /* Play button'dan düşük ama görünür */
+        z-index: 15;
     }
     
     .explore-line {
@@ -1260,10 +1215,6 @@ body {
     .explore-text {
         font-size: 11px;
         letter-spacing: 1px;
-    }
-    
-    .explore-btn:hover .explore-line {
-        width: 30px;
     }
     
     .right-floating-nav {
@@ -1276,18 +1227,25 @@ body {
     
     .bottom-right-socials {
         bottom: 40px;
-        right: 50%;
-        transform: translateX(50%);
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
         width: auto;
-        z-index: 15; /* Play button'dan düşük ama görünür */
+        z-index: 15;
     }
 
     .social-icons-home {
         gap: 35px;
     }
 
+    .social-icon,
+    .social-icon-hover {
+        font-size: 22px;
+    }
+
     .social-link-home {
-        font-size: 24px;
+        width: 28px;
+        height: 28px;
     }
     
     .preview-info {
@@ -1309,18 +1267,6 @@ body {
     .modal-play-btn {
         width: 120px !important;
         height: 60px !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-    }
-
-    .preview-container.active .modal-play-btn,
-    .preview-container.is-paused .modal-play-btn {
-        transform: translate(-50%, -50%) !important;
-    }
-
-    .preview-container.user-inactive .modal-play-btn {
-        transform: translate(-50%, -50%) !important;
     }
 
     .modal-play-btn .play-button {
@@ -1340,21 +1286,6 @@ body {
 
     .modal-play-btn .play-text {
         font-size: 8px;
-        letter-spacing: 0.5px;
-    }
-
-    .modal-play-btn:hover .play-button {
-        width: 58px;
-    }
-
-    .modal-play-btn:hover .play-button::before {
-        width: 88px;
-        height: 32px;
-    }
-
-    .modal-play-btn:hover .play-button::after {
-        width: 115px;
-        height: 40px;
     }
     
     .custom-controls {
@@ -1380,8 +1311,7 @@ body {
     .play-button-container {
         width: 120px;
         height: 60px;
-        top: 40% !important; /* Küçük ekranlarda daha yukarı */
-        z-index: 10000 !important;
+        top: 40% !important;
     }
 
     .play-button {
@@ -1398,15 +1328,10 @@ body {
         width: 95px;
         height: 35px;
     }
-
-    .modal-play-btn .play-text {
-        font-size: 7px;
-    }
     
     .bottom-left-explore {
-        bottom: 30px;
+        bottom: 90px;
         left: 15px;
-        z-index: 15; /* Play button'dan düşük */
     }
     
     .explore-text {
@@ -1418,9 +1343,15 @@ body {
     }
     
     .bottom-right-socials {
-        bottom: 30px;
-        right: 50%;
-        transform: translateX(50%);
-        z-index: 15; /* Play button'dan düşük */
+        bottom: 35px;
+    }
+
+    .social-icons-home {
+        gap: 30px;
+    }
+
+    .social-icon,
+    .social-icon-hover {
+        font-size: 20px;
     }
 }

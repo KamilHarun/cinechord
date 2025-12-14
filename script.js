@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Index - Main JavaScript
-   Version: 4.4 - HAMBURGER ICON FIX
+   Version: 4.6 - WORKS İLƏ EYNİLƏŞDİRİLMİŞ
    ============================================================ */
 
 // Global video configuration
@@ -71,7 +71,6 @@ window.openMainVideo = function() {
         loaderText: document.querySelector('.loader-percentage'),
         loaderLogo: document.querySelector('.loader-logo'),
         loaderAuthor: document.querySelector('.loader-author'),
-        header: document.querySelector('.header'),
         centerLogo: document.querySelector('.center-logo'),
         videoContainer: document.getElementById('videoContainer'),
         heroBgVideo: document.getElementById('heroBgVideo'), 
@@ -95,6 +94,14 @@ window.openMainVideo = function() {
         volumeSlider: document.getElementById('volumeSlider'),
         fullscreenBtn: document.getElementById('fullscreenBtn')
     };
+
+    // Menu Elements
+    const hamburger = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const overlay = document.getElementById('mobileMenuOverlay');
+    const hamburgerText = document.querySelector('.hamburger-text');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const centerLogo = document.querySelector('.center-logo');
 
     const UI_ELEMENTS = [
         ".center-logo", 
@@ -161,106 +168,78 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       6. MOBILE MENU - HAMBURGER ICON FIX
+       6. MOBILE MENU - WORKS İLƏ EYNİ
        ============================================================ */
 
-    function initMobileMenu() {
-        const hamburger = document.getElementById('hamburgerBtn');
-        const hamburgerText = hamburger?.querySelector('.hamburger-text');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const overlay = document.getElementById('mobileMenuOverlay');
-        const centerLogo = document.querySelector('.center-logo');
+    function toggleMenu() {
+        if (!hamburger || !mobileMenu) return;
 
+        const isActive = hamburger.classList.contains('active');
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        if (overlay) overlay.classList.toggle('active');
+        
+        if (hamburgerText) {
+            hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+        }
+        
+        if (!isActive) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.paddingRight = scrollbarWidth + 'px';
+            if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
+            if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
+        } else {
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            if (hamburger) hamburger.style.paddingRight = '';
+            if (centerLogo) centerLogo.style.paddingRight = '';
+        }
+    }
+
+    function initMobileMenu() {
         if (!hamburger || !mobileMenu) {
             console.error('Menu elementləri tapılmadı!');
             return;
         }
 
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            if (overlay) overlay.classList.toggle('active');
-            
-            if (hamburgerText) {
-                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
-            }
-            
-            if (!isActive) {
-                document.body.style.overflow = 'hidden';
-                document.body.style.paddingRight = scrollbarWidth + 'px';
-                if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
-                if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
-            } else {
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-                if (hamburger) hamburger.style.paddingRight = '';
-                if (centerLogo) centerLogo.style.paddingRight = '';
-            }
-        }
-
-        // Event handler function
-        function handleHamburgerClick(e) {
+        // Sadə click event - Works ilə eyni
+        hamburger.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
-        }
+        });
 
-        // Click event
-        hamburger.addEventListener('click', handleHamburgerClick);
-        
-        // Touch event - mobile üçün daha etibarlı
-        hamburger.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        }, { passive: false });
-
-        // Document səviyyəsində event delegation - child elementlərə basılanda da işləyir
-        document.addEventListener('click', function(e) {
-            // Hamburger və ya onun child-larına basılıbsa
-            if (e.target.id === 'hamburgerBtn' || e.target.closest('#hamburgerBtn')) {
-                // Artıq yuxarıdakı listener handle edib, amma əgər etməyibsə:
-                if (!e.defaultPrevented) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleMenu();
-                }
-            }
-        }, true); // Capture phase-də tutmaq üçün
-
+        // Overlay click
         if (overlay) {
-            overlay.addEventListener('click', function(e) {
-                e.preventDefault();
+            overlay.addEventListener('click', () => {
                 toggleMenu();
             });
         }
 
-        // Mobil Menyu Linkləri
-        const navLinks = mobileMenu.querySelectorAll('.nav-btn');
-        navLinks.forEach(link => {
+        // Menu linkləri
+        navBtns.forEach(link => {
             link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
                 const href = this.getAttribute('href');
                 
                 if (!href || href === '#' || this.classList.contains('active')) {
-                    toggleMenu();
+                    e.preventDefault();
+                    if (href !== '#') toggleMenu();
                     return;
                 }
 
+                e.preventDefault();
                 toggleMenu();
-                
+
                 setTimeout(() => {
                     navigateWithTransition(href);
                 }, 200);
             });
         });
 
-        // ESC düyməsi - video modal prioriteti
-        document.addEventListener('keydown', function(e) {
+        // ESC düyməsi
+        document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (elements.previewContainer && elements.previewContainer.classList.contains('active')) {
                     closeVideoPreview();
@@ -338,14 +317,13 @@ window.openMainVideo = function() {
     }
     
     /* ============================================================
-       8. VIDEO AUTOPLAY CHECK - Mobil uyumlu
+       8. VIDEO AUTOPLAY CHECK
        ============================================================ */
     function initVideoAutoplay() {
         if (!elements.heroBgVideo) return;
         
         const video = elements.heroBgVideo;
         
-        // Video ayarlarını garanti altına al
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
@@ -353,17 +331,14 @@ window.openMainVideo = function() {
         video.setAttribute('webkit-playsinline', 'true');
         video.setAttribute('x-webkit-airplay', 'allow');
         
-        // Controls'u kaldır (ekstra Play butonu görünmesin)
         video.removeAttribute('controls');
         video.controls = false;
         
-        // Autoplay için birden fazla yöntem dene
         function attemptPlay() {
             const playPromise = video.play();
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
                     console.warn("Autoplay failed:", error);
-                    // Kullanıcı etkileşimi sonrası tekrar dene
                     const interactionEvents = ['click', 'touchstart', 'scroll', 'touchend'];
                     const tryPlayOnce = () => {
                         video.play().catch(() => {});
@@ -378,7 +353,6 @@ window.openMainVideo = function() {
             }
         }
         
-        // Video yüklendiğinde oynat
         if (video.readyState >= 3) {
             attemptPlay();
         } else {
@@ -387,14 +361,12 @@ window.openMainVideo = function() {
             video.addEventListener('loadedmetadata', attemptPlay, { once: true });
         }
         
-        // Sayfa görünür olduğunda oynat
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && video.paused) {
                 attemptPlay();
             }
         });
         
-        // Video duraklarsa tekrar oynat
         video.addEventListener('pause', () => {
             if (!document.hidden && video.currentTime > 0) {
                 setTimeout(() => attemptPlay(), 100);
@@ -432,7 +404,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       10. NAVIGATION - Menyu xaricindəki linklər
+       10. NAVIGATION
        ============================================================ */
     
     function setupNavButtons() {
@@ -658,7 +630,6 @@ window.openMainVideo = function() {
 
         if (elements.closePreview) elements.closePreview.onclick = closeVideoPreview;
 
-        // Video modal keyboard controls
         document.addEventListener('keydown', (e) => {
             if (elements.previewContainer.classList.contains('active')) {
                 if (e.key === ' ') { e.preventDefault(); togglePlay(); }
