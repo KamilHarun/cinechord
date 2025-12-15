@@ -7,7 +7,7 @@
     
     // BACKEND URL
     const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
-    const API_SERVICES = `${BACKEND_URL}/api/services`;
+    const API_SERVICES = `${BACKEND_URL}/api/service`;
     const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
     
     const CONFIG = {
