@@ -11,7 +11,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="works.css">
@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    
+
     <div class="loading-screen">
         <div class="loader-content"></div>
     </div>
@@ -36,6 +36,28 @@
     <div class="page-transition"></div>
     <div class="grain-overlay"></div>
     <div class="progress-bar-top"></div>
+
+    <!-- LANGUAGE SELECTOR WITH GLOBE -->
+<div class="lang-selector" id="langSelector">
+    <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+        <span class="globe-icon">
+            <span class="globe-ellipse"></span>
+        </span>
+        <span class="current-lang" id="currentLangText">EN</span>
+    </button>
+    <div class="lang-dropdown" id="langDropdown">
+        <button class="lang-option active" data-lang="en">
+            <span class="lang-code">EN</span>
+            <span class="lang-name">English</span>
+            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+        </button>
+        <button class="lang-option" data-lang="az">
+            <span class="lang-code">AZ</span>
+            <span class="lang-name">Azərbaycan</span>
+            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+        </button>
+    </div>
+</div>
 
     <!-- HAMBURGER BUTTON -->
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
@@ -51,14 +73,12 @@
 
     <!-- MOBILE MENU -->
   <nav class="mobile-menu" id="mobileMenu">
-    <a href="../" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
-    
-    <a href="#" class="nav-btn active" data-text="WORK"><span class="nav-text">WORK</span></a>
-    
-    <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
-    <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
-    <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
-    <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+    <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+    <a href="#" class="nav-btn active" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+    <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+    <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+    <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
 
     <div class="menu-footer">
         <div class="menu-socials">
@@ -121,30 +141,28 @@
 
     <section class="hero-section">
         <div class="hero-bg">
-            <video autoplay muted loop playsinline class="hero-video" preload="auto">
-                <source src="../videos/Showreel.mp4" type="video/mp4">
-            </video>
+
             <div class="hero-overlay"></div>
         </div>
       <div class="hero-left-title">
-    <h1 class="title-main" data-text="WORKS">
+    <h1 class="title-main" data-text="WORKS" data-key="works">
         <span>WORKS</span>
     </h1>
 </div>
         <div class="hero-right-content">
         </div>
         <a href="#works" class="scroll-down-arrow">
-            <span class="arrow-text">Scroll</span>
+            <span class="arrow-text" data-key="scroll">Scroll</span>
             <div class="arrow-icon"></div>
         </a>
     </section>
 
     <section class="category-section">
         <div class="categories-container">
-            <button class="category-title category-btn active" onclick="filterWorks('all', this)">ALL</button>
-            <button class="category-title category-btn" onclick="filterWorks('films', this)">FILMS</button>
-            <button class="category-title category-btn" onclick="filterWorks('commercial', this)">COMMERCIAL</button>
-            <button class="category-title category-btn" onclick="filterWorks('clips', this)">CLIPS</button>
+            <button class="category-title category-btn active" onclick="filterWorks('all', this)" data-key="all">ALL</button>
+            <button class="category-title category-btn" onclick="filterWorks('films', this)" data-key="films">FILMS</button>
+            <button class="category-title category-btn" onclick="filterWorks('commercial', this)" data-key="commercial">COMMERCIAL</button>
+            <button class="category-title category-btn" onclick="filterWorks('clips', this)" data-key="clips">CLIPS</button>
         </div>
     </section>
 
@@ -165,7 +183,7 @@
 
         <div class="footer-wrapper">
             <div class="footer-col">
-                <span class="footer-label">ADDRESS</span>
+                <span class="footer-label" data-key="address">ADDRESS</span>
                 <div class="footer-content">
                     <p class="footer-text">Filmmaker LLC</p>
                     <p class="footer-text">5th Floor, Suite 580</p>
@@ -174,7 +192,7 @@
             </div>
 
             <div class="footer-col">
-                <span class="footer-label">GET IN TOUCH</span>
+                <span class="footer-label" data-key="get_in_touch">GET IN TOUCH</span>
                 <div class="footer-content">
                     <a href="mailto:hi@filmmaker.com" class="footer-link mask-link">
                         <span data-text="hi@filmmaker.com">hi@filmmaker.com</span>
@@ -186,7 +204,7 @@
             </div>
 
             <div class="footer-col">
-                <span class="footer-label">FOLLOW US</span>
+                <span class="footer-label" data-key="follow_us">FOLLOW US</span>
                 <div class="social-icons">
                     <a href="#" class="mask-icon">
                         <span class="icon-wrap">

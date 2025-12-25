@@ -11,7 +11,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="contact.css">
@@ -20,6 +20,29 @@
 
     <div class="page-transition"></div>
     <div class="grain-overlay"></div>
+
+
+     <!-- LANGUAGE SELECTOR WITH GLOBE -->
+        <div class="lang-selector" id="langSelector">
+            <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+                <span class="globe-icon">
+                    <span class="globe-ellipse"></span>
+                </span>
+                <span class="current-lang" id="currentLangText">EN</span>
+            </button>
+            <div class="lang-dropdown" id="langDropdown">
+                <button class="lang-option active" data-lang="en">
+                    <span class="lang-code">EN</span>
+                    <span class="lang-name">English</span>
+                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+                </button>
+                <button class="lang-option" data-lang="az">
+                    <span class="lang-code">AZ</span>
+                    <span class="lang-name">Azərbaycan</span>
+                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+                </button>
+            </div>
+        </div>
 
     <!-- HAMBURGER BUTTON -->
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
@@ -35,13 +58,13 @@
 
     <!-- MOBILE MENU -->
     <nav class="mobile-menu" id="mobileMenu">
-    <a href="../" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
-    <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
-    <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
-    <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
-    <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+    <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+    <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+    <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
     
-    <a href="#" class="nav-btn active" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+    <a href="#" class="nav-btn active" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
 
     <div class="menu-footer">
         <div class="menu-socials">
@@ -50,8 +73,8 @@
             <a href="#">VIMEO</a>
         </div>
         <div class="menu-contact-info">
-            <p>hello@cinechord.com</p>
-            <p>+994 50 123 45 67</p>
+            <p>info@cinechord.com</p>
+            <p>++994 50 233 04 54</p>
         </div>
     </div>
 </nav>
@@ -63,9 +86,9 @@
 
     <section class="hero reveal-item">
         <div class="hero-content">
-            <h1 class="hero-line outline-text">LET'S WORK</h1>
+            <h1 class="hero-line outline-text" data-key="lets_work">LET'S WORK</h1>
             <div class="hero-rolling-container">
-                <div class="hero-rolling-text" data-text="TOGETHER">
+                <div class="hero-rolling-text" data-text="TOGETHER" data-key="together">
                     <span>TOGETHER</span>
                 </div>
             </div>
@@ -80,25 +103,25 @@
                     
                     <div class="input-group">
                         <input type="text" class="cinematic-input" name="name" id="name" required placeholder=" ">
-                        <label class="floating-label">WHAT'S YOUR NAME?</label>
+                        <label class="floating-label" data-key="name_label">WHAT'S YOUR NAME?</label>
                         <div class="focus-line"></div>
                     </div>
 
                     <div class="input-group">
                         <input type="email" class="cinematic-input" name="email" id="email" required placeholder=" ">
-                        <label class="floating-label">EMAIL ADDRESS</label>
+                        <label class="floating-label" data-key="email_label">EMAIL ADDRESS</label>
                         <div class="focus-line"></div>
                     </div>
 
                     <div class="input-group">
                         <textarea class="cinematic-input textarea-mode" name="message" id="message" required placeholder=" "></textarea>
-                        <label class="floating-label">TELL US ABOUT YOUR PROJECT</label>
+                        <label class="floating-label" data-key="message_label">TELL US ABOUT YOUR PROJECT</label>
                         <div class="focus-line"></div>
                     </div>
 
                     <div class="form-checkbox">
                         <input type="checkbox" id="newsletter" name="newsletter">
-                        <label for="newsletter">Stay in the loop with updates</label>
+                        <label for="newsletter" data-key="newsletter">Stay in the loop with updates</label>
                     </div>
 
                     <div class="send-btn-container" id="sendBtnContainer">
@@ -114,13 +137,13 @@
             <div class="info-column reveal-item">
                 <div class="contact-items">
                     <div class="contact-item">
-                        <span class="label-small">EMAIL</span>
+                        <span class="label-small" data-key="email">EMAIL</span>
                         <a href="mailto:hello@cinechord.com" class="contact-link rolling-link" data-text="hello@cinechord.com">
                             <span>hello@cinechord.com</span>
                         </a>
                     </div>
                     <div class="contact-item">
-                        <span class="label-small">PHONE</span>
+                        <span class="label-small" data-key="phone">PHONE</span>
                         <a href="tel:+994501234567" class="contact-link rolling-link" data-text="+994 50 123 45 67">
                             <span>+994 50 123 45 67</span>
                         </a>
@@ -129,7 +152,7 @@
 
                 <div class="divider"></div>
 
-                <p class="info-description">
+                <p class="info-description" data-key="description">
                     We are always looking for new talent and exciting projects. <br>Let's create something visual.
                 </p>
 
@@ -146,7 +169,7 @@
     <footer class="main-footer reveal-item">
         <div class="footer-wrapper">
             <div class="footer-col">
-                <span class="footer-label">ADDRESS</span>
+                <span class="footer-label" data-key="address">ADDRESS</span>
                 <div class="footer-content">
                     <p class="footer-text">Filmmaker LLC</p>
                     <p class="footer-text">5th Floor, Suite 580</p>
@@ -155,7 +178,7 @@
             </div>
             
             <div class="footer-col">
-                <span class="footer-label">GET IN TOUCH</span>
+                <span class="footer-label" data-key="get_in_touch">GET IN TOUCH</span>
                 <div class="footer-content">
                     <a href="mailto:hi@filmmaker.com" class="mask-link">
                         <span data-text="hi@filmmaker.com">hi@filmmaker.com</span>
@@ -167,7 +190,7 @@
             </div>
             
             <div class="footer-col">
-                <span class="footer-label">FOLLOW US</span>
+                <span class="footer-label" data-key="follow_us">FOLLOW US</span>
                 <div class="social-icons">
                     <a href="#" class="mask-icon">
                         <span class="icon-wrap">

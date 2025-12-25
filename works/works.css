@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - Works Page Stylesheet
-   Version: 6.0 - INDEX İLƏ EYNİLƏŞDİRİLMİŞ
+   Version: 6.2 - GLOBE ICON FIX
    ========================================= */
 
 /* =========================================
@@ -27,6 +27,12 @@ body {
     line-height: 1.5;
     overflow-x: hidden;
     position: relative;
+}
+
+/* Azərbaycan dili üçün Montserrat font */
+body.lang-az,
+body.lang-az * {
+    font-family: 'Montserrat', sans-serif !important;
 }
 
 /* =========================================
@@ -100,7 +106,258 @@ body {
 }
 
 /* ============================================================
-   6. HAMBURGER MENU BUTTON
+   6. GLOBE LANGUAGE SELECTOR - MINIMAL
+   ============================================================ */
+
+.lang-selector {
+    position: fixed;
+    top: 33px;
+    right: 175px;
+    z-index: 30001;
+    pointer-events: auto;
+}
+
+.lang-globe-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    padding: 15px 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+    position: relative;
+    z-index: 30002;
+}
+
+.globe-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Globe - ince xətlərlə çəkilmiş */
+.globe-icon::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Üfüqi xətt */
+.globe-icon::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.6);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Şaquli ellips */
+.globe-icon i {
+    display: none;
+}
+
+.globe-icon .globe-ellipse {
+    position: absolute;
+    width: 10px;
+    height: 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover - Globe fırlanır */
+.lang-globe-btn:hover .globe-icon {
+    transform: rotate(20deg);
+}
+
+.lang-globe-btn:hover .globe-icon::before,
+.lang-globe-btn:hover .globe-ellipse {
+    border-color: #FFA500;
+}
+
+.lang-globe-btn:hover .globe-icon::after {
+    background: #FFA500;
+}
+
+/* Active state - Dropdown açıqdır */
+.lang-selector.active .globe-icon {
+    transform: rotate(0deg);
+    animation: globePulse 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-selector.active .globe-icon::before {
+    border-color: #FFA500;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+}
+
+.lang-selector.active .globe-icon::after {
+    background: #FFA500;
+    box-shadow: 0 0 8px rgba(255, 165, 0, 0.4);
+}
+
+.lang-selector.active .globe-ellipse {
+    border-color: #FFA500;
+    animation: ellipseRotate 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Globe pulse animasiyası */
+@keyframes globePulse {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    30% {
+        transform: scale(1.15) rotate(-10deg);
+    }
+    60% {
+        transform: scale(0.95) rotate(5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* Ellips fırlanma animasiyası */
+@keyframes ellipseRotate {
+    0% {
+        transform: rotateY(0deg);
+        width: 10px;
+    }
+    50% {
+        transform: rotateY(90deg);
+        width: 2px;
+    }
+    100% {
+        transform: rotateY(180deg);
+        width: 10px;
+    }
+}
+
+.current-lang {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-globe-btn:hover .current-lang {
+    color: #FFA500;
+    letter-spacing: 2px;
+}
+
+.lang-selector.active .current-lang {
+    color: #FFA500;
+}
+
+/* Dropdown */
+.lang-dropdown {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    min-width: 160px;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transform-origin: top right;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 30003;
+    pointer-events: none;
+}
+
+.lang-selector.active .lang-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.lang-option:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.lang-option.active {
+    background: rgba(255, 165, 0, 0.1);
+}
+
+.lang-code {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 1px;
+    min-width: 24px;
+}
+
+.lang-option.active .lang-code {
+    color: #FFA500;
+}
+
+.lang-name {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    flex: 1;
+    text-align: left;
+}
+
+.lang-option:hover .lang-name {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.lang-option.active .lang-name {
+    color: rgba(255, 165, 0, 0.7);
+}
+
+.lang-check {
+    font-size: 10px;
+    color: #FFA500;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-option.active .lang-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+
+/* ============================================================
+   7. HAMBURGER MENU BUTTON
    ============================================================ */
 
 .hamburger {
@@ -114,9 +371,10 @@ body {
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 15px;
+    padding: 10px;
     width: auto;
     height: auto;
+    pointer-events: auto;
 }
 
 .hamburger * {
@@ -190,7 +448,7 @@ body {
 }
 
 /* ============================================================
-   7. MOBILE MENU OVERLAY
+   8. MOBILE MENU OVERLAY
    ============================================================ */
 
 .mobile-menu-overlay {
@@ -214,7 +472,7 @@ body {
 }
 
 /* ============================================================
-   8. MOBILE MENU
+   9. MOBILE MENU
    ============================================================ */
 
 .mobile-menu {
@@ -269,6 +527,12 @@ body {
     opacity: 0;
     transform: translateX(150px);
     transition: opacity 0.8s ease, transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
 }
 
 .mobile-menu.active .nav-btn {
@@ -296,6 +560,12 @@ body {
     display: block;
     color: #fff;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    position: relative;
+    z-index: 2;
 }
 
 .nav-btn::after {
@@ -310,14 +580,34 @@ body {
     align-items: center;
     justify-content: center;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .nav-btn:hover .nav-text {
-    transform: translateY(-100%) skewY(5deg);
+    transform: translateY(-100%) skewY(5deg) translateZ(0);
 }
 
 .nav-btn:hover::after {
-    transform: translateY(-100%) skewY(0deg);
+    transform: translateY(-100%) skewY(0deg) translateZ(0);
+}
+
+.nav-btn:not(:hover) .nav-text {
+    transform: translateY(0) skewY(0deg) translateZ(0);
+}
+
+.nav-btn:not(:hover)::after {
+    transform: translateY(0) translateZ(0);
+}
+
+body.lang-az .nav-btn {
+    font-size: 3.2vw;
+    letter-spacing: 2px;
+    margin: -0.5vh 0;
 }
 
 .menu-footer {
@@ -363,7 +653,6 @@ body {
     letter-spacing: 1px;
 }
 
-/* Telefon numarası için özel stil - mavi renk görünmesin */
 .menu-contact-info p,
 .menu-contact-info p a,
 .menu-contact-info a {
@@ -379,7 +668,7 @@ body {
 }
 
 /* ============================================================
-   9. LOGO
+   10. LOGO
    ============================================================ */
 
 .center-logo {
@@ -404,8 +693,9 @@ body {
 .center-logo:hover .logo-img {
     opacity: 0.8;
 }
+
 /* =========================================
-   10. SCROLL REVEAL ANIMATION
+   11. SCROLL REVEAL ANIMATION
    ========================================= */
 .reveal-item {
     opacity: 0;
@@ -422,7 +712,7 @@ body {
 }
 
 /* =========================================
-   11. HERO SECTION (FIXED: WORKS MASK EFFECT)
+   12. HERO SECTION
    ========================================= */
 .hero-section {
     min-height: 100vh;
@@ -463,61 +753,50 @@ body {
     z-index: 1;
 }
 
-/* Başlıq Konteyneri - Daşmanı gizlətmək üçün */
 .hero-left-title {
     position: absolute;
     left: 60px;
     top: 45%;
     transform: translateY(-50%);
     z-index: 5;
-    overflow: hidden; /* Animasiya zamanı kənara çıxmasın */
-    padding-right: 30px; /* ✅ DÜZƏLİŞ: S hərfi kəsilməsin deyə sağ boşluq əlavə edildi */
+    overflow: hidden;
+    padding-right: 30px;
 }
 
-/* Əsas Başlıq - WORKS */
 .title-main {
     font-family: 'Gabarito', sans-serif;
-    /* Ölçü böyüdüldü */
     font-size: clamp(2rem, 6vw, 6rem); 
     font-weight: 900;
     letter-spacing: -2px;
     line-height: 1;
     text-transform: uppercase;
     margin: 0;
-    
     display: inline-block;
     position: relative;
     cursor: default;
-
-    /* MASK OFF (Başlanğıc: İçi boş, kənarı ağ) */
     color: transparent;
     -webkit-text-stroke: 1.5px #fff;
     text-shadow: none;
 }
 
-/* Orijinal Mətnin Hərəkəti */
 .title-main span {
     display: block;
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* MASK ON (Hover: İçi dolu narıncı) */
 .title-main::after {
-    content: attr(data-text); /* HTML-dən data-text oxuyur */
+    content: attr(data-text);
     position: absolute;
     top: 100%;
     left: 0;
     width: 100%;
     height: 100%;
-    
     color: #FFA500;
     -webkit-text-stroke: 0;
-    
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
 }
 
-/* Hover Animasiyası */
 .title-main:hover span {
     transform: translateY(-100%);
 }
@@ -591,29 +870,8 @@ body {
     z-index: 2;
 }
 
-/* RESPONSIVE HERO */
-@media (max-width: 768px) {
-    .hero-left-title {
-        left: 20px;
-        top: 40%;
-        /* Mobildə də padding-i qoruyuruq */
-        padding-right: 20px; 
-    }
-    
-    .title-main {
-        font-size: 12vw; /* Mobildə də böyük olsun */
-    }
-    
-    .hero-right-content {
-        right: auto;
-        left: 20px;
-        top: 60%;
-        transform: translateY(0);
-        max-width: 90%;
-    }
-}
 /* =========================================
-   12. CATEGORIES & GRID
+   13. CATEGORIES & GRID
    ========================================= */
 .category-section {
     background-color: #050505;
@@ -699,11 +957,9 @@ body {
     width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: #000; /* Poster yoksa siyah görünsün */
+    background: #000;
     border-radius: 2px;
 }
-
-/* ⚠️ KÖHNƏ: video-loading-placeholder SİLİNMİŞDİR (Lazımsız idi) */
 
 .project-video {
     width: 100%;
@@ -716,16 +972,16 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 2; /* Poster img'in üstünde olsun */
-    opacity: 1; /* Başlanğıcda görünür - video frame'i gösterilsin */
+    z-index: 2;
+    opacity: 1;
     visibility: visible;
-    pointer-events: none; /* Hover olmadan tıklanamaz */
+    pointer-events: none;
 }
 
 .project-card:hover .project-video {
     transform: scale(1.05);
-    opacity: 1; /* Hover'da görünür ve oynatılır */
-    pointer-events: auto; /* Hover'da tıklanabilir */
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .card-overlay {
@@ -734,15 +990,15 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.0); /* ✅ DÜZƏLİŞ: Başlanğıcda tam şəffaf örtük */
-    opacity: 1; /* ✅ DÜZƏLİŞ: Opacity həmişə 1 saxlanılır, hoverdə fon qaralır */
+    background: rgba(0, 0, 0, 0.0);
+    opacity: 1;
     transition: opacity 0.4s ease;
     z-index: 3;
 }
 
 .project-card:hover .card-overlay {
     opacity: 1;
-    background: rgba(0, 0, 0, 0.4); /* Hoverdə qaranlıqlaşma */
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .card-info {
@@ -812,11 +1068,6 @@ body {
     color: #000;
 }
 
-/* =========================================
-   12.5. POSTER & VIDEO LAYER DÜZƏLİŞİ (YENİ JS MƏNTİQİ ÜÇÜN)
-   ========================================= */
-
-/* 1. Şəkil (Poster) stili - Artık video frame'i kullanılıyor, bu sadece fallback */
 .project-poster-img {
     position: absolute;
     top: 0;
@@ -824,33 +1075,19 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: 1; /* Video'nun altında olsun (fallback için) */
-    opacity: 0; /* Varsayılan olarak gizli - video frame'i gösterilecek */
+    z-index: 1;
+    opacity: 0;
     transition: opacity 0.3s ease;
-    display: none; /* Varsayılan olarak gizli */
+    display: none;
     pointer-events: none;
 }
 
-/* 2. Poster img artık kullanılmıyor - video frame'i gösteriliyor */
-
-/* 4. Poster img yoksa bile container görünür olsun */
 .project-image-container:has(.project-poster-img) {
     background: transparent;
 }
 
-/* 5. Overlay - hoverdə qaralmanı təmin etmək üçün dəyişiklik */
-.card-overlay {
-    background: rgba(0, 0, 0, 0.0); /* Başlanğıcda tam şəffaf */
-    opacity: 1; /* Görünür, lakin şəffaf */
-}
-
-.project-card:hover .card-overlay {
-    background: rgba(0, 0, 0, 0.4); /* Hoverdə qara pərdə gəlir */
-    opacity: 1;
-}
-
 /* =========================================
-   13. MODAL VIDEO PLAYER
+   14. MODAL VIDEO PLAYER
    ========================================= */
 .preview-container {
     position: fixed;
@@ -976,7 +1213,7 @@ body {
 }
 
 /* ============================================================
-   14. PLAY BUTTON
+   15. PLAY BUTTON
    ============================================================ */
 
 .play-button-container {
@@ -1239,7 +1476,7 @@ body {
 }
 
 /* =========================================
-   15. CINEMATIC FOOTER
+   16. CINEMATIC FOOTER
    ========================================= */
 .main-footer {
     background: #050505;
@@ -1446,23 +1683,71 @@ body {
 }
 
 /* =========================================
-   16. RESPONSIVE - TABLET (1024px)
+   17. RESPONSIVE - TABLET (1024px)
    ========================================= */
 @media (max-width: 1024px) {
     .mobile-menu {
         width: 50%;
     }
+    
+    .lang-selector {
+        right: 155px;
+    }
 }
 
 /* =========================================
-   17. RESPONSIVE - MOBILE (768px)
+   18. RESPONSIVE - MOBILE (768px)
    ========================================= */
 @media (max-width: 768px) {
+    .lang-selector {
+        top: 25px;
+        right: auto;
+        left: 100px;
+        z-index: 30001;
+    }
+    
+    .lang-globe-btn {
+        padding: 6px;
+        gap: 8px;
+        pointer-events: auto;
+    }
+    
+    .globe-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .globe-icon::before {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .globe-icon::after {
+        width: 16px;
+    }
+    
+    .globe-icon .globe-ellipse {
+        width: 8px;
+        height: 16px;
+    }
+    
+    .current-lang {
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+    
+    .lang-dropdown {
+        left: 0;
+        right: auto;
+        min-width: 150px;
+        transform-origin: top left;
+    }
+    
     .hamburger {
         top: 20px;
         right: 20px;
         gap: 12px;
-        padding: 12px;
+        padding: 8px;
     }
     
     .hamburger-text {
@@ -1516,16 +1801,24 @@ body {
         height: 80px;
     }
 
-    /* Hero Text */
     .hero-left-title {
         left: 20px;
+        top: 40%;
+        padding-right: 20px;
     }
-
+    
     .title-main {
-        font-size: 40px;
+        font-size: 12vw;
+    }
+    
+    .hero-right-content {
+        right: auto;
+        left: 20px;
+        top: 60%;
+        transform: translateY(0);
+        max-width: 90%;
     }
 
-    /* Categories */
     .categories-container {
         justify-content: flex-start;
         overflow-x: auto;
@@ -1554,14 +1847,12 @@ body {
         transform: scale(1.1);
     }
 
-    /* Projects Grid */
     .projects-grid {
         padding: 0 20px;
         grid-template-columns: 1fr;
         gap: 30px;
     }
 
-    /* Footer */
     .main-footer {
         padding: 60px 20px 30px;
     }
@@ -1600,7 +1891,6 @@ body {
         text-align: left;
     }
 
-    /* MODAL PLAY BUTTON */
     .modal-play-btn {
         width: 120px !important;
         height: 60px !important;
@@ -1657,7 +1947,6 @@ body {
         height: 40px;
     }
 
-    /* VIDEO MODAL CONTROLS */
     .preview-info {
         top: 70px;
         left: 20px;
@@ -1678,16 +1967,57 @@ body {
         padding: 0 20px 40px;
     }
 
-    /* Volume gizlət */
     .volume-wrapper {
         display: none;
     }
 }
 
 /* =========================================
-   18. RESPONSIVE - SMALL MOBILE (480px)
+   19. RESPONSIVE - SMALL MOBILE (480px)
    ========================================= */
 @media (max-width: 480px) {
+    .lang-selector {
+        top: 22px;
+        left: 82px;
+        z-index: 30001;
+    }
+    
+    .lang-globe-btn {
+        padding: 5px;
+        gap: 6px;
+        pointer-events: auto;
+    }
+    
+    .globe-icon {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .globe-icon::before {
+        width: 14px;
+        height: 14px;
+        border-width: 1px;
+    }
+    
+    .globe-icon::after {
+        width: 14px;
+        height: 1px;
+    }
+    
+    .globe-icon .globe-ellipse {
+        width: 7px;
+        height: 14px;
+        border-width: 1px;
+    }
+    
+    .current-lang {
+        font-size: 10px;
+    }
+    
+    .lang-dropdown {
+        min-width: 140px;
+    }
+    
     .center-logo {
         top: 12px;
         left: 15px;
@@ -1698,7 +2028,10 @@ body {
         height: 65px;
     }
 
-    /* MODAL PLAY BUTTON - DAHA KİÇİK */
+    .hamburger {
+        padding: 6px;
+    }
+
     .modal-play-btn,
     .play-button-container {
         width: 100px !important;
@@ -1748,4 +2081,6 @@ body {
     .right-controls-group {
         gap: 8px;
     }
+
+    
 }

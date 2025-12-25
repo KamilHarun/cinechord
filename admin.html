@@ -283,16 +283,24 @@
                         </div>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>Əsas Başlıq</label>
+                                <label>Əsas Başlıq (İngilizcə)</label>
                                 <input type="text" id="aMainTitle" placeholder="OUR STORY">
+                            </div>
+                            <div class="form-group">
+                                <label>Əsas Başlıq (Azərbaycan)</label>
+                                <input type="text" id="aMainTitleAz" placeholder="BİZİM HEKAYƏ">
                             </div>
                             <div class="form-group">
                                 <label>Video Faylı</label>
                                 <input type="file" id="aVideoFile" accept="video/mp4">
                             </div>
                             <div class="form-group full-width">
-                                <label>Alt Başlıq</label>
+                                <label>Alt Başlıq (İngilizcə)</label>
                                 <textarea id="aSubTitle" rows="2" placeholder="Alt başlıq mətni..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Alt Başlıq (Azərbaycan)</label>
+                                <textarea id="aSubTitleAz" rows="2" placeholder="Alt başlıq mətni (Azərbaycan)...""></textarea>
                             </div>
                         </div>
                     </div>
@@ -304,16 +312,28 @@
                         </div>
                         <div class="form-grid">
                             <div class="form-group full-width">
-                                <label>Biz Kimik</label>
+                                <label>Biz Kimik (İngilizcə)</label>
                                 <textarea id="aWho" rows="3" placeholder="Şirkət haqqında məlumat..."></textarea>
                             </div>
                             <div class="form-group full-width">
-                                <label>Missiyamız</label>
+                                <label>Biz Kimik (Azərbaycan)</label>
+                                <textarea id="aWhoAz" rows="3" placeholder="Şirkət haqqında məlumat (Azərbaycan)..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Missiyamız (İngilizcə)</label>
                                 <textarea id="aMission" rows="3" placeholder="Missiya mətni..."></textarea>
                             </div>
                             <div class="form-group full-width">
-                                <label>Yanaşmamız</label>
+                                <label>Missiyamız (Azərbaycan)</label>
+                                <textarea id="aMissionAz" rows="3" placeholder="Missiya mətni (Azərbaycan)..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Yanaşmamız (İngilizcə)</label>
                                 <textarea id="aApproach" rows="3" placeholder="Yanaşma mətni..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Yanaşmamız (Azərbaycan)</label>
+                                <textarea id="aApproachAz" rows="3" placeholder="Yanaşma mətni (Azərbaycan)..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -333,8 +353,12 @@
                                 <input type="text" id="aPhone" placeholder="+994 XX XXX XX XX">
                             </div>
                             <div class="form-group">
-                                <label>Ünvan</label>
-                                <input type="text" id="aAddress" placeholder="Şəhər, Ölkə">
+                                <label>Ünvan (İngilizcə)</label>
+                                <input type="text" id="aAddress" placeholder="BAKU, AZERBAIJAN">
+                            </div>
+                            <div class="form-group">
+                                <label>Ünvan (Azərbaycan)</label>
+                                <input type="text" id="aAddressAz" placeholder="BAKI, AZƏRBAYCAN">
                             </div>
                         </div>
                     </div>
@@ -455,16 +479,40 @@
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId">
                         <div class="mb-3">
-                            <label class="form-label">Başlıq</label>
+                            <label class="form-label">Başlıq (İngilizcə)</label>
                             <input type="text" id="sTitle" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Başlıq (Azərbaycan)</label>
+                            <input type="text" id="sTitleAz" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Icon Class (fa-solid fa-star)</label>
                             <input type="text" id="sIcon" class="form-control">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Təsvir</label>
+                            <label class="form-label">Təsvir (İngilizcə)</label>
                             <textarea id="sDesc" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Təsvir (Azərbaycan)</label>
+                            <textarea id="sDescAz" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bullet Points (İngilizcə) - Hər sətri ayrı maddə</label>
+                            <textarea id="sBulletPoints" class="form-control" rows="4" placeholder="Birinci maddə&#10;İkinci maddə&#10;Üçüncü maddə"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bullet Points (Azərbaycan) - Hər sətri ayrı maddə</label>
+                            <textarea id="sBulletPointsAz" class="form-control" rows="4" placeholder="Birinci maddə&#10;İkinci maddə&#10;Üçüncü maddə"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Proses Addımları (İngilizcə) - Hər sətri ayrı addım</label>
+                            <textarea id="sProcessSteps" class="form-control" rows="4" placeholder="Birinci addım&#10;İkinci addım&#10;Üçüncü addım"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Proses Addımları (Azərbaycan) - Hər sətri ayrı addım</label>
+                            <textarea id="sProcessStepsAz" class="form-control" rows="4" placeholder="Birinci addım&#10;İkinci addım&#10;Üçüncü addım"></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Video Faylı</label>

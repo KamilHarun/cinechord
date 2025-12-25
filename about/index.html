@@ -9,7 +9,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -19,6 +19,28 @@
 
     <div class="page-transition"></div>
     <div class="grain-overlay"></div>
+
+<!-- LANGUAGE SELECTOR WITH GLOBE -->
+<div class="lang-selector" id="langSelector">
+    <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+        <span class="globe-icon">
+            <span class="globe-ellipse"></span>
+        </span>
+        <span class="current-lang" id="currentLangText">EN</span>
+    </button>
+    <div class="lang-dropdown" id="langDropdown">
+        <button class="lang-option active" data-lang="en">
+            <span class="lang-code">EN</span>
+            <span class="lang-name">English</span>
+            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+        </button>
+        <button class="lang-option" data-lang="az">
+            <span class="lang-code">AZ</span>
+            <span class="lang-name">Azərbaycan</span>
+            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+        </button>
+    </div>
+</div>
 
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
         <span class="hamburger-text">MENU</span>
@@ -31,14 +53,14 @@
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
     <nav class="mobile-menu" id="mobileMenu">
-    <a href="../" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
-    <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
-    <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
-    <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+    <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+    <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
     
-    <a href="#" class="nav-btn active" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+    <a href="#" class="nav-btn active" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
     
-    <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+    <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
 
     <div class="menu-footer">
         <div class="menu-socials">
@@ -82,36 +104,36 @@
 
                 <div class="about-text-blocks">
                     <div class="about-block reveal-item">
-                        <h2 class="block-title">WHO WE ARE</h2>
+                        <h2 class="block-title" data-key="who_we_are">WHO WE ARE</h2>
                         <div id="who-we-are" class="block-text">Loading...</div>
                     </div>
 
                     <div class="about-block reveal-item">
-                        <h2 class="block-title">OUR MISSION</h2>
+                        <h2 class="block-title" data-key="our_mission">OUR MISSION</h2>
                         <div id="our-mission" class="block-text">Loading...</div>
                     </div>
 
                     <div class="about-block reveal-item">
-                        <h2 class="block-title">OUR APPROACH</h2>
+                        <h2 class="block-title" data-key="our_approach">OUR APPROACH</h2>
                         <div id="our-approach" class="block-text">Loading...</div>
                     </div>
                 </div>
 
                 <div class="info-grid reveal-item">
                     <div class="info-item">
-                        <span class="label-small">EMAIL</span>
+                        <span class="label-small" data-key="email">EMAIL</span>
                         <a id="email-link" href="mailto:" class="rolling-link" data-text="">
                             <span></span>
                         </a>
                     </div>
 
                     <div class="info-item">
-                        <span class="label-small">ADDRESS</span>
+                        <span class="label-small" data-key="address">ADDRESS</span>
                         <span id="address" class="static-value">Loading...</span>
                     </div>
 
                     <div class="info-item">
-                        <span class="label-small">PHONE</span>
+                        <span class="label-small" data-key="phone">PHONE</span>
                         <a id="phone-link" href="tel:" class="rolling-link" data-text="">
                             <span></span>
                         </a>

@@ -27,6 +27,24 @@ body {
     position: relative;
 }
 
+/* Azərbaycan dili üçün Montserrat */
+body.lang-az,
+body.lang-az * {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* AZ dili üçün - Font Awesome ikonlarını qoruyuruq */
+body.lang-az .fa-solid,
+body.lang-az .fa-brands,
+body.lang-az [class^="fa-"],
+body.lang-az [class*=" fa-"],
+body.lang-az .social-icon i,
+body.lang-az .social-icon-hover i,
+body.lang-az .ctrl-btn i,
+body.lang-az .lang-check i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+}
+
 /* =========================================
    2. PAGE TRANSITION & GRAIN (Contact Style)
    ========================================= */
@@ -214,6 +232,12 @@ body {
     opacity: 0;
     transform: translateX(150px);
     transition: opacity 0.8s ease, transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
 }
 
 .mobile-menu.active .nav-btn {
@@ -233,10 +257,22 @@ body {
 .mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
 .mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
 
+body.lang-az .nav-btn {
+    font-size: 3.2vw;
+    letter-spacing: 2px;
+    margin: -0.5vh 0;
+}
+
 .nav-text {
     display: block;
     color: #fff;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    position: relative;
+    z-index: 2;
 }
 
 .nav-btn::after {
@@ -251,10 +287,18 @@ body {
     align-items: center;
     justify-content: center;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    z-index: 1;
+    pointer-events: none;
 }
 
-.nav-btn:hover .nav-text { transform: translateY(-100%) skewY(5deg); }
-.nav-btn:hover::after { transform: translateY(-100%) skewY(0deg); }
+.nav-btn:hover .nav-text { transform: translateY(-100%) skewY(5deg) translateZ(0); }
+.nav-btn:hover::after { transform: translateY(-100%) skewY(0deg) translateZ(0); }
+.nav-btn:not(:hover) .nav-text { transform: translateY(0) skewY(0deg) translateZ(0); }
+.nav-btn:not(:hover)::after { transform: translateY(0) translateZ(0); }
 
 /* MENU FOOTER */
 .menu-footer {
@@ -394,6 +438,251 @@ body {
 .main-content {
     max-width: 900px;
     margin: 0 auto;
+}
+
+/* ============================================================
+   GLOBE LANGUAGE SELECTOR - MINIMAL
+   ============================================================ */
+
+.lang-selector {
+    position: fixed;
+    top: 45px;
+    right: 175px;
+    z-index: 30000;
+}
+
+.lang-globe-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.globe-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Globe - ince xətlərlə çəkilmiş */
+.globe-icon::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Üfüqi xətt */
+.globe-icon::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.6);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Şaquli ellips */
+.globe-icon i {
+    display: none;
+}
+
+.globe-icon .globe-ellipse {
+    position: absolute;
+    width: 10px;
+    height: 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover - Globe fırlanır */
+.lang-globe-btn:hover .globe-icon {
+    transform: rotate(20deg);
+}
+
+.lang-globe-btn:hover .globe-icon::before,
+.lang-globe-btn:hover .globe-icon::after,
+.lang-globe-btn:hover .globe-ellipse {
+    border-color: #fff;
+}
+
+.lang-globe-btn:hover .globe-icon::after {
+    background: #fff;
+}
+
+/* Active state - Dropdown açıqdır */
+.lang-selector.active .globe-icon {
+    transform: rotate(0deg);
+    animation: globePulse 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-selector.active .globe-icon::before {
+    border-color: #FFA500;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+}
+
+.lang-selector.active .globe-icon::after {
+    background: #FFA500;
+    box-shadow: 0 0 8px rgba(255, 165, 0, 0.4);
+}
+
+.lang-selector.active .globe-ellipse {
+    border-color: #FFA500;
+    animation: ellipseRotate 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Globe pulse animasiyası */
+@keyframes globePulse {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    30% {
+        transform: scale(1.15) rotate(-10deg);
+    }
+    60% {
+        transform: scale(0.95) rotate(5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* Ellips fırlanma animasiyası */
+@keyframes ellipseRotate {
+    0% {
+        transform: rotateY(0deg);
+        width: 10px;
+    }
+    50% {
+        transform: rotateY(90deg);
+        width: 2px;
+    }
+    100% {
+        transform: rotateY(180deg);
+        width: 10px;
+    }
+}
+
+.current-lang {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-globe-btn:hover .current-lang {
+    color: #fff;
+    letter-spacing: 2px;
+}
+
+.lang-selector.active .current-lang {
+    color: #FFA500;
+}
+
+/* Dropdown */
+.lang-dropdown {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    min-width: 160px;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transform-origin: top right;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 30001;
+}
+
+.lang-selector.active .lang-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.lang-option:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.lang-option.active {
+    background: rgba(255, 165, 0, 0.1);
+}
+
+.lang-code {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 1px;
+    min-width: 24px;
+}
+
+.lang-option.active .lang-code {
+    color: #FFA500;
+}
+
+.lang-name {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    flex: 1;
+    text-align: left;
+}
+
+.lang-option:hover .lang-name {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.lang-option.active .lang-name {
+    color: rgba(255, 165, 0, 0.7);
+}
+
+.lang-check {
+    font-size: 10px;
+    color: #FFA500;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-option.active .lang-check {
+    opacity: 1;
+    transform: scale(1);
 }
 
 /* =========================================

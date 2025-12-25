@@ -1,5 +1,5 @@
 // ============================================
-// CINECHORD ADMIN PANEL - UPDATED
+// CINECHORD ADMIN PANEL - FIXED & UPDATED
 // ============================================
 
 // ✅ URL TƏNZİMLƏMƏLƏRİ
@@ -10,7 +10,7 @@ const BASE_URL = "https://cinechord-admin-production.up.railway.app";
 
 const UPLOADS_URL = `${BASE_URL}/uploads/`;
 
-// API
+// API ENDPOINTS
 const API = {
     LOGIN: `${BASE_URL}/api/auth/login`,
     WORKS: `${BASE_URL}/admin/works`,
@@ -19,7 +19,7 @@ const API = {
     ABOUT: `${BASE_URL}/admin/about`
 };
 
-// GLOBAL
+// GLOBAL VARIABLES
 let worksChart, categoryChart;
 let currentPage = 0;
 const pageSize = 20;
@@ -28,7 +28,7 @@ let selectedItems = [];
 let worksDataCache = [];
 
 // ============================================
-// UTILS
+// UTILS (KÖMƏKÇİ FUNKSİYALAR)
 // ============================================
 
 function getImageUrl(url) {
@@ -46,7 +46,7 @@ function formatDate(dateString) {
     });
 }
 
-// TOKEN EXPIRY
+// TOKEN EXPIRY CHECK
 function checkTokenExpiry() {
     const token = localStorage.getItem('jwt_token');
     if(!token) return;
@@ -60,7 +60,7 @@ function checkTokenExpiry() {
 setInterval(checkTokenExpiry, 60000);
 
 // ============================================
-// AUTH
+// AUTH (GİRİŞ SİSTEMİ)
 // ============================================
 
 function checkAuth() {
@@ -97,7 +97,7 @@ async function authFetch(url, options = {}) {
     }
 }
 
-// LOGIN
+// LOGIN SUBMIT
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const username = document.getElementById('loginUser').value;
@@ -314,13 +314,12 @@ async function deleteWork(id) {
     if(r.isConfirmed) {
         try {
             const res = await authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' });
-            
             if (res && res.ok) {
                 Swal.fire('Silindi', '', 'success');
                 loadWorks(currentPage);
                 loadDashboard();
             } else {
-                Swal.fire('Xəta', 'Silmək mümkün olmadı. Server xətası.', 'error');
+                Swal.fire('Xəta', 'Silmək mümkün olmadı.', 'error');
             }
         } catch (e) {
             Swal.fire('Xəta', 'Sistem xətası', 'error');
@@ -328,7 +327,7 @@ async function deleteWork(id) {
     }
 }
 
-// --- MODAL & FORM ---
+// --- WORK MODAL & FORM ---
 function openWorkModal() {
     document.getElementById('workForm').reset();
     document.getElementById('workId').value = ''; 
@@ -338,7 +337,6 @@ function openWorkModal() {
 
 function editWorkById(id) {
     const w = worksDataCache.find(work => work.id === id);
-
     if (!w) {
         Swal.fire('Xəta', 'Məlumat tapılmadı!', 'error');
         return;
@@ -381,10 +379,7 @@ async function submitWork() {
     fd.append('agency', document.getElementById('wAgency').value);
     fd.append('location', document.getElementById('wLocation').value);
     fd.append('productionYear', document.getElementById('wYear').value);
-    
-    const isFeatured = document.getElementById('wFeatured').checked;
-    fd.append('isFeatured', isFeatured ? 'true' : 'false');
-    
+    fd.append('isFeatured', document.getElementById('wFeatured').checked ? 'true' : 'false');
     fd.append('videoUrl', document.getElementById('wVideoUrl').value);
     fd.append('description', document.getElementById('wDescription').value);
 
@@ -396,7 +391,7 @@ async function submitWork() {
 
     Swal.fire({
         title: 'Yüklənir...',
-        html: '<div style="width:100%;height:6px;background:rgba(139,92,246,0.2);border-radius:3px;overflow:hidden;"><div id="uploadProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#8b5cf6,#22d3ee);transition:width 0.3s;"></div></div>',
+        html: 'Zəhmət olmasa gözləyin...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
@@ -407,11 +402,7 @@ async function submitWork() {
 
         const xhr = new XMLHttpRequest();
         xhr.upload.addEventListener('progress', (e) => {
-            if (e.lengthComputable) {
-                const percent = Math.round((e.loaded / e.total) * 100);
-                const pb = document.getElementById('uploadProgressBar');
-                if(pb) pb.style.width = percent + '%';
-            }
+            // Optional: Progress Bar Logic here if needed
         });
 
         const token = localStorage.getItem('jwt_token');
@@ -425,23 +416,7 @@ async function submitWork() {
                 loadWorks(currentPage); 
                 loadDashboard();
             } else {
-                let errorMsg = `Server xətası: ${xhr.status}`;
-                if (xhr.responseText) {
-                    try {
-                        const errJson = JSON.parse(xhr.responseText);
-                        if(errJson.message) errorMsg = errJson.message;
-                        if(errJson.error) errorMsg = errJson.error;
-                        if(errJson.details) {
-                            errorMsg = Object.entries(errJson.details)
-                                .map(([key, val]) => `${key}: ${val}`)
-                                .join(' | ');
-                        }
-                    } catch(e) {
-                        errorMsg = xhr.responseText.substring(0, 200);
-                    }
-                }
-                console.error('❌ Error Response:', xhr.responseText);
-                Swal.fire('Xəta', errorMsg, 'error');
+                Swal.fire('Xəta', `Server xətası: ${xhr.status}`, 'error');
             }
         };
 
@@ -449,7 +424,6 @@ async function submitWork() {
         xhr.send(fd);
 
     } catch(e) { 
-        console.error('❌ submitWork Exception:', e);
         Swal.fire('Xəta', e.message, 'error'); 
     }
 }
@@ -462,12 +436,8 @@ function toggleBulkSelect(id) {
     
     const bar = document.getElementById('bulkActionsBar');
     if(bar) {
-        if(selectedItems.length > 0) {
-            bar.style.display = 'flex';
-            bar.querySelector('.bulk-count').textContent = `${selectedItems.length} iş seçildi`;
-        } else {
-            bar.style.display = 'none';
-        }
+        bar.style.display = selectedItems.length > 0 ? 'flex' : 'none';
+        bar.querySelector('.bulk-count').textContent = `${selectedItems.length} iş seçildi`;
     }
 }
 
@@ -497,7 +467,7 @@ function filterWorks() {
 }
 
 // ============================================
-// SERVICES (XİDMƏTLƏR)
+// SERVICES (XİDMƏTLƏR) - FIXED & UPDATED
 // ============================================
 
 async function loadServices() {
@@ -532,6 +502,7 @@ async function loadServices() {
 }
 
 function openServiceModal() {
+    // MODAL AÇILANDA FORMU TAM TƏMİZLƏYİR
     document.getElementById('serviceForm').reset();
     document.getElementById('serviceId').value = '';
     new bootstrap.Modal(document.getElementById('serviceModal')).show();
@@ -539,22 +510,90 @@ function openServiceModal() {
 
 async function submitService() {
     const fd = new FormData();
-    fd.append('title', document.getElementById('sTitle').value);
-    fd.append('iconClass', document.getElementById('sIcon').value);
-    fd.append('description', document.getElementById('sDesc').value);
     
+    // 1. DƏYƏRLƏRİ OXUYURUQ
+    const title = document.getElementById('sTitle').value;
+    let titleAz = document.getElementById('sTitleAz').value; 
+    
+    const desc = document.getElementById('sDesc').value;
+    let descAz = document.getElementById('sDescAz').value;
+
+    const bulletPointsText = document.getElementById('sBulletPoints').value;
+    let bulletPointsAzText = document.getElementById('sBulletPointsAz').value;
+
+    const processStepsText = document.getElementById('sProcessSteps').value;
+    let processStepsAzText = document.getElementById('sProcessStepsAz').value;
+
+    // --- AVTOMATİK KOPYALAMA (NULL CHECK FIX) ---
+    // Əgər AZ başlıq boşdursa, İngilis başlığını ora yaz
+    if (!titleAz || titleAz.trim() === "") {
+        titleAz = title; 
+    }
+    // Təsvir boşdursa
+    if (!descAz || descAz.trim() === "") {
+        descAz = desc;
+    }
+    // Siyahılar boşdursa
+    if (!bulletPointsAzText || bulletPointsAzText.trim() === "") {
+        bulletPointsAzText = bulletPointsText;
+    }
+    if (!processStepsAzText || processStepsAzText.trim() === "") {
+        processStepsAzText = processStepsText;
+    }
+    // ------------------------------------------
+
+    // 2. FORMDATA-YA ƏLAVƏ EDİRİK
+    fd.append('title', title);
+    fd.append('titleAz', titleAz);
+    fd.append('iconClass', document.getElementById('sIcon').value);
+    fd.append('description', desc);
+    fd.append('descriptionAz', descAz);
+    
+    // Bullet Points Arrays
+    const bulletPoints = bulletPointsText.split('\n').filter(line => line.trim() !== '');
+    bulletPoints.forEach(point => fd.append('bulletPoints', point.trim()));
+    
+    const bulletPointsAz = bulletPointsAzText.split('\n').filter(line => line.trim() !== '');
+    bulletPointsAz.forEach(point => fd.append('bulletPointsAz', point.trim()));
+    
+    // Process Steps Arrays
+    const processSteps = processStepsText.split('\n').filter(line => line.trim() !== '');
+    processSteps.forEach(step => fd.append('processSteps', step.trim()));
+    
+    const processStepsAz = processStepsAzText.split('\n').filter(line => line.trim() !== '');
+    processStepsAz.forEach(step => fd.append('processStepsAz', step.trim()));
+    
+    // Video Fayl
     const video = document.getElementById('sVideoFile').files[0];
     if(video) fd.append('videoFile', video);
     
-    Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
+    // Loading Animation
+    Swal.fire({
+        title: 'Yüklənir...', 
+        html: 'Zəhmət olmasa gözləyin, video böyükdüsə vaxt ala bilər.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
     
-    const res = await authFetch(`${API.SERVICES}`, { method: 'POST', body: fd });
-    if(res && res.ok) {
-        Swal.fire('Uğurlu', 'Xidmət əlavə edildi', 'success');
-        bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
-        loadServices();
-    } else {
-        Swal.fire('Xəta', 'Xidmət əlavə edilmədi', 'error');
+    try {
+        const res = await authFetch(`${API.SERVICES}`, { method: 'POST', body: fd });
+        
+        if(res && res.ok) {
+            Swal.fire('Uğurlu', 'Xidmət uğurla yaradıldı!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
+            loadServices();
+            loadDashboard();
+        } else {
+            let errorMsg = 'Xidmət əlavə edilmədi';
+            try {
+                const errData = await res.json();
+                if(errData.message) errorMsg = errData.message;
+            } catch(e) {}
+            Swal.fire('Xəta', errorMsg, 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        Swal.fire('Xəta', 'Serverlə əlaqə kəsildi', 'error');
     }
 }
 
@@ -576,7 +615,7 @@ async function deleteService(id) {
 }
 
 // ============================================
-// MESSAGES (MESAJLAR) - REDESIGNED
+// MESSAGES (MESAJLAR)
 // ============================================
 
 async function loadMessages() {
@@ -613,10 +652,7 @@ async function loadMessages() {
             
             const safeName = (m.name || 'Adsız').replace(/'/g, "\\'").replace(/"/g, '&quot;');
             const safeEmail = (m.email || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-            const safeMsg = (m.message || '')
-                .replace(/'/g, "\\'")
-                .replace(/"/g, '&quot;')
-                .replace(/\n/g, '<br>');
+            const safeMsg = (m.message || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '<br>');
             
             const displayDate = formatDate(m.createdAt || m.sentAt);
             const preview = (m.message || '').substring(0, 50) + ((m.message?.length || 0) > 50 ? '...' : '');
@@ -676,10 +712,7 @@ async function viewMessage(id, name, email, message) {
 }
 
 async function deleteMessage(id) {
-    if (!id || id <= 0) {
-        Swal.fire('Xəta', 'Mesaj ID-si etibarsızdır.', 'error');
-        return;
-    }
+    if (!id || id <= 0) return;
 
     const r = await Swal.fire({
         title: 'Mesaj silinsin?',
@@ -695,17 +728,14 @@ async function deleteMessage(id) {
     if(r.isConfirmed) {
         try {
             const res = await authFetch(`${API.CONTACTS}/${id}`, { method: 'DELETE' }); 
-            
             if(res && res.ok) {
                 Swal.fire('Silindi!', 'Mesaj uğurla silindi.', 'success');
                 loadMessages();
                 loadDashboard();
             } else {
-                const errorText = await res?.text() || 'Bilinməyən xəta';
-                Swal.fire('Xəta', `Mesaj silinmədi: ${errorText}`, 'error');
+                Swal.fire('Xəta', 'Mesaj silinmədi.', 'error');
             }
         } catch(e) {
-            console.error('Mesaj silinərkən xəta:', e);
             Swal.fire('Xəta', 'Şəbəkə xətası baş verdi.', 'error');
         }
     }
@@ -722,26 +752,38 @@ async function loadAbout() {
         
         const data = await res.json();
         document.getElementById('aMainTitle').value = data.mainTitle || '';
+        document.getElementById('aMainTitleAz').value = data.mainTitleAz || '';
         document.getElementById('aSubTitle').value = data.subTitle || '';
+        document.getElementById('aSubTitleAz').value = data.subTitleAz || '';
         document.getElementById('aWho').value = data.whoWeAreText || '';
+        document.getElementById('aWhoAz').value = data.whoWeAreTextAz || '';
         document.getElementById('aMission').value = data.ourMissionText || '';
+        document.getElementById('aMissionAz').value = data.ourMissionTextAz || '';
         document.getElementById('aApproach').value = data.ourApproachText || '';
+        document.getElementById('aApproachAz').value = data.ourApproachTextAz || '';
         document.getElementById('aEmail').value = data.email || '';
         document.getElementById('aPhone').value = data.phone || '';
         document.getElementById('aAddress').value = data.address || '';
+        document.getElementById('aAddressAz').value = data.addressAz || '';
     } catch(e) { console.error(e); }
 }
 
 document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
     const fd = new FormData();
     fd.append('mainTitle', document.getElementById('aMainTitle').value);
+    fd.append('mainTitleAz', document.getElementById('aMainTitleAz').value);
     fd.append('subTitle', document.getElementById('aSubTitle').value);
+    fd.append('subTitleAz', document.getElementById('aSubTitleAz').value);
     fd.append('whoWeAreText', document.getElementById('aWho').value);
+    fd.append('whoWeAreTextAz', document.getElementById('aWhoAz').value);
     fd.append('ourMissionText', document.getElementById('aMission').value);
+    fd.append('ourMissionTextAz', document.getElementById('aMissionAz').value);
     fd.append('ourApproachText', document.getElementById('aApproach').value);
+    fd.append('ourApproachTextAz', document.getElementById('aApproachAz').value);
     fd.append('email', document.getElementById('aEmail').value);
     fd.append('phone', document.getElementById('aPhone').value);
     fd.append('address', document.getElementById('aAddress').value);
+    fd.append('addressAz', document.getElementById('aAddressAz').value);
     
     const video = document.getElementById('aVideoFile').files[0];
     if(video) fd.append('videoFile', video);

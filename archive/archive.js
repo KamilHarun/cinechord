@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Main JavaScript
-   Version: 6.4 - LOGO CLICK FIXED
+   Version: 6.5 - SCRAMBLE EFFECT BUG FIXED
    ============================================================ */
 
 (function() {
@@ -64,6 +64,10 @@
     let activityTimeout = null;
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
+    // Global translations object
+    window.translations = null;
+    window.currentLang = 'en';
+
     /* ============================================================
        4. PAGE TRANSITION SYSTEM
        ============================================================ */
@@ -118,7 +122,6 @@
             const href = this.getAttribute('href');
             
             if (!href) {
-                // Əgər href yoxdursa, default olaraq ana səhifəyə yönləndir
                 navigateWithTransition('../');
                 return;
             }
@@ -126,12 +129,249 @@
             navigateWithTransition(href);
         });
 
-        // Touch event üçün də əlavə et (mobile üçün)
         logo.addEventListener('touchend', function(e) {
             e.preventDefault();
             const href = this.getAttribute('href') || '../';
             navigateWithTransition(href);
         }, { passive: false });
+    }
+
+    /* ============================================================
+       5. TRANSLATION SYSTEM
+       ============================================================ */
+
+    async function loadTranslations() {
+        try {
+            const response = await fetch('../lang/archive.json');
+            if (!response.ok) throw new Error('Translation file not found');
+            window.translations = await response.json();
+            console.log('Translations loaded:', window.translations);
+            return window.translations;
+        } catch (error) {
+            console.error('Error loading translations:', error);
+            // Fallback translations
+            window.translations = {
+                "en": {
+                    "menu": "MENU",
+                    "close": "CLOSE",
+                    "home": "HOME",
+                    "work": "WORK",
+                    "service": "SERVICE",
+                    "archive": "ARCHIVE",
+                    "about": "ABOUT",
+                    "contact": "CONTACT",
+                    "archive_title": "ARCHIVE",
+                    "play": "PLAY",
+                    "address": "ADDRESS",
+                    "get_in_touch": "GET IN TOUCH",
+                    "follow_us": "FOLLOW US"
+                },
+                "az": {
+                    "menu": "MENYU",
+                    "close": "BAĞLA",
+                    "home": "ANA SƏHİFƏ",
+                    "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR",
+                    "archive": "ARXİV",
+                    "about": "HAQQIMIZDA",
+                    "contact": "ƏLAQƏ",
+                    "archive_title": "ARXİV",
+                    "play": "BAŞLAT",
+                    "address": "ÜNVAN",
+                    "get_in_touch": "ƏLAQƏ SAXLAYIN",
+                    "follow_us": "BİZİ İZLƏYİN"
+                }
+            };
+            return window.translations;
+        }
+    }
+
+    function applyTranslations(lang) {
+        if (!window.translations || !window.translations[lang]) {
+            console.warn('Translations not available for:', lang);
+            return;
+        }
+
+        const t = window.translations[lang];
+        window.currentLang = lang;
+
+        // Hamburger Menu Text
+        const hamburgerTextEl = document.querySelector('.hamburger-text');
+        if (hamburgerTextEl) {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isMenuOpen = hamburgerBtn && hamburgerBtn.classList.contains('active');
+            hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
+        }
+
+        // Navigation Buttons
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            const navText = btn.querySelector('.nav-text');
+            const key = btn.getAttribute('data-key');
+            
+            if (key && t[key]) {
+                if (navText) navText.textContent = t[key];
+                btn.setAttribute('data-text', t[key]);
+            }
+        });
+
+        // Archive Title
+        const archiveTitle = document.querySelector('.archive-title');
+        if (archiveTitle) {
+            const key = archiveTitle.getAttribute('data-key');
+            if (key && t[key]) {
+                archiveTitle.textContent = t[key];
+            }
+        }
+
+        // Play Button
+        const playTexts = document.querySelectorAll('.play-text');
+        playTexts.forEach(el => {
+            if (t.play) {
+                el.textContent = t.play;
+                el.setAttribute('data-text', t.play);
+            }
+        });
+
+        // Footer Labels
+        const footerLabels = document.querySelectorAll('.footer-label');
+        footerLabels.forEach(label => {
+            const key = label.getAttribute('data-key');
+            if (key && t[key]) {
+                label.textContent = t[key];
+            }
+        });
+
+        // Table Headers
+        const tableHeaders = document.querySelectorAll('.archive-table th[data-key]');
+        tableHeaders.forEach(header => {
+            const key = header.getAttribute('data-key');
+            if (key && t[key]) {
+                header.textContent = t[key];
+            }
+        });
+
+        // Archive Subtitle
+        const archiveSubtitle = document.querySelector('.archive-subtitle');
+        if (archiveSubtitle) {
+            const fullFilmSpan = archiveSubtitle.querySelector('span[data-key="full_film_available"]');
+            const shootMessageLink = archiveSubtitle.querySelector('a[data-key="shoot_message"]');
+            
+            if (fullFilmSpan && t.full_film_available) {
+                fullFilmSpan.textContent = t.full_film_available;
+            }
+            
+            if (shootMessageLink && t.shoot_message) {
+                shootMessageLink.textContent = t.shoot_message;
+            }
+        }
+
+        // Apply font class
+        if (lang === 'az') {
+            document.body.classList.add('lang-az');
+            document.documentElement.setAttribute('lang', 'az');
+        } else {
+            document.body.classList.remove('lang-az');
+            document.documentElement.setAttribute('lang', 'en');
+        }
+
+        console.log('Translations applied for:', lang);
+    }
+
+    /* ============================================================
+       6. GLOBE LANGUAGE SELECTOR
+       ============================================================ */
+
+    function initLanguageSelector() {
+        const langSelector = document.getElementById('langSelector');
+        const langGlobeBtn = document.getElementById('langGlobeBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLangText = document.getElementById('currentLangText');
+        
+        if (!langSelector || !langGlobeBtn) return;
+        
+        // LocalStorage-dən dil seçimini yüklə
+        const savedLang = localStorage.getItem('selectedLang') || 'en';
+        window.currentLang = savedLang;
+        
+        // Seçilmiş dili tətbiq et (translations zaten yüklenmiş olmalı)
+        applyTranslations(savedLang);
+        
+        langOptions.forEach(option => {
+            if (option.dataset.lang === savedLang) {
+                option.classList.add('active');
+                if (currentLangText) {
+                    currentLangText.textContent = savedLang.toUpperCase();
+                }
+            } else {
+                option.classList.remove('active');
+            }
+        });
+        
+        // Globe düyməsinə klik - dropdown aç/bağla
+        langGlobeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            langSelector.classList.toggle('active');
+        });
+        
+        // Dil seçimlərinə klik
+        langOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const lang = option.dataset.lang;
+                
+                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
+                if (option.classList.contains('active')) {
+                    langSelector.classList.remove('active');
+                    return;
+                }
+                
+                // Aktiv classını dəyiş
+                langOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Current lang text-i yenilə
+                if (currentLangText) {
+                    currentLangText.textContent = lang.toUpperCase();
+                }
+                
+                // LocalStorage-ə yadda saxla
+                localStorage.setItem('selectedLang', lang);
+                
+                // Tərcümələri tətbiq et
+                applyTranslations(lang);
+                
+                // Dropdown-u bağla
+                setTimeout(() => {
+                    langSelector.classList.remove('active');
+                }, 200);
+                
+                // Event göndər
+                document.dispatchEvent(new CustomEvent('languageChanged', { 
+                    detail: { language: lang } 
+                }));
+                
+                console.log('Language changed to:', lang);
+            });
+        });
+        
+        // Xaricdə klik - dropdown-u bağla
+        document.addEventListener('click', (e) => {
+            if (!langSelector.contains(e.target)) {
+                langSelector.classList.remove('active');
+            }
+        });
+        
+        // ESC düyməsi - dropdown-u bağla
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && langSelector.classList.contains('active')) {
+                langSelector.classList.remove('active');
+            }
+        });
     }
 
     /* ============================================================
@@ -159,7 +399,12 @@
             if (overlay) overlay.classList.toggle('active');
             
             if (hamburgerText) {
-                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+                if (window.translations && window.translations[window.currentLang]) {
+                    const t = window.translations[window.currentLang];
+                    hamburgerText.textContent = isActive ? t.menu : t.close;
+                } else {
+                    hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+                }
             }
             
             if (!isActive) {
@@ -175,35 +420,29 @@
             }
         }
 
-        // Event Delegation ilə hamburger click - ikonlara basanda da işləyir
         function handleHamburgerClick(e) {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
         }
 
-        // Click event
         hamburger.addEventListener('click', handleHamburgerClick);
         
-        // Touch event - mobile üçün daha etibarlı
         hamburger.addEventListener('touchend', function(e) {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
         }, { passive: false });
 
-        // Həmçinin document səviyyəsində event delegation
         document.addEventListener('click', function(e) {
-            // Hamburger və ya onun child-larına basılıbsa
             if (e.target.id === 'hamburgerBtn' || e.target.closest('#hamburgerBtn')) {
-                // Artıq yuxarıdakı listener handle edib, amma əgər etməyibsə:
                 if (!e.defaultPrevented) {
                     e.preventDefault();
                     e.stopPropagation();
                     toggleMenu();
                 }
             }
-        }, true); // Capture phase-də tutmaq üçün
+        }, true);
 
         if (overlay) {
             overlay.addEventListener('click', function(e) {
@@ -373,11 +612,13 @@
     }
 
     /* ============================================================
-       10. TABLE ROW EFFECTS
+       10. TABLE ROW EFFECTS - SCRAMBLE BUG FIXED
        ============================================================ */
 
     function attachTableRowEffects() {
         document.querySelectorAll('.archive-table tbody tr').forEach(row => {
+            
+            // Row click - video modal aç
             row.addEventListener('click', function() {
                 const videoSrc = this.getAttribute('data-video-src');
                 const title = this.getAttribute('data-title');
@@ -387,18 +628,27 @@
                 openModal(videoSrc, `${client} - ${title}`);
             });
 
+            // ===== SCRAMBLE EFFECT - DÜZƏLDİLMİŞ VERSİYA =====
             row.addEventListener('mouseenter', function() {
                 const cells = this.querySelectorAll('td:not(.number-col)');
-                const originalTexts = {};
-
+                
                 cells.forEach(cell => {
-                    originalTexts[cell.className] = cell.textContent;
-                });
-
-                cells.forEach(cell => {
-                    const originalText = originalTexts[cell.className];
+                    // Əvvəlki interval varsa, onu clear et
+                    if (cell._scrambleInterval) {
+                        clearInterval(cell._scrambleInterval);
+                        cell._scrambleInterval = null;
+                    }
+                    
+                    // Orijinal mətni YALNIZ ilk dəfə saxla
+                    // Əgər artıq saxlanılıbsa, onu istifadə et
+                    if (!cell.dataset.originalText) {
+                        cell.dataset.originalText = cell.textContent;
+                    }
+                    
+                    const originalText = cell.dataset.originalText;
                     let iteration = 0;
-                    const interval = setInterval(() => {
+                    
+                    cell._scrambleInterval = setInterval(() => {
                         let newText = '';
                         for (let i = 0; i < originalText.length; i++) {
                             if (i < iteration) {
@@ -408,22 +658,30 @@
                             }
                         }
                         cell.textContent = newText;
-                        iteration += 1 / 2.5;
+                        iteration += 1 / 3.5;
+                        
                         if (iteration >= originalText.length) {
-                            clearInterval(interval);
-                            cell.textContent = originalText;
+                            clearInterval(cell._scrambleInterval);
+                            cell._scrambleInterval = null;
+                            cell.textContent = originalText; // Mütləq orijinalı qoy
                         }
                     }, 30);
-
-                    cell.dataset.scrambleInterval = interval;
                 });
             });
 
             row.addEventListener('mouseleave', function() {
                 const cells = this.querySelectorAll('td:not(.number-col)');
+                
                 cells.forEach(cell => {
-                    if (cell.dataset.scrambleInterval) {
-                        clearInterval(parseInt(cell.dataset.scrambleInterval));
+                    // İntervalı dayandır
+                    if (cell._scrambleInterval) {
+                        clearInterval(cell._scrambleInterval);
+                        cell._scrambleInterval = null;
+                    }
+                    
+                    // VACİB: Orijinal mətni bərpa et!
+                    if (cell.dataset.originalText) {
+                        cell.textContent = cell.dataset.originalText;
                     }
                 });
             });
@@ -599,11 +857,9 @@
        ============================================================ */
     
     function setupOtherLinks() {
-        // Logo xaric bütün internal linklər
         const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"]):not(.center-logo)');
         
         internalLinks.forEach(link => {
-            // Mobil menunun içindəki linklərə toxunmuruq (ayrıca handle olunur)
             if (link.closest('.mobile-menu')) return;
 
             link.addEventListener('click', function(e) {
@@ -624,14 +880,16 @@
        13. INITIALIZATION
        ============================================================ */
     
-    function init() {
+    async function init() {
+        await loadTranslations();
         initPageTransition();
-        initLogoClick();       // Logo ayrıca handle olunur
+        initLogoClick();
+        initLanguageSelector();
         initMobileMenu();
         initScrollReveal();
         initVideoModal();
         loadArchiveData();
-        setupOtherLinks();     // Digər linklər
+        setupOtherLinks();
     }
 
     if (document.readyState === 'loading') {

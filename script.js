@@ -1,12 +1,15 @@
 /* ============================================================
    CineChord Index - Main JavaScript
-   Version: 4.6 - WORKS İLƏ EYNİLƏŞDİRİLMİŞ
+   Version: 5.2 - VIDEO STARTS AFTER LOADING COMPLETE
    ============================================================ */
+
+       const SHOWREEL_VIDEO_URL = "https://player.cloudinary.com/embed/?cloud_name=dinncr6hs&public_id=CineChord_Showreel_1_1_y9lq3g&profile=cld-default";
+
 
 // Global video configuration
 window.CONFIG = {
     videos: [
-        'videos/Showreel.mp4',
+        'videos/CineChord_Showreel.mp4',
         'videos/ABB-TamGenc-Card.mp4',
         'videos/Bakcell-099.mp4',
         'videos/Yaz-furseti-kampaniyasi.mp4',
@@ -15,6 +18,11 @@ window.CONFIG = {
     titles: ['SHOWREEL', 'ABB TAM GENC', 'BAKCELL 099', 'ABB YAZ FÜRSƏTİ', 'BAKCELL YENİ DÖVR']
 };
 window.currentIndex = 0;
+
+// Global translations object
+window.translations = null;
+// Default olaraq həmişə İngilis dili
+window.currentLang = 'en';
 
 // Global function for main play button
 window.openMainVideo = function() {
@@ -108,7 +116,8 @@ window.openMainVideo = function() {
         ".play-button-container", 
         ".right-floating-nav", 
         ".bottom-right-socials", 
-        ".bottom-left-explore"
+        ".bottom-left-explore",
+        ".lang-selector"
     ];
 
     /* ============================================================
@@ -118,6 +127,7 @@ window.openMainVideo = function() {
     let isAnimating = false;
     let activityTimeout = null;
     let currentVideoEl = elements.heroBgVideo;
+    let videoShouldPlay = false; // Flag videoyu nə vaxt başlatmaq üçün
 
     /* ============================================================
        4. UTILITY FUNCTIONS
@@ -131,7 +141,112 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       5. PAGE TRANSITION SYSTEM
+       5. TRANSLATION SYSTEM
+       ============================================================ */
+
+    async function loadTranslations() {
+        try {
+            const response = await fetch('lang/home.json');
+            if (!response.ok) throw new Error('Translation file not found');
+            window.translations = await response.json();
+            console.log('Translations loaded:', window.translations);
+            return window.translations;
+        } catch (error) {
+            console.error('Error loading translations:', error);
+            // Fallback translations
+            window.translations = {
+                "en": {
+                    "menu": "MENU",
+                    "close": "CLOSE",
+                    "home": "HOME",
+                    "work": "WORK",
+                    "service": "SERVICE",
+                    "archive": "ARCHIVE",
+                    "about": "ABOUT",
+                    "contact": "CONTACT",
+                    "play": "PLAY",
+                    "explore": "EXPLORE OUR WORKS",
+                    "designed_by": "Designed By Harunov"
+                },
+                "az": {
+                    "menu": "MENYU",
+                    "close": "BAĞLA",
+                    "home": "ANA SƏHİFƏ",
+                    "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR",
+                    "archive": "ARXİV",
+                    "about": "HAQQIMIZDA",
+                    "contact": "ƏLAQƏ",
+                    "play": "BAŞLAT",
+                    "explore": "İŞLƏRİMİZİ KƏŞF EDİN",
+                    "designed_by": "Dizayn: Harunov"
+                }
+            };
+            return window.translations;
+        }
+    }
+
+    function applyTranslations(lang) {
+        if (!window.translations || !window.translations[lang]) {
+            console.warn('Translations not available for:', lang);
+            return;
+        }
+
+        const t = window.translations[lang];
+        window.currentLang = lang;
+
+        // Hamburger Menu Text
+        const hamburgerTextEl = document.querySelector('.hamburger-text');
+        if (hamburgerTextEl) {
+            const isMenuOpen = hamburger && hamburger.classList.contains('active');
+            hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
+        }
+
+        // Navigation Buttons
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            const navText = btn.querySelector('.nav-text');
+            const key = btn.getAttribute('data-key');
+            
+            if (key && t[key]) {
+                if (navText) navText.textContent = t[key];
+                btn.setAttribute('data-text', t[key]);
+            }
+        });
+
+        // Play Button
+        const playTexts = document.querySelectorAll('.play-text');
+        playTexts.forEach(el => {
+            el.textContent = t.play;
+            el.setAttribute('data-text', t.play);
+        });
+
+        // Explore Button
+        const exploreText = document.querySelector('.explore-text');
+        if (exploreText) {
+            exploreText.textContent = t.explore;
+        }
+
+        // Loader Author
+        const loaderAuthorSpan = document.querySelector('.loader-author span');
+        if (loaderAuthorSpan) {
+            loaderAuthorSpan.textContent = t.designed_by;
+        }
+
+        // Apply font class
+        if (lang === 'az') {
+            document.body.classList.add('lang-az');
+            document.documentElement.setAttribute('lang', 'az');
+        } else {
+            document.body.classList.remove('lang-az');
+            document.documentElement.setAttribute('lang', 'en');
+        }
+
+        console.log('Translations applied for:', lang);
+    }
+
+    /* ============================================================
+       6. PAGE TRANSITION SYSTEM
        ============================================================ */
     
     function initPageTransition() {
@@ -168,7 +283,105 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       6. MOBILE MENU - WORKS İLƏ EYNİ
+       7. GLOBE LANGUAGE SELECTOR
+       ============================================================ */
+
+    function initLanguageSelector() {
+        const langSelector = document.getElementById('langSelector');
+        const langGlobeBtn = document.getElementById('langGlobeBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLangText = document.getElementById('currentLangText');
+        
+        if (!langSelector || !langGlobeBtn) return;
+        
+        // LocalStorage-dən dil seçimini yüklə
+        const savedLang = localStorage.getItem('selectedLang') || 'en';
+        window.currentLang = savedLang;
+        
+        // Seçilmiş dili tətbiq et
+        applyTranslations(savedLang);
+        
+        // UI-ı seçilmiş dilə uyğunlaşdır
+        langOptions.forEach(option => {
+            if (option.dataset.lang === savedLang) {
+                option.classList.add('active');
+                if (currentLangText) {
+                    currentLangText.textContent = savedLang.toUpperCase();
+                }
+            } else {
+                option.classList.remove('active');
+            }
+        });
+        
+        // Globe düyməsinə klik - dropdown aç/bağla
+        langGlobeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            langSelector.classList.toggle('active');
+        });
+        
+        // Dil seçimlərinə klik
+        langOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const lang = option.dataset.lang;
+                
+                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
+                if (option.classList.contains('active')) {
+                    langSelector.classList.remove('active');
+                    return;
+                }
+                
+                // Aktiv classını dəyiş
+                langOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Current lang text-i yenilə
+                if (currentLangText) {
+                    currentLangText.textContent = lang.toUpperCase();
+                }
+                
+                // LocalStorage-ə yadda saxla (istifadəçi manual dəyişdirdikdə)
+                // Amma səhifə yenilənəndə yenə EN olacaq
+                localStorage.setItem('selectedLang', lang);
+                
+                // Tərcümələri tətbiq et
+                applyTranslations(lang);
+                
+                // Dropdown-u bağla
+                setTimeout(() => {
+                    langSelector.classList.remove('active');
+                }, 200);
+                
+                // Event göndər (başqa komponentlər üçün)
+                document.dispatchEvent(new CustomEvent('languageChanged', { 
+                    detail: { language: lang } 
+                }));
+                
+                console.log('Language changed to:', lang);
+            });
+        });
+        
+        // Xaricdə klik - dropdown-u bağla
+        document.addEventListener('click', (e) => {
+            if (!langSelector.contains(e.target)) {
+                langSelector.classList.remove('active');
+            }
+        });
+        
+        // ESC düyməsi - dropdown-u bağla
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && langSelector.classList.contains('active')) {
+                langSelector.classList.remove('active');
+            }
+        });
+    }
+
+    /* ============================================================
+       8. MOBILE MENU
        ============================================================ */
 
     function toggleMenu() {
@@ -177,12 +390,18 @@ window.openMainVideo = function() {
         const isActive = hamburger.classList.contains('active');
         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
         
+        // Dil dropdown-unu bağla
+        const langSelector = document.getElementById('langSelector');
+        if (langSelector) langSelector.classList.remove('active');
+        
         hamburger.classList.toggle('active');
         mobileMenu.classList.toggle('active');
         if (overlay) overlay.classList.toggle('active');
         
-        if (hamburgerText) {
-            hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+        // Hamburger text-i dil sisteminə uyğun dəyiş
+        if (hamburgerText && window.translations && window.translations[window.currentLang]) {
+            const t = window.translations[window.currentLang];
+            hamburgerText.textContent = isActive ? t.menu : t.close;
         }
         
         if (!isActive) {
@@ -204,21 +423,18 @@ window.openMainVideo = function() {
             return;
         }
 
-        // Sadə click event - Works ilə eyni
         hamburger.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
         });
 
-        // Overlay click
         if (overlay) {
             overlay.addEventListener('click', () => {
                 toggleMenu();
             });
         }
 
-        // Menu linkləri
         navBtns.forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
@@ -238,7 +454,6 @@ window.openMainVideo = function() {
             });
         });
 
-        // ESC düyməsi
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (elements.previewContainer && elements.previewContainer.classList.contains('active')) {
@@ -253,7 +468,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       7. GSAP ANIMATIONS
+       9. GSAP ANIMATIONS
        ============================================================ */
     
     function initGSAP() {
@@ -288,6 +503,11 @@ window.openMainVideo = function() {
                     onComplete: () => {
                         if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
                         revealSite();
+                        // Loading bitdikdən SONRA videoyu başlat
+                        videoShouldPlay = true;
+                        if (window.startHeroVideo) {
+                            setTimeout(() => window.startHeroVideo(), 300);
+                        }
                     }
                 });
             }
@@ -297,7 +517,17 @@ window.openMainVideo = function() {
     function revealSite(isPageTransition = false) {
         if (typeof gsap === 'undefined') return;
         
-        const mainTl = gsap.timeline();
+        const mainTl = gsap.timeline({
+            onComplete: () => {
+                // Site reveal bitdikdən sonra videoyu başlat (page transition halında)
+                if (isPageTransition) {
+                    videoShouldPlay = true;
+                    if (window.startHeroVideo) {
+                        setTimeout(() => window.startHeroVideo(), 300);
+                    }
+                }
+            }
+        });
         
         if (isPageTransition && elements.loadingScreen) {
             mainTl.to(elements.loadingScreen, {
@@ -310,6 +540,7 @@ window.openMainVideo = function() {
         const startDelay = isPageTransition ? "-=0.7" : 0;
 
         mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
+        mainTl.to(".lang-selector", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.05);
         mainTl.to(".play-button-container", { y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out" }, startDelay + 0.1);
         mainTl.to(".right-floating-nav", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.15);
         mainTl.to(".bottom-right-socials", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.2);
@@ -317,8 +548,9 @@ window.openMainVideo = function() {
     }
     
     /* ============================================================
-       8. VIDEO AUTOPLAY CHECK
+       10. VIDEO AUTOPLAY CHECK
        ============================================================ */
+    
     function initVideoAutoplay() {
         if (!elements.heroBgVideo) return;
         
@@ -334,7 +566,14 @@ window.openMainVideo = function() {
         video.removeAttribute('controls');
         video.controls = false;
         
+        // Video avtomatik başlamasın - load edilsin sadəcə
+        video.pause();
+        video.load();
+        
         function attemptPlay() {
+            // Yalnız loading bitib videoShouldPlay true olduqda başlasın
+            if (!videoShouldPlay) return;
+            
             const playPromise = video.play();
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
@@ -353,29 +592,31 @@ window.openMainVideo = function() {
             }
         }
         
-        if (video.readyState >= 3) {
-            attemptPlay();
-        } else {
-            video.addEventListener('loadeddata', attemptPlay, { once: true });
-            video.addEventListener('canplay', attemptPlay, { once: true });
-            video.addEventListener('loadedmetadata', attemptPlay, { once: true });
-        }
+        // Metadata yükləndikdə hazır ol amma başlatma
+        video.addEventListener('loadedmetadata', () => {
+            console.log('Video metadata loaded, waiting for loading screen to finish');
+        }, { once: true });
         
+        // Document visibility dəyişdikdə
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && video.paused) {
+            if (!document.hidden && video.paused && videoShouldPlay) {
                 attemptPlay();
             }
         });
         
+        // Video pause olduqda (əgər olmamalıdırsa)
         video.addEventListener('pause', () => {
-            if (!document.hidden && video.currentTime > 0) {
+            if (!document.hidden && video.currentTime > 0 && videoShouldPlay) {
                 setTimeout(() => attemptPlay(), 100);
             }
         });
+        
+        // Public function - xaricdən çağırmaq üçün
+        window.startHeroVideo = attemptPlay;
     }
 
     /* ============================================================
-       9. LOADING SCREEN LOGIC
+       11. LOADING SCREEN LOGIC
        ============================================================ */
     
     function initLoadingScreen() {
@@ -404,7 +645,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       10. NAVIGATION
+       12. NAVIGATION
        ============================================================ */
     
     function setupNavButtons() {
@@ -430,7 +671,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       11. VIDEO SLIDER 
+       13. VIDEO SLIDER 
        ============================================================ */
     
     function initVideoSlider() {
@@ -513,7 +754,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       12. VIDEO MODAL
+       14. VIDEO MODAL
        ============================================================ */
     
     function handleUserActivity() {
@@ -530,6 +771,7 @@ window.openMainVideo = function() {
 
     function updatePlayButtonUI() {
         const modalPlayText = document.querySelector('#modalPlayBtnContainer .play-text');
+        const t = window.translations ? window.translations[window.currentLang] : { play: 'PLAY' };
         
         if (elements.previewVideo.paused) {
             if (elements.playIcon) elements.playIcon.style.display = 'block';
@@ -537,13 +779,19 @@ window.openMainVideo = function() {
             elements.previewContainer.classList.add('is-paused');
             elements.previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
-            if (modalPlayText) modalPlayText.textContent = 'PLAY';
+            if (modalPlayText) {
+                modalPlayText.textContent = t.play;
+                modalPlayText.setAttribute('data-text', t.play);
+            }
         } else {
             if (elements.playIcon) elements.playIcon.style.display = 'none';
             if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
             elements.previewContainer.classList.remove('is-paused');
             handleUserActivity();
-            if (modalPlayText) modalPlayText.textContent = 'PAUSE';
+            if (modalPlayText) {
+                modalPlayText.textContent = 'PAUSE';
+                modalPlayText.setAttribute('data-text', 'PAUSE');
+            }
         }
     }
 
@@ -640,7 +888,7 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       13. PLAY BUTTON MOUSE FOLLOW EFFECT
+       15. PLAY BUTTON MOUSE FOLLOW EFFECT
        ============================================================ */
 
     function initPlayButtonFollow() {
@@ -700,12 +948,16 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       14. INITIALIZATION
+       16. INITIALIZATION
        ============================================================ */
     
-    function init() {
+    async function init() {
+        // Əvvəlcə tərcümələri yüklə
+        await loadTranslations();
+        
         initGSAP();
         initPageTransition();
+        initLanguageSelector();
         initMobileMenu();
         initLoadingScreen();
         initVideoAutoplay();

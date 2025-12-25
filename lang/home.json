@@ -1,0 +1,30 @@
+{
+  "en": {
+    "menu": "MENU",
+    "close": "CLOSE",
+    "home": "HOME",
+    "work": "WORK",
+    "service": "SERVICE",
+    "archive": "ARCHIVE",
+    "about": "ABOUT",
+    "contact": "CONTACT",
+    "play": "PLAY",
+    "explore": "EXPLORE OUR WORKS",
+    "designed_by": "Designed By Harunov"
+  },
+  "az": {
+    "menu": "MENYU",
+    "close": "BAĞLA",
+    "home": "ANA SƏHİFƏ",
+    "work": "İŞLƏR",
+    "service": "XİDMƏTLƏR",
+    "archive": "ARXİV",
+    "about": "HAQQIMIZDA",
+    "contact": "ƏLAQƏ",
+    "play": "BAŞLAT",
+    "explore": "İŞLƏRİMİZLƏ TANIŞ OLUN",
+    "designed_by": "Dizayn: Harunov"
+  }
+}
+
+

@@ -1,0 +1,48 @@
+{
+  "en": {
+    "menu": "MENU",
+    "close": "CLOSE",
+    "home": "HOME",
+    "work": "WORK",
+    "service": "SERVICE",
+    "archive": "ARCHIVE",
+    "about": "ABOUT",
+    "contact": "CONTACT",
+    "works": "WORKS",
+    "scroll": "Scroll",
+    "all": "ALL",
+    "films": "FILMS",
+    "commercial": "COMMERCIAL",
+    "clips": "CLIPS",
+    "play": "PLAY",
+    "view_all_works": "VIEW ALL WORKS",
+    "open_archive": "OPEN ARCHIVE",
+    "address": "ADDRESS",
+    "get_in_touch": "GET IN TOUCH",
+    "follow_us": "FOLLOW US"
+  },
+  "az": {
+    "menu": "MENYU",
+    "close": "BAĞLA",
+    "home": "ANA SƏHİFƏ",
+    "work": "İŞLƏR",
+    "service": "XİDMƏTLƏR",
+    "archive": "ARXİV",
+    "about": "HAQQIMIZDA",
+    "contact": "ƏLAQƏ",
+    "works": "İŞLƏR",
+    "scroll": "Sürüşdür",
+    "all": "HAMISI",
+    "films": "FİLMLƏR",
+    "commercial": "REKLAM",
+    "clips": "KLİPLƏR",
+    "play": "BAŞLAT",
+    "view_all_works": "BÜTÜN İŞLƏRƏ BAX",
+    "open_archive": "ARXİVİ AÇ",
+    "address": "ÜNVAN",
+    "get_in_touch": "ƏLAQƏ SAXLAYIN",
+    "follow_us": "BİZİ İZLƏYİN"
+  }
+}
+
+

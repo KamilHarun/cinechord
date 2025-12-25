@@ -18,6 +18,10 @@
         VIDEO_ROOT_MARGIN: '100px'
     };
 
+    // Global translations object
+    window.translations = null;
+    window.currentLang = 'en';
+
     /* ============================================================
         2. DOM ELEMENT REFERENCES
         ============================================================ */
@@ -92,7 +96,12 @@
         if (overlay) overlay.classList.toggle('active');
         
         if (hamburgerText) {
-            hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+            if (window.translations && window.translations[window.currentLang]) {
+                const t = window.translations[window.currentLang];
+                hamburgerText.textContent = isActive ? t.menu : t.close;
+            } else {
+                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+            }
         }
         
         // FIX: Scrollbar compensation - Jump problemini həll edir
@@ -158,6 +167,238 @@
             });
         });
     }
+
+    /* ============================================================
+       4. TRANSLATION SYSTEM
+       ============================================================ */
+
+    async function loadTranslations() {
+        try {
+            const response = await fetch('../lang/services.json');
+            if (!response.ok) throw new Error('Translation file not found');
+            window.translations = await response.json();
+            console.log('Translations loaded:', window.translations);
+            return window.translations;
+        } catch (error) {
+            console.error('Error loading translations:', error);
+            // Fallback translations
+            window.translations = {
+                "en": {
+                    "menu": "MENU",
+                    "close": "CLOSE",
+                    "home": "HOME",
+                    "work": "WORK",
+                    "service": "SERVICE",
+                    "archive": "ARCHIVE",
+                    "about": "ABOUT",
+                    "contact": "CONTACT",
+                    "our_services": "Our Services",
+                    "lets_chat": "LET'S CHAT",
+                    "contact_btn": "CONTACT",
+                    "address": "ADDRESS",
+                    "get_in_touch": "GET IN TOUCH",
+                    "follow_us": "FOLLOW US"
+                },
+                "az": {
+                    "menu": "MENYU",
+                    "close": "BAĞLA",
+                    "home": "ANA SƏHİFƏ",
+                    "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR",
+                    "archive": "ARXİV",
+                    "about": "HAQQIMIZDA",
+                    "contact": "ƏLAQƏ",
+                    "our_services": "Xidmətlərimiz",
+                    "lets_chat": "GƏLİN SÖHBƏT EDƏK",
+                    "contact_btn": "ƏLAQƏ",
+                    "address": "ÜNVAN",
+                    "get_in_touch": "ƏLAQƏ SAXLAYIN",
+                    "follow_us": "BİZİ İZLƏYİN"
+                }
+            };
+            return window.translations;
+        }
+    }
+
+    function applyTranslations(lang) {
+        if (!window.translations || !window.translations[lang]) {
+            console.warn('Translations not available for:', lang);
+            return;
+        }
+
+        const t = window.translations[lang];
+        window.currentLang = lang;
+
+        // Hamburger Menu Text
+        const hamburgerTextEl = document.querySelector('.hamburger-text');
+        if (hamburgerTextEl) {
+            const hamburger = document.getElementById('hamburgerBtn');
+            const isMenuOpen = hamburger && hamburger.classList.contains('active');
+            hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
+        }
+
+        // Navigation Buttons
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            const navText = btn.querySelector('.nav-text');
+            const key = btn.getAttribute('data-key');
+            
+            if (key && t[key]) {
+                if (navText) navText.textContent = t[key];
+                btn.setAttribute('data-text', t[key]);
+            }
+        });
+
+        // Services Title
+        const servicesTitle = document.querySelector('.services-title');
+        if (servicesTitle) {
+            const key = servicesTitle.getAttribute('data-key');
+            if (key && t[key]) {
+                const span = servicesTitle.querySelector('span');
+                if (span) span.textContent = t[key];
+                servicesTitle.setAttribute('data-text', t[key]);
+            }
+        }
+
+        // Chat Title
+        const chatTitle = document.querySelector('.chat-title');
+        if (chatTitle) {
+            const key = chatTitle.getAttribute('data-key');
+            if (key && t[key]) {
+                chatTitle.textContent = t[key];
+            }
+        }
+
+        // Contact Button
+        const contactBtn = document.querySelector('.chat-cta-button');
+        if (contactBtn) {
+            const key = contactBtn.getAttribute('data-key');
+            if (key && t[key]) {
+                contactBtn.innerHTML = t[key] + ' <i class="fas fa-long-arrow-alt-right"></i>';
+            }
+        }
+
+        // Footer Labels
+        const footerLabels = document.querySelectorAll('.footer-label');
+        footerLabels.forEach(label => {
+            const key = label.getAttribute('data-key');
+            if (key && t[key]) {
+                label.textContent = t[key];
+            }
+        });
+
+        // Apply font class
+        if (lang === 'az') {
+            document.body.classList.add('lang-az');
+            document.documentElement.setAttribute('lang', 'az');
+        } else {
+            document.body.classList.remove('lang-az');
+            document.documentElement.setAttribute('lang', 'en');
+        }
+
+        console.log('Translations applied for:', lang);
+    }
+
+    /* ============================================================
+       5. GLOBE LANGUAGE SELECTOR
+       ============================================================ */
+
+    function initLanguageSelector() {
+        const langSelector = document.getElementById('langSelector');
+        const langGlobeBtn = document.getElementById('langGlobeBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLangText = document.getElementById('currentLangText');
+        
+        if (!langSelector || !langGlobeBtn) return;
+        
+        // LocalStorage-dən dil seçimini yüklə
+        const savedLang = localStorage.getItem('selectedLang') || 'en';
+        window.currentLang = savedLang;
+        
+        // Seçilmiş dili tətbiq et (translations zaten yüklenmiş olmalı)
+        applyTranslations(savedLang);
+        
+        langOptions.forEach(option => {
+            if (option.dataset.lang === savedLang) {
+                option.classList.add('active');
+                if (currentLangText) {
+                    currentLangText.textContent = savedLang.toUpperCase();
+                }
+            } else {
+                option.classList.remove('active');
+            }
+        });
+        
+        // Globe düyməsinə klik - dropdown aç/bağla
+        langGlobeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            langSelector.classList.toggle('active');
+        });
+        
+        // Dil seçimlərinə klik
+        langOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const lang = option.dataset.lang;
+                
+                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
+                if (option.classList.contains('active')) {
+                    langSelector.classList.remove('active');
+                    return;
+                }
+                
+                // Aktiv classını dəyiş
+                langOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Current lang text-i yenilə
+                if (currentLangText) {
+                    currentLangText.textContent = lang.toUpperCase();
+                }
+                
+                // LocalStorage-ə yadda saxla
+                localStorage.setItem('selectedLang', lang);
+                
+                // Tərcümələri tətbiq et
+                applyTranslations(lang);
+                
+                // API verilerini yeniden yükle (dil değiştiğinde)
+                fetchAndRenderServices(lang);
+                
+                // Dropdown-u bağla
+                setTimeout(() => {
+                    langSelector.classList.remove('active');
+                }, 200);
+                
+                // Event göndər
+                document.dispatchEvent(new CustomEvent('languageChanged', { 
+                    detail: { language: lang } 
+                }));
+                
+                console.log('Language changed to:', lang);
+            });
+        });
+        
+        // Xaricdə klik - dropdown-u bağla
+        document.addEventListener('click', (e) => {
+            if (!langSelector.contains(e.target)) {
+                langSelector.classList.remove('active');
+            }
+        });
+        
+        // ESC düyməsi - dropdown-u bağla
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && langSelector.classList.contains('active')) {
+                langSelector.classList.remove('active');
+            }
+        });
+    }
+
+
 
     /* ============================================================
         5. GLOBAL NAVİQASİYA (Menyu xaricindəki linklər)
@@ -313,111 +554,178 @@
         return url;
     }
 
-    async function fetchAndRenderServices() {
+    // API verilerini sakla
+    let cachedServicesData = null;
+
+    async function fetchAndRenderServices(lang = 'en') {
         const container = elements.servicesContainer;
         if (!container) return;
 
         try {
-            const response = await fetch(API_SERVICES);
-            if (!response.ok) throw new Error(`API error! Status: ${response.status}`);
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:560',message:'fetchAndRenderServices called',data:{lang:lang},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
             
-            const data = await response.json();
-            const services = data.content ? data.content : data;
+            // API'ye dil parametresi gönder
+            const langParam = lang === 'az' ? 'az' : 'en';
+            const url = `${API_SERVICES}?lang=${langParam}`;
             
-            if (!services || services.length === 0) {
-                container.innerHTML = '<p style="text-align:center; padding: 100px; color: rgba(255,255,255,0.5);">No services available.</p>';
-                return;
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:567',message:'Making API request',data:{url:url,langParam:langParam},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            
+            const response = await fetch(url);
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:570',message:'API response received',data:{status:response.status,statusText:response.statusText,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            
+            if (!response.ok) {
+                // #region agent log
+                const responseClone = response.clone();
+                const errorText = await responseClone.text().catch(() => 'Could not read error response');
+                fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:570',message:'API error response body',data:{status:response.status,statusText:response.statusText,errorText:errorText.substring(0,500)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                throw new Error(`API error! Status: ${response.status}`);
             }
             
-            let htmlContent = '';
+            const data = await response.json();
             
-            services.forEach((service, index) => {
-                let videoSrc = service.videoUrl || '';
-                if (videoSrc) {
-                    videoSrc = cleanUrlPath(videoSrc);
-                    if (!videoSrc.startsWith('http')) {
-                        videoSrc = UPLOADS_URL + videoSrc;
-                    }
-                }
-                
-                const bulletListHtml = service.bulletPoints && Array.isArray(service.bulletPoints)
-                    ? service.bulletPoints.map(item => `<li>${item}</li>`).join('')
-                    : '';
-                
-                const processStepsHtml = service.processSteps && Array.isArray(service.processSteps)
-                    ? service.processSteps.map((item, i) => `<li>${i + 1}. ${item}</li>`).join('')
-                    : '';
-                
-                const titleText = (service.title || '').toUpperCase();
-
-                const mediaColumn = `
-                    <div class="media-column">
-                        <div class="media-container">
-                            <div class="media-frame">
-                                <video class="media-content" 
-                                    muted loop playsinline preload="auto"
-                                    src="${videoSrc}"> 
-                                </video>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                const contentColumn = `
-                    <div class="content-column">
-                        <div class="content-wrapper">
-                            <div class="service-header">
-                                <div class="icon-container">
-                                    <i class="${service.iconClass || 'fas fa-cogs'}"></i>
-                                </div>
-                                <h2 class="service-title" data-text="${titleText}">
-                                    <span>${titleText}</span>
-                                </h2>
-                            </div>
-                            <p class="description">${service.description || ''}</p>
-                            ${bulletListHtml ? `<ul class="bullet-list">${bulletListHtml}</ul>` : ''}
-                            ${bulletListHtml && processStepsHtml ? '<div class="divider"></div>' : ''}
-                            ${processStepsHtml ? `<ol class="numbered-list">${processStepsHtml}</ol>` : ''}
-                            <a href="../contact/" class="cta-button">
-                                CONTACT <i class="fas fa-long-arrow-alt-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                `;
-                
-                if (index % 2 === 0) {
-                    htmlContent += `<section class="page-wrapper reveal-item">${mediaColumn}${contentColumn}</section>`;
-                } else { 
-                    htmlContent += `<section class="page-wrapper reveal-item">${contentColumn}${mediaColumn}</section>`;
-                }
-            });
-
-            container.innerHTML = htmlContent;
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:572',message:'API response data parsed',data:{hasContent:!!data.content,isArray:Array.isArray(data),dataType:typeof data,servicesLength:data.content?.length||(Array.isArray(data)?data.length:0)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
             
-            initScrollReveal();
-            initVideoLazyLoad();
-            initVideoAutoplay(); // Yeni yüklenen videolar için autoplay
+            const services = data.content ? data.content : data;
+            cachedServicesData = services;
+            
+            if (!services || services.length === 0) {
+                const noServicesMsg = lang === 'az' ? 'Xidmətlər mövcud deyil.' : 'No services available.';
+                container.innerHTML = `<p style="text-align:center; padding: 100px; color: rgba(255,255,255,0.5);">${noServicesMsg}</p>`;
+                return;
+            }
+
+            renderServices(services, lang);
             
         } catch (error) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:585',message:'Error caught',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            
             console.error('Xidmətlər yüklənərkən xəta:', error);
-            container.innerHTML = `
-                <p style="text-align:center; padding: 100px; color: #FF8C00;">
-                    Xidmətlər hazırda mövcud deyil.<br>
-                    <small style="color: rgba(255,255,255,0.4);">API: ${API_SERVICES}</small>
-                </p>
-            `;
+            // Eğer önceki veri varsa onu kullan
+            if (cachedServicesData) {
+                renderServices(cachedServicesData, lang);
+            } else {
+                const errorMsg = lang === 'az' ? 'Xidmətlər hazırda mövcud deyil.' : 'Services are currently unavailable.';
+                container.innerHTML = `
+                    <p style="text-align:center; padding: 100px; color: #FF8C00;">
+                        ${errorMsg}<br>
+                        <small style="color: rgba(255,255,255,0.4);">API: ${API_SERVICES}</small><br>
+                        <small style="color: rgba(255,255,255,0.4);">Error: ${error.message}</small>
+                    </p>
+                `;
+            }
         }
+    }
+
+    function renderServices(services, lang = 'en') {
+        const container = elements.servicesContainer;
+        if (!container) return;
+        
+        let htmlContent = '';
+        
+        services.forEach((service, index) => {
+            let videoSrc = service.videoUrl || '';
+            if (videoSrc) {
+                videoSrc = cleanUrlPath(videoSrc);
+                if (!videoSrc.startsWith('http')) {
+                    videoSrc = UPLOADS_URL + videoSrc;
+                }
+            }
+            
+            // Backend artık lang parametresine göre doğru dildeki veriyi title, description gibi alanlara koyuyor
+            // O yüzden direkt service.title, service.description kullanıyoruz (backend zaten doğru dili koydu)
+            const bulletPoints = service.bulletPoints || [];
+            const processSteps = service.processSteps || [];
+            const title = service.title || '';
+            const description = service.description || '';
+            
+            const bulletListHtml = bulletPoints && Array.isArray(bulletPoints)
+                ? bulletPoints.map(item => `<li>${item}</li>`).join('')
+                : '';
+            
+            const processStepsHtml = processSteps && Array.isArray(processSteps)
+                ? processSteps.map((item, i) => `<li>${i + 1}. ${item}</li>`).join('')
+                : '';
+            
+            const titleText = (title || '').toUpperCase();
+
+            const mediaColumn = `
+                <div class="media-column">
+                    <div class="media-container">
+                        <div class="media-frame">
+                            <video class="media-content" 
+                                muted loop playsinline preload="auto"
+                                src="${videoSrc}"> 
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const contentColumn = `
+                <div class="content-column">
+                    <div class="content-wrapper">
+                        <div class="service-header">
+                            <div class="icon-container">
+                                <i class="${service.iconClass || 'fas fa-cogs'}"></i>
+                            </div>
+                            <h2 class="service-title" data-text="${titleText}">
+                                <span>${titleText}</span>
+                            </h2>
+                        </div>
+                        <p class="description">${description || ''}</p>
+                        ${bulletListHtml ? `<ul class="bullet-list">${bulletListHtml}</ul>` : ''}
+                        ${bulletListHtml && processStepsHtml ? '<div class="divider"></div>' : ''}
+                        ${processStepsHtml ? `<ol class="numbered-list">${processStepsHtml}</ol>` : ''}
+                        <a href="../contact/" class="cta-button">
+                            ${isAz ? 'ƏLAQƏ' : 'CONTACT'} <i class="fas fa-long-arrow-alt-right"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            if (index % 2 === 0) {
+                htmlContent += `<section class="page-wrapper reveal-item">${mediaColumn}${contentColumn}</section>`;
+            } else { 
+                htmlContent += `<section class="page-wrapper reveal-item">${contentColumn}${mediaColumn}</section>`;
+            }
+        });
+
+        container.innerHTML = htmlContent;
+        
+        initScrollReveal();
+        initVideoLazyLoad();
+        initVideoAutoplay();
     }
 
     /* ============================================================
         9. INITIALIZATION
         ============================================================ */
     
-    function init() {
+    async function init() {
+        // Translation ve API çağrılarını paralel başlat
+        const currentLang = localStorage.getItem('selectedLang') || 'en';
+        const translationsPromise = loadTranslations();
+        const apiPromise = fetchAndRenderServices(currentLang);
+        
+        // Translation yüklenmesini bekle (çünkü initLanguageSelector için gerekli)
+        await translationsPromise;
+        
         initPageTransition();
+        initLanguageSelector();
         initMobileMenu();
         initVideoAutoplay(); // Video autoplay'i başlat
-        fetchAndRenderServices(); 
         setupNavButtons(); 
         
         if (elements.chatSection) {
@@ -431,6 +739,9 @@
             }, { threshold: 0.15 });
             observer.observe(elements.chatSection);
         }
+        
+        // API yüklemesini bekle (hata olursa fallback gösterilecek)
+        await apiPromise;
     }
 
     if (document.readyState === 'loading') {

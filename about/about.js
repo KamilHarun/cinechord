@@ -31,7 +31,8 @@
         
         SCROLL_THROTTLE: 16,
         RETRY_ATTEMPTS: 2,
-        RETRY_DELAY: 1000
+        RETRY_DELAY: 1000,
+        REQUEST_TIMEOUT: 10000
     };
 
     /* ============================================================
@@ -155,7 +156,10 @@
             elements.mobileMenu.classList.toggle('active');
             if (elements.overlay) elements.overlay.classList.toggle('active');
             
-            if (hamburgerText) {
+            if (hamburgerText && window.translations && window.translations[window.currentLang]) {
+                const t = window.translations[window.currentLang];
+                hamburgerText.textContent = isActive ? t.menu : t.close;
+            } else if (hamburgerText) {
                 hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
             }
             
@@ -240,6 +244,217 @@
     }
 
     /* ============================================================
+       5. TRANSLATION SYSTEM
+       ============================================================ */
+
+    async function loadTranslations() {
+        try {
+            const response = await fetch('../lang/about.json');
+            if (!response.ok) throw new Error('Translation file not found');
+            window.translations = await response.json();
+            console.log('Translations loaded:', window.translations);
+            return window.translations;
+        } catch (error) {
+            console.error('Error loading translations:', error);
+            // Fallback translations
+            window.translations = {
+                "en": {
+                    "menu": "MENU",
+                    "close": "CLOSE",
+                    "home": "HOME",
+                    "work": "WORK",
+                    "service": "SERVICE",
+                    "archive": "ARCHIVE",
+                    "about": "ABOUT",
+                    "contact": "CONTACT",
+                    "who_we_are": "WHO WE ARE",
+                    "our_mission": "OUR MISSION",
+                    "our_approach": "OUR APPROACH",
+                    "email": "EMAIL",
+                    "address": "ADDRESS",
+                    "phone": "PHONE"
+                },
+                "az": {
+                    "menu": "MENYU",
+                    "close": "BAĞLA",
+                    "home": "ANA SƏHİFƏ",
+                    "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR",
+                    "archive": "ARXİV",
+                    "about": "HAQQIMIZDA",
+                    "contact": "ƏLAQƏ",
+                    "who_we_are": "BİZ KİMİK",
+                    "our_mission": "MİSSİYAMIZ",
+                    "our_approach": "YANAŞMAMIZ",
+                    "email": "E-POÇT",
+                    "address": "ÜNVAN",
+                    "phone": "TELEFON"
+                }
+            };
+            return window.translations;
+        }
+    }
+
+    function applyTranslations(lang) {
+        if (!window.translations || !window.translations[lang]) {
+            console.warn('Translations not available for:', lang);
+            return;
+        }
+
+        const t = window.translations[lang];
+        window.currentLang = lang;
+
+        // Hamburger Menu Text
+        const hamburgerTextEl = document.querySelector('.hamburger-text');
+        if (hamburgerTextEl) {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isMenuOpen = hamburgerBtn && hamburgerBtn.classList.contains('active');
+            hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
+        }
+
+        // Navigation Buttons
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            const navText = btn.querySelector('.nav-text');
+            const key = btn.getAttribute('data-key');
+            
+            if (key && t[key]) {
+                if (navText) navText.textContent = t[key];
+                btn.setAttribute('data-text', t[key]);
+            }
+        });
+
+        // Block Titles
+        const blockTitles = document.querySelectorAll('.block-title');
+        blockTitles.forEach(title => {
+            const key = title.getAttribute('data-key');
+            if (key && t[key]) {
+                title.textContent = t[key];
+            }
+        });
+
+        // Labels
+        const labels = document.querySelectorAll('.label-small');
+        labels.forEach(label => {
+            const key = label.getAttribute('data-key');
+            if (key && t[key]) {
+                label.textContent = t[key];
+            }
+        });
+
+        // Apply font class
+        if (lang === 'az') {
+            document.body.classList.add('lang-az');
+            document.documentElement.setAttribute('lang', 'az');
+        } else {
+            document.body.classList.remove('lang-az');
+            document.documentElement.setAttribute('lang', 'en');
+        }
+
+        console.log('Translations applied for:', lang);
+    }
+
+    /* ============================================================
+       6. GLOBE LANGUAGE SELECTOR
+       ============================================================ */
+
+    function initLanguageSelector() {
+        const langSelector = document.getElementById('langSelector');
+        const langGlobeBtn = document.getElementById('langGlobeBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLangText = document.getElementById('currentLangText');
+        
+        if (!langSelector || !langGlobeBtn) return;
+        
+        // LocalStorage-dən dil seçimini yüklə
+        const savedLang = localStorage.getItem('selectedLang') || 'en';
+        window.currentLang = savedLang;
+        
+        // Seçilmiş dili tətbiq et (translations zaten yüklenmiş olmalı)
+        applyTranslations(savedLang);
+        
+        langOptions.forEach(option => {
+            if (option.dataset.lang === savedLang) {
+                option.classList.add('active');
+                if (currentLangText) {
+                    currentLangText.textContent = savedLang.toUpperCase();
+                }
+            } else {
+                option.classList.remove('active');
+            }
+        });
+        
+        // Globe düyməsinə klik - dropdown aç/bağla
+        langGlobeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            langSelector.classList.toggle('active');
+        });
+        
+        // Dil seçimlərinə klik
+        langOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const lang = option.dataset.lang;
+                
+                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
+                if (option.classList.contains('active')) {
+                    langSelector.classList.remove('active');
+                    return;
+                }
+                
+                // Aktiv classını dəyiş
+                langOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Current lang text-i yenilə
+                if (currentLangText) {
+                    currentLangText.textContent = lang.toUpperCase();
+                }
+                
+                // LocalStorage-ə yadda saxla
+                localStorage.setItem('selectedLang', lang);
+                
+                // Tərcümələri tətbiq et
+                applyTranslations(lang);
+                
+                // API verilerini yeniden yükle (dil değiştiğinde)
+                loadDynamicContent(lang);
+                
+                // Dropdown-u bağla
+                setTimeout(() => {
+                    langSelector.classList.remove('active');
+                }, 200);
+                
+                // Event göndər
+                document.dispatchEvent(new CustomEvent('languageChanged', { 
+                    detail: { language: lang } 
+                }));
+                
+                console.log('Language changed to:', lang);
+            });
+        });
+        
+        // Xaricdə klik - dropdown-u bağla
+        document.addEventListener('click', (e) => {
+            if (!langSelector.contains(e.target)) {
+                langSelector.classList.remove('active');
+            }
+        });
+        
+        // ESC düyməsi - dropdown-u bağla
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && langSelector.classList.contains('active')) {
+                langSelector.classList.remove('active');
+            }
+        });
+    }
+
+
+    /* ============================================================
        7. COMPLEX VIDEO HANDLING
        ============================================================ */
     
@@ -298,34 +513,49 @@
        8. DYNAMIC CONTENT LOADING (API + Fallback)
        ============================================================ */
     
-    async function loadDynamicContent() {
+    // API verilerini sakla
+    let cachedApiData = null;
+
+    async function loadDynamicContent(lang = 'en') {
         try {
+            // API'ye dil parametresi gönder
+            const langParam = lang === 'az' ? 'az' : 'en';
+            const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
+            
             const response = await retryFetch(() => 
-                fetchWithTimeout(`${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}`, { method: 'GET' })
+                fetchWithTimeout(url, { method: 'GET' })
             );
             
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
             const apiData = await response.json();
-            processApiData(apiData);
+            cachedApiData = apiData;
+            processApiData(apiData, lang);
             
         } catch (error) {
-            showFallbackContent();
+            // Eğer API'den veri gelmezse, önceki veriyi kullan veya fallback göster
+            if (cachedApiData) {
+                processApiData(cachedApiData, lang);
+            } else {
+                showFallbackContent(lang);
+            }
         }
     }
 
-    function processApiData(data) {
+    function processApiData(data, lang = 'en') {
         function formatText(text) {
             if (!text) return '';
             return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
         }
         
+        // Backend artık lang parametresine göre doğru dildeki veriyi title, description gibi alanlara koyuyor
+        // O yüzden direkt data.mainTitle, data.subTitle kullanıyoruz (backend zaten doğru dili koydu)
         const content = {
             mainTitle: data.mainTitle || "OUR STORY",
             subTitle: data.subTitle || "We are passionate filmmakers dedicated to cinematic storytelling",
-            whoWeAreText: formatText(data.whoWeAreText),
-            ourMissionText: formatText(data.ourMissionText),
-            ourApproachText: formatText(data.ourApproachText),
+            whoWeAreText: formatText(data.whoWeAreText || ''),
+            ourMissionText: formatText(data.ourMissionText || ''),
+            ourApproachText: formatText(data.ourApproachText || ''),
             email: data.email || "hello@cinechord.com",
             phone: data.phone || "+994 50 123 45 67",
             address: data.address || "BAKU, AZERBAIJAN"
@@ -371,16 +601,17 @@
         }
     }
 
-    function showFallbackContent() {
+    function showFallbackContent(lang = 'en') {
+        const isAz = lang === 'az';
         const fallback = {
-            mainTitle: "OUR STORY",
-            subTitle: "We are passionate filmmakers dedicated to cinematic storytelling.",
-            whoWeAreText: "CineChord is a creative studio specializing in visual storytelling and film production.",
-            ourMissionText: "Our mission is to transform ideas into powerful visual experiences.",
-            ourApproachText: "We approach every project with creativity and technical excellence.",
+            mainTitle: isAz ? "BİZİM HEKAYƏMİZ" : "OUR STORY",
+            subTitle: isAz ? "Biz kinematik hekayəçilikə həsr olunmuş ehtiraslı film yaradıcılarıyıq." : "We are passionate filmmakers dedicated to cinematic storytelling.",
+            whoWeAreText: isAz ? "CineChord vizual hekayəçilik və film istehsalı üzrə ixtisaslaşmış yaradıcı studiyadır." : "CineChord is a creative studio specializing in visual storytelling and film production.",
+            ourMissionText: isAz ? "Missiyamız ideyaları güclü vizual təcrübələrə çevirməkdir." : "Our mission is to transform ideas into powerful visual experiences.",
+            ourApproachText: isAz ? "Biz hər layihəyə yaradıcılıq və texniki mükemməlliklə yanaşırıq." : "We approach every project with creativity and technical excellence.",
             email: "hello@cinechord.com",
             phone: "+994 50 123 45 67",
-            address: "BAKU, AZERBAIJAN"
+            address: isAz ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"
         };
         populateContent(fallback);
     }
@@ -437,15 +668,26 @@
        11. INITIALIZATION
        ============================================================ */
     
-    function init() {
+    async function init() {
+        // Translation ve API çağrılarını paralel başlat
+        const currentLang = localStorage.getItem('selectedLang') || 'en';
+        const translationsPromise = loadTranslations();
+        const apiPromise = loadDynamicContent(currentLang);
+        
+        // Translation yüklenmesini bekle (çünkü initLanguageSelector için gerekli)
+        await translationsPromise;
+        
         initPageTransition();
+        initLanguageSelector();
         initMenuSystem();
         initLogoAnimation();
         loadStaticVideo();
-        loadDynamicContent();
         initScrollEffects();
         initRevealAnimations();
         setupNavLinks(); // <--- Bütün səhifələrdə olduğu kimi əlavə edildi
+        
+        // API yüklemesini bekle (hata olursa fallback gösterilecek)
+        await apiPromise;
     }
 
     if (document.readyState === 'loading') {

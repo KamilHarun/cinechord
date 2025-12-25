@@ -1,0 +1,36 @@
+{
+  "en": {
+    "menu": "MENU",
+    "close": "CLOSE",
+    "home": "HOME",
+    "work": "WORK",
+    "service": "SERVICE",
+    "archive": "ARCHIVE",
+    "about": "ABOUT",
+    "contact": "CONTACT",
+    "our_services": "Our Services",
+    "lets_chat": "LET'S CHAT",
+    "contact_btn": "CONTACT",
+    "address": "ADDRESS",
+    "get_in_touch": "GET IN TOUCH",
+    "follow_us": "FOLLOW US"
+  },
+  "az": {
+    "menu": "MENYU",
+    "close": "BAĞLA",
+    "home": "ANA SƏHİFƏ",
+    "work": "İŞLƏR",
+    "service": "XİDMƏTLƏR",
+    "archive": "ARXİV",
+    "about": "HAQQIMIZDA",
+    "contact": "ƏLAQƏ",
+    "our_services": "Xidmətlərimiz",
+    "lets_chat": "GƏLİN SÖHBƏT EDƏK",
+    "contact_btn": "ƏLAQƏ",
+    "address": "ÜNVAN",
+    "get_in_touch": "ƏLAQƏ SAXLAYIN",
+    "follow_us": "BİZİ İZLƏYİN"
+  }
+}
+
+

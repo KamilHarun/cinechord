@@ -15,7 +15,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -25,6 +25,30 @@
 
     <div class="page-transition"></div>
     <div class="grain-overlay"></div>
+
+
+     <!-- LANGUAGE SELECTOR WITH GLOBE -->
+        <div class="lang-selector" id="langSelector">
+            <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+                <span class="globe-icon">
+                    <span class="globe-ellipse"></span>
+                </span>
+                <span class="current-lang" id="currentLangText">EN</span>
+            </button>
+            <div class="lang-dropdown" id="langDropdown">
+                <button class="lang-option active" data-lang="en">
+                    <span class="lang-code">EN</span>
+                    <span class="lang-name">English</span>
+                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+                </button>
+                <button class="lang-option" data-lang="az">
+                    <span class="lang-code">AZ</span>
+                    <span class="lang-name">Azərbaycan</span>
+                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+                </button>
+            </div>
+        </div>
+
 
     <!-- VIDEO MODAL (WORKS STYLE) -->
     <div class="preview-container is-paused" id="previewContainer">
@@ -99,14 +123,14 @@
 
     <!-- MOBILE MENU -->
    <nav class="mobile-menu" id="mobileMenu">
-    <a href="../" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
-    <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
-    <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+    <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
     
-    <a href="#" class="nav-btn active" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+    <a href="#" class="nav-btn active" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
     
-    <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
-    <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+    <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+    <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
 
     <div class="menu-footer">
         <div class="menu-socials">
@@ -136,10 +160,10 @@
                 </div>
                 
                 <div class="archive-title-container">
-                    <h1 class="archive-title">ARCHIVE</h1>
+                    <h1 class="archive-title" data-key="archive_title">ARCHIVE</h1>
                     <p class="archive-subtitle">
-                        FULL FILM AVAILABLE ON REQUEST • 
-                        <a href="../contact/">SHOOT A MESSAGE</a>
+                        <span data-key="full_film_available">FULL FILM AVAILABLE ON REQUEST</span> • 
+                        <a href="../contact/" data-key="shoot_message">SHOOT A MESSAGE</a>
                     </p>
                 </div>
             </div>
@@ -148,12 +172,12 @@
                 <thead>
                     <tr>
                         <th class="number-col" scope="col">#</th>
-                        <th class="client-col" scope="col">CLIENT</th>
-                        <th class="title-col" scope="col">TITLE</th>
-                        <th class="type-col" scope="col">TYPE</th>
-                        <th class="location-col" scope="col">LOCATION</th>
-                        <th class="agency-col" scope="col">AGENCY</th>
-                        <th class="year-col" scope="col">YEAR</th>
+                        <th class="client-col" scope="col" data-key="client">CLIENT</th>
+                        <th class="title-col" scope="col" data-key="title">TITLE</th>
+                        <th class="type-col" scope="col" data-key="type">TYPE</th>
+                        <th class="location-col" scope="col" data-key="location">LOCATION</th>
+                        <th class="agency-col" scope="col" data-key="agency">AGENCY</th>
+                        <th class="year-col" scope="col" data-key="year">YEAR</th>
                     </tr>
                 </thead>
                 <tbody>
