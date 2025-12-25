@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 7.1 - FINAL FIX: Navigation Conflict Solved
+   Version: 7.2 - VIDEO & DYNAMIC CONTACT INFO ADDED
    ============================================================ */
 
 (function() {
@@ -40,24 +40,18 @@
        ============================================================ */
     
     const elements = {
-        // Global
         pageTransition: document.querySelector('.page-transition'),
         progressBarTop: document.querySelector('.progress-bar-top'),
         centerLogo: document.querySelector('.center-logo'),
         
-        // Menu Elements
         hamburger: document.getElementById('hamburgerBtn'),
         mobileMenu: document.getElementById('mobileMenu'),
         overlay: document.getElementById('mobileMenuOverlay'),
         navBtns: document.querySelectorAll('.nav-btn'),
         
-        // Layout Sections
         contentSection: document.querySelector('.content-section'),
-        
-        // Video
         aboutVideo: document.getElementById('about-video'),
         
-        // Dynamic Content Text Elements
         mainTitle: document.getElementById('main-title'),
         subtitle: document.getElementById('subtitle'),
         whoWeAre: document.getElementById('who-we-are'),
@@ -71,7 +65,7 @@
     let isTransitioning = false;
 
     /* ============================================================
-       3. UTILITY FUNCTIONS (Yardımçı funksiyalar)
+       3. UTILITY FUNCTIONS
        ============================================================ */
     
     function throttle(func, delay) {
@@ -115,7 +109,6 @@
     
     function initPageTransition() {
         if (!elements.pageTransition) return;
-        
         setTimeout(() => {
             elements.pageTransition.classList.add('page-loaded');
         }, CONFIG.PAGE_LOAD_DELAY);
@@ -141,7 +134,7 @@
     }
 
     /* ============================================================
-       5. MENU SYSTEM (Mobile Menu - Navigasiyanı burası idarə edir)
+       5. MENU SYSTEM
        ============================================================ */
     
     function initMenuSystem() {
@@ -179,7 +172,6 @@
             });
         }
 
-        // Mobil Menyu Linkləri (Sadece burası işləyir)
         elements.navBtns.forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
@@ -244,7 +236,7 @@
     }
 
     /* ============================================================
-       5. TRANSLATION SYSTEM
+       7. TRANSLATION SYSTEM
        ============================================================ */
 
     async function loadTranslations() {
@@ -256,7 +248,6 @@
             return window.translations;
         } catch (error) {
             console.error('Error loading translations:', error);
-            // Fallback translations
             window.translations = {
                 "en": {
                     "menu": "MENU",
@@ -304,7 +295,6 @@
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        // Hamburger Menu Text
         const hamburgerTextEl = document.querySelector('.hamburger-text');
         if (hamburgerTextEl) {
             const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -312,7 +302,6 @@
             hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
         }
 
-        // Navigation Buttons
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             const navText = btn.querySelector('.nav-text');
@@ -324,7 +313,6 @@
             }
         });
 
-        // Block Titles
         const blockTitles = document.querySelectorAll('.block-title');
         blockTitles.forEach(title => {
             const key = title.getAttribute('data-key');
@@ -333,7 +321,6 @@
             }
         });
 
-        // Labels
         const labels = document.querySelectorAll('.label-small');
         labels.forEach(label => {
             const key = label.getAttribute('data-key');
@@ -342,7 +329,6 @@
             }
         });
 
-        // Apply font class
         if (lang === 'az') {
             document.body.classList.add('lang-az');
             document.documentElement.setAttribute('lang', 'az');
@@ -355,23 +341,20 @@
     }
 
     /* ============================================================
-       6. GLOBE LANGUAGE SELECTOR
+       8. GLOBE LANGUAGE SELECTOR
        ============================================================ */
 
     function initLanguageSelector() {
         const langSelector = document.getElementById('langSelector');
         const langGlobeBtn = document.getElementById('langGlobeBtn');
-        const langDropdown = document.getElementById('langDropdown');
         const langOptions = document.querySelectorAll('.lang-option');
         const currentLangText = document.getElementById('currentLangText');
         
         if (!langSelector || !langGlobeBtn) return;
         
-        // LocalStorage-dən dil seçimini yüklə
         const savedLang = localStorage.getItem('selectedLang') || 'en';
         window.currentLang = savedLang;
         
-        // Seçilmiş dili tətbiq et (translations zaten yüklenmiş olmalı)
         applyTranslations(savedLang);
         
         langOptions.forEach(option => {
@@ -385,14 +368,12 @@
             }
         });
         
-        // Globe düyməsinə klik - dropdown aç/bağla
         langGlobeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             langSelector.classList.toggle('active');
         });
         
-        // Dil seçimlərinə klik
         langOptions.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -400,36 +381,26 @@
                 
                 const lang = option.dataset.lang;
                 
-                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
                 if (option.classList.contains('active')) {
                     langSelector.classList.remove('active');
                     return;
                 }
                 
-                // Aktiv classını dəyiş
                 langOptions.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
                 
-                // Current lang text-i yenilə
                 if (currentLangText) {
                     currentLangText.textContent = lang.toUpperCase();
                 }
                 
-                // LocalStorage-ə yadda saxla
                 localStorage.setItem('selectedLang', lang);
-                
-                // Tərcümələri tətbiq et
                 applyTranslations(lang);
-                
-                // API verilerini yeniden yükle (dil değiştiğinde)
                 loadDynamicContent(lang);
                 
-                // Dropdown-u bağla
                 setTimeout(() => {
                     langSelector.classList.remove('active');
                 }, 200);
                 
-                // Event göndər
                 document.dispatchEvent(new CustomEvent('languageChanged', { 
                     detail: { language: lang } 
                 }));
@@ -438,14 +409,12 @@
             });
         });
         
-        // Xaricdə klik - dropdown-u bağla
         document.addEventListener('click', (e) => {
             if (!langSelector.contains(e.target)) {
                 langSelector.classList.remove('active');
             }
         });
         
-        // ESC düyməsi - dropdown-u bağla
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && langSelector.classList.contains('active')) {
                 langSelector.classList.remove('active');
@@ -453,9 +422,8 @@
         });
     }
 
-
     /* ============================================================
-       7. COMPLEX VIDEO HANDLING
+       9. COMPLEX VIDEO HANDLING
        ============================================================ */
     
     function forceVideoPlay() {
@@ -479,6 +447,7 @@
     function loadStaticVideo() {
         if (!elements.aboutVideo) return;
 
+        console.log('Loading fallback static video');
         elements.aboutVideo.src = CONFIG.STATIC_VIDEO;
         elements.aboutVideo.muted = true;
         elements.aboutVideo.loop = true;
@@ -510,15 +479,13 @@
     }
 
     /* ============================================================
-       8. DYNAMIC CONTENT LOADING (API + Fallback)
+       10. DYNAMIC CONTENT LOADING (API + Fallback)
        ============================================================ */
     
-    // API verilerini sakla
     let cachedApiData = null;
 
     async function loadDynamicContent(lang = 'en') {
         try {
-            // API'ye dil parametresi gönder
             const langParam = lang === 'az' ? 'az' : 'en';
             const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
             
@@ -533,7 +500,7 @@
             processApiData(apiData, lang);
             
         } catch (error) {
-            // Eğer API'den veri gelmezse, önceki veriyi kullan veya fallback göster
+            console.error('API error:', error);
             if (cachedApiData) {
                 processApiData(cachedApiData, lang);
             } else {
@@ -548,8 +515,6 @@
             return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
         }
         
-        // Backend artık lang parametresine göre doğru dildeki veriyi title, description gibi alanlara koyuyor
-        // O yüzden direkt data.mainTitle, data.subTitle kullanıyoruz (backend zaten doğru dili koydu)
         const content = {
             mainTitle: data.mainTitle || "OUR STORY",
             subTitle: data.subTitle || "We are passionate filmmakers dedicated to cinematic storytelling",
@@ -558,7 +523,8 @@
             ourApproachText: formatText(data.ourApproachText || ''),
             email: data.email || "hello@cinechord.com",
             phone: data.phone || "+994 50 123 45 67",
-            address: data.address || "BAKU, AZERBAIJAN"
+            address: data.address || "BAKU, AZERBAIJAN",
+            videoUrl: data.videoUrl || null
         };
         
         populateContent(content);
@@ -579,11 +545,9 @@
         }
         
         safeUpdate(elements.subtitle, content.subTitle);
-        
         safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
         safeUpdate(elements.ourMission, content.ourMissionText, true);
         safeUpdate(elements.ourApproach, content.ourApproachText, true);
-        
         safeUpdate(elements.address, content.address);
 
         if (elements.emailLink) {
@@ -599,6 +563,26 @@
             const span = elements.phoneLink.querySelector('span');
             if(span) span.textContent = content.phone;
         }
+        
+        // VIDEO YÜKLƏNMƏSI
+        if (content.videoUrl && elements.aboutVideo) {
+            console.log('Loading video from API:', content.videoUrl);
+            elements.aboutVideo.src = content.videoUrl;
+            elements.aboutVideo.muted = true;
+            elements.aboutVideo.loop = true;
+            elements.aboutVideo.playsInline = true;
+            elements.aboutVideo.load();
+            
+            elements.aboutVideo.addEventListener('loadeddata', function() {
+                forceVideoPlay();
+            }, { once: true });
+            
+            elements.aboutVideo.addEventListener('pause', function() {
+                if (!document.hidden) forceVideoPlay();
+            });
+        } else if (elements.aboutVideo) {
+            loadStaticVideo();
+        }
     }
 
     function showFallbackContent(lang = 'en') {
@@ -611,13 +595,14 @@
             ourApproachText: isAz ? "Biz hər layihəyə yaradıcılıq və texniki mükemməlliklə yanaşırıq." : "We approach every project with creativity and technical excellence.",
             email: "hello@cinechord.com",
             phone: "+994 50 123 45 67",
-            address: isAz ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"
+            address: isAz ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN",
+            videoUrl: null
         };
         populateContent(fallback);
     }
 
     /* ============================================================
-       9. SCROLL REVEAL ANIMATIONS
+       11. SCROLL REVEAL ANIMATIONS
        ============================================================ */
     
     function initRevealAnimations() {
@@ -641,21 +626,18 @@
     }
     
     /* ============================================================
-       10. GLOBAL NAVİQASİYA (FIX EDİLMİŞ - Logo və Footer üçün)
+       12. GLOBAL NAVİQASİYA
        ============================================================ */
 
     function setupNavLinks() {
-        // Yalnız Mobil Menyuda OLMAYAN linkləri tapırıq
         const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
         
         internalLinks.forEach(link => {
-            // VACİB FIX: Mobil menyu daxilindəki linklərə event əlavə etmirik.
             if (link.closest('.mobile-menu')) return;
 
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
                 
-                // Mailto və Tel linklərinə toxunma
                 if (href.startsWith('mailto') || href.startsWith('tel')) return;
                 
                 e.preventDefault();
@@ -665,28 +647,24 @@
     }
 
     /* ============================================================
-       11. INITIALIZATION
+       13. INITIALIZATION
        ============================================================ */
     
     async function init() {
-        // Translation ve API çağrılarını paralel başlat
         const currentLang = localStorage.getItem('selectedLang') || 'en';
         const translationsPromise = loadTranslations();
         const apiPromise = loadDynamicContent(currentLang);
         
-        // Translation yüklenmesini bekle (çünkü initLanguageSelector için gerekli)
         await translationsPromise;
         
         initPageTransition();
         initLanguageSelector();
         initMenuSystem();
         initLogoAnimation();
-        loadStaticVideo();
         initScrollEffects();
         initRevealAnimations();
-        setupNavLinks(); // <--- Bütün səhifələrdə olduğu kimi əlavə edildi
+        setupNavLinks();
         
-        // API yüklemesini bekle (hata olursa fallback gösterilecek)
         await apiPromise;
     }
 

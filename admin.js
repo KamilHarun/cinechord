@@ -774,6 +774,10 @@ async function loadAbout() {
         document.getElementById('aMissionAz').value = data.ourMissionTextAz || '';
         document.getElementById('aApproachAz').value = data.ourApproachTextAz || '';
         document.getElementById('aAddressAz').value = data.addressAz || '';
+
+        // ✅ EMAİL AND PHONE
+        document.getElementById('aEmail').value = data.email || '';
+        document.getElementById('aPhone').value = data.phone || '';
         
         console.log('About məlumatları uğurla yükləndi');
         
