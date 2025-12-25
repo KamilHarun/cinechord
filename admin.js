@@ -148,7 +148,7 @@ function navigateTo(page) {
     if(page === 'works') loadWorks();
     if(page === 'services') loadServices();
     if(page === 'messages') loadMessages();
-    if(page === 'about') loadAbout();
+    if(page === 'about') loadAbout(); // ✅ ƏLAVƏ EDİLDİ
 }
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -741,11 +741,49 @@ async function deleteMessage(id) {
 }
 
 // ============================================
-// ABOUT (HAQQIMIZDA) - FIXED VERSION
+// ABOUT (HAQQIMIZDA) - COMPLETE VERSION
 // ============================================
 
+async function loadAbout() {
+    try {
+        // Backend-dən bütün məlumatları yüklə (lang parametri olmadan)
+        const res = await authFetch(`${API.ABOUT}?t=${Date.now()}`);
+        
+        if(!res || !res.ok) {
+            console.error('About məlumatları yüklənmədi');
+            Swal.fire('Xəta', 'About məlumatları yüklənmədi', 'error');
+            return;
+        }
+        
+        const data = await res.json();
+        console.log('About data loaded:', data);
+        
+        // ✅ İNGİLİSCƏ FİELD-LƏR
+        document.getElementById('aMainTitle').value = data.mainTitle || '';
+        document.getElementById('aSubTitle').value = data.subTitle || '';
+        document.getElementById('aWho').value = data.whoWeAreText || '';
+        document.getElementById('aMission').value = data.ourMissionText || '';
+        document.getElementById('aApproach').value = data.ourApproachText || '';
+        document.getElementById('aAddress').value = data.address || '';
+        
+        // ✅ AZƏRBAYCANCA FİELD-LƏR
+        document.getElementById('aMainTitleAz').value = data.mainTitleAz || '';
+        document.getElementById('aSubTitleAz').value = data.subTitleAz || '';
+        document.getElementById('aWhoAz').value = data.whoWeAreTextAz || '';
+        document.getElementById('aMissionAz').value = data.ourMissionTextAz || '';
+        document.getElementById('aApproachAz').value = data.ourApproachTextAz || '';
+        document.getElementById('aAddressAz').value = data.addressAz || '';
+        
+        console.log('About məlumatları uğurla yükləndi');
+        
+    } catch(error) {
+        console.error('About yüklənərkən xəta:', error);
+        Swal.fire('Xəta', 'About məlumatları yüklənmədi', 'error');
+    }
+}
+
 document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
-    // Məlumatları obyekt şəklində yığırıq (Daha etibarlıdır)
+    // Məlumatları obyekt şəklində yığırıq
     const aboutData = {
         mainTitle: document.getElementById('aMainTitle').value,
         mainTitleAz: document.getElementById('aMainTitleAz').value,
@@ -761,7 +799,6 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
         addressAz: document.getElementById('aAddressAz').value
     };
 
-    // Əgər video faylı YOXDURSA, birbaşa JSON göndərmək daha yaxşıdır
     const videoFile = document.getElementById('aVideoFile').files[0];
     
     let options = {
@@ -769,25 +806,27 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
     };
 
     if (videoFile) {
-        // Əgər video varsa FormData istifadə etməliyik
+        // Video varsa FormData istifadə et
         const fd = new FormData();
         Object.keys(aboutData).forEach(key => fd.append(key, aboutData[key]));
         fd.append('videoFile', videoFile);
         options.body = fd;
-        // authFetch avtomatik Content-Type tənzimləyəcək
     } else {
-        // Video yoxdursa təmiz JSON göndəririk (Xanaların qarışmaması üçün)
+        // Video yoxdursa JSON göndər
         options.body = JSON.stringify(aboutData);
         options.headers = { 'Content-Type': 'application/json' };
     }
     
-    Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
+    Swal.fire({
+        title: 'Yüklənir...', 
+        didOpen: () => Swal.showLoading()
+    });
     
     try {
         const res = await authFetch(`${API.ABOUT}/updateAbout`, options);
         if(res && res.ok) {
             Swal.fire('Uğurlu!', 'Məlumatlar yeniləndi', 'success');
-            loadAbout();
+            loadAbout(); // Yenidən yüklə
         } else { 
             Swal.fire('Xəta', 'Yadda saxlamaq olmadı. Sahələri yoxlayın.', 'error'); 
         }
