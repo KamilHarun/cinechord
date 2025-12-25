@@ -10,7 +10,15 @@
     "contact": "CONTACT",
     "play": "PLAY",
     "explore": "EXPLORE OUR WORKS",
-    "designed_by": "Designed By Harunov"
+    "designed_by": "Designed By Harunov",
+    
+    "contact_hero_1": "LET'S WORK",
+    "contact_hero_2": "TOGETHER",
+    "form_name": "WHAT'S YOUR NAME?",
+    "form_email": "WHAT'S YOUR EMAIL?",
+    "form_service": "WHAT SERVICES ARE YOU LOOKING FOR?",
+    "form_message": "TELL US ABOUT YOUR PROJECT",
+    "form_send": "SEND MESSAGE"
   },
   "az": {
     "menu": "MENYU",
@@ -23,7 +31,14 @@
     "contact": "ƏLAQƏ",
     "play": "BAŞLAT",
     "explore": "İŞLƏRİMİZLƏ TANIŞ OLUN",
-    "designed_by": "Dizayn: Harunov"
+    "designed_by": "Dizayn: Harunov",
 
+    "contact_hero_1": "GƏLİN BİRLİKDƏ",
+    "contact_hero_2": "İŞLƏYƏK",
+    "form_name": "ADINIZ NƏDİR?",
+    "form_email": "E-POÇT ÜNVANINIZ?",
+    "form_service": "HANSI XİDMƏTLƏR LAZIMDIR?",
+    "form_message": "LAYİHƏNİZ HAQQINDA DANIŞIN",
+    "form_send": "GÖNDƏRİN"
   }
 }

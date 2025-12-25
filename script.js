@@ -3,13 +3,12 @@
    Version: 5.2 - VIDEO STARTS AFTER LOADING COMPLETE
    ============================================================ */
 
-       const SHOWREEL_VIDEO_URL = "https://player.cloudinary.com/embed/?cloud_name=dinncr6hs&public_id=CineChord_Showreel_1_1_y9lq3g&profile=cld-default";
-
+const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/CineChord_Showreel_1_1_y9lq3g.mp4";
 
 // Global video configuration
 window.CONFIG = {
     videos: [
-        'videos/CineChord_Showreel.mp4',
+        SHOWREEL_VIDEO_URL, // Artıq Cloudinary linkini istifadə edir
         'videos/ABB-TamGenc-Card.mp4',
         'videos/Bakcell-099.mp4',
         'videos/Yaz-furseti-kampaniyasi.mp4',
@@ -80,8 +79,7 @@ window.openMainVideo = function() {
         loaderLogo: document.querySelector('.loader-logo'),
         loaderAuthor: document.querySelector('.loader-author'),
         centerLogo: document.querySelector('.center-logo'),
-        videoContainer: document.getElementById('videoContainer'),
-        heroBgVideo: document.getElementById('heroBgVideo'), 
+        videoContainer: document.getElementById('videoContainer'), 
         projectCounter: document.getElementById('projectCounter'),
         projectName: document.getElementById('projectName'),
         prevBtn: document.getElementById('prevVideoBtn'),
@@ -126,7 +124,7 @@ window.openMainVideo = function() {
     
     let isAnimating = false;
     let activityTimeout = null;
-    let currentVideoEl = elements.heroBgVideo;
+    let currentVideoEl = null; // İlk video elementi initVideoSlider'da oluşturulacak
     let videoShouldPlay = false; // Flag videoyu nə vaxt başlatmaq üçün
 
     /* ============================================================
@@ -467,152 +465,140 @@ window.openMainVideo = function() {
         });
     }
 
-    /* ============================================================
-       9. GSAP ANIMATIONS
-       ============================================================ */
-    
-    function initGSAP() {
-        if (typeof gsap === 'undefined') return;
-        
-        gsap.set(".hero-section", { autoAlpha: 1 });
-        gsap.set(UI_ELEMENTS, { y: 50, autoAlpha: 0 });
-    }
+   /* ============================================================
+       9. GSAP ANIMATIONS
+       ============================================================ */
+    
+    function initGSAP() {
+        if (typeof gsap === 'undefined') return;
+        
+        gsap.set(".hero-section", { autoAlpha: 1 });
+        gsap.set(UI_ELEMENTS, { y: 50, autoAlpha: 0 });
+    }
 
-    function runLoadingAnimation() {
-        if (typeof gsap === 'undefined') {
-            revealSite();
-            return;
-        }
+    function runLoadingAnimation() {
+        if (typeof gsap === 'undefined') {
+            revealSite();
+            return;
+        }
 
-        const tl = gsap.timeline();
-        tl.fromTo(elements.loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1, ease: "power2.out" }, 0)
-          .to(elements.loaderAuthor, { opacity: 1, duration: 0.4 }, "-=0.8")
-          .to(elements.loaderFill, {
-            width: "100%",
-            duration: 1.8,
-            ease: "power2.inOut",
-            onUpdate: function() {
-                let prog = Math.round(this.progress() * 100);
-                if (elements.loaderText) elements.loaderText.textContent = prog + "%";
-            },
-            onComplete: () => {
-                gsap.to(elements.loadingScreen, {
-                    y: "-100%",
-                    duration: 1,
-                    ease: "power4.inOut",
-                    onComplete: () => {
-                        if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
-                        revealSite();
-                        // Loading bitdikdən SONRA videoyu başlat
-                        videoShouldPlay = true;
-                        if (window.startHeroVideo) {
-                            setTimeout(() => window.startHeroVideo(), 300);
-                        }
-                    }
-                });
-            }
-        });
-    }
+        const tl = gsap.timeline();
+        tl.fromTo(elements.loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1, ease: "power2.out" }, 0)
+          .to(elements.loaderAuthor, { opacity: 1, duration: 0.4 }, "-=0.8")
+          .to(elements.loaderFill, {
+            width: "100%",
+            duration: 1.8,
+            ease: "power2.inOut",
+            onUpdate: function() {
+                let prog = Math.round(this.progress() * 100);
+                if (elements.loaderText) elements.loaderText.textContent = prog + "%";
+            },
+            onComplete: () => {
+                gsap.to(elements.loadingScreen, {
+                    y: "-100%",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    onComplete: () => {
+                        if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
+                        // BURADA VİDEONU AKTİVLƏŞDİRİRİK
+                        videoShouldPlay = true; 
+                        revealSite(); 
+                    }
+                });
+            }
+        });
+    }
 
-    function revealSite(isPageTransition = false) {
-        if (typeof gsap === 'undefined') return;
-        
-        const mainTl = gsap.timeline({
-            onComplete: () => {
-                // Site reveal bitdikdən sonra videoyu başlat (page transition halında)
-                if (isPageTransition) {
-                    videoShouldPlay = true;
-                    if (window.startHeroVideo) {
-                        setTimeout(() => window.startHeroVideo(), 300);
-                    }
-                }
-            }
-        });
-        
-        if (isPageTransition && elements.loadingScreen) {
-            mainTl.to(elements.loadingScreen, {
-                y: "100%",
-                duration: 0.9,
-                ease: "expo.inOut"
-            }, 0);
-        }
-        
-        const startDelay = isPageTransition ? "-=0.7" : 0;
+   function revealSite(isPageTransition = false) {
+        if (typeof gsap === 'undefined') return;
+        
+        const mainTl = gsap.timeline({
+            onStart: () => {
+                // Animasiya başlayan kimi videonu da başlat
+                if (window.startHeroVideo) {
+                    window.startHeroVideo();
+                }
+            }
+        });
+        
+        if (isPageTransition && elements.loadingScreen) {
+            mainTl.to(elements.loadingScreen, {
+                y: "100%",
+                duration: 0.9,
+                ease: "expo.inOut"
+            }, 0);
+        }
+        
+        const startDelay = isPageTransition ? "-=0.7" : 0;
 
-        mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
-        mainTl.to(".lang-selector", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.05);
-        mainTl.to(".play-button-container", { y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out" }, startDelay + 0.1);
-        mainTl.to(".right-floating-nav", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.15);
-        mainTl.to(".bottom-right-socials", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.2);
-        mainTl.to(".bottom-left-explore", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.25);
-    }
-    
-    /* ============================================================
+        mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
+        mainTl.to(".lang-selector", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.05);
+        mainTl.to(".play-button-container", { y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out" }, startDelay + 0.1);
+        mainTl.to(".right-floating-nav", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.15);
+        mainTl.to(".bottom-right-socials", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.2);
+        mainTl.to(".bottom-left-explore", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.25);
+    }
+  /* ============================================================
        10. VIDEO AUTOPLAY CHECK
        ============================================================ */
     
     function initVideoAutoplay() {
-        if (!elements.heroBgVideo) return;
+        if (!currentVideoEl) return;
         
-        const video = elements.heroBgVideo;
+        const video = currentVideoEl;
         
+        // Brauzerlərin autoplay icazəsi verməsi üçün əsas şərtlər
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
+        video.autoplay = true; 
+        video.setAttribute('muted', '');
         video.setAttribute('playsinline', 'true');
         video.setAttribute('webkit-playsinline', 'true');
-        video.setAttribute('x-webkit-airplay', 'allow');
         
         video.removeAttribute('controls');
         video.controls = false;
         
-        // Video avtomatik başlamasın - load edilsin sadəcə
-        video.pause();
-        video.load();
-        
+        // Videonu başlatmağa çalışan daxili funksiya
         function attemptPlay() {
-            // Yalnız loading bitib videoShouldPlay true olduqda başlasın
-            if (!videoShouldPlay) return;
+            if (!videoShouldPlay) return; // Loading hələ bitməyibsə başlatma
             
-            const playPromise = video.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.warn("Autoplay failed:", error);
-                    const interactionEvents = ['click', 'touchstart', 'scroll', 'touchend'];
-                    const tryPlayOnce = () => {
-                        video.play().catch(() => {});
-                        interactionEvents.forEach(type => {
-                            document.removeEventListener(type, tryPlayOnce);
-                        });
-                    };
-                    interactionEvents.forEach(type => {
-                        document.addEventListener(type, tryPlayOnce, { once: true, passive: true });
-                    });
-                });
-            }
+            video.play().catch(error => {
+                console.warn("Autoplay failed, waiting for user interaction:", error);
+                
+                // Əgər brauzer bloklayarsa, istifadəçi ekrana toxunan kimi başlat
+                const playOnInteraction = () => {
+                    video.play();
+                    ['click', 'touchstart', 'keydown'].forEach(ev => 
+                        document.removeEventListener(ev, playOnInteraction)
+                    );
+                };
+                ['click', 'touchstart', 'keydown'].forEach(ev => 
+                    document.addEventListener(ev, playOnInteraction, { once: true })
+                );
+            });
         }
         
-        // Metadata yükləndikdə hazır ol amma başlatma
+        // Global funksiya edirik ki, revealSite (loading bitəndə) bunu çağıra bilsin
+        window.startHeroVideo = attemptPlay;
+        
+        // Metadata yükləndikdə məlumat ver
         video.addEventListener('loadedmetadata', () => {
-            console.log('Video metadata loaded, waiting for loading screen to finish');
+            console.log('Video metadata loaded');
         }, { once: true });
         
-        // Document visibility dəyişdikdə
+        // Brauzer tabı dəyişib geri qayıdanda və ya video pause olsa yenidən başlat
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && video.paused && videoShouldPlay) {
                 attemptPlay();
             }
         });
-        
-        // Video pause olduqda (əgər olmamalıdırsa)
+
         video.addEventListener('pause', () => {
             if (!document.hidden && video.currentTime > 0 && videoShouldPlay) {
                 setTimeout(() => attemptPlay(), 100);
             }
         });
-        
-        // Public function - xaricdən çağırmaq üçün
-        window.startHeroVideo = attemptPlay;
     }
 
     /* ============================================================
@@ -670,87 +656,69 @@ window.openMainVideo = function() {
         setupNavButtons();
     }
 
-    /* ============================================================
-       13. VIDEO SLIDER 
+  /* ============================================================
+       13. VIDEO SLIDER (AUTO-PLAY FIXED)
        ============================================================ */
     
     function initVideoSlider() {
-        if (!elements.videoContainer || !currentVideoEl) return;
+        if (!elements.videoContainer) return;
+        
+        // Köhnə videonu təmizlə və yenisini yarat
+        elements.videoContainer.querySelectorAll('video.hero-bg').forEach(v => v.remove());
 
-        currentVideoEl.loop = true; 
-
-        function changeVideo(direction) {
-            if (isAnimating) return;
-            isAnimating = true;
-
-            if (direction === 'next') {
-                window.currentIndex = (window.currentIndex + 1) % window.CONFIG.videos.length;
-            } else {
-                window.currentIndex = (window.currentIndex - 1 + window.CONFIG.videos.length) % window.CONFIG.videos.length;
-            }
-
-            const nextVideoEl = document.createElement('video');
-            nextVideoEl.className = 'hero-bg';
-            nextVideoEl.src = window.CONFIG.videos[window.currentIndex];
-            nextVideoEl.autoplay = true;
-            nextVideoEl.muted = true;
-            nextVideoEl.loop = true; 
-            nextVideoEl.playsInline = true;
-
-            if (typeof gsap !== 'undefined') {
-                gsap.set(nextVideoEl, { autoAlpha: 1 });
-                elements.videoContainer.insertBefore(nextVideoEl, document.querySelector('.hero-overlay'));
-                const startX = direction === 'next' ? "100%" : "-100%";
-                const endXOld = direction === 'next' ? "-100%" : "100%";
-                gsap.set(nextVideoEl, { x: startX });
-
-                nextVideoEl.onloadeddata = () => {
-                    const tl = gsap.timeline({
-                        onComplete: () => {
-                            if (currentVideoEl) currentVideoEl.remove();
-                            currentVideoEl = nextVideoEl;
-                            isAnimating = false;
-                        }
-                    });
-                    tl.to(currentVideoEl, { x: endXOld, duration: 1.2, ease: "power3.inOut" }, 0)
-                      .to(nextVideoEl, { x: "0%", duration: 1.2, ease: "power3.inOut" }, 0);
-                    updateInfoUI(window.currentIndex);
-                };
-            } else {
-                elements.videoContainer.insertBefore(nextVideoEl, document.querySelector('.hero-overlay'));
-                if (currentVideoEl) currentVideoEl.remove();
-                currentVideoEl = nextVideoEl;
-                isAnimating = false;
-                updateInfoUI(window.currentIndex);
-            }
+        const firstVideo = document.createElement('video');
+        firstVideo.id = 'heroBgVideo';
+        firstVideo.className = 'hero-bg';
+        
+        // Mütləq atributlar
+        firstVideo.muted = true;
+        firstVideo.loop = true;
+        firstVideo.playsInline = true;
+        firstVideo.autoplay = true;
+        firstVideo.setAttribute('muted', '');
+        firstVideo.setAttribute('playsinline', 'true');
+        
+        // Linki mənimsət
+        firstVideo.src = window.CONFIG.videos[window.currentIndex];
+        
+        // Elementi DOM-a əlavə et
+        const overlay = document.querySelector('.hero-overlay');
+        if (overlay) {
+            elements.videoContainer.insertBefore(firstVideo, overlay);
+        } else {
+            elements.videoContainer.appendChild(firstVideo);
         }
+        
+        currentVideoEl = firstVideo;
 
+        // VİDEONU MƏCBURİ BAŞLATMA MEXANİZMİ
+        const forcePlay = () => {
+            if (firstVideo.paused) {
+                firstVideo.play().catch(() => {
+                    // Əgər brauzer hələ də bloklayırsa, ilk klikdə başlat
+                    document.addEventListener('click', () => firstVideo.play(), { once: true });
+                });
+            }
+        };
+
+        // Video data yüklənən kimi başlat
+        firstVideo.addEventListener('loadeddata', forcePlay);
+        
+        // Hər ehtimala qarşı 2 saniyə sonra bir də yoxla (əgər event işləməsə)
+        setTimeout(forcePlay, 2000);
+
+        // UI Yeniləmə (Xəta verməməsi üçün yoxlama ilə)
         function updateInfoUI(index = window.currentIndex) {
             const total = String(window.CONFIG.videos.length).padStart(2, '0');
             const current = String(index + 1).padStart(2, '0');
-            if (elements.projectCounter && elements.projectName) {
-                if (typeof gsap !== 'undefined') {
-                    gsap.fromTo([elements.projectCounter, elements.projectName], 
-                        { y: 15, autoAlpha: 0 }, 
-                        { y: 0, autoAlpha: 1, duration: 0.4 }
-                    );
-                }
-                elements.projectCounter.textContent = `${current} — ${total}`;
-                elements.projectName.textContent = window.CONFIG.titles[index];
-            }
+            if (elements.projectCounter) elements.projectCounter.textContent = `${current} — ${total}`;
+            if (elements.projectName) elements.projectName.textContent = window.CONFIG.titles[index];
         }
 
         updateInfoUI();
 
-        if (elements.nextBtn) elements.nextBtn.addEventListener('click', () => changeVideo('next'));
-        if (elements.prevBtn) elements.prevBtn.addEventListener('click', () => changeVideo('prev'));
-        
-        document.addEventListener('keydown', (e) => {
-            if (!elements.previewContainer || !elements.previewContainer.classList.contains('active')) {
-                if (e.key === 'ArrowRight') changeVideo('next');
-                if (e.key === 'ArrowLeft') changeVideo('prev');
-            }
-        });
+        if (elements.nextBtn) elements.nextBtn.onclick = () => changeVideo('next');
+        if (elements.prevBtn) elements.prevBtn.onclick = () => changeVideo('prev');
     }
 
     /* ============================================================

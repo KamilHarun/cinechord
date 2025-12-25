@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - Works Page Stylesheet
-   Version: 6.2 - GLOBE ICON FIX
+   Version: 9.0 - FINAL OPTIMIZED (ONLY WORKS TITLE FIXED)
    ========================================= */
 
 /* =========================================
@@ -33,6 +33,20 @@ body {
 body.lang-az,
 body.lang-az * {
     font-family: 'Montserrat', sans-serif !important;
+}
+
+/* AZ dili üçün - Font Awesome ikonlarını qoruyuruq */
+body.lang-az .fa-solid,
+body.lang-az .fa-brands,
+body.lang-az [class^="fa-"],
+body.lang-az [class*=" fa-"],
+body.lang-az .social-icon i,
+body.lang-az .social-icon-hover i,
+body.lang-az .ctrl-btn i,
+body.lang-az .lang-check i,
+body.lang-az .mask-icon i,
+body.lang-az .mask-icon .icon-wrap i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
 }
 
 /* =========================================
@@ -579,13 +593,14 @@ body.lang-az * {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform: translateZ(0);
     will-change: transform;
     z-index: 1;
     pointer-events: none;
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 .nav-btn:hover .nav-text {
@@ -594,6 +609,7 @@ body.lang-az * {
 
 .nav-btn:hover::after {
     transform: translateY(-100%) skewY(0deg) translateZ(0);
+    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
 }
 
 .nav-btn:not(:hover) .nav-text {
@@ -602,6 +618,7 @@ body.lang-az * {
 
 .nav-btn:not(:hover)::after {
     transform: translateY(0) translateZ(0);
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 body.lang-az .nav-btn {
@@ -761,6 +778,8 @@ body.lang-az .nav-btn {
     z-index: 5;
     overflow: hidden;
     padding-right: 30px;
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
 }
 
 .title-main {
@@ -782,6 +801,7 @@ body.lang-az .nav-btn {
 .title-main span {
     display: block;
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: inherit; /* Parent'tan font al */
 }
 
 .title-main::after {
@@ -793,8 +813,10 @@ body.lang-az .nav-btn {
     height: 100%;
     color: #FFA500;
     -webkit-text-stroke: 0;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
+    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 .title-main:hover span {
@@ -803,6 +825,11 @@ body.lang-az .nav-btn {
 
 .title-main:hover::after {
     transform: translateY(-100%);
+    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+}
+
+.title-main:not(:hover)::after {
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 .hero-right-content {
@@ -907,6 +934,11 @@ body.lang-az .nav-btn {
     opacity: 0.4;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform: scale(1);
+}
+
+/* Azerbaycan dilinde kategori butonları için küçük font */
+body.lang-az .category-btn {
+    font-size: clamp(16px, 2.8vw, 42px);
 }
 
 .category-btn:hover {
@@ -1501,6 +1533,8 @@ body.lang-az .nav-btn {
     display: block;
     overflow: hidden;
     cursor: pointer;
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
 }
 
 .cta-text {
@@ -1513,8 +1547,15 @@ body.lang-az .nav-btn {
     margin: 0;
     letter-spacing: -1px;
     position: relative;
-    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
     line-height: 1.1;
+    display: block;
+    overflow: hidden;
+}
+
+.cta-text span {
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    font-family: inherit;
 }
 
 .cta-text::after {
@@ -1523,13 +1564,26 @@ body.lang-az .nav-btn {
     top: 100%;
     left: 0;
     width: 100%;
+    height: 100%;
     color: #FFA500;
     -webkit-text-stroke: 0;
-    font-family: 'Gabarito', sans-serif;
+    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
 }
 
-.cta-text-link:hover .cta-text {
+.cta-text-link:hover .cta-text span {
     transform: translateY(-100%);
+}
+
+.cta-text-link:hover .cta-text::after {
+    transform: translateY(-100%);
+    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+}
+
+.cta-text-link:not(:hover) .cta-text::after {
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 .cta-button {
@@ -1601,7 +1655,8 @@ body.lang-az .nav-btn {
     overflow: hidden;
     text-decoration: none;
     line-height: 1.2;
-    padding-bottom: 2px;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
     cursor: pointer;
 }
 
@@ -1622,10 +1677,21 @@ body.lang-az .nav-btn {
     width: 100%;
     color: #FFA500;
     font-weight: 600;
+    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .mask-link:hover span {
     transform: translateY(-100%);
+}
+
+.mask-link:hover span::after {
+    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+}
+
+.mask-link:not(:hover) span::after {
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 .social-icons {
@@ -1964,100 +2030,6 @@ body.lang-az .nav-btn {
     }
 
     .custom-controls {
-        padding: 0 20px 40px;
-    }
-
-    .volume-wrapper {
-        display: none;
-    }
-}
-
-/* =========================================
-   19. RESPONSIVE - SMALL MOBILE (480px)
-   ========================================= */
-@media (max-width: 480px) {
-    .lang-selector {
-        top: 22px;
-        left: 82px;
-        z-index: 30001;
-    }
-    
-    .lang-globe-btn {
-        padding: 5px;
-        gap: 6px;
-        pointer-events: auto;
-    }
-    
-    .globe-icon {
-        width: 16px;
-        height: 16px;
-    }
-    
-    .globe-icon::before {
-        width: 14px;
-        height: 14px;
-        border-width: 1px;
-    }
-    
-    .globe-icon::after {
-        width: 14px;
-        height: 1px;
-    }
-    
-    .globe-icon .globe-ellipse {
-        width: 7px;
-        height: 14px;
-        border-width: 1px;
-    }
-    
-    .current-lang {
-        font-size: 10px;
-    }
-    
-    .lang-dropdown {
-        min-width: 140px;
-    }
-    
-    .center-logo {
-        top: 12px;
-        left: 15px;
-    }
-    
-    .logo-img {
-        width: 65px;
-        height: 65px;
-    }
-
-    .hamburger {
-        padding: 6px;
-    }
-
-    .modal-play-btn,
-    .play-button-container {
-        width: 100px !important;
-        height: 50px !important;
-    }
-
-    .play-button {
-        width: 50px;
-        height: 20px;
-    }
-
-    .play-button::before {
-        width: 75px;
-        height: 28px;
-    }
-
-    .play-button::after {
-        width: 95px;
-        height: 35px;
-    }
-
-    .play-text {
-        font-size: 7px;
-    }
-
-    .custom-controls {
         padding: 0 10px 20px 10px;
     }
 
@@ -2081,6 +2053,51 @@ body.lang-az .nav-btn {
     .right-controls-group {
         gap: 8px;
     }
+}
 
-    
+/* =========================================
+   20. AZƏRBAYCAN DİLİ - İ və Ş HƏRFİ DÜZƏLİŞİ (OPTIMIZED)
+   ========================================= */
+
+/* YALNIZ HERO BAŞLIQ (İŞLƏR) ÜÇÜN */
+/* Digər hissələr (Menu, Contact) əvvəlki kimi qalır */
+
+body.lang-az .title-main,
+body.lang-az .title-main span {
+    line-height: 1.3 !important;      /* 1.6 çox idi, 1.3-ə endirdik (sürətli olsun) */
+    padding-top: 8px !important;      /* 15px çox idi, 8px bəs edir */
+    padding-bottom: 8px !important;
+    display: inline-block !important;
+}
+
+/* Hero Konteyner */
+body.lang-az .hero-left-title {
+    overflow: hidden !important;
+    height: auto !important;
+    padding-top: 0 !important;   
+    padding-bottom: 0 !important;
+    display: block !important;
+}
+
+/* Narıncı yazı (WORKS/İŞLƏR) */
+body.lang-az .title-main::after {
+    content: attr(data-text);
+    top: 100% !important;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    line-height: 1.3 !important;      /* Uyğunlaşdırıldı */
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    transform: translateY(0);
+}
+
+/* Hover Animasiyası */
+body.lang-az .title-main:hover span {
+    transform: translateY(-100%) !important;
+}
+
+body.lang-az .title-main:hover::after {
+    transform: translateY(-100%) !important;
+    clip-path: inset(0 0 0 0) !important;
 }

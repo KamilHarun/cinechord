@@ -545,7 +545,6 @@ async function submitService() {
     // 2. FORMDATA-YA ƏLAVƏ EDİRİK
     fd.append('title', title);
     fd.append('titleAz', titleAz);
-    fd.append('iconClass', document.getElementById('sIcon').value);
     fd.append('description', desc);
     fd.append('descriptionAz', descAz);
     
@@ -761,8 +760,6 @@ async function loadAbout() {
         document.getElementById('aMissionAz').value = data.ourMissionTextAz || '';
         document.getElementById('aApproach').value = data.ourApproachText || '';
         document.getElementById('aApproachAz').value = data.ourApproachTextAz || '';
-        document.getElementById('aEmail').value = data.email || '';
-        document.getElementById('aPhone').value = data.phone || '';
         document.getElementById('aAddress').value = data.address || '';
         document.getElementById('aAddressAz').value = data.addressAz || '';
     } catch(e) { console.error(e); }
@@ -780,8 +777,6 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
     fd.append('ourMissionTextAz', document.getElementById('aMissionAz').value);
     fd.append('ourApproachText', document.getElementById('aApproach').value);
     fd.append('ourApproachTextAz', document.getElementById('aApproachAz').value);
-    fd.append('email', document.getElementById('aEmail').value);
-    fd.append('phone', document.getElementById('aPhone').value);
     fd.append('address', document.getElementById('aAddress').value);
     fd.append('addressAz', document.getElementById('aAddressAz').value);
     

@@ -8,8 +8,7 @@
     const API_WORKS = `${BACKEND_URL}/api/works`;
     const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
 
-    const SHOWREEL_VIDEO_URL = "https://player.cloudinary.com/embed/?cloud_name=dinncr6hs&public_id=Works_Showreel_epbwt0&profile=cld-default";
-    
+const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Works_Showreel_epbwt0.mp4";    
     // Əsas elementlər
     const container = document.getElementById('dynamic-projects-grid');
     const loadingScreen = document.querySelector('.loading-screen');
@@ -68,6 +67,70 @@
         setTimeout(() => {
             pageTransition.classList.add('page-loaded'); 
         }, 100);
+    }
+
+    // ============================================================
+    // ✅ YENİ: HERO VIDEO INIT (Arxa fon videosu üçün)
+    // ============================================================
+    function initHeroVideo() {
+        const heroBg = document.querySelector('.hero-bg');
+        if (!heroBg) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'hero-bg element not found',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            console.warn('hero-bg element not found');
+            return;
+        }
+        
+        const video = document.createElement('video');
+        video.src = SHOWREEL_VIDEO_URL;
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.style.position = "absolute";
+        video.style.top = "0";
+        video.style.left = "0";
+        video.style.width = "100%";
+        video.style.height = "100%";
+        video.style.objectFit = "cover";
+        video.style.zIndex = "-1";
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Creating Cloudinary video',data:{videoSrc:SHOWREEL_VIDEO_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        
+        // Video hatalarını yakala
+        video.addEventListener('error', (e) => {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video error event',data:{error:e.error,networkState:video.networkState,readyState:video.readyState,src:video.src},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            console.error('Hero video loading error:', e, video.error, video.networkState);
+        });
+        
+        video.addEventListener('loadstart', () => {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video loadstart',data:{src:video.src},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+        });
+        
+        video.addEventListener('loadeddata', () => {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video loadeddata',data:{src:video.src,readyState:video.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+        });
+        
+        // Play hatalarını yakala
+        video.play().catch((error) => {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video play error',data:{error:error.message,errorName:error.name,src:video.src},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            console.warn('Hero video autoplay failed:', error);
+        });
+        
+        heroBg.appendChild(video);
     }
 
     // ============================================================
@@ -801,6 +864,7 @@
     async function init() {
         await loadTranslations();
         initLanguageSelector();
+        initHeroVideo(); // ← Cloudinary video'yu yükle
         loadDynamicWorks();
         setupNavLinks();
     }
