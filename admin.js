@@ -741,57 +741,59 @@ async function deleteMessage(id) {
 }
 
 // ============================================
-// ABOUT (HAQQIMIZDA)
+// ABOUT (HAQQIMIZDA) - FIXED VERSION
 // ============================================
 
-async function loadAbout() {
-    try {
-        const res = await authFetch(`${API.ABOUT}/getAbout?t=${Date.now()}`);
-        if(!res || !res.ok) return;
-        
-        const data = await res.json();
-        document.getElementById('aMainTitle').value = data.mainTitle || '';
-        document.getElementById('aMainTitleAz').value = data.mainTitleAz || '';
-        document.getElementById('aSubTitle').value = data.subTitle || '';
-        document.getElementById('aSubTitleAz').value = data.subTitleAz || '';
-        document.getElementById('aWho').value = data.whoWeAreText || '';
-        document.getElementById('aWhoAz').value = data.whoWeAreTextAz || '';
-        document.getElementById('aMission').value = data.ourMissionText || '';
-        document.getElementById('aMissionAz').value = data.ourMissionTextAz || '';
-        document.getElementById('aApproach').value = data.ourApproachText || '';
-        document.getElementById('aApproachAz').value = data.ourApproachTextAz || '';
-        document.getElementById('aAddress').value = data.address || '';
-        document.getElementById('aAddressAz').value = data.addressAz || '';
-    } catch(e) { console.error(e); }
-}
-
 document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
-    const fd = new FormData();
-    fd.append('mainTitle', document.getElementById('aMainTitle').value);
-    fd.append('mainTitleAz', document.getElementById('aMainTitleAz').value);
-    fd.append('subTitle', document.getElementById('aSubTitle').value);
-    fd.append('subTitleAz', document.getElementById('aSubTitleAz').value);
-    fd.append('whoWeAreText', document.getElementById('aWho').value);
-    fd.append('whoWeAreTextAz', document.getElementById('aWhoAz').value);
-    fd.append('ourMissionText', document.getElementById('aMission').value);
-    fd.append('ourMissionTextAz', document.getElementById('aMissionAz').value);
-    fd.append('ourApproachText', document.getElementById('aApproach').value);
-    fd.append('ourApproachTextAz', document.getElementById('aApproachAz').value);
-    fd.append('address', document.getElementById('aAddress').value);
-    fd.append('addressAz', document.getElementById('aAddressAz').value);
+    // Məlumatları obyekt şəklində yığırıq (Daha etibarlıdır)
+    const aboutData = {
+        mainTitle: document.getElementById('aMainTitle').value,
+        mainTitleAz: document.getElementById('aMainTitleAz').value,
+        subTitle: document.getElementById('aSubTitle').value,
+        subTitleAz: document.getElementById('aSubTitleAz').value,
+        whoWeAreText: document.getElementById('aWho').value,
+        whoWeAreTextAz: document.getElementById('aWhoAz').value,
+        ourMissionText: document.getElementById('aMission').value,
+        ourMissionTextAz: document.getElementById('aMissionAz').value,
+        ourApproachText: document.getElementById('aApproach').value,
+        ourApproachTextAz: document.getElementById('aApproachAz').value,
+        address: document.getElementById('aAddress').value,
+        addressAz: document.getElementById('aAddressAz').value
+    };
+
+    // Əgər video faylı YOXDURSA, birbaşa JSON göndərmək daha yaxşıdır
+    const videoFile = document.getElementById('aVideoFile').files[0];
     
-    const video = document.getElementById('aVideoFile').files[0];
-    if(video) fd.append('videoFile', video);
+    let options = {
+        method: 'PUT'
+    };
+
+    if (videoFile) {
+        // Əgər video varsa FormData istifadə etməliyik
+        const fd = new FormData();
+        Object.keys(aboutData).forEach(key => fd.append(key, aboutData[key]));
+        fd.append('videoFile', videoFile);
+        options.body = fd;
+        // authFetch avtomatik Content-Type tənzimləyəcək
+    } else {
+        // Video yoxdursa təmiz JSON göndəririk (Xanaların qarışmaması üçün)
+        options.body = JSON.stringify(aboutData);
+        options.headers = { 'Content-Type': 'application/json' };
+    }
     
     Swal.fire({title: 'Yüklənir...', didOpen: () => Swal.showLoading()});
     
     try {
-        const res = await authFetch(`${API.ABOUT}/updateAbout`, { method: 'PUT', body: fd });
+        const res = await authFetch(`${API.ABOUT}/updateAbout`, options);
         if(res && res.ok) {
             Swal.fire('Uğurlu!', 'Məlumatlar yeniləndi', 'success');
             loadAbout();
-        } else { Swal.fire('Xəta', 'Yadda saxlamaq olmadı', 'error'); }
-    } catch(e) { Swal.fire('Xəta', e.message, 'error'); }
+        } else { 
+            Swal.fire('Xəta', 'Yadda saxlamaq olmadı. Sahələri yoxlayın.', 'error'); 
+        }
+    } catch(e) { 
+        Swal.fire('Xəta', e.message, 'error'); 
+    }
 });
 
 // ============================================

@@ -242,7 +242,7 @@ body.lang-az .nav-btn {
 .lang-selector {
     position: fixed;
     top: 33px;
-    right: 175px;
+    right: 165px;   
     z-index: 30001;
     pointer-events: auto;
 }
@@ -1461,9 +1461,9 @@ body.lang-az .nav-btn {
 
 @media (max-width: 768px) {
     .lang-selector {
-        top: 22px;
-        right: auto;
-        left: 100px;
+        top: 24px !important;    /* Hamburgerlə eyni sıraya gətirir */
+        right: 125px !important; /* Hamburgerin dərhal soluna qoyur */
+        left: auto !important;   /* Solda durmasın deyə bunu mütləq yaz */
         z-index: 30001;
     }
     
@@ -1570,7 +1570,7 @@ body.lang-az .nav-btn {
 
     .play-button-container {
         width: 140px;
-        height: 70px;
+        height: 90px;
         top: 45%;
         z-index: 10000 !important;
     }

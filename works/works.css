@@ -1766,9 +1766,9 @@ body.lang-az .category-btn {
    ========================================= */
 @media (max-width: 768px) {
     .lang-selector {
-        top: 25px;
-        right: auto;
-        left: 100px;
+        top: 22px !important;    /* Hamburgerlə eyni sıraya gətirir */
+        right: 125px !important; /* Hamburgerin dərhal soluna qoyur */
+        left: auto !important;   /* Solda durmasın deyə bunu mütləq yaz */
         z-index: 30001;
     }
     
@@ -1852,9 +1852,18 @@ body.lang-az .category-btn {
         width: 100%;
     }
     
-    .nav-btn {
-        font-size: 13vw;
-        margin: -5px 0;
+ .nav-btn {
+        font-size: 11vw !important;  /* Sözləri Home-dakı kimi böyük saxlayırıq */
+        margin: -1vh 0 !important;   /* Mənfi margin yaxınlaşdırır (Home-dakı rəqəm) */
+        line-height: 1.0 !important; /* Home-da bu rəqəm 0.95-dir, amma AZ dili üçün 1.0 idealdır */
+        display: block !important;
+        overflow: visible !important;
+    }
+
+    body.lang-az .nav-btn {
+        font-size: 8.5vw !important; /* Uzun sözlərin qırağa çıxmaması üçün */
+        line-height: 1.2 !important; /* AZ hərflərinin bir-birinə girməməsi üçün 0.1 artıq verdik */
+        letter-spacing: 0px !important; 
     }
     
     .center-logo {

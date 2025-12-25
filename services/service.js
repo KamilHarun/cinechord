@@ -557,158 +557,136 @@
     // API verilerini sakla
     let cachedServicesData = null;
 
-    async function fetchAndRenderServices(lang = 'en') {
-        const container = elements.servicesContainer;
-        if (!container) return;
+async function fetchAndRenderServices(lang = 'en') {
+    const container = elements.servicesContainer;
+    if (!container) return;
 
-        try {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:560',message:'fetchAndRenderServices called',data:{lang:lang},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-            
-            // API'ye dil parametresi gönder
-            const langParam = lang === 'az' ? 'az' : 'en';
-            const url = `${API_SERVICES}?lang=${langParam}`;
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:567',message:'Making API request',data:{url:url,langParam:langParam},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-            
-            const response = await fetch(url);
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:570',message:'API response received',data:{status:response.status,statusText:response.statusText,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-            
-            if (!response.ok) {
-                // #region agent log
-                const responseClone = response.clone();
-                const errorText = await responseClone.text().catch(() => 'Could not read error response');
-                fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:570',message:'API error response body',data:{status:response.status,statusText:response.statusText,errorText:errorText.substring(0,500)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-                throw new Error(`API error! Status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:572',message:'API response data parsed',data:{hasContent:!!data.content,isArray:Array.isArray(data),dataType:typeof data,servicesLength:data.content?.length||(Array.isArray(data)?data.length:0)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-            
-            const services = data.content ? data.content : data;
-            cachedServicesData = services;
-            
-            if (!services || services.length === 0) {
-                const noServicesMsg = lang === 'az' ? 'Xidmətlər mövcud deyil.' : 'No services available.';
-                container.innerHTML = `<p style="text-align:center; padding: 100px; color: rgba(255,255,255,0.5);">${noServicesMsg}</p>`;
-                return;
-            }
+    try {
+        // 1. API'ye dil parametresi gönder (BU KISIM KALMALI)
+        const langParam = lang === 'az' ? 'az' : 'en';
+        const url = `${API_SERVICES}?lang=${langParam}`;
+        
+        // 2. Asıl veriyi çeken istek (BU KISIM KALMALI)
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`API error! Status: ${response.status}`);
+        }
+        
+        // 3. Veriyi JSON formatına çevir (BU KISIM KALMALI)
+        const data = await response.json();
+        
+        const services = data.content ? data.content : data;
+        cachedServicesData = services;
+        
+        if (!services || services.length === 0) {
+            const noServicesMsg = lang === 'az' ? 'Xidmətlər mövcud deyil.' : 'No services available.';
+            container.innerHTML = `<p style="text-align:center; padding: 100px; color: rgba(255,255,255,0.5);">${noServicesMsg}</p>`;
+            return;
+        }
 
-            renderServices(services, lang);
-            
-        } catch (error) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'service.js:585',message:'Error caught',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-            
-            console.error('Xidmətlər yüklənərkən xəta:', error);
-            // Eğer önceki veri varsa onu kullan
-            if (cachedServicesData) {
-                renderServices(cachedServicesData, lang);
-            } else {
-                const errorMsg = lang === 'az' ? 'Xidmətlər hazırda mövcud deyil.' : 'Services are currently unavailable.';
-                container.innerHTML = `
-                    <p style="text-align:center; padding: 100px; color: #FF8C00;">
-                        ${errorMsg}<br>
-                        <small style="color: rgba(255,255,255,0.4);">API: ${API_SERVICES}</small><br>
-                        <small style="color: rgba(255,255,255,0.4);">Error: ${error.message}</small>
-                    </p>
-                `;
-            }
+        // 4. Veriyi ekrana bas (BU KISIM KALMALI)
+        renderServices(services, lang);
+        
+    } catch (error) {
+        console.error('Xidmətlər yüklənərkən xəta:', error);
+        
+        if (cachedServicesData) {
+            renderServices(cachedServicesData, lang);
+        } else {
+            const errorMsg = lang === 'az' ? 'Xidmətlər hazırda mövcud deyil.' : 'Services are currently unavailable.';
+            container.innerHTML = `
+                <p style="text-align:center; padding: 100px; color: #FF8C00;">
+                    ${errorMsg}<br>
+                    <small style="color: rgba(255,255,255,0.4);">API: ${API_SERVICES}</small><br>
+                    <small style="color: rgba(255,255,255,0.4);">Error: ${error.message}</small>
+                </p>
+            `;
         }
     }
+}
 
-    function renderServices(services, lang = 'en') {
-        const container = elements.servicesContainer;
-        if (!container) return;
-        
-        let htmlContent = '';
-        
-        services.forEach((service, index) => {
-            let videoSrc = service.videoUrl || '';
-            if (videoSrc) {
-                videoSrc = cleanUrlPath(videoSrc);
-                if (!videoSrc.startsWith('http')) {
-                    videoSrc = UPLOADS_URL + videoSrc;
-                }
+   function renderServices(services, lang = 'en') {
+    const container = elements.servicesContainer;
+    if (!container) return;
+    
+    // HATAYI DÜZELTEN KRİTİK TANIMLAMA
+    const isAz = lang === 'az'; 
+
+    let htmlContent = '';
+    
+    services.forEach((service, index) => {
+        let videoSrc = service.videoUrl || '';
+        if (videoSrc) {
+            videoSrc = cleanUrlPath(videoSrc);
+            if (!videoSrc.startsWith('http')) {
+                videoSrc = UPLOADS_URL + videoSrc;
             }
-            
-            // Backend artık lang parametresine göre doğru dildeki veriyi title, description gibi alanlara koyuyor
-            // O yüzden direkt service.title, service.description kullanıyoruz (backend zaten doğru dili koydu)
-            const bulletPoints = service.bulletPoints || [];
-            const processSteps = service.processSteps || [];
-            const title = service.title || '';
-            const description = service.description || '';
-            
-            const bulletListHtml = bulletPoints && Array.isArray(bulletPoints)
-                ? bulletPoints.map(item => `<li>${item}</li>`).join('')
-                : '';
-            
-            const processStepsHtml = processSteps && Array.isArray(processSteps)
-                ? processSteps.map((item, i) => `<li>${i + 1}. ${item}</li>`).join('')
-                : '';
-            
-            const titleText = (title || '').toUpperCase();
+        }
+        
+        const bulletPoints = service.bulletPoints || [];
+        const processSteps = service.processSteps || [];
+        const title = service.title || '';
+        const description = service.description || '';
+        
+        const bulletListHtml = bulletPoints && Array.isArray(bulletPoints)
+            ? bulletPoints.map(item => `<li>${item}</li>`).join('')
+            : '';
+        
+        const processStepsHtml = processSteps && Array.isArray(processSteps)
+            ? processSteps.map((item, i) => `<li>${i + 1}. ${item}</li>`).join('')
+            : '';
+        
+        const titleText = (title || '').toUpperCase();
 
-            const mediaColumn = `
-                <div class="media-column">
-                    <div class="media-container">
-                        <div class="media-frame">
-                            <video class="media-content" 
-                                muted loop playsinline preload="auto"
-                                src="${videoSrc}"> 
-                            </video>
-                        </div>
+        const mediaColumn = `
+            <div class="media-column">
+                <div class="media-container">
+                    <div class="media-frame">
+                        <video class="media-content" 
+                            muted loop playsinline preload="auto"
+                            src="${videoSrc}"> 
+                        </video>
                     </div>
                 </div>
-            `;
-            
-            const contentColumn = `
-                <div class="content-column">
-                    <div class="content-wrapper">
-                        <div class="service-header">
-                            <div class="icon-container">
-                                <i class="${service.iconClass || 'fas fa-cogs'}"></i>
-                            </div>
-                            <h2 class="service-title" data-text="${titleText}">
-                                <span>${titleText}</span>
-                            </h2>
-                        </div>
-                        <p class="description">${description || ''}</p>
-                        ${bulletListHtml ? `<ul class="bullet-list">${bulletListHtml}</ul>` : ''}
-                        ${bulletListHtml && processStepsHtml ? '<div class="divider"></div>' : ''}
-                        ${processStepsHtml ? `<ol class="numbered-list">${processStepsHtml}</ol>` : ''}
-                        <a href="../contact/" class="cta-button">
-                            ${isAz ? 'ƏLAQƏ' : 'CONTACT'} <i class="fas fa-long-arrow-alt-right"></i>
-                        </a>
-                    </div>
-                </div>
-            `;
-            
-            if (index % 2 === 0) {
-                htmlContent += `<section class="page-wrapper reveal-item">${mediaColumn}${contentColumn}</section>`;
-            } else { 
-                htmlContent += `<section class="page-wrapper reveal-item">${contentColumn}${mediaColumn}</section>`;
-            }
-        });
-
-        container.innerHTML = htmlContent;
+            </div>
+        `;
         
-        initScrollReveal();
-        initVideoLazyLoad();
-        initVideoAutoplay();
-    }
+        const contentColumn = `
+            <div class="content-column">
+                <div class="content-wrapper">
+                    <div class="service-header">
+                        <div class="icon-container">
+                            <i class="${service.iconClass || 'fas fa-cogs'}"></i>
+                        </div>
+                        <h2 class="service-title" data-text="${titleText}">
+                            <span>${titleText}</span>
+                        </h2>
+                    </div>
+                    <p class="description">${description || ''}</p>
+                    ${bulletListHtml ? `<ul class="bullet-list">${bulletListHtml}</ul>` : ''}
+                    ${bulletListHtml && processStepsHtml ? '<div class="divider"></div>' : ''}
+                    ${processStepsHtml ? `<ol class="numbered-list">${processStepsHtml}</ol>` : ''}
+                    <a href="../contact/" class="cta-button">
+                        ${isAz ? 'ƏLAQƏ' : 'CONTACT'} <i class="fas fa-long-arrow-alt-right"></i>
+                    </a>
+                </div>
+            </div>
+        `;
+        
+        if (index % 2 === 0) {
+            htmlContent += `<section class="page-wrapper reveal-item">${mediaColumn}${contentColumn}</section>`;
+        } else { 
+            htmlContent += `<section class="page-wrapper reveal-item">${contentColumn}${mediaColumn}</section>`;
+        }
+    });
 
+    container.innerHTML = htmlContent;
+    
+    initScrollReveal();
+    initVideoLazyLoad();
+    initVideoAutoplay();
+}
     /* ============================================================
         9. INITIALIZATION
         ============================================================ */

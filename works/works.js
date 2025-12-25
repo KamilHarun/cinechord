@@ -876,3 +876,39 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     }
 
 })();
+// ============================================================
+    // ✅ YENİ: SCROLL AUTO-HIDE (Logo, Globe, Menu)
+    // ============================================================
+    let lastScrollTop = 0;
+    const scrollThreshold = 50; // Scroll həssaslığı
+
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Əgər mobil menyu açıqdırsa, gizlətməni dayandır
+        const isMenuOpen = hamburger && hamburger.classList.contains('active');
+        if (isMenuOpen) return;
+
+        // Header elementlərini seçirik
+        const elementsToHide = [centerLogo, hamburger, document.getElementById('langSelector')];
+
+        if (Math.abs(lastScrollTop - currentScroll) <= scrollThreshold) return;
+
+        if (currentScroll > lastScrollTop && currentScroll > 100) {
+            // Aşağı scroll - GİZLƏT
+            elementsToHide.forEach(el => {
+                if (el) el.style.transform = 'translateY(-100px)';
+                if (el) el.style.opacity = '0';
+                if (el) el.style.pointerEvents = 'none';
+            });
+        } else {
+            // Yuxarı scroll - GÖSTƏR
+            elementsToHide.forEach(el => {
+                if (el) el.style.transform = 'translateY(0)';
+                if (el) el.style.opacity = '1';
+                if (el) el.style.pointerEvents = 'auto';
+            });
+        }
+        
+        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+    }, { passive: true });
