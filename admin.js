@@ -1,16 +1,10 @@
 // ============================================
-// CINECHORD ADMIN PANEL - FIXED & UPDATED
+// CINECHORD ADMIN PANEL - COMPLETE & FIXED
 // ============================================
 
-// ✅ URL TƏNZİMLƏMƏLƏRİ
-// const BASE_URL = "http://localhost:8080"; 
-
-// 2. Serverdə istifadə üçün:
 const BASE_URL = "https://cinechord-admin-production.up.railway.app";
-
 const UPLOADS_URL = `${BASE_URL}/uploads/`;
 
-// API ENDPOINTS
 const API = {
     LOGIN: `${BASE_URL}/api/auth/login`,
     WORKS: `${BASE_URL}/admin/works`,
@@ -19,7 +13,6 @@ const API = {
     ABOUT: `${BASE_URL}/admin/about`
 };
 
-// GLOBAL VARIABLES
 let worksChart, categoryChart;
 let currentPage = 0;
 const pageSize = 20;
@@ -28,7 +21,7 @@ let selectedItems = [];
 let worksDataCache = [];
 
 // ============================================
-// UTILS (KÖMƏKÇİ FUNKSİYALAR)
+// UTILS
 // ============================================
 
 function getImageUrl(url) {
@@ -46,7 +39,6 @@ function formatDate(dateString) {
     });
 }
 
-// TOKEN EXPIRY CHECK
 function checkTokenExpiry() {
     const token = localStorage.getItem('jwt_token');
     if(!token) return;
@@ -60,7 +52,7 @@ function checkTokenExpiry() {
 setInterval(checkTokenExpiry, 60000);
 
 // ============================================
-// AUTH (GİRİŞ SİSTEMİ)
+// AUTH
 // ============================================
 
 function checkAuth() {
@@ -97,7 +89,6 @@ async function authFetch(url, options = {}) {
     }
 }
 
-// LOGIN SUBMIT
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const username = document.getElementById('loginUser').value;
@@ -230,7 +221,7 @@ function initCharts(works) {
 }
 
 // ============================================
-// WORKS (PORTFOLIO)
+// WORKS
 // ============================================
 
 async function loadWorks(page = 0) {
@@ -300,7 +291,6 @@ function renderPagination(totalPages, current) {
     document.getElementById('pagination').innerHTML = html;
 }
 
-// --- DELETE WORK ---
 async function deleteWork(id) {
     const r = await Swal.fire({
         title: 'Silinsin?', 
@@ -327,7 +317,6 @@ async function deleteWork(id) {
     }
 }
 
-// --- WORK MODAL & FORM ---
 function openWorkModal() {
     document.getElementById('workForm').reset();
     document.getElementById('workId').value = ''; 
@@ -401,10 +390,6 @@ async function submitWork() {
         let method = id ? 'PUT' : 'POST';
 
         const xhr = new XMLHttpRequest();
-        xhr.upload.addEventListener('progress', (e) => {
-            // Optional: Progress Bar Logic here if needed
-        });
-
         const token = localStorage.getItem('jwt_token');
         xhr.open(method, url);
         if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -428,7 +413,6 @@ async function submitWork() {
     }
 }
 
-// Bulk & Search Functions
 function toggleBulkSelect(id) {
     const checkbox = document.querySelector(`.bulk-checkbox[data-id="${id}"]`);
     if (checkbox.checked) selectedItems.push(id);
@@ -467,7 +451,7 @@ function filterWorks() {
 }
 
 // ============================================
-// SERVICES (XİDMƏTLƏR) - FIXED & UPDATED
+// SERVICES
 // ============================================
 
 async function loadServices() {
@@ -502,7 +486,6 @@ async function loadServices() {
 }
 
 function openServiceModal() {
-    // MODAL AÇILANDA FORMU TAM TƏMİZLƏYİR
     document.getElementById('serviceForm').reset();
     document.getElementById('serviceId').value = '';
     new bootstrap.Modal(document.getElementById('serviceModal')).show();
@@ -511,7 +494,6 @@ function openServiceModal() {
 async function submitService() {
     const fd = new FormData();
     
-    // 1. DƏYƏRLƏRİ OXUYURUQ
     const title = document.getElementById('sTitle').value;
     let titleAz = document.getElementById('sTitleAz').value; 
     
@@ -524,49 +506,31 @@ async function submitService() {
     const processStepsText = document.getElementById('sProcessSteps').value;
     let processStepsAzText = document.getElementById('sProcessStepsAz').value;
 
-    // --- AVTOMATİK KOPYALAMA (NULL CHECK FIX) ---
-    // Əgər AZ başlıq boşdursa, İngilis başlığını ora yaz
-    if (!titleAz || titleAz.trim() === "") {
-        titleAz = title; 
-    }
-    // Təsvir boşdursa
-    if (!descAz || descAz.trim() === "") {
-        descAz = desc;
-    }
-    // Siyahılar boşdursa
-    if (!bulletPointsAzText || bulletPointsAzText.trim() === "") {
-        bulletPointsAzText = bulletPointsText;
-    }
-    if (!processStepsAzText || processStepsAzText.trim() === "") {
-        processStepsAzText = processStepsText;
-    }
-    // ------------------------------------------
+    if (!titleAz || titleAz.trim() === "") titleAz = title; 
+    if (!descAz || descAz.trim() === "") descAz = desc;
+    if (!bulletPointsAzText || bulletPointsAzText.trim() === "") bulletPointsAzText = bulletPointsText;
+    if (!processStepsAzText || processStepsAzText.trim() === "") processStepsAzText = processStepsText;
 
-    // 2. FORMDATA-YA ƏLAVƏ EDİRİK
     fd.append('title', title);
     fd.append('titleAz', titleAz);
     fd.append('description', desc);
     fd.append('descriptionAz', descAz);
     
-    // Bullet Points Arrays
     const bulletPoints = bulletPointsText.split('\n').filter(line => line.trim() !== '');
     bulletPoints.forEach(point => fd.append('bulletPoints', point.trim()));
     
     const bulletPointsAz = bulletPointsAzText.split('\n').filter(line => line.trim() !== '');
     bulletPointsAz.forEach(point => fd.append('bulletPointsAz', point.trim()));
     
-    // Process Steps Arrays
     const processSteps = processStepsText.split('\n').filter(line => line.trim() !== '');
     processSteps.forEach(step => fd.append('processSteps', step.trim()));
     
     const processStepsAz = processStepsAzText.split('\n').filter(line => line.trim() !== '');
     processStepsAz.forEach(step => fd.append('processStepsAz', step.trim()));
     
-    // Video Fayl
     const video = document.getElementById('sVideoFile').files[0];
     if(video) fd.append('videoFile', video);
     
-    // Loading Animation
     Swal.fire({
         title: 'Yüklənir...', 
         html: 'Zəhmət olmasa gözləyin, video böyükdüsə vaxt ala bilər.',
@@ -614,7 +578,7 @@ async function deleteService(id) {
 }
 
 // ============================================
-// MESSAGES (MESAJLAR)
+// MESSAGES
 // ============================================
 
 async function loadMessages() {
@@ -635,7 +599,6 @@ async function loadMessages() {
             return;
         }
         
-        // Sort by date
         messages.sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
             const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
@@ -739,15 +702,15 @@ async function deleteMessage(id) {
         }
     }
 }
+
 // ============================================
-// ABOUT (HAQQIMIZDA) - COMPLETE & FIXED
+// ABOUT (HAQQIMIZDA) - EMAIL & PHONE ƏLAVƏ EDİLDİ
 // ============================================
 
 async function loadAbout() {
     try {
         console.log('Loading About data...');
         
-        // ✅ Backend endpoint: /admin/about/getAbout
         const res = await authFetch(`${API.ABOUT}/getAbout?t=${Date.now()}`);
         
         if(!res || !res.ok) {
@@ -759,25 +722,39 @@ async function loadAbout() {
         const data = await res.json();
         console.log('About data loaded:', data);
         
-        // ✅ İNGİLİSCƏ FIELD-LƏR
-        document.getElementById('aMainTitle').value = data.mainTitle || '';
-        document.getElementById('aSubTitle').value = data.subTitle || '';
-        document.getElementById('aWho').value = data.whoWeAreText || '';
-        document.getElementById('aMission').value = data.ourMissionText || '';
-        document.getElementById('aApproach').value = data.ourApproachText || '';
-        document.getElementById('aAddress').value = data.address || '';
+        // İNGİLİSCƏ FIELD-LƏR
+        if(document.getElementById('aMainTitle')) 
+            document.getElementById('aMainTitle').value = data.mainTitle || '';
+        if(document.getElementById('aSubTitle')) 
+            document.getElementById('aSubTitle').value = data.subTitle || '';
+        if(document.getElementById('aWho')) 
+            document.getElementById('aWho').value = data.whoWeAreText || '';
+        if(document.getElementById('aMission')) 
+            document.getElementById('aMission').value = data.ourMissionText || '';
+        if(document.getElementById('aApproach')) 
+            document.getElementById('aApproach').value = data.ourApproachText || '';
+        if(document.getElementById('aAddress')) 
+            document.getElementById('aAddress').value = data.address || '';
         
-        // ✅ AZƏRBAYCANCA FIELD-LƏR
-        document.getElementById('aMainTitleAz').value = data.mainTitleAz || '';
-        document.getElementById('aSubTitleAz').value = data.subTitleAz || '';
-        document.getElementById('aWhoAz').value = data.whoWeAreTextAz || '';
-        document.getElementById('aMissionAz').value = data.ourMissionTextAz || '';
-        document.getElementById('aApproachAz').value = data.ourApproachTextAz || '';
-        document.getElementById('aAddressAz').value = data.addressAz || '';
-
-        // ✅ EMAİL AND PHONE
-        document.getElementById('aEmail').value = data.email || '';
-        document.getElementById('aPhone').value = data.phone || '';
+        // AZƏRBAYCANCA FIELD-LƏR
+        if(document.getElementById('aMainTitleAz')) 
+            document.getElementById('aMainTitleAz').value = data.mainTitleAz || '';
+        if(document.getElementById('aSubTitleAz')) 
+            document.getElementById('aSubTitleAz').value = data.subTitleAz || '';
+        if(document.getElementById('aWhoAz')) 
+            document.getElementById('aWhoAz').value = data.whoWeAreTextAz || '';
+        if(document.getElementById('aMissionAz')) 
+            document.getElementById('aMissionAz').value = data.ourMissionTextAz || '';
+        if(document.getElementById('aApproachAz')) 
+            document.getElementById('aApproachAz').value = data.ourApproachTextAz || '';
+        if(document.getElementById('aAddressAz')) 
+            document.getElementById('aAddressAz').value = data.addressAz || '';
+        
+        // ✅ EMAIL VƏ PHONE
+        if(document.getElementById('aEmail')) 
+            document.getElementById('aEmail').value = data.email || '';
+        if(document.getElementById('aPhone')) 
+            document.getElementById('aPhone').value = data.phone || '';
         
         console.log('About məlumatları uğurla yükləndi');
         
@@ -788,33 +765,30 @@ async function loadAbout() {
 }
 
 document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
-    // Məlumatları obyekt şəklində yığırıq
     const aboutData = {
-        mainTitle: document.getElementById('aMainTitle').value,
-        mainTitleAz: document.getElementById('aMainTitleAz').value,
-        subTitle: document.getElementById('aSubTitle').value,
-        subTitleAz: document.getElementById('aSubTitleAz').value,
-        whoWeAreText: document.getElementById('aWho').value,
-        whoWeAreTextAz: document.getElementById('aWhoAz').value,
-        ourMissionText: document.getElementById('aMission').value,
-        ourMissionTextAz: document.getElementById('aMissionAz').value,
-        ourApproachText: document.getElementById('aApproach').value,
-        ourApproachTextAz: document.getElementById('aApproachAz').value,
-        address: document.getElementById('aAddress').value,
-        addressAz: document.getElementById('aAddressAz').value
+        mainTitle: document.getElementById('aMainTitle')?.value || '',
+        mainTitleAz: document.getElementById('aMainTitleAz')?.value || '',
+        subTitle: document.getElementById('aSubTitle')?.value || '',
+        subTitleAz: document.getElementById('aSubTitleAz')?.value || '',
+        whoWeAreText: document.getElementById('aWho')?.value || '',
+        whoWeAreTextAz: document.getElementById('aWhoAz')?.value || '',
+        ourMissionText: document.getElementById('aMission')?.value || '',
+        ourMissionTextAz: document.getElementById('aMissionAz')?.value || '',
+        ourApproachText: document.getElementById('aApproach')?.value || '',
+        ourApproachTextAz: document.getElementById('aApproachAz')?.value || '',
+        address: document.getElementById('aAddress')?.value || '',
+        addressAz: document.getElementById('aAddressAz')?.value || '',
+        email: document.getElementById('aEmail')?.value || 'hello@cinechord.com',
+        phone: document.getElementById('aPhone')?.value || '+994 50 123 45 67'
     };
 
-    const videoFile = document.getElementById('aVideoFile').files[0];
+    const videoFile = document.getElementById('aVideoFile')?.files[0];
     
-    // ✅ Backend @ModelAttribute + @RequestParam istədiyi üçün FormData istifadə edirik
     const fd = new FormData();
-    
-    // Bütün field-ləri FormData-ya əlavə et
     Object.keys(aboutData).forEach(key => {
         fd.append(key, aboutData[key]);
     });
     
-    // Video faylı varsa əlavə et
     if (videoFile) {
         fd.append('videoFile', videoFile);
     }
@@ -827,7 +801,6 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
     });
     
     try {
-        // ✅ Backend endpoint: /admin/about/updateAbout
         const res = await authFetch(`${API.ABOUT}/updateAbout`, { 
             method: 'PUT', 
             body: fd 
@@ -835,7 +808,7 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
         
         if(res && res.ok) {
             Swal.fire('Uğurlu!', 'Məlumatlar yeniləndi', 'success');
-            loadAbout(); // Yenidən yüklə
+            loadAbout();
         } else { 
             Swal.fire('Xəta', 'Yadda saxlamaq olmadı. Sahələri yoxlayın.', 'error'); 
         }
@@ -846,10 +819,9 @@ document.getElementById('saveAboutBtn')?.addEventListener('click', async () => {
 });
 
 // ============================================
-// INIT (BAŞLANĞIC)
+// INIT
 // ============================================
 
-// Dark Mode
 const themeCheckbox = document.getElementById('themeCheckbox');
 if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
@@ -860,5 +832,4 @@ document.getElementById('themeToggleNav')?.addEventListener('click', () => {
     localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 });
 
-// App Start
 checkAuth();
