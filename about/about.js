@@ -313,11 +313,17 @@
             }
         });
 
-        const blockTitles = document.querySelectorAll('.block-title');
+       const blockTitles = document.querySelectorAll('.block-title, .hero-rolling-text');
         blockTitles.forEach(title => {
             const key = title.getAttribute('data-key');
             if (key && t[key]) {
-                title.textContent = t[key];
+                const span = title.querySelector('span');
+                if (span) {
+                    span.textContent = t[key];
+                } else {
+                    title.textContent = t[key];
+                }
+                title.setAttribute('data-text', t[key]); // Narıncı hover qatı üçün
             }
         });
 
@@ -484,30 +490,32 @@
     
     let cachedApiData = null;
 
-    async function loadDynamicContent(lang = 'en') {
-        try {
-            const langParam = lang === 'az' ? 'az' : 'en';
-            const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
-            
-            const response = await retryFetch(() => 
-                fetchWithTimeout(url, { method: 'GET' })
-            );
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const apiData = await response.json();
-            cachedApiData = apiData;
-            processApiData(apiData, lang);
-            
-        } catch (error) {
-            console.error('API error:', error);
-            if (cachedApiData) {
-                processApiData(cachedApiData, lang);
-            } else {
-                showFallbackContent(lang);
-            }
+   async function loadDynamicContent(lang = 'en') {
+    // API-dan cavab gələnə qədər ehtiyat mətni dərhal göstər
+    showFallbackContent(lang); 
+    
+    try {
+        const langParam = lang === 'az' ? 'az' : 'en';
+        const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
+        
+        const response = await retryFetch(() => 
+            fetchWithTimeout(url, { method: 'GET' })
+        );
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const apiData = await response.json();
+        cachedApiData = apiData;
+        processApiData(apiData, lang);
+        
+    } catch (error) {
+        console.error('API error:', error);
+        if (cachedApiData) {
+            processApiData(cachedApiData, lang);
         }
+        // Xəta halında onsuz da yuxarıda fallback çağırıldığı üçün ekran boş qalmayacaq
     }
+}
 
     function processApiData(data, lang = 'en') {
         function formatText(text) {
@@ -650,13 +658,16 @@
        13. INITIALIZATION
        ============================================================ */
     
-    async function init() {
+   async function init() {
         const currentLang = localStorage.getItem('selectedLang') || 'en';
-        const translationsPromise = loadTranslations();
-        const apiPromise = loadDynamicContent(currentLang);
         
-        await translationsPromise;
+        // Öncə tərcümələri tam yükləyirik
+        await loadTranslations();
         
+        // Sonra tətbiq edirik
+        applyTranslations(currentLang);
+        
+        // Digər funksiyaları başladırıq
         initPageTransition();
         initLanguageSelector();
         initMenuSystem();
@@ -665,7 +676,8 @@
         initRevealAnimations();
         setupNavLinks();
         
-        await apiPromise;
+        // Ən sonda databazadan gələn dinamik kontenti yükləyirik
+        await loadDynamicContent(currentLang);
     }
 
     if (document.readyState === 'loading') {
