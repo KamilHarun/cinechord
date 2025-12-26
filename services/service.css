@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - Service Page Stylesheet
-   Version: 3.1 - AZERBAIJAN FONT FIX (OPTIMIZED TITLE)
+   Version: 3.2 - SERVICE TITLE ORANGE + ICON ANIMATION
    ========================================= */
 
 /* =========================================
@@ -28,8 +28,7 @@ body {
 }
 
 body.modal-open {
-    overflow: hidden !important; /* Skroll barı silir */
-    /* padding-right: 17px; Skroll barın yoxa çıxmasını kompensasiya edir */
+    overflow: hidden !important;
 }
 
 /* Azərbaycan dili üçün Montserrat */
@@ -365,8 +364,6 @@ body.lang-az .lang-check i {
     transform: scale(1);
 }
 
-
-
 /* ============================================================
    4. HAMBURGER MENU BUTTON
    ============================================================ */
@@ -457,8 +454,9 @@ body.lang-az .lang-check i {
 .hamburger.active:hover .hamburger-line {
     background: #FFA500;
 }
+
 body.modal-open .hamburger {
-    right: calc(40px + 17px); /* 40px (əsas right) + 17px (skroll bar eni) */
+    right: calc(40px + 17px);
 }
 
 /* ============================================================
@@ -599,7 +597,7 @@ body.modal-open .hamburger {
     will-change: transform;
     z-index: 1;
     pointer-events: none;
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 .nav-btn:hover .nav-text {
@@ -608,7 +606,7 @@ body.modal-open .hamburger {
 
 .nav-btn:hover::after {
     transform: translateY(-100%) skewY(0deg) translateZ(0);
-    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+    clip-path: inset(0 0 0 0);
 }
 
 .nav-btn:not(:hover) .nav-text {
@@ -617,7 +615,7 @@ body.modal-open .hamburger {
 
 .nav-btn:not(:hover)::after {
     transform: translateY(0) translateZ(0);
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 body.lang-az .nav-btn {
@@ -669,7 +667,6 @@ body.lang-az .nav-btn {
     letter-spacing: 1px;
 }
 
-/* Telefon numarası için özel stil - mavi renk görünmesin */
 .menu-contact-info p,
 .menu-contact-info p a,
 .menu-contact-info a {
@@ -856,6 +853,7 @@ body.lang-az .nav-btn {
     margin-bottom: 30px;
 }
 
+/* ✅ ICON CONTAINER - HOVER ANİMASYONU */
 .icon-container {
     width: 50px;
     height: 50px;
@@ -866,20 +864,33 @@ body.lang-az .nav-btn {
     justify-content: center;
     margin-right: 15px;
     flex-shrink: 0;
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .icon-container i {
     font-size: 20px;
     color: rgba(255, 255, 255, 0.9);
+    transition: color 0.3s ease;
 }
 
+/* ✅ HOVER - ICON FIRLANSıN VƏ TURUNCU OLSUN */
+.service-header:hover .icon-container {
+    transform: rotate(10deg) scale(1.1);
+    border-color: #FFA500;
+}
+
+.service-header:hover .icon-container i {
+    color: #FFA500;
+}
+
+/* ✅ SERVICE TITLE - TURUNCU */
 .service-title {
     font-family: 'Gabarito', sans-serif;
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #ffffff;
+    color: #FFA500;
     margin: 0;
 }
 
@@ -1008,7 +1019,6 @@ body.lang-az .nav-btn {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Video native controls'u tamamen gizle */
 .chat-video::-webkit-media-controls {
     display: none !important;
 }
@@ -1075,7 +1085,7 @@ body.lang-az .nav-btn {
 }
 
 /* =========================================
-   12. CINEMATIC FOOTER
+   13. CINEMATIC FOOTER
    ========================================= */
 .main-footer {
     background: #050505;
@@ -1130,7 +1140,8 @@ body.lang-az .nav-btn {
     overflow: hidden;
     text-decoration: none;
     line-height: 1.2;
-    padding-bottom: 2px;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
     cursor: pointer;
 }
 
@@ -1143,6 +1154,11 @@ body.lang-az .nav-btn {
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* Azerbaycan dilinde Montserrat kullan */
+body.lang-az .mask-link span {
+    font-family: 'Montserrat', sans-serif;
+}
+
 .mask-link span::after {
     content: attr(data-text);
     position: absolute;
@@ -1151,10 +1167,26 @@ body.lang-az .nav-btn {
     width: 100%;
     color: #FFA500;
     font-weight: 600;
+    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Azerbaycan dilinde Montserrat kullan */
+body.lang-az .mask-link span::after {
+    font-family: 'Montserrat', sans-serif;
 }
 
 .mask-link:hover span {
     transform: translateY(-100%);
+}
+
+.mask-link:hover span::after {
+    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+}
+
+.mask-link:not(:hover) span::after {
+    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 /* Social Icons */
@@ -1236,14 +1268,14 @@ body.lang-az .nav-btn {
 }
 
 /* ============================================================
-   17. RESPONSIVE - MOBILE (768px) - FINAL OPTIMIZED
+   17. RESPONSIVE - MOBILE (768px)
    ============================================================ */
 
 @media (max-width: 768px) {
     .lang-selector {
-        top: 24px !important;    /* Hamburgerlə eyni sıraya gətirir */
-        right: 125px !important; /* Hamburgerin dərhal soluna qoyur */
-        left: auto !important;   /* Solda durmasın deyə bunu mütləq yaz */
+        top: 38px !important;
+        right: 125px !important;
+        left: auto !important;
         z-index: 30001;
     }
     
@@ -1285,7 +1317,7 @@ body.lang-az .nav-btn {
     }
     
     .hamburger {
-        top: 20px;
+        top: 35px;
         right: 20px;
         gap: 12px;
         padding: 8px;
@@ -1327,34 +1359,30 @@ body.lang-az .nav-btn {
         width: 100%;
     }
     
-    /* Ümumi Menyu Düymələri */
     .nav-btn {
         font-size: 13vw;
         margin: -5px 0;
         display: block !important;
     }
     
-    /* AZ dili üçün Xüsusi Menyu Tənzimləməsi (Sığmayan sözlər üçün) */
     body.lang-az .nav-btn {
-        font-size: 8.2vw !important; /* Xidmətlər sözü sığsın deyə kiçildildi */
+        font-size: 8.2vw !important;
         letter-spacing: -0.5px !important;
         margin: -0.5vh 0;
         max-width: 95vw !important;
         white-space: nowrap !important;
     }
 
-    /* Ana Başlıqlar üçün (Xidmətlərimiz / Bizim Hekayəmiz) */
     body.lang-az .hero-rolling-text,
     body.lang-az .services-title,
     body.lang-az .title-main {
-        font-size: 9vw !important; /* Ekranın eninə görə avtomatik ölçü */
+        font-size: 9vw !important;
         line-height: 1.3 !important;
         width: 100% !important;
         text-align: center !important;
-        overflow: visible !important; /* İ nöqtəsi görünməsi üçün */
+        overflow: visible !important;
     }
 
-    /* Başlıq daxilindəki elementlər */
     body.lang-az .hero-rolling-text span,
     body.lang-az .hero-rolling-text::after,
     body.lang-az .services-title span,
@@ -1372,160 +1400,164 @@ body.lang-az .nav-btn {
         width: 80px;
         height: 80px;
     }
+}
 
-    .play-button-container {
-        width: 140px;
-        height: 90px;
-        top: 45%;
-        z-index: 10000 !important;
+/* ============================================================
+   FOOTER MOBILE FIX - SERVICE SƏHİFƏSİ
+   ============================================================ */
+
+/* Tablet və aşağı */
+@media (max-width: 1024px) {
+    .main-footer {
+        padding: 60px 40px 30px;
     }
     
-    .play-button {
-        width: 60px;
-        height: 24px;
-    }
-
-    .play-button::before {
-        width: 90px;
-        height: 32px;
-    }
-
-    .play-button::after {
-        width: 120px;
-        height: 40px;
-    }
-
-    .play-button span, 
-    .play-text {
-        font-size: 9px;
-        letter-spacing: 0.5px;
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        max-width: 100%;
     }
     
-    .bottom-left-explore {
-        bottom: 100px;
-        left: 20px;
-        z-index: 15;
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .main-footer {
+        padding: 60px 20px 30px;
+        overflow-x: hidden;
     }
     
-    .explore-line {
-        width: 40px;
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        max-width: 100%;
+        padding: 0;
     }
     
-    .explore-text {
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .footer-label {
         font-size: 11px;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+    }
+    
+    .footer-content {
+        gap: 8px;
+    }
+    
+    .footer-text {
+        font-size: 14px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .mask-link {
+        max-width: 100%;
+        word-break: break-word;
+    }
+    
+    .mask-link span {
+        font-size: 14px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .social-icons {
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+    
+    .mask-icon i {
+        font-size: 20px;
+    }
+    
+    .footer-bottom {
+        margin-top: 50px;
+        padding-top: 20px;
+    }
+    
+    .copyright {
+        font-size: 10px;
+        text-align: center;
+    }
+}
+
+/* Çox kiçik ekranlar */
+@media (max-width: 480px) {
+    .main-footer {
+        padding: 50px 15px 25px;
+    }
+    
+    .footer-wrapper {
+        gap: 35px;
+    }
+    
+    .footer-label {
+        font-size: 10px;
         letter-spacing: 1px;
     }
     
-    .right-floating-nav {
-        bottom: 100px;
-        right: 50%;
-        transform: translateX(50%);
-        align-items: center;
-        width: 100%;
+    .footer-text,
+    .mask-link span {
+        font-size: 13px;
     }
     
-    .bottom-right-socials {
-        bottom: 40px;
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-        width: auto;
-        z-index: 15;
+    .social-icons {
+        gap: 20px;
     }
+    
+    .mask-icon i {
+        font-size: 18px;
+    }
+    
+    .copyright {
+        font-size: 9px;
+    }
+}
 
-    .social-icons-home {
-        gap: 35px;
-    }
+/* Overflow fix - CRITICAL */
+body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
 
-    .social-icon,
-    .social-icon-hover {
-        font-size: 22px;
-    }
+.main-footer,
+.footer-wrapper,
+.footer-col,
+.footer-content {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
 
-    .social-link-home {
-        width: 28px;
-        height: 28px;
-    }
-    
-    .preview-info {
-        top: 70px;
-        left: 20px;
-    }
-
-    .preview-title {
-        font-size: 24px;
-    }
-    
-    .close-preview {
-        top: 20px;
-        right: 20px;
-        width: 40px;
-        height: 40px;
-    }
-    
-    .modal-play-btn {
-        width: 120px !important;
-        height: 60px !important;
-    }
-
-    .modal-play-btn .play-button {
-        width: 55px;
-        height: 22px;
-    }
-
-    .modal-play-btn .play-button::before {
-        width: 85px;
-        height: 30px;
-    }
-
-    .modal-play-btn .play-button::after {
-        width: 110px;
-        height: 38px;
-    }
-
-    .modal-play-btn .play-text {
-        font-size: 8px;
-    }
-    
-    .custom-controls {
-        padding: 0 20px 40px;
-    }
-    
-    .ctrl-btn {
-        min-width: 36px;
-        min-height: 36px;
-        padding: 6px;
-    }
-    
-    .ctrl-btn i {
-        font-size: 16px !important;
-    }
-    
-    .main-play-btn i {
-        font-size: 24px !important;
-    }
-    
-    .volume-wrapper {
-        display: none;
-    }
+/* Email və Phone text wrap */
+.mask-link span::after {
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 /* =========================================
-   16. AZƏRBAYCAN DİLİ - SERVICES TITLE FIX (OPTIMIZED)
+   16. AZƏRBAYCAN DİLİ - SERVICES TITLE FIX
    ========================================= */
 
-/* Xidmətlər Başlığı (SERVICES/XİDMƏTLƏR) */
 body.lang-az .services-title,
 body.lang-az .services-title span {
-    line-height: 1.3 !important;      /* Sətir hündürlüyü */
-    padding-top: 8px !important;      /* "İ" hərfi üçün yer */
-    padding-bottom: 8px !important;   /* "Ş" quyruğu üçün yer */
+    line-height: 1.3 !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
     display: inline-block !important;
-    clip-path: none !important;       /* Köhnə fixi ləğv edirik */
+    clip-path: none !important;
     -webkit-clip-path: none !important;
 }
 
-/* Konteyner */
 body.lang-az .services-title-container {
     overflow: hidden !important;
     height: auto !important;
@@ -1534,7 +1566,6 @@ body.lang-az .services-title-container {
     display: block !important;
 }
 
-/* Narıncı yazı (Hover) */
 body.lang-az .services-title::after {
     content: attr(data-text);
     top: 100% !important;
@@ -1547,7 +1578,6 @@ body.lang-az .services-title::after {
     transform: translateY(0);
 }
 
-/* Hover Animasiyası */
 body.lang-az .services-title:hover span {
     transform: translateY(-100%) !important;
 }

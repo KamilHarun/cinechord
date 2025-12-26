@@ -1469,7 +1469,7 @@ body.lang-az .nav-btn {
     }
     
  .nav-btn {
-        font-size: 11vw !important;  /* Sözləri Home-dakı kimi böyük saxlayırıq */
+        font-size: 13vw !important;  /* Sözləri Home-dakı kimi böyük saxlayırıq */
         margin: -1vh 0 !important;   /* Mənfi margin yaxınlaşdırır (Home-dakı rəqəm) */
         line-height: 1.0 !important; /* Home-da bu rəqəm 0.95-dir, amma AZ dili üçün 1.0 idealdır */
         display: block !important;

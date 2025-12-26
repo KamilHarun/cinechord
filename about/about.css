@@ -989,7 +989,7 @@ body.lang-az .rolling-link::after {
    ========================================= */
 @media (max-width: 768px) {
     .lang-selector {
-        top: 22px !important;    /* Hamburgerlə eyni sıraya gətirir */
+        top: 38px !important;    /* Hamburgerlə eyni sıraya gətirir */
         right: 125px !important; /* Hamburgerin dərhal soluna qoyur */
         left: auto !important;   /* Solda durmasın deyə bunu mütləq yaz */
         z-index: 30001;
@@ -1033,7 +1033,7 @@ body.lang-az .rolling-link::after {
     }
     
     .hamburger {
-        top: 20px;
+        top: 35px;
         right: 20px;
         gap: 12px;
         padding: 8px;
@@ -1076,7 +1076,7 @@ body.lang-az .rolling-link::after {
     }
     
  .nav-btn {
-        font-size: 11vw !important;  /* Sözləri Home-dakı kimi böyük saxlayırıq */
+        font-size: 13vw !important;  /* Sözləri Home-dakı kimi böyük saxlayırıq */
         margin: -1vh 0 !important;   /* Mənfi margin yaxınlaşdırır (Home-dakı rəqəm) */
         line-height: 1.0 !important; /* Home-da bu rəqəm 0.95-dir, amma AZ dili üçün 1.0 idealdır */
         display: block !important;

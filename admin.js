@@ -9,7 +9,7 @@ const API = {
     LOGIN: `${BASE_URL}/api/auth/login`,
     WORKS: `${BASE_URL}/admin/works`,
     SERVICES: `${BASE_URL}/admin/services`,
-    CONTACTS: `${BASE_URL}/admin/contacts`,
+    CONTACTS: `${BASE_URL}/admin/contact`,
     ABOUT: `${BASE_URL}/admin/about`
 };
 
