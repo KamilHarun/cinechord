@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - Works Page Stylesheet
-   Version: 9.0 - FINAL OPTIMIZED (ONLY WORKS TITLE FIXED)
+   Version: 9.1 - FOOTER CTA İ HƏRFİ FİX
    ========================================= */
 
 /* =========================================
@@ -600,7 +600,7 @@ body.lang-az .mask-icon .icon-wrap i {
     will-change: transform;
     z-index: 1;
     pointer-events: none;
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 .nav-btn:hover .nav-text {
@@ -609,7 +609,7 @@ body.lang-az .mask-icon .icon-wrap i {
 
 .nav-btn:hover::after {
     transform: translateY(-100%) skewY(0deg) translateZ(0);
-    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+    clip-path: inset(0 0 0 0);
 }
 
 .nav-btn:not(:hover) .nav-text {
@@ -618,7 +618,7 @@ body.lang-az .mask-icon .icon-wrap i {
 
 .nav-btn:not(:hover)::after {
     transform: translateY(0) translateZ(0);
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 body.lang-az .nav-btn {
@@ -801,7 +801,7 @@ body.lang-az .nav-btn {
 .title-main span {
     display: block;
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: inherit; /* Parent'tan font al */
+    font-family: inherit;
 }
 
 .title-main::after {
@@ -815,8 +815,8 @@ body.lang-az .nav-btn {
     -webkit-text-stroke: 0;
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
-    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    font-family: inherit;
+    clip-path: inset(100% 0 0 0);
 }
 
 .title-main:hover span {
@@ -825,11 +825,11 @@ body.lang-az .nav-btn {
 
 .title-main:hover::after {
     transform: translateY(-100%);
-    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+    clip-path: inset(0 0 0 0);
 }
 
 .title-main:not(:hover)::after {
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 .hero-right-content {
@@ -1567,8 +1567,8 @@ body.lang-az .category-btn {
     height: 100%;
     color: #FFA500;
     -webkit-text-stroke: 0;
-    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    font-family: inherit;
+    clip-path: inset(100% 0 0 0);
     transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
     pointer-events: none;
 }
@@ -1579,11 +1579,11 @@ body.lang-az .category-btn {
 
 .cta-text-link:hover .cta-text::after {
     transform: translateY(-100%);
-    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+    clip-path: inset(0 0 0 0);
 }
 
 .cta-text-link:not(:hover) .cta-text::after {
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 .cta-button {
@@ -1677,8 +1677,8 @@ body.lang-az .category-btn {
     width: 100%;
     color: #FFA500;
     font-weight: 600;
-    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    font-family: inherit;
+    clip-path: inset(100% 0 0 0);
     transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
@@ -1687,11 +1687,11 @@ body.lang-az .category-btn {
 }
 
 .mask-link:hover span::after {
-    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+    clip-path: inset(0 0 0 0);
 }
 
 .mask-link:not(:hover) span::after {
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 .social-icons {
@@ -1766,9 +1766,9 @@ body.lang-az .category-btn {
    ========================================= */
 @media (max-width: 768px) {
     .lang-selector {
-        top: 22px !important;    /* Hamburgerlə eyni sıraya gətirir */
-        right: 125px !important; /* Hamburgerin dərhal soluna qoyur */
-        left: auto !important;   /* Solda durmasın deyə bunu mütləq yaz */
+        top: 35px !important;
+        right: 125px !important;
+        left: auto !important;
         z-index: 30001;
     }
     
@@ -1810,7 +1810,7 @@ body.lang-az .category-btn {
     }
     
     .hamburger {
-        top: 20px;
+        top: 33px;
         right: 20px;
         gap: 12px;
         padding: 8px;
@@ -1852,17 +1852,17 @@ body.lang-az .category-btn {
         width: 100%;
     }
     
- .nav-btn {
-        font-size: 11vw !important;  /* Sözləri Home-dakı kimi böyük saxlayırıq */
-        margin: -1vh 0 !important;   /* Mənfi margin yaxınlaşdırır (Home-dakı rəqəm) */
-        line-height: 1.0 !important; /* Home-da bu rəqəm 0.95-dir, amma AZ dili üçün 1.0 idealdır */
+    .nav-btn {
+        font-size: 11vw !important;
+        margin: -1vh 0 !important;
+        line-height: 1.0 !important;
         display: block !important;
         overflow: visible !important;
     }
 
     body.lang-az .nav-btn {
-        font-size: 8.5vw !important; /* Uzun sözlərin qırağa çıxmaması üçün */
-        line-height: 1.2 !important; /* AZ hərflərinin bir-birinə girməməsi üçün 0.1 artıq verdik */
+        font-size: 8.5vw !important;
+        line-height: 1.2 !important;
         letter-spacing: 0px !important; 
     }
     
@@ -2065,21 +2065,18 @@ body.lang-az .category-btn {
 }
 
 /* =========================================
-   20. AZƏRBAYCAN DİLİ - İ və Ş HƏRFİ DÜZƏLİŞİ (OPTIMIZED)
+   19. AZƏRBAYCAN DİLİ - İ və Ş HƏRFİ DÜZƏLİŞİ
    ========================================= */
 
-/* YALNIZ HERO BAŞLIQ (İŞLƏR) ÜÇÜN */
-/* Digər hissələr (Menu, Contact) əvvəlki kimi qalır */
-
+/* HERO BAŞLIQ (İŞLƏR) ÜÇÜN */
 body.lang-az .title-main,
 body.lang-az .title-main span {
-    line-height: 1.3 !important;      /* 1.6 çox idi, 1.3-ə endirdik (sürətli olsun) */
-    padding-top: 8px !important;      /* 15px çox idi, 8px bəs edir */
+    line-height: 1.3 !important;
+    padding-top: 8px !important;
     padding-bottom: 8px !important;
     display: inline-block !important;
 }
 
-/* Hero Konteyner */
 body.lang-az .hero-left-title {
     overflow: hidden !important;
     height: auto !important;
@@ -2088,20 +2085,18 @@ body.lang-az .hero-left-title {
     display: block !important;
 }
 
-/* Narıncı yazı (WORKS/İŞLƏR) */
 body.lang-az .title-main::after {
     content: attr(data-text);
     top: 100% !important;
     left: 0;
     width: 100%;
     height: 100%;
-    line-height: 1.3 !important;      /* Uyğunlaşdırıldı */
+    line-height: 1.3 !important;
     padding-top: 8px !important;
     padding-bottom: 8px !important;
     transform: translateY(0);
 }
 
-/* Hover Animasiyası */
 body.lang-az .title-main:hover span {
     transform: translateY(-100%) !important;
 }
@@ -2109,4 +2104,46 @@ body.lang-az .title-main:hover span {
 body.lang-az .title-main:hover::after {
     transform: translateY(-100%) !important;
     clip-path: inset(0 0 0 0) !important;
+}
+
+/* FOOTER CTA TEXT - İ və Ş DÜZƏLIŞI (DAHA İNCƏ) */
+body.lang-az .cta-text,
+body.lang-az .cta-text span {
+    line-height: 1.2 !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    display: inline-block !important;
+}
+
+body.lang-az .cta-text-link {
+    overflow: hidden !important;
+    height: auto !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: block !important;
+}
+
+body.lang-az .cta-text::after {
+    content: attr(data-text);
+    line-height: 1.2 !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    top: 100% !important;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateY(0);
+}
+
+body.lang-az .cta-text-link:hover .cta-text span {
+    transform: translateY(-100%) !important;
+}
+
+body.lang-az .cta-text-link:hover .cta-text::after {
+    transform: translateY(-100%) !important;
+    clip-path: inset(0 0 0 0) !important;
+}
+
+body.lang-az .cta-text-link:not(:hover) .cta-text::after {
+    clip-path: inset(100% 0 0 0) !important;
 }

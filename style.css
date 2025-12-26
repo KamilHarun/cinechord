@@ -1,6 +1,6 @@
 /* ================================================================
    CineChord Index - COMPLETE CSS
-   Version: 5.1 - GLOBE ALIGNMENT FIX
+   Version: 5.3 - MOBILE AUTOPLAY OVERLAY FIX
    ================================================================ */
 
 /* 1. RESET */
@@ -192,6 +192,10 @@ body.lang-az .nav-btn {
     height: 100%;
 }
 
+/* ============================================================
+   MOBİL BRAUZER VİDEO OVERLAY FİX - KRİTİK
+   ============================================================ */
+
 .hero-bg {
     position: absolute;
     top: 0;
@@ -200,27 +204,64 @@ body.lang-az .nav-btn {
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    pointer-events: none;
+    pointer-events: none !important;
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Bütün WebKit (Safari, Chrome) video kontrollarını gizlət */
 .hero-bg::-webkit-media-controls {
     display: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
 
 .hero-bg::-webkit-media-controls-enclosure {
     display: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
 
 .hero-bg::-webkit-media-controls-panel {
     display: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
 
 .hero-bg::-webkit-media-controls-play-button {
     display: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
 
+/* iOS Safari üçün böyük play overlay düyməsini TAMAMİLƏ gizlət */
 .hero-bg::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Android Chrome üçün overlay play button */
+.hero-bg::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Firefox üçün */
+.hero-bg::-moz-media-controls {
+    display: none !important;
+}
+
+/* Microsoft Edge üçün */
+.hero-bg::-ms-media-controls {
     display: none !important;
 }
 
@@ -717,7 +758,7 @@ body.lang-az .nav-btn {
     will-change: transform;
     z-index: 1;
     pointer-events: none;
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 .nav-btn:hover .nav-text {
@@ -726,7 +767,7 @@ body.lang-az .nav-btn {
 
 .nav-btn:hover::after {
     transform: translateY(-100%) skewY(0deg) translateZ(0);
-    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
+    clip-path: inset(0 0 0 0);
 }
 
 .nav-btn:not(:hover) .nav-text {
@@ -735,7 +776,7 @@ body.lang-az .nav-btn {
 
 .nav-btn:not(:hover)::after {
     transform: translateY(0) translateZ(0);
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
+    clip-path: inset(100% 0 0 0);
 }
 
 .menu-footer {
@@ -1461,9 +1502,9 @@ body.lang-az .nav-btn {
 
 @media (max-width: 768px) {
     .lang-selector {
-        top: 24px !important;    /* Hamburgerlə eyni sıraya gətirir */
-        right: 125px !important; /* Hamburgerin dərhal soluna qoyur */
-        left: auto !important;   /* Solda durmasın deyə bunu mütləq yaz */
+        top: 24px !important;
+        right: 125px !important;
+        left: auto !important;
         z-index: 30001;
     }
     

@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Index - Main JavaScript
-   Version: 5.2 - VIDEO STARTS AFTER LOADING COMPLETE
+   Version: 5.3 - MOBILE AUTOPLAY OVERLAY FIX
    ============================================================ */
 
 const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/CineChord_Showreel_1_1_y9lq3g.mp4";
@@ -8,7 +8,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Ci
 // Global video configuration
 window.CONFIG = {
     videos: [
-        SHOWREEL_VIDEO_URL, // Artıq Cloudinary linkini istifadə edir
+        SHOWREEL_VIDEO_URL,
         'videos/ABB-TamGenc-Card.mp4',
         'videos/Bakcell-099.mp4',
         'videos/Yaz-furseti-kampaniyasi.mp4',
@@ -20,7 +20,6 @@ window.currentIndex = 0;
 
 // Global translations object
 window.translations = null;
-// Default olaraq həmişə İngilis dili
 window.currentLang = 'en';
 
 // Global function for main play button
@@ -124,8 +123,8 @@ window.openMainVideo = function() {
     
     let isAnimating = false;
     let activityTimeout = null;
-    let currentVideoEl = null; // İlk video elementi initVideoSlider'da oluşturulacak
-    let videoShouldPlay = false; // Flag videoyu nə vaxt başlatmaq üçün
+    let currentVideoEl = null;
+    let videoShouldPlay = false;
 
     /* ============================================================
        4. UTILITY FUNCTIONS
@@ -151,7 +150,6 @@ window.openMainVideo = function() {
             return window.translations;
         } catch (error) {
             console.error('Error loading translations:', error);
-            // Fallback translations
             window.translations = {
                 "en": {
                     "menu": "MENU",
@@ -193,14 +191,12 @@ window.openMainVideo = function() {
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        // Hamburger Menu Text
         const hamburgerTextEl = document.querySelector('.hamburger-text');
         if (hamburgerTextEl) {
             const isMenuOpen = hamburger && hamburger.classList.contains('active');
             hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
         }
 
-        // Navigation Buttons
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             const navText = btn.querySelector('.nav-text');
@@ -212,26 +208,22 @@ window.openMainVideo = function() {
             }
         });
 
-        // Play Button
         const playTexts = document.querySelectorAll('.play-text');
         playTexts.forEach(el => {
             el.textContent = t.play;
             el.setAttribute('data-text', t.play);
         });
 
-        // Explore Button
         const exploreText = document.querySelector('.explore-text');
         if (exploreText) {
             exploreText.textContent = t.explore;
         }
 
-        // Loader Author
         const loaderAuthorSpan = document.querySelector('.loader-author span');
         if (loaderAuthorSpan) {
             loaderAuthorSpan.textContent = t.designed_by;
         }
 
-        // Apply font class
         if (lang === 'az') {
             document.body.classList.add('lang-az');
             document.documentElement.setAttribute('lang', 'az');
@@ -293,14 +285,11 @@ window.openMainVideo = function() {
         
         if (!langSelector || !langGlobeBtn) return;
         
-        // LocalStorage-dən dil seçimini yüklə
         const savedLang = localStorage.getItem('selectedLang') || 'en';
         window.currentLang = savedLang;
         
-        // Seçilmiş dili tətbiq et
         applyTranslations(savedLang);
         
-        // UI-ı seçilmiş dilə uyğunlaşdır
         langOptions.forEach(option => {
             if (option.dataset.lang === savedLang) {
                 option.classList.add('active');
@@ -312,14 +301,12 @@ window.openMainVideo = function() {
             }
         });
         
-        // Globe düyməsinə klik - dropdown aç/bağla
         langGlobeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             langSelector.classList.toggle('active');
         });
         
-        // Dil seçimlərinə klik
         langOptions.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -327,34 +314,26 @@ window.openMainVideo = function() {
                 
                 const lang = option.dataset.lang;
                 
-                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
                 if (option.classList.contains('active')) {
                     langSelector.classList.remove('active');
                     return;
                 }
                 
-                // Aktiv classını dəyiş
                 langOptions.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
                 
-                // Current lang text-i yenilə
                 if (currentLangText) {
                     currentLangText.textContent = lang.toUpperCase();
                 }
                 
-                // LocalStorage-ə yadda saxla (istifadəçi manual dəyişdirdikdə)
-                // Amma səhifə yenilənəndə yenə EN olacaq
                 localStorage.setItem('selectedLang', lang);
                 
-                // Tərcümələri tətbiq et
                 applyTranslations(lang);
                 
-                // Dropdown-u bağla
                 setTimeout(() => {
                     langSelector.classList.remove('active');
                 }, 200);
                 
-                // Event göndər (başqa komponentlər üçün)
                 document.dispatchEvent(new CustomEvent('languageChanged', { 
                     detail: { language: lang } 
                 }));
@@ -363,14 +342,12 @@ window.openMainVideo = function() {
             });
         });
         
-        // Xaricdə klik - dropdown-u bağla
         document.addEventListener('click', (e) => {
             if (!langSelector.contains(e.target)) {
                 langSelector.classList.remove('active');
             }
         });
         
-        // ESC düyməsi - dropdown-u bağla
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && langSelector.classList.contains('active')) {
                 langSelector.classList.remove('active');
@@ -388,7 +365,6 @@ window.openMainVideo = function() {
         const isActive = hamburger.classList.contains('active');
         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
         
-        // Dil dropdown-unu bağla
         const langSelector = document.getElementById('langSelector');
         if (langSelector) langSelector.classList.remove('active');
         
@@ -396,7 +372,6 @@ window.openMainVideo = function() {
         mobileMenu.classList.toggle('active');
         if (overlay) overlay.classList.toggle('active');
         
-        // Hamburger text-i dil sisteminə uyğun dəyiş
         if (hamburgerText && window.translations && window.translations[window.currentLang]) {
             const t = window.translations[window.currentLang];
             hamburgerText.textContent = isActive ? t.menu : t.close;
@@ -466,80 +441,79 @@ window.openMainVideo = function() {
     }
 
    /* ============================================================
-       9. GSAP ANIMATIONS
-       ============================================================ */
-    
-    function initGSAP() {
-        if (typeof gsap === 'undefined') return;
-        
-        gsap.set(".hero-section", { autoAlpha: 1 });
-        gsap.set(UI_ELEMENTS, { y: 50, autoAlpha: 0 });
-    }
+       9. GSAP ANIMATIONS
+       ============================================================ */
+    
+    function initGSAP() {
+        if (typeof gsap === 'undefined') return;
+        
+        gsap.set(".hero-section", { autoAlpha: 1 });
+        gsap.set(UI_ELEMENTS, { y: 50, autoAlpha: 0 });
+    }
 
-    function runLoadingAnimation() {
-        if (typeof gsap === 'undefined') {
-            revealSite();
-            return;
-        }
+    function runLoadingAnimation() {
+        if (typeof gsap === 'undefined') {
+            revealSite();
+            return;
+        }
 
-        const tl = gsap.timeline();
-        tl.fromTo(elements.loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1, ease: "power2.out" }, 0)
-          .to(elements.loaderAuthor, { opacity: 1, duration: 0.4 }, "-=0.8")
-          .to(elements.loaderFill, {
-            width: "100%",
-            duration: 1.8,
-            ease: "power2.inOut",
-            onUpdate: function() {
-                let prog = Math.round(this.progress() * 100);
-                if (elements.loaderText) elements.loaderText.textContent = prog + "%";
-            },
-            onComplete: () => {
-                gsap.to(elements.loadingScreen, {
-                    y: "-100%",
-                    duration: 1,
-                    ease: "power4.inOut",
-                    onComplete: () => {
-                        if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
-                        // BURADA VİDEONU AKTİVLƏŞDİRİRİK
-                        videoShouldPlay = true; 
-                        revealSite(); 
-                    }
-                });
-            }
-        });
-    }
+        const tl = gsap.timeline();
+        tl.fromTo(elements.loaderLogo, { scale: 0.8 }, { scale: 1, duration: 1, ease: "power2.out" }, 0)
+          .to(elements.loaderAuthor, { opacity: 1, duration: 0.4 }, "-=0.8")
+          .to(elements.loaderFill, {
+            width: "100%",
+            duration: 1.8,
+            ease: "power2.inOut",
+            onUpdate: function() {
+                let prog = Math.round(this.progress() * 100);
+                if (elements.loaderText) elements.loaderText.textContent = prog + "%";
+            },
+            onComplete: () => {
+                gsap.to(elements.loadingScreen, {
+                    y: "-100%",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    onComplete: () => {
+                        if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
+                        videoShouldPlay = true; 
+                        revealSite(); 
+                    }
+                });
+            }
+        });
+    }
 
-   function revealSite(isPageTransition = false) {
-        if (typeof gsap === 'undefined') return;
-        
-        const mainTl = gsap.timeline({
-            onStart: () => {
-                // Animasiya başlayan kimi videonu da başlat
-                if (window.startHeroVideo) {
-                    window.startHeroVideo();
-                }
-            }
-        });
-        
-        if (isPageTransition && elements.loadingScreen) {
-            mainTl.to(elements.loadingScreen, {
-                y: "100%",
-                duration: 0.9,
-                ease: "expo.inOut"
-            }, 0);
-        }
-        
-        const startDelay = isPageTransition ? "-=0.7" : 0;
+   function revealSite(isPageTransition = false) {
+        if (typeof gsap === 'undefined') return;
+        
+        const mainTl = gsap.timeline({
+            onStart: () => {
+                if (window.startHeroVideo) {
+                    window.startHeroVideo();
+                }
+            }
+        });
+        
+        if (isPageTransition && elements.loadingScreen) {
+            mainTl.to(elements.loadingScreen, {
+                y: "100%",
+                duration: 0.9,
+                ease: "expo.inOut"
+            }, 0);
+        }
+        
+        const startDelay = isPageTransition ? "-=0.7" : 0;
 
-        mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
-        mainTl.to(".lang-selector", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.05);
-        mainTl.to(".play-button-container", { y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out" }, startDelay + 0.1);
-        mainTl.to(".right-floating-nav", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.15);
-        mainTl.to(".bottom-right-socials", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.2);
-        mainTl.to(".bottom-left-explore", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.25);
-    }
+        mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
+        mainTl.to(".lang-selector", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.05);
+        mainTl.to(".play-button-container", { y: 0, autoAlpha: 1, duration: 0.95, ease: "power2.out" }, startDelay + 0.1);
+        mainTl.to(".right-floating-nav", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.15);
+        mainTl.to(".bottom-right-socials", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.2);
+        mainTl.to(".bottom-left-explore", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.25);
+    }
+
   /* ============================================================
-       10. VIDEO AUTOPLAY CHECK
+       10. VIDEO AUTOPLAY - MOBİL OVERLAY FİX
        ============================================================ */
     
     function initVideoAutoplay() {
@@ -547,47 +521,54 @@ window.openMainVideo = function() {
         
         const video = currentVideoEl;
         
-        // Brauzerlərin autoplay icazəsi verməsi üçün əsas şərtlər
+        // Məcburi atributlar
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.autoplay = true; 
+        video.autoplay = true;
+        video.preload = 'auto'; // ƏLAVƏ
         video.setAttribute('muted', '');
         video.setAttribute('playsinline', 'true');
         video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('preload', 'auto'); // ƏLAVƏ
         
         video.removeAttribute('controls');
         video.controls = false;
         
-        // Videonu başlatmağa çalışan daxili funksiya
+        // Pointer events söndür - MOBİL OVERLAY BLOKLU
+        video.style.pointerEvents = 'none'; // ƏLAVƏ
+        
         function attemptPlay() {
-            if (!videoShouldPlay) return; // Loading hələ bitməyibsə başlatma
+            if (!videoShouldPlay) return;
             
-            video.play().catch(error => {
-                console.warn("Autoplay failed, waiting for user interaction:", error);
-                
-                // Əgər brauzer bloklayarsa, istifadəçi ekrana toxunan kimi başlat
-                const playOnInteraction = () => {
-                    video.play();
-                    ['click', 'touchstart', 'keydown'].forEach(ev => 
-                        document.removeEventListener(ev, playOnInteraction)
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('Video started successfully');
+                }).catch(error => {
+                    console.warn("Autoplay failed:", error);
+                    
+                    const playOnInteraction = () => {
+                        video.play().then(() => {
+                            console.log('Video started after interaction');
+                        });
+                    };
+                    
+                    ['click', 'touchstart', 'touchend', 'keydown'].forEach(ev => 
+                        document.addEventListener(ev, playOnInteraction, { once: true, passive: true })
                     );
-                };
-                ['click', 'touchstart', 'keydown'].forEach(ev => 
-                    document.addEventListener(ev, playOnInteraction, { once: true })
-                );
-            });
+                });
+            }
         }
         
-        // Global funksiya edirik ki, revealSite (loading bitəndə) bunu çağıra bilsin
         window.startHeroVideo = attemptPlay;
         
-        // Metadata yükləndikdə məlumat ver
         video.addEventListener('loadedmetadata', () => {
             console.log('Video metadata loaded');
+            attemptPlay();
         }, { once: true });
         
-        // Brauzer tabı dəyişib geri qayıdanda və ya video pause olsa yenidən başlat
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && video.paused && videoShouldPlay) {
                 attemptPlay();
@@ -657,31 +638,34 @@ window.openMainVideo = function() {
     }
 
   /* ============================================================
-       13. VIDEO SLIDER (AUTO-PLAY FIXED)
+       13. VIDEO SLIDER - MOBİL AUTOPLAY FİX
        ============================================================ */
     
     function initVideoSlider() {
         if (!elements.videoContainer) return;
         
-        // Köhnə videonu təmizlə və yenisini yarat
         elements.videoContainer.querySelectorAll('video.hero-bg').forEach(v => v.remove());
 
         const firstVideo = document.createElement('video');
         firstVideo.id = 'heroBgVideo';
         firstVideo.className = 'hero-bg';
         
-        // Mütləq atributlar
+        // MƏCBUR atributlar - mobil üçün kritik
         firstVideo.muted = true;
         firstVideo.loop = true;
         firstVideo.playsInline = true;
         firstVideo.autoplay = true;
+        firstVideo.preload = 'auto'; // ƏLAVƏ
         firstVideo.setAttribute('muted', '');
         firstVideo.setAttribute('playsinline', 'true');
+        firstVideo.setAttribute('webkit-playsinline', 'true');
+        firstVideo.setAttribute('preload', 'auto'); // ƏLAVƏ
         
-        // Linki mənimsət
+        // Pointer events söndür - MOBİL OVERLAY İNTERACTİON BLOKLU
+        firstVideo.style.pointerEvents = 'none'; // ƏLAVƏ
+        
         firstVideo.src = window.CONFIG.videos[window.currentIndex];
         
-        // Elementi DOM-a əlavə et
         const overlay = document.querySelector('.hero-overlay');
         if (overlay) {
             elements.videoContainer.insertBefore(firstVideo, overlay);
@@ -691,23 +675,41 @@ window.openMainVideo = function() {
         
         currentVideoEl = firstVideo;
 
-        // VİDEONU MƏCBURİ BAŞLATMA MEXANİZMİ
+        // AGGRESSİV AUTOPLAY MEXANİZMİ - YAXŞILAŞDIRILMIŞ
         const forcePlay = () => {
-            if (firstVideo.paused) {
-                firstVideo.play().catch(() => {
-                    // Əgər brauzer hələ də bloklayırsa, ilk klikdə başlat
-                    document.addEventListener('click', () => firstVideo.play(), { once: true });
+            const playPromise = firstVideo.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.warn('Autoplay blocked, waiting for interaction:', err);
+                    
+                    const startOnTouch = () => {
+                        firstVideo.play();
+                        ['click', 'touchstart', 'touchend'].forEach(ev => 
+                            document.removeEventListener(ev, startOnTouch)
+                        );
+                    };
+                    
+                    ['click', 'touchstart', 'touchend'].forEach(ev => 
+                        document.addEventListener(ev, startOnTouch, { once: true, passive: true })
+                    );
                 });
             }
         };
 
-        // Video data yüklənən kimi başlat
+        // ƏLAVƏ EVENT LİSTENERLƏR - ÇOXLU TETRİK POINT
+        firstVideo.addEventListener('loadedmetadata', forcePlay);
         firstVideo.addEventListener('loadeddata', forcePlay);
+        firstVideo.addEventListener('canplay', forcePlay);
+        firstVideo.addEventListener('canplaythrough', forcePlay);
         
-        // Hər ehtimala qarşı 2 saniyə sonra bir də yoxla (əgər event işləməsə)
+        // 1 saniyə sonra yenidən cəhd
+        setTimeout(forcePlay, 1000);
+        
+        // 2 saniyə sonra son cəhd
         setTimeout(forcePlay, 2000);
 
-        // UI Yeniləmə (Xəta verməməsi üçün yoxlama ilə)
+        // UI Yeniləmə
         function updateInfoUI(index = window.currentIndex) {
             const total = String(window.CONFIG.videos.length).padStart(2, '0');
             const current = String(index + 1).padStart(2, '0');
@@ -920,7 +922,6 @@ window.openMainVideo = function() {
        ============================================================ */
     
     async function init() {
-        // Əvvəlcə tərcümələri yüklə
         await loadTranslations();
         
         initGSAP();

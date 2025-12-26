@@ -1382,7 +1382,7 @@ body.lang-az .nav-btn {
    ========================================= */
 @media (max-width: 768px) {
     .lang-selector {
-        top: 22px !important;    /* Hamburgerlə eyni sıraya gətirir */
+        top: 30px !important;    /* Hamburgerlə eyni sıraya gətirir */
         right: 125px !important; /* Hamburgerin dərhal soluna qoyur */
         left: auto !important;   /* Solda durmasın deyə bunu mütləq yaz */
         z-index: 30001;
