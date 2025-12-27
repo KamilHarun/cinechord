@@ -476,122 +476,103 @@
         });
     });
 
-    // ============================================================
-    // 6. WORKS API & GRID
-    // ============================================================
-    
-    // URL təmizləyən və birləşdirən köməkçi funksiya
-    function getFullMediaUrl(path) {
-        if (!path) return '';
-        
-        // Əgər tam linkdirsə (http/https), olduğu kimi qaytar
-        if (path.startsWith('http')) return path;
+// ============================================================
+// 6. WORKS API & GRID - (Qara ekran problemi həll olunmuş versiya)
+// ============================================================
 
-        let cleanPath = path;
+// URL təmizləyən və birləşdirən köməkçi funksiya
+function getFullMediaUrl(path) {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
 
-        // Yolun əvvəlindəki "/" işarəsini silirik
-        while (cleanPath.startsWith('/')) {
-            cleanPath = cleanPath.substring(1);
-        }
-
-        // Əgər yol "uploads/" sözü ilə başlayırsa, onu silirik
-        if (cleanPath.startsWith('uploads/')) {
-            cleanPath = cleanPath.substring(8);
-        }
-
-        return UPLOADS_URL + cleanPath;
+    let cleanPath = path;
+    while (cleanPath.startsWith('/')) {
+        cleanPath = cleanPath.substring(1);
     }
+    if (cleanPath.startsWith('uploads/')) {
+        cleanPath = cleanPath.substring(8);
+    }
+    return UPLOADS_URL + cleanPath;
+}
 
-    async function loadDynamicWorks() {
-        if(!container) return;
-        
-        try {
-            const response = await fetch(API_WORKS);
-            if (!response.ok) throw new Error('API Error');
-            
-            const data = await response.json();
-            const works = data.content ? data.content : data;
-            container.innerHTML = ''; 
+async function loadDynamicWorks() {
+    if (!container) return;
 
-            if(works.length === 0) {
-                container.innerHTML = '<p style="color:white; text-align:center;">No works found.</p>';
-                return;
-            }
+    try {
+        const response = await fetch(API_WORKS);
+        if (!response.ok) throw new Error('API Error');
 
-            works.forEach((work, index) => {
-                const rawVideoPath = work.previewVideoUrl || work.videoUrl;
-                const rawImagePath = work.thumbnailUrl || work.imageUrl; 
-                
-                const videoSrc = getFullMediaUrl(rawVideoPath);
-                const imageSrc = getFullMediaUrl(rawImagePath);
-                
-                const categoryClass = categoryMap[work.category] || 'other';
-                
-                if (!videoSrc) return; 
+        const data = await response.json();
+        const works = data.content ? data.content : data;
+        container.innerHTML = '';
 
-                const workHTML = `
-                    <div class="project-card reveal-item" 
-                        data-category="${categoryClass}" 
-                        data-video-src="${videoSrc}" 
-                        data-title="${work.title}"
-                        style="transition-delay: ${index * 0.05}s;">
-                        <div class="project-image-container">
-                            <video muted loop playsinline class="project-video" preload="none"
-                                poster="${imageSrc || ''}" 
-                                data-video-src="${videoSrc}">
-                            </video>
-                            <div class="card-overlay"></div>
-                            <div class="card-info">
-                                <h3 class="card-title">${work.title}</h3>
-                                <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
-                            </div>
+        if (works.length === 0) {
+            container.innerHTML = '<p style="color:white; text-align:center;">No works found.</p>';
+            return;
+        }
+
+        works.forEach((work, index) => {
+            const rawVideoPath = work.previewVideoUrl || work.videoUrl;
+            const videoSrc = getFullMediaUrl(rawVideoPath);
+            const categoryClass = categoryMap[work.category] || 'other';
+
+            if (!videoSrc) return;
+
+            // DƏYİŞİKLİK BURADADIR: src dərhal təyin olunur və #t=0.1 əlavə edilir
+            const workHTML = `
+                <div class="project-card reveal-item" 
+                    data-category="${categoryClass}" 
+                    data-video-src="${videoSrc}" 
+                    data-title="${work.title}"
+                    style="transition-delay: ${index * 0.05}s;">
+                    <div class="project-image-container">
+                        <video muted loop playsinline class="project-video" 
+                            preload="metadata" 
+                            src="${videoSrc}#t=0.1"> 
+                        </video>
+                        <div class="card-overlay"></div>
+                        <div class="card-info">
+                            <h3 class="card-title">${work.title}</h3>
+                            <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
                         </div>
-                        <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
                     </div>
-                `;
-                container.innerHTML += workHTML;
-            });
-            
-            const newCards = container.querySelectorAll('.project-card');
-            newCards.forEach(card => observer.observe(card));
+                    <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
+                </div>
+            `;
+            container.innerHTML += workHTML;
+        });
 
-            attachHoverEffects();
-            
-        } catch (error) {
-            console.error("API Error:", error);
-            container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
-        }
+        const newCards = container.querySelectorAll('.project-card');
+        newCards.forEach(card => observer.observe(card));
+
+        // Hover effektlərini aktivləşdiririk
+        attachHoverEffects();
+
+    } catch (error) {
+        console.error("API Error:", error);
+        container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
     }
+}
 
-    function attachHoverEffects() {
-        document.querySelectorAll('.project-card').forEach(card => {
-            const video = card.querySelector('video');
-            if (!video) return;
+function attachHoverEffects() {
+    document.querySelectorAll('.project-card').forEach(card => {
+        const video = card.querySelector('video');
+        if (!video) return;
 
-            let isVideoLoaded = false;
-
-            card.addEventListener('mouseenter', () => {
-                const videoSrc = video.getAttribute('data-video-src');
-                
-                if (!videoSrc) return; 
-
-                if (!isVideoLoaded) {
-                    video.src = videoSrc;
-                    video.load();
-                    isVideoLoaded = true;
-                }
-                
-                video.play().catch(error => {
-                     console.log("Auto-play prevented or loading:", error);
-                });
-            });
-
-            card.addEventListener('mouseleave', () => { 
-                video.pause(); 
-                video.currentTime = 0; 
+        // Hover edəndə video başlasın
+        card.addEventListener('mouseenter', () => {
+            video.play().catch(error => {
+                console.log("Play error:", error);
             });
         });
-    }
+
+        // Hover-dən çıxanda video dayansın və yenidən ilk rəngli kadrda (0.1s) qalsın
+        card.addEventListener('mouseleave', () => {
+            video.pause();
+            video.currentTime = 0.1; 
+        });
+    });
+}
 
     window.filterWorks = function(category, btn) {
         if(btn) {
