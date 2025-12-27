@@ -703,7 +703,7 @@ body.lang-az .nav-btn {
 }
 
 /* =========================================
-   10. HERO SECTION - İ və Ş FIX
+   10. HERO SECTION - SADƏ MƏTN (HEÇ BİR EFEKT YOX)
    ========================================= */
 .hero {
     min-height: auto;
@@ -742,72 +742,40 @@ body.lang-az .hero-line {
 
 .hero-rolling-container {
     margin-top: 15px;
-    overflow: hidden;
     padding-top: 0.15em;
     padding-bottom: 0.15em;
 }
 
-/* ✅ FIX: Azərbaycan dili üçün - İ və Ş hərflərinin kəsilməməsi */
+/* Azərbaycan dili üçün - İ və Ş hərflərinin kəsilməməsi */
 body.lang-az .hero-rolling-container {
     padding-top: 0.35em;
     padding-bottom: 0.35em;
 }
 
+/* ✅ SADƏ MƏTN - HEÇ BİR EFEKT */
 .hero-rolling-text {
     font-family: 'Gabarito', sans-serif;
     font-size: clamp(3rem, 8vw, 6.5rem);
     color: #FFA500;
     font-weight: 900;
     text-transform: uppercase;
-    position: relative;
-    display: inline-block;
     line-height: 1;
-    cursor: pointer;
 }
 
 /* Azerbaycan dilinde Montserrat kullan ve küçük font */
 body.lang-az .hero-rolling-text {
     font-family: 'Montserrat', sans-serif;
     font-size: clamp(2.5rem, 6.5vw, 5.2rem);
-    line-height: 1.2; /* ✅ FIX: Line height artırılıb - İ və Ş üçün yer */
+    line-height: 1.2;
 }
 
-.hero-rolling-text span,
-.hero-rolling-text::after {
-    display: block;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: inherit; /* Parent'tan font al */
+.hero-rolling-text span {
+    font-family: inherit;
 }
 
 /* Azerbaycan dilinde Montserrat kullan */
-body.lang-az .hero-rolling-text span,
-body.lang-az .hero-rolling-text::after {
+body.lang-az .hero-rolling-text span {
     font-family: 'Montserrat', sans-serif;
-}
-
-.hero-rolling-text::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    color: #FFA500;
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
-    font-family: inherit; /* Parent'tan font al - hover'da font değişmesin */
-}
-
-.hero-rolling-text:hover span,
-.hero-rolling-text:hover::after {
-    transform: translateY(-100%);
-}
-
-.hero-rolling-text:hover::after {
-    clip-path: inset(0 0 0 0); /* Hover durumunda göster */
-}
-
-.hero-rolling-text:not(:hover)::after {
-    clip-path: inset(100% 0 0 0); /* Hover olmayan durumda gizle */
 }
 
 /* =========================================

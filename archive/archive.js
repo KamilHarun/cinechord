@@ -876,88 +876,26 @@
         });
     }
 
-    /* ============================================================
-       13. INITIALIZATION
-       ============================================================ */
-    
-    async function init() {
-        await loadTranslations();
-        initPageTransition();
-        initLogoClick();
-        initLanguageSelector();
-        initMobileMenu();
-        initScrollReveal();
-        initVideoModal();
-        loadArchiveData();
-        setupOtherLinks();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-
-    async function init() {
-    // ... digər funksiyaların (loadTranslations, initPageTransition və s.)
-    
-    loadContactDetails(); // <--- BUNU ƏLAVƏ ET Kİ, SƏHİFƏ AÇILANDA MƏLUMAT GƏLSİN
-}
-
-/* ============================================================
-   GLOBAL CONTACT INFO UPDATER (Footer & Contact Page)
+ /* ============================================================
+   13. INITIALIZATION
    ============================================================ */
 
-async function updateGlobalContactInfo() {
-    try {
-        // 1. Admin paneldəki About məlumatlarını gətiririk
-        // QEYD: URL-i öz server ünvanına uyğun yoxla
-        const baseUrl = "https://cinechord-admin-production.up.railway.app"; 
-        const response = await fetch(`${baseUrl}/api/about?lang=en`);
-
-        if (!response.ok) {
-            console.error("Məlumat tapılmadı");
-            return;
-        }
-
-        const data = await response.json();
-
-        // 2. Bütün səhifədəki Emailləri tapıb yeniləyirik
-        if (data.email) {
-            const emailElements = document.querySelectorAll('.global-email');
-            emailElements.forEach(el => {
-                el.textContent = data.email;
-                el.href = `mailto:${data.email}`;
-            });
-        }
-
-        // 3. Bütün səhifədəki Telefon nömrələrini tapıb yeniləyirik
-        if (data.phone) {
-            const phoneElements = document.querySelectorAll('.global-phone');
-            phoneElements.forEach(el => {
-                el.textContent = data.phone;
-                // tel: linki üçün boşluqları silirik (+994 50... -> +99450...)
-                const cleanPhone = data.phone.replace(/\s+/g, '');
-                el.href = `tel:${cleanPhone}`;
-            });
-        }
-
-        // 4. Bütün səhifədəki Ünvanları tapıb yeniləyirik
-        if (data.address) {
-            const addressElements = document.querySelectorAll('.global-address');
-            addressElements.forEach(el => {
-                el.textContent = data.address;
-            });
-        }
-
-    } catch (error) {
-        console.error("Əlaqə məlumatları yenilənərkən xəta:", error);
-    }
+async function init() {
+    await loadTranslations();
+    initPageTransition();
+    initLogoClick();
+    initLanguageSelector();
+    initMobileMenu();
+    initScrollReveal();
+    initVideoModal();
+    loadArchiveData();
+    setupOtherLinks();
 }
 
-// Səhifə tam yüklənəndə funksiyanı işə sal
-document.addEventListener('DOMContentLoaded', () => {
-    updateGlobalContactInfo();
-});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
-})();
+})(); // ← İIFE bağlanır

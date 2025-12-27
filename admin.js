@@ -451,7 +451,7 @@ function filterWorks() {
 }
 
 // ============================================
-// SERVICES
+// SERVICES (CREATE & UPDATE SUPPORTED)
 // ============================================
 
 async function loadServices() {
@@ -474,9 +474,15 @@ async function loadServices() {
                     </div>
                     <h4>${s.title}</h4>
                     <p>${(s.description||'').substring(0,80)}${s.description?.length > 80 ? '...' : ''}</p>
-                    <button class="btn-danger" style="margin-top:0.75rem;" onclick='deleteService(${s.id})'>
-                        <i class="fas fa-trash"></i> Sil
-                    </button>
+                    
+                    <div class="service-actions" style="margin-top:1rem; display:flex; gap:8px; justify-content:center;">
+                        <button class="btn-edit" onclick='editServiceById(${JSON.stringify(s).replace(/'/g, "&apos;")})'>
+                            <i class="fas fa-edit"></i> Redaktə
+                        </button>
+                        <button class="btn-danger" onclick='deleteService(${s.id})'>
+                            <i class="fas fa-trash"></i> Sil
+                        </button>
+                    </div>
                 </div>
             `).join('');
         } else {
@@ -487,72 +493,97 @@ async function loadServices() {
 
 function openServiceModal() {
     document.getElementById('serviceForm').reset();
-    document.getElementById('serviceId').value = '';
+    document.getElementById('serviceId').value = ''; // ID-ni sıfırlayırıq ki, "Create" rejiminə keçsin
+    document.getElementById('serviceModalLabel').innerText = "Yeni Xidmət";
+    new bootstrap.Modal(document.getElementById('serviceModal')).show();
+}
+
+// Redaktə rejimi: Modalı doldurur
+function editServiceById(s) {
+    document.getElementById('serviceForm').reset();
+    document.getElementById('serviceId').value = s.id;
+    document.getElementById('serviceModalLabel').innerText = "Xidməti Redaktə Et";
+
+    // Sahələri doldururuq
+    document.getElementById('sTitle').value = s.title || '';
+    document.getElementById('sTitleAz').value = s.titleAz || '';
+    document.getElementById('sDesc').value = s.description || '';
+    document.getElementById('sDescAz').value = s.descriptionAz || '';
+
+    // Massivləri (bullet points) yenidən string halına salırıq
+    document.getElementById('sBulletPoints').value = Array.isArray(s.bulletPoints) ? s.bulletPoints.join('\n') : '';
+    document.getElementById('sBulletPointsAz').value = Array.isArray(s.bulletPointsAz) ? s.bulletPointsAz.join('\n') : '';
+    document.getElementById('sProcessSteps').value = Array.isArray(s.processSteps) ? s.processSteps.join('\n') : '';
+    document.getElementById('sProcessStepsAz').value = Array.isArray(s.processStepsAz) ? s.processStepsAz.join('\n') : '';
+
     new bootstrap.Modal(document.getElementById('serviceModal')).show();
 }
 
 async function submitService() {
+    const id = document.getElementById('serviceId').value;
     const fd = new FormData();
     
+    // Əsas sahələr
     const title = document.getElementById('sTitle').value;
-    let titleAz = document.getElementById('sTitleAz').value; 
-    
     const desc = document.getElementById('sDesc').value;
-    let descAz = document.getElementById('sDescAz').value;
-
-    const bulletPointsText = document.getElementById('sBulletPoints').value;
-    let bulletPointsAzText = document.getElementById('sBulletPointsAz').value;
-
-    const processStepsText = document.getElementById('sProcessSteps').value;
-    let processStepsAzText = document.getElementById('sProcessStepsAz').value;
-
-    if (!titleAz || titleAz.trim() === "") titleAz = title; 
-    if (!descAz || descAz.trim() === "") descAz = desc;
-    if (!bulletPointsAzText || bulletPointsAzText.trim() === "") bulletPointsAzText = bulletPointsText;
-    if (!processStepsAzText || processStepsAzText.trim() === "") processStepsAzText = processStepsText;
+    
+    if(!title) {
+        Swal.fire('Xəta', 'Başlıq mütləqdir', 'warning');
+        return;
+    }
 
     fd.append('title', title);
-    fd.append('titleAz', titleAz);
+    fd.append('titleAz', document.getElementById('sTitleAz').value || title);
     fd.append('description', desc);
-    fd.append('descriptionAz', descAz);
+    fd.append('descriptionAz', document.getElementById('sDescAz').value || desc);
     
-    const bulletPoints = bulletPointsText.split('\n').filter(line => line.trim() !== '');
+    // Bullet Points emalı
+    const bulletPoints = document.getElementById('sBulletPoints').value.split('\n').filter(line => line.trim() !== '');
     bulletPoints.forEach(point => fd.append('bulletPoints', point.trim()));
     
-    const bulletPointsAz = bulletPointsAzText.split('\n').filter(line => line.trim() !== '');
+    const bulletPointsAz = document.getElementById('sBulletPointsAz').value.split('\n').filter(line => line.trim() !== '');
     bulletPointsAz.forEach(point => fd.append('bulletPointsAz', point.trim()));
     
-    const processSteps = processStepsText.split('\n').filter(line => line.trim() !== '');
+    // Process Steps emalı
+    const processSteps = document.getElementById('sProcessSteps').value.split('\n').filter(line => line.trim() !== '');
     processSteps.forEach(step => fd.append('processSteps', step.trim()));
     
-    const processStepsAz = processStepsAzText.split('\n').filter(line => line.trim() !== '');
+    const processStepsAz = document.getElementById('sProcessStepsAz').value.split('\n').filter(line => line.trim() !== '');
     processStepsAz.forEach(step => fd.append('processStepsAz', step.trim()));
     
+    // Video Faylı
     const video = document.getElementById('sVideoFile').files[0];
     if(video) fd.append('videoFile', video);
-    
+
+    // Əgər Update-dirsə, video-nu silmək seçimi (opsional)
+    if(id) fd.append('removeVideo', 'false'); 
+
     Swal.fire({
-        title: 'Yüklənir...', 
-        html: 'Zəhmət olmasa gözləyin, video böyükdüsə vaxt ala bilər.',
+        title: 'Gözləyin...',
+        html: 'Məlumatlar serverə göndərilir...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
     
     try {
-        const res = await authFetch(`${API.SERVICES}`, { method: 'POST', body: fd });
+        // ID varsa PUT (Update), yoxdursa POST (Create)
+        const url = id ? `${API.SERVICES}/${id}` : `${API.SERVICES}`;
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await authFetch(url, { 
+            method: method, 
+            body: fd 
+        });
         
         if(res && res.ok) {
-            Swal.fire('Uğurlu', 'Xidmət uğurla yaradıldı!', 'success');
-            bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
+            Swal.fire('Uğurlu', id ? 'Xidmət yeniləndi!' : 'Xidmət yaradıldı!', 'success');
+            const modalEl = document.getElementById('serviceModal');
+            bootstrap.Modal.getInstance(modalEl).hide();
             loadServices();
             loadDashboard();
         } else {
-            let errorMsg = 'Xidmət əlavə edilmədi';
-            try {
-                const errData = await res.json();
-                if(errData.message) errorMsg = errData.message;
-            } catch(e) {}
-            Swal.fire('Xəta', errorMsg, 'error');
+            const errData = await res.json().catch(() => ({}));
+            Swal.fire('Xəta', errData.message || 'Əməliyyat baş tutmadı', 'error');
         }
     } catch (e) {
         console.error(e);
@@ -563,20 +594,23 @@ async function submitService() {
 async function deleteService(id) {
     const r = await Swal.fire({
         title: 'Silinsin?',
-        text: "Bu əməliyyat geri qaytarıla bilməz!",
+        text: "Bu xidmət daimi olaraq silinəcək!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Bəli, Sil',
-        cancelButtonText: 'Ləğv'
+        cancelButtonText: 'Ləğv et',
+        confirmButtonColor: '#ef4444'
     });
     
     if(r.isConfirmed) {
-        await authFetch(`${API.SERVICES}/${id}`, { method: 'DELETE' });
-        loadServices();
-        loadDashboard();
+        const res = await authFetch(`${API.SERVICES}/${id}`, { method: 'DELETE' });
+        if(res && res.ok) {
+            Swal.fire('Silindi', 'Xidmət silindi', 'success');
+            loadServices();
+            loadDashboard();
+        }
     }
 }
-
 // ============================================
 // MESSAGES
 // ============================================

@@ -7,8 +7,8 @@
     const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     const API_WORKS = `${BACKEND_URL}/api/works`;
     const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
-
-const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Works_Showreel_epbwt0.mp4";    
+    const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Works_Showreel_epbwt0.mp4";    
+    
     // Əsas elementlər
     const container = document.getElementById('dynamic-projects-grid');
     const loadingScreen = document.querySelector('.loading-screen');
@@ -70,14 +70,11 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     }
 
     // ============================================================
-    // ✅ YENİ: HERO VIDEO INIT (Arxa fon videosu üçün)
+    // 2. HERO VIDEO INIT (Arxa fon videosu üçün)
     // ============================================================
     function initHeroVideo() {
         const heroBg = document.querySelector('.hero-bg');
         if (!heroBg) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'hero-bg element not found',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             console.warn('hero-bg element not found');
             return;
         }
@@ -98,35 +95,11 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
         video.style.objectFit = "cover";
         video.style.zIndex = "-1";
         
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Creating Cloudinary video',data:{videoSrc:SHOWREEL_VIDEO_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
-        
-        // Video hatalarını yakala
         video.addEventListener('error', (e) => {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video error event',data:{error:e.error,networkState:video.networkState,readyState:video.readyState,src:video.src},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-            console.error('Hero video loading error:', e, video.error, video.networkState);
+            console.error('Hero video loading error:', e, video.error);
         });
         
-        video.addEventListener('loadstart', () => {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video loadstart',data:{src:video.src},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-        });
-        
-        video.addEventListener('loadeddata', () => {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video loadeddata',data:{src:video.src,readyState:video.readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
-        });
-        
-        // Play hatalarını yakala
         video.play().catch((error) => {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/c8cab837-75be-4e9d-8ade-87afca154918',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'works.js:75',message:'Video play error',data:{error:error.message,errorName:error.name,src:video.src},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             console.warn('Hero video autoplay failed:', error);
         });
         
@@ -134,7 +107,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     }
 
     // ============================================================
-    // 2. TRANSLATION SYSTEM
+    // 3. TRANSLATION SYSTEM
     // ============================================================
 
     async function loadTranslations() {
@@ -299,11 +272,14 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
             document.documentElement.setAttribute('lang', 'en');
         }
 
+        // Contact info yenilə
+        updateGlobalContactInfo();
+
         console.log('Translations applied for:', lang);
     }
 
     // ============================================================
-    // 3. LANGUAGE SELECTOR
+    // 4. LANGUAGE SELECTOR
     // ============================================================
 
     function initLanguageSelector() {
@@ -326,7 +302,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
         const savedLang = localStorage.getItem('selectedLang') || 'en';
         window.currentLang = savedLang;
         
-        // Seçilmiş dili tətbiq et (translations zaten yüklenmiş olmalı)
+        // Seçilmiş dili tətbiq et
         applyTranslations(savedLang);
         
         langOptions.forEach(option => {
@@ -411,7 +387,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     }
 
     // ============================================================
-    // 3. MENU SİSTEMİ (Mobil Menyu)
+    // 5. MENU SİSTEMİ (Mobil Menyu)
     // ============================================================
 
     function toggleMenu() {
@@ -501,10 +477,10 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     });
 
     // ============================================================
-    // 4. WORKS API & GRID
+    // 6. WORKS API & GRID
     // ============================================================
     
-    // URL təmizləyən və birləşdirən köməkçi funksiya (Cloudinary və Local üçün)
+    // URL təmizləyən və birləşdirən köməkçi funksiya
     function getFullMediaUrl(path) {
         if (!path) return '';
         
@@ -544,7 +520,6 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
 
             works.forEach((work, index) => {
                 const rawVideoPath = work.previewVideoUrl || work.videoUrl;
-                // Düzəliş: thumbnailUrl yoxdursa imageUrl istifadə et
                 const rawImagePath = work.thumbnailUrl || work.imageUrl; 
                 
                 const videoSrc = getFullMediaUrl(rawVideoPath);
@@ -606,9 +581,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
                     isVideoLoaded = true;
                 }
                 
-                // Video olanda hover üzərində avtomatik oynatma
                 video.play().catch(error => {
-                     // Auto-play xətasını tuturuq
                      console.log("Auto-play prevented or loading:", error);
                 });
             });
@@ -639,7 +612,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     };
 
     // ============================================================
-    // 5. SCROLL REVEAL
+    // 7. SCROLL REVEAL
     // ============================================================
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -656,7 +629,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     });
 
     // ============================================================
-    // 6. VIDEO MODAL
+    // 8. VIDEO MODAL
     // ============================================================
     
     function formatTime(seconds) {
@@ -775,9 +748,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
         ['mousemove', 'click'].forEach(evt => previewContainer.addEventListener(evt, handleUserActivity));
     }
 
-    // ============================================================
     // REWIND / FORWARD BUTTONS
-    // ============================================================
     if (rewindBtn) {
         rewindBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -796,9 +767,7 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
         });
     }
 
-    // ============================================================
     // VOLUME SLIDER
-    // ============================================================
     if (volumeSlider) {
         volumeSlider.addEventListener('input', (e) => {
             if (previewVideo) {
@@ -806,15 +775,12 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
             }
         });
         
-        // İlkin volume dəyərini sync et
         if (previewVideo) {
             volumeSlider.value = previewVideo.volume * 100;
         }
     }
 
-    // ============================================================
     // FULLSCREEN BUTTON
-    // ============================================================
     if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -829,14 +795,13 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     }
 
     // ============================================================
-    // 7. GLOBAL NAVİQASİYA
+    // 9. GLOBAL NAVİQASİYA
     // ============================================================
     
     function setupNavLinks() {
         const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
         
         internalLinks.forEach(link => {
-            // Mobil Menunun içindəki linklərə toxunmuruq
             if (link.closest('.mobile-menu')) return;
 
             link.addEventListener('click', function(e) {
@@ -858,15 +823,86 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     }
 
     // ============================================================
-    // 8. INIT
+    // 10. GLOBAL CONTACT INFO UPDATER
+    // ============================================================
+    
+    async function updateGlobalContactInfo() {
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/about?lang=${window.currentLang}`);
+
+            if (!response.ok) {
+                console.error("Məlumat tapılmadı");
+                return;
+            }
+
+            const data = await response.json();
+
+            // Email yenilə
+            if (data.email) {
+                const emailElements = document.querySelectorAll('.global-email');
+                emailElements.forEach(el => {
+                    const span = el.querySelector('span');
+                    if (span) {
+                        span.textContent = data.email;
+                        span.setAttribute('data-text', data.email);
+                    } else {
+                        el.textContent = data.email;
+                    }
+                    el.href = `mailto:${data.email}`;
+                });
+            }
+
+            // Telefon yenilə
+            if (data.phone) {
+                const phoneElements = document.querySelectorAll('.global-phone');
+                phoneElements.forEach(el => {
+                    const span = el.querySelector('span');
+                    if (span) {
+                        span.textContent = data.phone;
+                        span.setAttribute('data-text', data.phone);
+                    } else {
+                        el.textContent = data.phone;
+                    }
+                    const cleanPhone = data.phone.replace(/\s+/g, '');
+                    el.href = `tel:${cleanPhone}`;
+                });
+            }
+
+            // Ünvan yenilə
+            if (data.address) {
+                const addressElements = document.querySelectorAll('.global-address');
+                addressElements.forEach(el => {
+                    el.textContent = data.address;
+                });
+            }
+
+        } catch (error) {
+            console.error("Əlaqə məlumatları yenilənərkən xəta:", error);
+        }
+    }
+
+    // ============================================================
+    // 11. INIT - ✅ BİRLƏŞDİRİLMİŞ VƏ DÜZƏLDİLMİŞ
     // ============================================================
     
     async function init() {
+        // Translations yüklə
         await loadTranslations();
+        
+        // Language selector başlat
         initLanguageSelector();
-        initHeroVideo(); // ← Cloudinary video'yu yükle
+        
+        // Hero video başlat (Cloudinary)
+        initHeroVideo();
+        
+        // Works məlumatlarını yüklə
         loadDynamicWorks();
+        
+        // Naviqasiya linklərini qur
         setupNavLinks();
+        
+        // Contact məlumatlarını yüklə
+        updateGlobalContactInfo();
     }
 
     if (document.readyState === 'loading') {
@@ -874,67 +910,5 @@ const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Wo
     } else {
         init();
     }
-
-    async function init() {
-    // ... digər funksiyaların (loadTranslations, initPageTransition və s.)
-    
-    loadContactDetails(); // <--- BUNU ƏLAVƏ ET Kİ, SƏHİFƏ AÇILANDA MƏLUMAT GƏLSİN
-}
-
-/* ============================================================
-   GLOBAL CONTACT INFO UPDATER (Footer & Contact Page)
-   ============================================================ */
-
-async function updateGlobalContactInfo() {
-    try {
-        // 1. Admin paneldəki About məlumatlarını gətiririk
-        // QEYD: URL-i öz server ünvanına uyğun yoxla
-        const baseUrl = "https://cinechord-admin-production.up.railway.app"; 
-        const response = await fetch(`${baseUrl}/api/about?lang=en`);
-
-        if (!response.ok) {
-            console.error("Məlumat tapılmadı");
-            return;
-        }
-
-        const data = await response.json();
-
-        // 2. Bütün səhifədəki Emailləri tapıb yeniləyirik
-        if (data.email) {
-            const emailElements = document.querySelectorAll('.global-email');
-            emailElements.forEach(el => {
-                el.textContent = data.email;
-                el.href = `mailto:${data.email}`;
-            });
-        }
-
-        // 3. Bütün səhifədəki Telefon nömrələrini tapıb yeniləyirik
-        if (data.phone) {
-            const phoneElements = document.querySelectorAll('.global-phone');
-            phoneElements.forEach(el => {
-                el.textContent = data.phone;
-                // tel: linki üçün boşluqları silirik (+994 50... -> +99450...)
-                const cleanPhone = data.phone.replace(/\s+/g, '');
-                el.href = `tel:${cleanPhone}`;
-            });
-        }
-
-        // 4. Bütün səhifədəki Ünvanları tapıb yeniləyirik
-        if (data.address) {
-            const addressElements = document.querySelectorAll('.global-address');
-            addressElements.forEach(el => {
-                el.textContent = data.address;
-            });
-        }
-
-    } catch (error) {
-        console.error("Əlaqə məlumatları yenilənərkən xəta:", error);
-    }
-}
-
-// Səhifə tam yüklənəndə funksiyanı işə sal
-document.addEventListener('DOMContentLoaded', () => {
-    updateGlobalContactInfo();
-});
 
 })();

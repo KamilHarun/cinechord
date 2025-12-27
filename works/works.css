@@ -1852,18 +1852,15 @@ body.lang-az .category-btn {
         width: 100%;
     }
     
-    .nav-btn {
-        font-size: 11vw !important;
-        margin: -1vh 0 !important;
-        line-height: 1.0 !important;
-        display: block !important;
-        overflow: visible !important;
+ .nav-btn {
+        font-size: 13vw;
+        margin: -5px 0;
     }
 
     body.lang-az .nav-btn {
-        font-size: 8.5vw !important;
-        line-height: 1.2 !important;
-        letter-spacing: 0px !important; 
+        font-size: 9vw;
+        letter-spacing: 1px;
+        margin: -0.5vh 0;
     }
     
     .center-logo {

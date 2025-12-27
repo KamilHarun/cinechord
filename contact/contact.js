@@ -1,6 +1,6 @@
 /* ============================================================
     CineChord Contact - Main JavaScript
-    Version: Final - Fixed Mask Effect & Backend Integration
+    Version: Final Fixed - Hero Translation + Menu + Contact Info
    ============================================================ */
 
 (function() {
@@ -11,11 +11,10 @@
        ============================================================ */
     
     const CONFIG = {
-        // Sənin Backend URL-in
         BACKEND_URL: 'https://cinechord-admin-production.up.railway.app',
         ENDPOINTS: {
-            CONTACT: '/api/createMessage', // Mesaj göndərmək üçün
-            ABOUT: '/api/about'            // Email, Phone, Address çəkmək üçün
+            CONTACT: '/api/createMessage',
+            ABOUT: '/api/about'
         },
         SCROLL_THRESHOLD: 50,
         PAGE_LOAD_DELAY: 100,
@@ -53,20 +52,16 @@
         newsletterCheckbox: document.getElementById('newsletter'),
         textareas: document.querySelectorAll('.textarea-mode'),
         hamburger: document.getElementById('hamburgerBtn'),
-        hamburgerText: document.querySelector('.hamburger-text'),
         mobileMenu: document.getElementById('mobileMenu'),
         overlay: document.getElementById('mobileMenuOverlay'),
     };
 
     /* ============================================================
-        3. GLOBAL CONTACT INFO UPDATER (THE FIX)
-        Bu funksiya Admin paneldən gələn məlumatla həm yazını, 
-        həm də animasiyanı (data-text) yeniləyir.
+        3. GLOBAL CONTACT INFO UPDATER
        ============================================================ */
 
     async function updateGlobalContactInfo() {
         try {
-            // Dilə uyğun məlumatı çəkirik
             const response = await fetch(`${API_URLS.ABOUT}?lang=${window.currentLang}`);
             
             if (!response.ok) return;
@@ -76,15 +71,12 @@
             // --- 1. EMAIL FIX ---
             if (data.email) {
                 document.querySelectorAll('.global-email').forEach(el => {
-                    // Linki yenilə
                     el.href = `mailto:${data.email}`;
                     
                     const span = el.querySelector('span');
                     
-                    // Yazını yenilə
                     if (span) {
                         span.textContent = data.email;
-                        // Footer stili üçün (span-da data-text var)
                         if (span.hasAttribute('data-text')) {
                             span.setAttribute('data-text', data.email);
                         }
@@ -92,7 +84,6 @@
                         el.textContent = data.email;
                     }
 
-                    // Contact Body stili üçün (a-da data-text var)
                     if (el.hasAttribute('data-text')) {
                         el.setAttribute('data-text', data.email);
                     }
@@ -101,7 +92,7 @@
 
             // --- 2. PHONE FIX ---
             if (data.phone) {
-                const cleanPhone = data.phone.replace(/\s+/g, ''); // Boşluqları sil
+                const cleanPhone = data.phone.replace(/\s+/g, '');
                 
                 document.querySelectorAll('.global-phone').forEach(el => {
                     el.href = `tel:${cleanPhone}`;
@@ -109,7 +100,6 @@
                     const span = el.querySelector('span');
                     if (span) {
                         span.textContent = data.phone;
-                        // Footer stili
                         if (span.hasAttribute('data-text')) {
                             span.setAttribute('data-text', data.phone);
                         }
@@ -117,7 +107,6 @@
                         el.textContent = data.phone;
                     }
 
-                    // Contact Body stili
                     if (el.hasAttribute('data-text')) {
                         el.setAttribute('data-text', data.phone);
                     }
@@ -128,12 +117,10 @@
             if (data.address || data.addressAz) {
                 const address = (window.currentLang === 'az' && data.addressAz) ? data.addressAz : data.address;
                 
-                // Class olan yerləri yenilə
                 document.querySelectorAll('.global-address').forEach(el => {
                     el.textContent = address;
                 });
                 
-                // Footer-də class yoxdursa, strukturuna görə tapıb yenilə
                 const footerAddressContainer = document.querySelector('.footer-col .footer-content');
                 if (footerAddressContainer && !footerAddressContainer.querySelector('a')) {
                      const lines = address.split(','); 
@@ -211,7 +198,7 @@
        ============================================================ */
 
     function initMobileMenu() {
-        const { hamburger, mobileMenu, overlay, hamburgerText } = elements;
+        const { hamburger, mobileMenu, overlay } = elements;
         
         if (!hamburger || !mobileMenu) return;
 
@@ -223,13 +210,13 @@
             mobileMenu.classList.toggle('active');
             if (overlay) overlay.classList.toggle('active');
             
-            if (hamburgerText) {
-                if (window.translations && window.translations[window.currentLang]) {
-                    const t = window.translations[window.currentLang];
-                    hamburgerText.textContent = isActive ? t.menu : t.close;
-                } else {
-                    hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
-                }
+            // ✅ FIX: Hamburger text-i dinamik seç
+            const hamburgerText = document.querySelector('.hamburger-text');
+            if (hamburgerText && window.translations && window.translations[window.currentLang]) {
+                const t = window.translations[window.currentLang];
+                hamburgerText.textContent = isActive ? t.menu : t.close;
+            } else if (hamburgerText) {
+                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
             }
             
             if (!isActive) {
@@ -284,8 +271,38 @@
             console.error('Error loading translations:', error);
             // Fallback translations
             window.translations = {
-                "en": { "menu": "MENU", "close": "CLOSE", "send_message": "SEND MESSAGE", "sending": "SENDING...", "message_sent": "MESSAGE SENT!", "error": "ERROR! TRY AGAIN" },
-                "az": { "menu": "MENYU", "close": "BAĞLA", "send_message": "GÖNDƏRİN", "sending": "GÖNDƏRİLİR...", "message_sent": "MESAJ GÖNDƏRİLDİ!", "error": "XƏTA! YENIDƏN CƏHD EDİN" }
+                "en": { 
+                    "menu": "MENU", 
+                    "close": "CLOSE", 
+                    "send_message": "SEND MESSAGE", 
+                    "sending": "SENDING...", 
+                    "message_sent": "MESSAGE SENT!", 
+                    "error": "ERROR! TRY AGAIN",
+                    "home": "HOME",
+                    "work": "WORK",
+                    "service": "SERVICE",
+                    "archive": "ARCHIVE",
+                    "about": "ABOUT",
+                    "contact": "CONTACT",
+                    "lets_work": "LET'S WORK",
+                    "together": "TOGETHER"
+                },
+                "az": { 
+                    "menu": "MENYU", 
+                    "close": "BAĞLA", 
+                    "send_message": "GÖNDƏRİN", 
+                    "sending": "GÖNDƏRİLİR...", 
+                    "message_sent": "MESAJ GÖNDƏRİLDİ!", 
+                    "error": "XƏTA! YENIDƏN CƏHD EDİN",
+                    "home": "ANA SƏHİFƏ",
+                    "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR",
+                    "archive": "ARXİV",
+                    "about": "HAQQIMIZDA",
+                    "contact": "ƏLAQƏ",
+                    "lets_work": "GƏLİN BİRLİKDƏ",
+                    "together": "İŞLƏYƏK"
+                }
             };
             return window.translations;
         }
@@ -297,35 +314,49 @@
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        // Hamurger
-        if (elements.hamburgerText) {
-            const isMenuOpen = elements.hamburger.classList.contains('active');
-            elements.hamburgerText.textContent = isMenuOpen ? t.close : t.menu;
+        // ✅ FIX 1: Hamburger text-i dinamik seç
+        const hamburgerText = document.querySelector('.hamburger-text');
+        const hamburger = document.getElementById('hamburgerBtn');
+        
+        if (hamburgerText && hamburger) {
+            const isMenuOpen = hamburger.classList.contains('active');
+            hamburgerText.textContent = isMenuOpen ? t.close : t.menu;
         }
 
-        // Nav Buttons, Labels, etc.
+        // ✅ FIX 2: Bütün data-key elementlərini tərcümə et
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if (t[key]) {
-                // Input placeholder-ləri üçün xüsusi hal
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                    // Placeholder translation logic if needed
-                } else {
-                    // Normal text
-                    if (el.querySelector('span') && el.classList.contains('hero-rolling-text')) {
-                         el.querySelector('span').textContent = t[key];
-                         el.setAttribute('data-text', t[key]);
-                    } else if (el.tagName === 'LABEL') {
-                        el.textContent = t[key];
-                    } else if (el.classList.contains('nav-btn')) {
-                         const span = el.querySelector('.nav-text');
-                         if(span) span.textContent = t[key];
-                         el.setAttribute('data-text', t[key]);
-                    } else {
-                        // General text
-                        if(!el.classList.contains('rolling-link')) { 
-                            el.innerHTML = t[key].replace(/\n/g, '<br>');
-                        }
+                // ✅ HERO LINE (LET'S WORK)
+                if (el.classList.contains('hero-line')) {
+                    el.textContent = t[key];
+                }
+                // ✅ HERO ROLLING TEXT (TOGETHER)
+                else if (el.classList.contains('hero-rolling-text')) {
+                    const span = el.querySelector('span');
+                    if (span) span.textContent = t[key];
+                    el.setAttribute('data-text', t[key]);
+                }
+                // NAV BUTTON
+                else if (el.classList.contains('nav-btn')) {
+                    const navTextSpan = el.querySelector('.nav-text');
+                    if (navTextSpan) {
+                        navTextSpan.textContent = t[key];
+                    }
+                    el.setAttribute('data-text', t[key]);
+                }
+                // LABEL
+                else if (el.tagName === 'LABEL') {
+                    el.textContent = t[key];
+                }
+                // INPUT/TEXTAREA
+                else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    // Placeholder üçün - boş buraxırıq
+                }
+                // DİGƏR ELEMENTLƏR
+                else {
+                    if (!el.classList.contains('rolling-link')) { 
+                        el.innerHTML = t[key].replace(/\n/g, '<br>');
                     }
                 }
             }
@@ -333,10 +364,10 @@
 
         // Button state update
         const sendBtn = document.querySelector('.rolling-text-btn');
-        if(sendBtn && (t.send_message || t.form_send)) {
+        if (sendBtn && (t.send_message || t.form_send)) {
             const txt = t.send_message || t.form_send;
             const span = sendBtn.querySelector('span');
-            if(span) span.textContent = txt;
+            if (span) span.textContent = txt;
             sendBtn.setAttribute('data-text', txt);
         }
 
@@ -349,7 +380,7 @@
             document.documentElement.setAttribute('lang', 'en');
         }
         
-        // Dili dəyişəndə məlumatları da yenilə (ünvan azərbaycanca ola bilər)
+        // Contact info yenilə
         updateGlobalContactInfo();
     }
 
@@ -517,7 +548,7 @@
         initFormSubmission();
         setupNavLinks();
         
-        // ✅ CRITICAL: Məlumatları və Mask effektini düzəldən funksiyanı çağırırıq
+        // Contact info yüklə
         updateGlobalContactInfo();
     }
 

@@ -1273,7 +1273,7 @@ body.lang-az .mask-link span::after {
 
 @media (max-width: 768px) {
     .lang-selector {
-        top: 38px !important;
+        top: 35px !important;
         right: 125px !important;
         left: auto !important;
         z-index: 30001;
@@ -1365,12 +1365,10 @@ body.lang-az .mask-link span::after {
         display: block !important;
     }
     
-    body.lang-az .nav-btn {
-        font-size: 8.2vw !important;
-        letter-spacing: -0.5px !important;
+  body.lang-az .nav-btn {
+        font-size: 9vw;
+        letter-spacing: 1px;
         margin: -0.5vh 0;
-        max-width: 95vw !important;
-        white-space: nowrap !important;
     }
 
     body.lang-az .hero-rolling-text,
