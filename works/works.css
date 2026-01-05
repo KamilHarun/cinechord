@@ -2060,6 +2060,75 @@ body.lang-az .category-btn {
         gap: 8px;
     }
 }
+/* ============================================================
+   WORKS PAGE - SCROLL HIDE/SHOW CSS ADDON  
+   Bu kodu mövcud works.css faylına əlavə et
+   (Globe Language Selector bölməsindən əvvəl)
+   ============================================================ */
+
+/* ============================================================
+   LOGO POSİTİON DÜZƏLİŞİ - VACİB!
+   ============================================================ */
+
+/* Logo-nu absolute-dən fixed-ə dəyiş ki scroll işləsin */
+.center-logo {
+    position: fixed !important; /* absolute yerinə fixed */
+    top: 5px;
+    left: 40px;
+    z-index: 100;
+    pointer-events: auto;
+    text-decoration: none;
+}
+
+/* ============================================================
+   SCROLL HIDE/SHOW ANIMATION
+   ============================================================ */
+
+.hide-on-scroll {
+    opacity: 0 !important;
+    transform: translateY(-30px) !important;
+    pointer-events: none !important;
+}
+
+/* Smooth transitions for logo, hamburger, globe */
+.center-logo,
+.hamburger,
+.lang-selector {
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Logo specific adjustments */
+.center-logo {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.center-logo.hide-on-scroll {
+    transform: translateY(-30px);
+    opacity: 0;
+}
+
+/* Hamburger specific adjustments */
+.hamburger {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.hamburger.hide-on-scroll {
+    transform: translateY(-30px);
+    opacity: 0;
+}
+
+/* Globe specific adjustments */
+.lang-selector {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.lang-selector.hide-on-scroll {
+    transform: translateY(-30px);
+    opacity: 0;
+}
 
 /* =========================================
    19. AZƏRBAYCAN DİLİ - İ və Ş HƏRFİ DÜZƏLİŞİ

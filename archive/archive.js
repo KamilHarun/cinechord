@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Main JavaScript
-   Version: 6.5 - SCRAMBLE EFFECT BUG FIXED
+   Version: 6.7 - DYNAMIC CATEGORY TRANSLATION
    ============================================================ */
 
 (function() {
@@ -23,10 +23,33 @@
         ARCHIVE: `${CONFIG.BACKEND_URL}/api/archive`
     };
 
-    const categoryMap = {
-        'FILM': 'FILM', 'COMMERCIAL': 'COMMERCIAL', 'CLIP': 'CLIP',
-        'MUSIC_VIDEO': 'MUSIC VIDEO', 'DOCUMENTARY': 'DOCUMENTARY', 'SOCIAL': 'SOCIAL'
-    };
+    // Dynamic category translation - uses window.translations
+    function getCategoryDisplay(category) {
+        console.log('🔍 getCategoryDisplay called with:', category);
+        console.log('📚 window.translations:', window.translations);
+        console.log('🌍 window.currentLang:', window.currentLang);
+        
+        if (!window.translations || !window.translations[window.currentLang]) {
+            console.log('⚠️ Using fallback - translations not loaded');
+            // Fallback if translations not loaded
+            const fallbackMap = {
+                'FILM': 'FILM',
+                'COMMERCIAL': 'COMMERCIAL',
+                'CLIP': 'CLIP',
+                'MUSIC_VIDEO': 'MUSIC VIDEO',
+                'DOCUMENTARY': 'DOCUMENTARY',
+                'SOCIAL': 'SOCIAL'
+            };
+            return fallbackMap[category] || category;
+        }
+
+        const t = window.translations[window.currentLang];
+        const categoryKey = 'category_' + category.toLowerCase();
+        console.log('🔑 categoryKey:', categoryKey);
+        console.log('✅ Translated to:', t[categoryKey]);
+        
+        return t[categoryKey] || category;
+    }
 
     /* ============================================================
        2. DOM ELEMENT REFERENCES
@@ -62,6 +85,7 @@
        ============================================================ */
     
     let activityTimeout = null;
+    let archiveData = []; // Store archive data globally for re-rendering
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
     // Global translations object
@@ -137,18 +161,34 @@
     }
 
     /* ============================================================
-       5. TRANSLATION SYSTEM
+       6. TRANSLATION SYSTEM
        ============================================================ */
 
     async function loadTranslations() {
         try {
-            const response = await fetch('../lang/archive.json');
+            console.log('📥 Loading translations from ../lang/translation.json');
+            const response = await fetch('../lang/translation.json');
             if (!response.ok) throw new Error('Translation file not found');
             window.translations = await response.json();
-            console.log('Translations loaded:', window.translations);
+            console.log('✅ Translations loaded successfully:', window.translations);
+            
+            // Check if category translations exist
+            if (window.translations.en && window.translations.en.category_film) {
+                console.log('✅ Category translations found in EN');
+            } else {
+                console.log('⚠️ Category translations NOT found in EN');
+            }
+            
+            if (window.translations.az && window.translations.az.category_film) {
+                console.log('✅ Category translations found in AZ');
+            } else {
+                console.log('⚠️ Category translations NOT found in AZ');
+            }
+            
             return window.translations;
         } catch (error) {
-            console.error('Error loading translations:', error);
+            console.error('❌ Error loading translations:', error);
+            console.log('⚠️ Using fallback translations');
             // Fallback translations
             window.translations = {
                 "en": {
@@ -164,7 +204,13 @@
                     "play": "PLAY",
                     "address": "ADDRESS",
                     "get_in_touch": "GET IN TOUCH",
-                    "follow_us": "FOLLOW US"
+                    "follow_us": "FOLLOW US",
+                    "category_film": "FILM",
+                    "category_commercial": "COMMERCIAL",
+                    "category_clip": "CLIP",
+                    "category_music_video": "MUSIC VIDEO",
+                    "category_documentary": "DOCUMENTARY",
+                    "category_social": "SOCIAL"
                 },
                 "az": {
                     "menu": "MENYU",
@@ -179,7 +225,13 @@
                     "play": "BAŞLAT",
                     "address": "ÜNVAN",
                     "get_in_touch": "ƏLAQƏ SAXLAYIN",
-                    "follow_us": "BİZİ İZLƏYİN"
+                    "follow_us": "BİZİ İZLƏYİN",
+                    "category_film": "FİLM",
+                    "category_commercial": "REKLAM",
+                    "category_clip": "KLİP",
+                    "category_music_video": "MUSİQİ VİDEOSU",
+                    "category_documentary": "SƏNƏDLI",
+                    "category_social": "SOSIAL"
                 }
             };
             return window.translations;
@@ -251,6 +303,17 @@
             }
         });
 
+        // ========== YENİ KOD - Animasiyalı Video Sözləri ==========
+        const videoWords = document.querySelectorAll('.video-word[data-key]');
+        videoWords.forEach(word => {
+            const key = word.getAttribute('data-key');
+            if (key && t[key]) {
+                word.textContent = t[key];
+                console.log(`🎬 Video word translated: ${key} → ${t[key]}`);
+            }
+        });
+        // ========== YENİ KOD BİTİR ==========
+
         // Archive Subtitle
         const archiveSubtitle = document.querySelector('.archive-subtitle');
         if (archiveSubtitle) {
@@ -266,6 +329,10 @@
             }
         }
 
+        // Re-render table with translated categories
+        console.log('🔄 Calling reloadTableWithTranslations from applyTranslations');
+        reloadTableWithTranslations();
+
         // Apply font class
         if (lang === 'az') {
             document.body.classList.add('lang-az');
@@ -279,7 +346,7 @@
     }
 
     /* ============================================================
-       6. GLOBE LANGUAGE SELECTOR
+       7. GLOBE LANGUAGE SELECTOR
        ============================================================ */
 
     function initLanguageSelector() {
@@ -375,7 +442,7 @@
     }
 
     /* ============================================================
-       6. MOBILE MENU
+       8. MOBILE MENU
        ============================================================ */
 
     function initMobileMenu() {
@@ -485,7 +552,7 @@
     }
 
     /* ============================================================
-       7. SCROLL REVEAL (INTERSECTION OBSERVER)
+       9. SCROLL REVEAL (INTERSECTION OBSERVER)
        ============================================================ */
     
     const observerOptions = {
@@ -509,7 +576,7 @@
     }
 
     /* ============================================================
-       8. UTILITY FUNCTIONS
+       10. UTILITY FUNCTIONS
        ============================================================ */
 
     function cleanUrlPath(url) {
@@ -542,7 +609,7 @@
     }
 
     /* ============================================================
-       9. LOAD ARCHIVE DATA
+       11. LOAD ARCHIVE DATA
        ============================================================ */
 
     async function loadArchiveData() {
@@ -556,50 +623,12 @@
 
             const data = await response.json();
             const works = data.content ? data.content : data;
-            elements.tableBody.innerHTML = '';
-
-            if (works.length === 0) {
-                elements.tableBody.innerHTML = '<tr><td colspan="7" style="color:white; text-align:center; padding:60px; opacity:0.5;">No archive data found.</td></tr>';
-                return;
-            }
-
-            works.forEach((work, index) => {
-                let videoSrc = work.previewVideoUrl || work.videoUrl;
-
-                if (videoSrc) {
-                    videoSrc = cleanUrlPath(videoSrc);
-                    if (!videoSrc.startsWith('http')) {
-                        videoSrc = CONFIG.UPLOADS_URL + videoSrc;
-                    }
-                }
-
-                const categoryDisplay = categoryMap[work.category] || work.category || '-';
-
-                const row = document.createElement('tr');
-                row.setAttribute('data-video-src', videoSrc);
-                row.setAttribute('data-title', work.title || '');
-                row.setAttribute('data-client', work.clientName || '');
-                row.setAttribute('data-category', categoryDisplay);
-                row.setAttribute('data-year', work.productionYear || '');
-                row.style.transitionDelay = `${index * 0.05}s`;
-
-                row.innerHTML = `
-                    <td class="number-col">${String(index + 1).padStart(2, '0')}</td>
-                    <td class="client-col">${work.clientName || '-'}</td>
-                    <td class="title-col">${work.title || 'Untitled'}</td>
-                    <td class="type-col">${categoryDisplay}</td>
-                    <td class="location-col">${work.location || '-'}</td>
-                    <td class="agency-col">${work.agency || '-'}</td>
-                    <td class="year-col">${work.productionYear || '-'}</td>
-                `;
-
-                elements.tableBody.appendChild(row);
-            });
-
-            const newRows = elements.tableBody.querySelectorAll('tr');
-            newRows.forEach(row => observer.observe(row));
-
-            attachTableRowEffects();
+            
+            // Store data globally for language switching
+            archiveData = works;
+            
+            // Render table
+            renderArchiveTable(works);
 
         } catch (error) {
             console.error("Error loading archive:", error);
@@ -611,8 +640,70 @@
         }
     }
 
+    function renderArchiveTable(works) {
+        if (!elements.tableBody) return;
+        
+        elements.tableBody.innerHTML = '';
+
+        if (works.length === 0) {
+            elements.tableBody.innerHTML = '<tr><td colspan="7" style="color:white; text-align:center; padding:60px; opacity:0.5;">No archive data found.</td></tr>';
+            return;
+        }
+
+        works.forEach((work, index) => {
+            let videoSrc = work.previewVideoUrl || work.videoUrl;
+
+            if (videoSrc) {
+                videoSrc = cleanUrlPath(videoSrc);
+                if (!videoSrc.startsWith('http')) {
+                    videoSrc = CONFIG.UPLOADS_URL + videoSrc;
+                }
+            }
+
+            // Use dynamic category translation
+            const categoryDisplay = getCategoryDisplay(work.category);
+
+            const row = document.createElement('tr');
+            row.setAttribute('data-video-src', videoSrc);
+            row.setAttribute('data-title', work.title || '');
+            row.setAttribute('data-client', work.clientName || '');
+            row.setAttribute('data-category', categoryDisplay);
+            row.setAttribute('data-year', work.productionYear || '');
+            row.style.transitionDelay = `${index * 0.05}s`;
+
+            row.innerHTML = `
+                <td class="number-col">${String(index + 1).padStart(2, '0')}</td>
+                <td class="client-col">${work.clientName || '-'}</td>
+                <td class="title-col">${work.title || 'Untitled'}</td>
+                <td class="type-col">${categoryDisplay}</td>
+                <td class="location-col">${work.location || '-'}</td>
+                <td class="agency-col">${work.agency || '-'}</td>
+                <td class="year-col">${work.productionYear || '-'}</td>
+            `;
+
+            elements.tableBody.appendChild(row);
+        });
+
+        const newRows = elements.tableBody.querySelectorAll('tr');
+        newRows.forEach(row => observer.observe(row));
+
+        attachTableRowEffects();
+    }
+
+    function reloadTableWithTranslations() {
+        console.log('🔄 reloadTableWithTranslations called');
+        console.log('📊 archiveData:', archiveData);
+        
+        if (archiveData && archiveData.length > 0) {
+            console.log('✅ Re-rendering table with', archiveData.length, 'items');
+            renderArchiveTable(archiveData);
+        } else {
+            console.log('⚠️ No archive data to reload');
+        }
+    }
+
     /* ============================================================
-       10. TABLE ROW EFFECTS - SCRAMBLE BUG FIXED
+       12. TABLE ROW EFFECTS - SCRAMBLE BUG FIXED
        ============================================================ */
 
     function attachTableRowEffects() {
@@ -689,7 +780,7 @@
     }
 
     /* ============================================================
-       11. VIDEO MODAL LOGIC
+       13. VIDEO MODAL LOGIC
        ============================================================ */
 
     function handleUserActivity() {
@@ -853,7 +944,7 @@
     }
 
     /* ============================================================
-       12. DİGƏR LİNKLƏR (Logo xaric)
+       14. DİGƏR LİNKLƏR (Logo xaric)
        ============================================================ */
     
     function setupOtherLinks() {
@@ -876,26 +967,73 @@
         });
     }
 
- /* ============================================================
-   13. INITIALIZATION
+          /* ============================================================
+   WORKS PAGE - SCROLL HIDE/SHOW ADDON
    ============================================================ */
 
-async function init() {
-    await loadTranslations();
-    initPageTransition();
-    initLogoClick();
-    initLanguageSelector();
-    initMobileMenu();
-    initScrollReveal();
-    initVideoModal();
-    loadArchiveData();
-    setupOtherLinks();
-}
+// Scroll Hide/Show Funksionallığı
+(function() {
+    let lastScrollY = 0;
+    let ticking = false;
+    
+    function handleScroll() {
+        const currentScrollY = window.scrollY;
+        
+        const logo = document.querySelector('.center-logo');
+        const hamburger = document.querySelector('.hamburger');
+        const langSelector = document.querySelector('.lang-selector');
+        
+        // Scroll aşağı (100px-dən çox) - gizlə
+        if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+            if (logo) logo.classList.add('hide-on-scroll');
+            if (hamburger) hamburger.classList.add('hide-on-scroll');
+            if (langSelector) langSelector.classList.add('hide-on-scroll');
+        }
+        // Scroll yuxarı və ya 100px-dən az - göstər
+        else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+            if (logo) logo.classList.remove('hide-on-scroll');
+            if (hamburger) hamburger.classList.remove('hide-on-scroll');
+            if (langSelector) langSelector.classList.remove('hide-on-scroll');
+        }
+        
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+    
+    function requestScrollTick() {
+        if (!ticking) {
+            window.requestAnimationFrame(handleScroll);
+            ticking = true;
+        }
+    }
+    
+    // Scroll event listener (performanslı)
+    window.addEventListener('scroll', requestScrollTick, { passive: true });
+    
+    console.log('✅ Scroll hide/show initialized!');
+})();
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
+
+    /* ============================================================
+       15. INITIALIZATION
+       ============================================================ */
+
+    async function init() {
+        await loadTranslations();
+        initPageTransition();
+        initLogoClick();
+        initLanguageSelector();
+        initMobileMenu();
+        initScrollReveal();
+        initVideoModal();
+        loadArchiveData();
+        setupOtherLinks();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
 })(); // ← İIFE bağlanır

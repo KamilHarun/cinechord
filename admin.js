@@ -450,8 +450,11 @@ function filterWorks() {
     });
 }
 
+// Kodun ən yuxarısında digər let-lərin yanına əlavə et:
+let servicesDataCache = []; 
+
 // ============================================
-// SERVICES (CREATE & UPDATE SUPPORTED)
+// SERVICES (CREATE & UPDATE SUPPORTED) - FIXED
 // ============================================
 
 async function loadServices() {
@@ -463,110 +466,121 @@ async function loadServices() {
         const res = await authFetch(`${API.SERVICES}/getAll?t=${Date.now()}`);
         if(res && res.ok) {
             const services = await res.json();
+            servicesDataCache = services; // Məlumatı keşe yazırıq
+            
             if(services.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><i class="fas fa-magic"></i><h3>Xidmət yoxdur</h3></div>';
+                grid.innerHTML = '<div class="empty-state"><h3>Xidmət yoxdur</h3></div>';
                 return;
             }
             grid.innerHTML = services.map(s => `
                 <div class="service-card">
-                    <div style="width:48px;height:48px;background:rgba(139,92,246,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto;">
-                        <i class="${s.iconClass || 'fas fa-star'}" style="font-size:1.25rem;color:#8b5cf6;"></i>
+                    <div class="service-icon-box">
+                        <i class="${s.iconClass || 'fas fa-star'}"></i>
                     </div>
                     <h4>${s.title}</h4>
-                    <p>${(s.description||'').substring(0,80)}${s.description?.length > 80 ? '...' : ''}</p>
-                    
-                    <div class="service-actions" style="margin-top:1rem; display:flex; gap:8px; justify-content:center;">
-                        <button class="btn-edit" onclick='editServiceById(${JSON.stringify(s).replace(/'/g, "&apos;")})'>
+                    <p>${(s.description||'').substring(0,80)}...</p>
+                    <div class="service-actions">
+                        <button class="btn-edit" onclick="editServiceById(${s.id})">
                             <i class="fas fa-edit"></i> Redaktə
                         </button>
-                        <button class="btn-danger" onclick='deleteService(${s.id})'>
+                        <button class="btn-danger" onclick="deleteService(${s.id})">
                             <i class="fas fa-trash"></i> Sil
                         </button>
                     </div>
                 </div>
             `).join('');
-        } else {
-            grid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Xidmətlər yüklənmədi</h3></div>';
         }
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error("Yükləmə xətası:", e); }
 }
 
-function openServiceModal() {
-    document.getElementById('serviceForm').reset();
-    document.getElementById('serviceId').value = ''; // ID-ni sıfırlayırıq ki, "Create" rejiminə keçsin
-    document.getElementById('serviceModalLabel').innerText = "Yeni Xidmət";
-    new bootstrap.Modal(document.getElementById('serviceModal')).show();
+function editServiceById(id) {
+    const s = servicesDataCache.find(item => item.id === id);
+    if (!s) {
+        Swal.fire('Xəta', 'Məlumat tapılmadı!', 'error');
+        return;
+    }
+
+    // Modal və Form elementlərini yoxlayaraq doldururuq (Xətanın qarşısını alır)
+    const modalLabel = document.getElementById('serviceModalLabel');
+    if (modalLabel) modalLabel.innerText = "Xidməti Redaktə Et";
+
+    const fields = {
+        'serviceId': s.id,
+        'sTitle': s.title,
+        'sTitleAz': s.titleAz,
+        'sDesc': s.description,
+        'sDescAz': s.descriptionAz
+    };
+
+    for (const [fieldId, value] of Object.entries(fields)) {
+        const el = document.getElementById(fieldId);
+        if (el) el.value = value || '';
+    }
+
+    // Bullet points emalı
+    const bulletPoints = document.getElementById('sBulletPoints');
+    if (bulletPoints) bulletPoints.value = Array.isArray(s.bulletPoints) ? s.bulletPoints.join('\n') : '';
+
+    const bulletPointsAz = document.getElementById('sBulletPointsAz');
+    if (bulletPointsAz) bulletPointsAz.value = Array.isArray(s.bulletPointsAz) ? s.bulletPointsAz.join('\n') : '';
+
+    // Modalı göstər
+    const modalEl = document.getElementById('serviceModal');
+    if (modalEl) {
+        const modalInstance = new bootstrap.Modal(modalEl);
+        modalInstance.show();
+    }
 }
 
-// Redaktə rejimi: Modalı doldurur
-function editServiceById(s) {
-    document.getElementById('serviceForm').reset();
-    document.getElementById('serviceId').value = s.id;
-    document.getElementById('serviceModalLabel').innerText = "Xidməti Redaktə Et";
-
-    // Sahələri doldururuq
-    document.getElementById('sTitle').value = s.title || '';
-    document.getElementById('sTitleAz').value = s.titleAz || '';
-    document.getElementById('sDesc').value = s.description || '';
-    document.getElementById('sDescAz').value = s.descriptionAz || '';
-
-    // Massivləri (bullet points) yenidən string halına salırıq
-    document.getElementById('sBulletPoints').value = Array.isArray(s.bulletPoints) ? s.bulletPoints.join('\n') : '';
-    document.getElementById('sBulletPointsAz').value = Array.isArray(s.bulletPointsAz) ? s.bulletPointsAz.join('\n') : '';
-    document.getElementById('sProcessSteps').value = Array.isArray(s.processSteps) ? s.processSteps.join('\n') : '';
-    document.getElementById('sProcessStepsAz').value = Array.isArray(s.processStepsAz) ? s.processStepsAz.join('\n') : '';
-
-    new bootstrap.Modal(document.getElementById('serviceModal')).show();
-}
-
+// ============================================
+// SUBMIT SERVICE FUNCTION - FIXED
+// ============================================
 async function submitService() {
     const id = document.getElementById('serviceId').value;
     const fd = new FormData();
     
-    // Əsas sahələr
+    // Əsas sahələri götürürük
     const title = document.getElementById('sTitle').value;
+    const titleAz = document.getElementById('sTitleAz').value || title;
     const desc = document.getElementById('sDesc').value;
+    const descAz = document.getElementById('sDescAz').value || desc;
     
     if(!title) {
-        Swal.fire('Xəta', 'Başlıq mütləqdir', 'warning');
+        Swal.fire('Diqqət', 'Başlıq mütləqdir', 'warning');
         return;
     }
 
     fd.append('title', title);
-    fd.append('titleAz', document.getElementById('sTitleAz').value || title);
+    fd.append('titleAz', titleAz);
     fd.append('description', desc);
-    fd.append('descriptionAz', document.getElementById('sDescAz').value || desc);
+    fd.append('descriptionAz', descAz);
     
-    // Bullet Points emalı
-    const bulletPoints = document.getElementById('sBulletPoints').value.split('\n').filter(line => line.trim() !== '');
+    // Bullet Points (Hər sətiri massiv kimi göndəririk)
+    const bulletInput = document.getElementById('sBulletPoints').value;
+    const bulletPoints = bulletInput.split('\n').filter(line => line.trim() !== '');
     bulletPoints.forEach(point => fd.append('bulletPoints', point.trim()));
     
-    const bulletPointsAz = document.getElementById('sBulletPointsAz').value.split('\n').filter(line => line.trim() !== '');
+    const bulletInputAz = document.getElementById('sBulletPointsAz').value;
+    const bulletPointsAz = bulletInputAz.split('\n').filter(line => line.trim() !== '');
     bulletPointsAz.forEach(point => fd.append('bulletPointsAz', point.trim()));
     
-    // Process Steps emalı
-    const processSteps = document.getElementById('sProcessSteps').value.split('\n').filter(line => line.trim() !== '');
-    processSteps.forEach(step => fd.append('processSteps', step.trim()));
-    
-    const processStepsAz = document.getElementById('sProcessStepsAz').value.split('\n').filter(line => line.trim() !== '');
-    processStepsAz.forEach(step => fd.append('processStepsAz', step.trim()));
-    
-    // Video Faylı
-    const video = document.getElementById('sVideoFile').files[0];
-    if(video) fd.append('videoFile', video);
+    // Video faylı (əgər seçilibsə)
+    const videoFile = document.getElementById('sVideoFile');
+    if(videoFile && videoFile.files[0]) {
+        fd.append('videoFile', videoFile.files[0]);
+    }
 
-    // Əgər Update-dirsə, video-nu silmək seçimi (opsional)
     if(id) fd.append('removeVideo', 'false'); 
 
+    // Yükləmə mesajı
     Swal.fire({
-        title: 'Gözləyin...',
-        html: 'Məlumatlar serverə göndərilir...',
+        title: 'Yadda saxlanılır...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
     
     try {
-        // ID varsa PUT (Update), yoxdursa POST (Create)
+        // ID varsa PUT (yeniləmə), yoxdursa POST (yeni yaratma)
         const url = id ? `${API.SERVICES}/${id}` : `${API.SERVICES}`;
         const method = id ? 'PUT' : 'POST';
 
@@ -576,41 +590,25 @@ async function submitService() {
         });
         
         if(res && res.ok) {
-            Swal.fire('Uğurlu', id ? 'Xidmət yeniləndi!' : 'Xidmət yaradıldı!', 'success');
+            Swal.fire('Uğurlu!', id ? 'Xidmət yeniləndi.' : 'Xidmət yaradıldı.', 'success');
+            
+            // Modalı bağla
             const modalEl = document.getElementById('serviceModal');
-            bootstrap.Modal.getInstance(modalEl).hide();
-            loadServices();
-            loadDashboard();
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if(modalInstance) modalInstance.hide();
+            
+            loadServices(); // Siyahını yenilə
+            loadDashboard(); // Dashboard-dakı sayı yenilə
         } else {
             const errData = await res.json().catch(() => ({}));
-            Swal.fire('Xəta', errData.message || 'Əməliyyat baş tutmadı', 'error');
+            Swal.fire('Xəta', errData.message || 'Server xətası baş verdi', 'error');
         }
     } catch (e) {
-        console.error(e);
-        Swal.fire('Xəta', 'Serverlə əlaqə kəsildi', 'error');
+        console.error("Submit error:", e);
+        Swal.fire('Xəta', 'Əlaqə kəsildi', 'error');
     }
 }
 
-async function deleteService(id) {
-    const r = await Swal.fire({
-        title: 'Silinsin?',
-        text: "Bu xidmət daimi olaraq silinəcək!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Bəli, Sil',
-        cancelButtonText: 'Ləğv et',
-        confirmButtonColor: '#ef4444'
-    });
-    
-    if(r.isConfirmed) {
-        const res = await authFetch(`${API.SERVICES}/${id}`, { method: 'DELETE' });
-        if(res && res.ok) {
-            Swal.fire('Silindi', 'Xidmət silindi', 'success');
-            loadServices();
-            loadDashboard();
-        }
-    }
-}
 // ============================================
 // MESSAGES
 // ============================================

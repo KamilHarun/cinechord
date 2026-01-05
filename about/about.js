@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 7.2 - VIDEO & DYNAMIC CONTACT INFO ADDED
+   Version: 8.0 - FINAL FIX (Duplicates Removed + Full Features)
    ============================================================ */
 
 (function() {
@@ -48,6 +48,12 @@
         mobileMenu: document.getElementById('mobileMenu'),
         overlay: document.getElementById('mobileMenuOverlay'),
         navBtns: document.querySelectorAll('.nav-btn'),
+        
+        // Globe Selector Elements
+        langSelector: document.getElementById('langSelector'),
+        langGlobeBtn: document.getElementById('langGlobeBtn'),
+        langOptions: document.querySelectorAll('.lang-option'),
+        currentLangText: document.getElementById('currentLangText'),
         
         contentSection: document.querySelector('.content-section'),
         aboutVideo: document.getElementById('about-video'),
@@ -159,21 +165,22 @@
             document.body.style.overflow = isActive ? '' : 'hidden';
         }
 
-        elements.hamburger.addEventListener('click', (e) => {
+        // Təkrar eventlərin qarşısını almaq üçün onclick istifadə edirik
+        elements.hamburger.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
-        });
+        };
 
         if (elements.overlay) {
-            elements.overlay.addEventListener('click', (e) => {
+            elements.overlay.onclick = function(e) {
                 e.preventDefault();
                 toggleMenu();
-            });
+            };
         }
 
         elements.navBtns.forEach(link => {
-            link.addEventListener('click', function(e) {
+            link.onclick = function(e) {
                 const href = this.getAttribute('href');
                 
                 if (!href || href === '#' || this.classList.contains('active')) {
@@ -188,7 +195,7 @@
                 setTimeout(() => {
                     navigateWithTransition(href);
                 }, 100);
-            });
+            };
         });
 
         document.addEventListener('keydown', function(e) {
@@ -199,7 +206,7 @@
     }
 
     /* ============================================================
-       6. LOGO ANIMATION & SCROLL EFFECTS
+       6. LOGO ANIMATION
        ============================================================ */
     
     function initLogoAnimation() {
@@ -208,31 +215,6 @@
                 elements.centerLogo.classList.add('entry-done');
             }
         }, CONFIG.LOGO_ENTRY_DELAY);
-    }
-
-    function updateScrollProgress() {
-        if (!elements.progressBarTop) return;
-        
-        const target = elements.contentSection || document.documentElement;
-        
-        const scrollTop = target.scrollTop || window.pageYOffset;
-        const scrollHeight = target.scrollHeight - target.clientHeight;
-        
-        let scrolled = (scrollTop / scrollHeight) * 100;
-        if (isNaN(scrolled)) scrolled = 0;
-        
-        elements.progressBarTop.style.width = Math.min(scrolled, 100) + '%';
-    }
-
-    const handleScroll = throttle(() => {
-        updateScrollProgress();
-    }, CONFIG.SCROLL_THROTTLE);
-
-    function initScrollEffects() {
-        if (elements.contentSection) {
-            elements.contentSection.addEventListener('scroll', handleScroll, { passive: true });
-        }
-        window.addEventListener('scroll', handleScroll, { passive: true });
     }
 
     /* ============================================================
@@ -244,42 +226,21 @@
             const response = await fetch('../lang/about.json');
             if (!response.ok) throw new Error('Translation file not found');
             window.translations = await response.json();
-            console.log('Translations loaded:', window.translations);
             return window.translations;
         } catch (error) {
             console.error('Error loading translations:', error);
             window.translations = {
                 "en": {
-                    "menu": "MENU",
-                    "close": "CLOSE",
-                    "home": "HOME",
-                    "work": "WORK",
-                    "service": "SERVICE",
-                    "archive": "ARCHIVE",
-                    "about": "ABOUT",
-                    "contact": "CONTACT",
-                    "who_we_are": "WHO WE ARE",
-                    "our_mission": "OUR MISSION",
-                    "our_approach": "OUR APPROACH",
-                    "email": "EMAIL",
-                    "address": "ADDRESS",
-                    "phone": "PHONE"
+                    "menu": "MENU", "close": "CLOSE", "home": "HOME", "work": "WORK",
+                    "service": "SERVICE", "archive": "ARCHIVE", "about": "ABOUT", "contact": "CONTACT",
+                    "who_we_are": "WHO WE ARE", "our_mission": "OUR MISSION", "our_approach": "OUR APPROACH",
+                    "email": "EMAIL", "address": "ADDRESS", "phone": "PHONE"
                 },
                 "az": {
-                    "menu": "MENYU",
-                    "close": "BAĞLA",
-                    "home": "ANA SƏHİFƏ",
-                    "work": "İŞLƏR",
-                    "service": "XİDMƏTLƏR",
-                    "archive": "ARXİV",
-                    "about": "HAQQIMIZDA",
-                    "contact": "ƏLAQƏ",
-                    "who_we_are": "BİZ KİMİK",
-                    "our_mission": "MİSSİYAMIZ",
-                    "our_approach": "YANAŞMAMIZ",
-                    "email": "E-POÇT",
-                    "address": "ÜNVAN",
-                    "phone": "TELEFON"
+                    "menu": "MENYU", "close": "BAĞLA", "home": "ANA SƏHİFƏ", "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR", "archive": "ARXİV", "about": "HAQQIMIZDA", "contact": "ƏLAQƏ",
+                    "who_we_are": "BİZ KİMİK", "our_mission": "MİSSİYAMIZ", "our_approach": "YANAŞMAMIZ",
+                    "email": "E-POÇT", "address": "ÜNVAN", "phone": "TELEFON"
                 }
             };
             return window.translations;
@@ -287,18 +248,14 @@
     }
 
     function applyTranslations(lang) {
-        if (!window.translations || !window.translations[lang]) {
-            console.warn('Translations not available for:', lang);
-            return;
-        }
+        if (!window.translations || !window.translations[lang]) return;
 
         const t = window.translations[lang];
         window.currentLang = lang;
 
         const hamburgerTextEl = document.querySelector('.hamburger-text');
         if (hamburgerTextEl) {
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const isMenuOpen = hamburgerBtn && hamburgerBtn.classList.contains('active');
+            const isMenuOpen = elements.hamburger && elements.hamburger.classList.contains('active');
             hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
         }
 
@@ -306,7 +263,6 @@
         navButtons.forEach(btn => {
             const navText = btn.querySelector('.nav-text');
             const key = btn.getAttribute('data-key');
-            
             if (key && t[key]) {
                 if (navText) navText.textContent = t[key];
                 btn.setAttribute('data-text', t[key]);
@@ -318,21 +274,16 @@
             const key = title.getAttribute('data-key');
             if (key && t[key]) {
                 const span = title.querySelector('span');
-                if (span) {
-                    span.textContent = t[key];
-                } else {
-                    title.textContent = t[key];
-                }
-                title.setAttribute('data-text', t[key]); // Narıncı hover qatı üçün
+                if (span) span.textContent = t[key];
+                else title.textContent = t[key];
+                title.setAttribute('data-text', t[key]);
             }
         });
 
         const labels = document.querySelectorAll('.label-small');
         labels.forEach(label => {
             const key = label.getAttribute('data-key');
-            if (key && t[key]) {
-                label.textContent = t[key];
-            }
+            if (key && t[key]) label.textContent = t[key];
         });
 
         if (lang === 'az') {
@@ -342,8 +293,6 @@
             document.body.classList.remove('lang-az');
             document.documentElement.setAttribute('lang', 'en');
         }
-
-        console.log('Translations applied for:', lang);
     }
 
     /* ============================================================
@@ -351,85 +300,71 @@
        ============================================================ */
 
     function initLanguageSelector() {
-        const langSelector = document.getElementById('langSelector');
-        const langGlobeBtn = document.getElementById('langGlobeBtn');
-        const langOptions = document.querySelectorAll('.lang-option');
-        const currentLangText = document.getElementById('currentLangText');
-        
-        if (!langSelector || !langGlobeBtn) return;
+        if (!elements.langSelector || !elements.langGlobeBtn) return;
         
         const savedLang = localStorage.getItem('selectedLang') || 'en';
         window.currentLang = savedLang;
         
         applyTranslations(savedLang);
         
-        langOptions.forEach(option => {
+        elements.langOptions.forEach(option => {
             if (option.dataset.lang === savedLang) {
                 option.classList.add('active');
-                if (currentLangText) {
-                    currentLangText.textContent = savedLang.toUpperCase();
-                }
+                if (elements.currentLangText) elements.currentLangText.textContent = savedLang.toUpperCase();
             } else {
                 option.classList.remove('active');
             }
         });
         
-        langGlobeBtn.addEventListener('click', (e) => {
+        // Klik problemi burada həll edilir
+        elements.langGlobeBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            langSelector.classList.toggle('active');
-        });
+            elements.langSelector.classList.toggle('active');
+        };
         
-        langOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
+        elements.langOptions.forEach(option => {
+            option.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
                 const lang = option.dataset.lang;
                 
                 if (option.classList.contains('active')) {
-                    langSelector.classList.remove('active');
+                    elements.langSelector.classList.remove('active');
                     return;
                 }
                 
-                langOptions.forEach(opt => opt.classList.remove('active'));
+                elements.langOptions.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
                 
-                if (currentLangText) {
-                    currentLangText.textContent = lang.toUpperCase();
-                }
+                if (elements.currentLangText) elements.currentLangText.textContent = lang.toUpperCase();
                 
                 localStorage.setItem('selectedLang', lang);
                 applyTranslations(lang);
                 loadDynamicContent(lang);
                 
                 setTimeout(() => {
-                    langSelector.classList.remove('active');
+                    elements.langSelector.classList.remove('active');
                 }, 200);
-                
-                document.dispatchEvent(new CustomEvent('languageChanged', { 
-                    detail: { language: lang } 
-                }));
-                
-                console.log('Language changed to:', lang);
-            });
+            };
         });
         
         document.addEventListener('click', (e) => {
-            if (!langSelector.contains(e.target)) {
-                langSelector.classList.remove('active');
+            if (!elements.langSelector.contains(e.target)) {
+                elements.langSelector.classList.remove('active');
             }
         });
         
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && langSelector.classList.contains('active')) {
-                langSelector.classList.remove('active');
+            if (e.key === 'Escape' && elements.langSelector.classList.contains('active')) {
+                elements.langSelector.classList.remove('active');
             }
         });
     }
 
     /* ============================================================
-       9. COMPLEX VIDEO HANDLING
+       9. VIDEO HANDLING
        ============================================================ */
     
     function forceVideoPlay() {
@@ -452,13 +387,10 @@
 
     function loadStaticVideo() {
         if (!elements.aboutVideo) return;
-
-        console.log('Loading fallback static video');
         elements.aboutVideo.src = CONFIG.STATIC_VIDEO;
         elements.aboutVideo.muted = true;
         elements.aboutVideo.loop = true;
         elements.aboutVideo.playsInline = true;
-        
         elements.aboutVideo.load();
 
         elements.aboutVideo.addEventListener('loadeddata', function() {
@@ -485,37 +417,32 @@
     }
 
     /* ============================================================
-       10. DYNAMIC CONTENT LOADING (API + Fallback)
+       10. DYNAMIC CONTENT LOADING
        ============================================================ */
     
     let cachedApiData = null;
 
-   async function loadDynamicContent(lang = 'en') {
-    // API-dan cavab gələnə qədər ehtiyat mətni dərhal göstər
-    showFallbackContent(lang); 
-    
-    try {
-        const langParam = lang === 'az' ? 'az' : 'en';
-        const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
-        
-        const response = await retryFetch(() => 
-            fetchWithTimeout(url, { method: 'GET' })
-        );
-        
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
-        const apiData = await response.json();
-        cachedApiData = apiData;
-        processApiData(apiData, lang);
-        
-    } catch (error) {
-        console.error('API error:', error);
-        if (cachedApiData) {
-            processApiData(cachedApiData, lang);
+    async function loadDynamicContent(lang = 'en') {
+        showFallbackContent(lang); 
+        try {
+            const langParam = lang === 'az' ? 'az' : 'en';
+            const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
+            
+            const response = await retryFetch(() => 
+                fetchWithTimeout(url, { method: 'GET' })
+            );
+            
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const apiData = await response.json();
+            cachedApiData = apiData;
+            processApiData(apiData, lang);
+            
+        } catch (error) {
+            console.error('API error:', error);
+            if (cachedApiData) processApiData(cachedApiData, lang);
         }
-        // Xəta halında onsuz da yuxarıda fallback çağırıldığı üçün ekran boş qalmayacaq
     }
-}
 
     function processApiData(data, lang = 'en') {
         function formatText(text) {
@@ -534,7 +461,6 @@
             address: data.address || "BAKU, AZERBAIJAN",
             videoUrl: data.videoUrl || null
         };
-        
         populateContent(content);
     }
 
@@ -572,22 +498,15 @@
             if(span) span.textContent = content.phone;
         }
         
-        // VIDEO YÜKLƏNMƏSI
         if (content.videoUrl && elements.aboutVideo) {
-            console.log('Loading video from API:', content.videoUrl);
             elements.aboutVideo.src = content.videoUrl;
             elements.aboutVideo.muted = true;
             elements.aboutVideo.loop = true;
             elements.aboutVideo.playsInline = true;
             elements.aboutVideo.load();
-            
             elements.aboutVideo.addEventListener('loadeddata', function() {
                 forceVideoPlay();
             }, { once: true });
-            
-            elements.aboutVideo.addEventListener('pause', function() {
-                if (!document.hidden) forceVideoPlay();
-            });
         } else if (elements.aboutVideo) {
             loadStaticVideo();
         }
@@ -610,31 +529,85 @@
     }
 
     /* ============================================================
-       11. SCROLL REVEAL ANIMATIONS
+       11. SCROLL LOGIC: PROGRESS + REVEAL + HIDE/SHOW NAV
        ============================================================ */
     
-    function initRevealAnimations() {
+    function initScrollLogic() {
+        // A. Update Progress Bar
+        const updateProgress = () => {
+            if (!elements.progressBarTop) return;
+            const target = elements.contentSection || document.documentElement;
+            const scrollTop = target.scrollTop || window.pageYOffset;
+            const scrollHeight = target.scrollHeight - target.clientHeight;
+            let scrolled = (scrollTop / scrollHeight) * 100;
+            elements.progressBarTop.style.width = Math.min(scrolled, 100) + '%';
+        };
+
+        // B. Reveal Animations
         const revealElements = document.querySelectorAll('.reveal-item');
-        
-        if (revealElements.length === 0) return;
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
-                }
+        if (revealElements.length > 0) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -30px 0px'
             });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -30px 0px'
-        });
-        
-        revealElements.forEach(el => observer.observe(el));
+            revealElements.forEach(el => observer.observe(el));
+        }
+
+        // C. Hide/Show Nav on Scroll (DÜZƏLDİLMİŞ HİSSƏ)
+        let lastScrollY = 0;
+        let ticking = false;
+
+        function handleScroll() {
+            // About səhifəsində scroll pəncərədə deyil, .content-section div-ində olur
+            const target = elements.contentSection || window;
+            const currentScrollY = target.scrollTop !== undefined ? target.scrollTop : window.scrollY;
+
+            // Scroll aşağı (100px-dən çox) - gizlə
+            if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+                if (elements.centerLogo) elements.centerLogo.classList.add('hide-on-scroll');
+                if (elements.hamburger) elements.hamburger.classList.add('hide-on-scroll');
+                if (elements.langSelector) elements.langSelector.classList.add('hide-on-scroll');
+            }
+            // Scroll yuxarı və ya 100px-dən az - göstər
+            else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+                if (elements.centerLogo) elements.centerLogo.classList.remove('hide-on-scroll');
+                if (elements.hamburger) elements.hamburger.classList.remove('hide-on-scroll');
+                if (elements.langSelector) elements.langSelector.classList.remove('hide-on-scroll');
+            }
+            
+            lastScrollY = currentScrollY;
+            updateProgress(); // Progress barı da burada yeniləyirik
+            ticking = false;
+        }
+
+        // Event listener-i düzgün elementə əlavə edirik
+        if (elements.contentSection) {
+            elements.contentSection.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(handleScroll);
+                    ticking = true;
+                }
+            }, { passive: true });
+        } else {
+            // Mobil və ya alternativ layout üçün fallback
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(handleScroll);
+                    ticking = true;
+                }
+            }, { passive: true });
+        }
     }
     
     /* ============================================================
-       12. GLOBAL NAVİQASİYA
+       12. GLOBAL NAVIGATION LINKS
        ============================================================ */
 
     function setupNavLinks() {
@@ -645,7 +618,6 @@
 
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
-                
                 if (href.startsWith('mailto') || href.startsWith('tel')) return;
                 
                 e.preventDefault();
@@ -658,25 +630,19 @@
        13. INITIALIZATION
        ============================================================ */
     
-   async function init() {
+    async function init() {
         const currentLang = localStorage.getItem('selectedLang') || 'en';
         
-        // Öncə tərcümələri tam yükləyirik
         await loadTranslations();
-        
-        // Sonra tətbiq edirik
         applyTranslations(currentLang);
         
-        // Digər funksiyaları başladırıq
         initPageTransition();
-        initLanguageSelector();
-        initMenuSystem();
+        initLanguageSelector(); 
+        initMenuSystem();       
         initLogoAnimation();
-        initScrollEffects();
-        initRevealAnimations();
+        initScrollLogic();      
         setupNavLinks();
         
-        // Ən sonda databazadan gələn dinamik kontenti yükləyirik
         await loadDynamicContent(currentLang);
     }
 
@@ -685,7 +651,5 @@
     } else {
         init();
     }
-
-    
 
 })();

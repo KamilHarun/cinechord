@@ -1595,19 +1595,15 @@ body.lang-az .play-text {
     }
     
     /* ✅ DÜZƏLİŞ: Menu sözlərini aralamaq */
-    .nav-btn {
-        font-size: 13vw !important;
-        margin: -0.3vh 0 !important;
-        line-height: 1.15 !important;
-        display: block !important;
-        overflow: visible !important;
+   .nav-btn {
+        font-size: 13vw;
+        margin: -5px 0;
     }
     
-    body.lang-az .nav-btn {
-        font-size: 9vw !important;
-        letter-spacing: 1px !important;
-        margin: -0.5vh 0 !important;
-        line-height: 1.2 !important;
+      body.lang-az .nav-btn {
+        font-size: 9vw;
+        letter-spacing: 1px;
+        margin: -0.5vh 0;
     }
     
     .center-logo {

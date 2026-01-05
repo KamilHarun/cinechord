@@ -687,6 +687,53 @@ async function fetchAndRenderServices(lang = 'en') {
     initVideoLazyLoad();
     initVideoAutoplay();
 }
+
+  /* ============================================================
+   WORKS PAGE - SCROLL HIDE/SHOW ADDON
+   ============================================================ */
+
+// Scroll Hide/Show Funksionallığı
+(function() {
+    let lastScrollY = 0;
+    let ticking = false;
+    
+    function handleScroll() {
+        const currentScrollY = window.scrollY;
+        
+        const logo = document.querySelector('.center-logo');
+        const hamburger = document.querySelector('.hamburger');
+        const langSelector = document.querySelector('.lang-selector');
+        
+        // Scroll aşağı (100px-dən çox) - gizlə
+        if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+            if (logo) logo.classList.add('hide-on-scroll');
+            if (hamburger) hamburger.classList.add('hide-on-scroll');
+            if (langSelector) langSelector.classList.add('hide-on-scroll');
+        }
+        // Scroll yuxarı və ya 100px-dən az - göstər
+        else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+            if (logo) logo.classList.remove('hide-on-scroll');
+            if (hamburger) hamburger.classList.remove('hide-on-scroll');
+            if (langSelector) langSelector.classList.remove('hide-on-scroll');
+        }
+        
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+    
+    function requestScrollTick() {
+        if (!ticking) {
+            window.requestAnimationFrame(handleScroll);
+            ticking = true;
+        }
+    }
+    
+    // Scroll event listener (performanslı)
+    window.addEventListener('scroll', requestScrollTick, { passive: true });
+    
+    console.log('✅ Scroll hide/show initialized!');
+})();
+
     /* ============================================================
         9. INITIALIZATION
         ============================================================ */
