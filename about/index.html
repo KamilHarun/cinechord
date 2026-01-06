@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="about.css">
 </head>
 <body>
@@ -20,27 +19,26 @@
     <div class="page-transition"></div>
     <div class="grain-overlay"></div>
 
-<!-- LANGUAGE SELECTOR WITH GLOBE -->
-<div class="lang-selector" id="langSelector">
-    <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
-        <span class="globe-icon">
-            <span class="globe-ellipse"></span>
-        </span>
-        <span class="current-lang" id="currentLangText">EN</span>
-    </button>
-    <div class="lang-dropdown" id="langDropdown">
-        <button class="lang-option active" data-lang="en">
-            <span class="lang-code">EN</span>
-            <span class="lang-name">English</span>
-            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+    <div class="lang-selector" id="langSelector">
+        <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+            <span class="globe-icon">
+                <span class="globe-ellipse"></span>
+            </span>
+            <span class="current-lang" id="currentLangText">EN</span>
         </button>
-        <button class="lang-option" data-lang="az">
-            <span class="lang-code">AZ</span>
-            <span class="lang-name">Azərbaycan</span>
-            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
-        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <button class="lang-option active" data-lang="en">
+                <span class="lang-code">EN</span>
+                <span class="lang-name">English</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+            <button class="lang-option" data-lang="az">
+                <span class="lang-code">AZ</span>
+                <span class="lang-name">Azərbaycan</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+        </div>
     </div>
-</div>
 
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
         <span class="hamburger-text">MENU</span>
@@ -53,103 +51,89 @@
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
     <nav class="mobile-menu" id="mobileMenu">
-    <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
-    <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
-    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
-    <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
-    
-    <a href="#" class="nav-btn active" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
-    
-    <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
+        <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+        <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+        <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+        <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+        <a href="#" class="nav-btn active" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+        <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
 
-    <div class="menu-footer">
-        <div class="menu-socials">
-            <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
-            <a href="#">YOUTUBE</a>
-            <a href="#">VIMEO</a>
+        <div class="menu-footer">
+            <div class="menu-socials">
+                <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+                <a href="#">YOUTUBE</a>
+                <a href="#">VIMEO</a>
+            </div>
+            <div class="menu-contact-info">
+                <p id="menu-email">hello@cinechord.com</p>
+                <p id="menu-phone">+994 50 123 45 67</p>
+            </div>
         </div>
-     <div class="menu-contact-info">
-        <!-- ✅ ID ƏLAVƏ EDİLDİ -->
-        <p id="menu-email">hello@cinechord.com</p>
-        <p id="menu-phone">+994 50 123 45 67</p>
-    </div>
-    </div>
-</nav>
+    </nav>
     
     <a href="../" class="center-logo">
         <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
     </a>
 
     <div class="container">
-        
-        <section class="video-section">
-            <div class="video-container">
-                <video id="about-video" class="fullscreen-video" autoplay muted loop playsinline>
-                    <source src="../videos/Showreel.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-                <div class="video-overlay"></div>
-            </div>
-        </section>
-
-        <section class="content-section">
+        <div class="content-section">
             <div class="main-content">
                 
-   <div class="title-wrapper reveal-item">
-    <h1 id="main-title" class="hero-rolling-text" data-text="OUR STORY">
-        <span>OUR STORY</span>
-    </h1>
-</div>
+                <h1 class="hero-rolling-text" id="main-title" data-text="ABOUT US"><span>ABOUT US</span></h1>
 
-                <p id="subtitle" class="subtitle reveal-item">Loading...</p>
+                <p id="subtitle" class="subtitle">A story-first creative studio specialising in cinematic production.</p>
 
-                <div class="about-text-blocks">
-                    <div class="about-block reveal-item">
-                        <h2 class="block-title" data-key="who_we_are">WHO WE ARE</h2>
-                        <div id="who-we-are" class="block-text">Loading...</div>
+                <section class="chew-row">
+                    <div class="chew-sidebar">
+                        <span class="sidebar-label" id="why-label" data-key="who_we_are">WHY CINECHORD</span>
                     </div>
+                    
+                    <div class="chew-main-content">
+                        <div class="video-container reveal-item" id="why-media-container">
+                            <video autoplay muted loop playsinline class="side-video">
+                                <source src="../videos/Showreel.mp4" type="video/mp4">
+                            </video>
+                        </div>
 
-                    <div class="about-block reveal-item">
-                        <h2 class="block-title" data-key="our_mission">OUR MISSION</h2>
-                        <div id="our-mission" class="block-text">Loading...</div>
+                        <div class="text-footer-block reveal-item">
+                            <h2 class="big-statement" id="why-title">
+                                WE CRAFT VISUAL STORIES THAT RESONATE.
+                            </h2>
+                            <div class="description-grid">
+                                <p class="desc-text" id="why-description-1">
+                                    CineChord olaraq biz hekayənin gücünə inanırıq...
+                                </p>
+                                <p class="desc-text" id="why-description-2">
+                                    Hər bir layihəyə unikal vizual dil əlavə edirik...
+                                </p>
+                            </div>
+                        </div>
                     </div>
+                </section>
 
-                    <div class="about-block reveal-item">
-                        <h2 class="block-title" data-key="our_approach">OUR APPROACH</h2>
-                        <div id="our-approach" class="block-text">Loading...</div>
-                    </div>
+                <div style="display:none;">
+                    <p id="who-we-are"></p>
+                    <p id="our-mission"></p>
+                    <p id="our-approach"></p>
+                    <a id="email-link" href=""><span></span></a>
+                    <a id="phone-link" href=""><span></span></a>
+                    <p id="address"></p>
+                    <video id="about-video"></video>
                 </div>
 
-                <div class="info-grid reveal-item">
-                    <div class="info-item">
-                        <span class="label-small" data-key="email">EMAIL</span>
-                        <a id="email-link" href="mailto:" class="rolling-link" data-text="">
-                            <span></span>
-                        </a>
+                <section class="chew-row reveal-item">
+                    <div class="chew-sidebar">
+                        <span class="sidebar-label" data-key="meet_us">Meet Us</span>
                     </div>
-
-                    <div class="info-item">
-                        <span class="label-small" data-key="address">ADDRESS</span>
-                        <span id="address" class="static-value">Loading...</span>
+                    <div class="chew-main-content">
+                        <div class="chew-team-grid" id="team-grid">
+                            <!-- JS ilə doldurulacaq -->
+                        </div>
                     </div>
-
-                    <div class="info-item">
-                        <span class="label-small" data-key="phone">PHONE</span>
-                        <a id="phone-link" href="tel:" class="rolling-link" data-text="">
-                            <span></span>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="social-icons-minimal reveal-item">
-                    <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer" class="minimal-social">INSTAGRAM</a>
-                    <a href="#" class="minimal-social">LINKEDIN</a>
-                    <a href="#" class="minimal-social">VIMEO</a>
-                    <a href="#" class="minimal-social">BEHANCE</a>
-                </div>
+                </section>
 
             </div>
-        </section>
+        </div>
     </div>
 
     <script src="about.js"></script>

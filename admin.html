@@ -7,6 +7,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -15,7 +16,6 @@
 </head>
 <body>
 
-    <!-- LOGIN OVERLAY -->
     <div id="login-overlay" style="display: flex;">
         <div class="login-container">
             <div class="login-left">
@@ -33,12 +33,12 @@
                     
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> İstifadəçi adı</label>
-                        <input type="text" id="loginUser" placeholder="admin" required autocomplete="username">
+                        <input type="text" id="loginUser" placeholder="admin" required>
                     </div>
                     
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Şifrə</label>
-                        <input type="password" id="loginPass" placeholder="••••••" required autocomplete="current-password">
+                        <input type="password" id="loginPass" placeholder="••••••" required>
                     </div>
                     
                     <button type="submit" class="btn-login">
@@ -50,58 +50,45 @@
         </div>
     </div>
 
-    <!-- ADMIN WRAPPER -->
     <div class="admin-wrapper" id="admin-wrapper" style="display: none;">
         
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="brand">
                     <i class="fas fa-clapperboard"></i>
                     <span>CineChord</span>
                 </div>
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             </div>
             
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-title">ƏSAS</div>
                     <a href="#" class="nav-item active" data-page="dashboard">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
+                        <i class="fas fa-chart-line"></i><span>Dashboard</span>
                     </a>
                 </div>
                 
                 <div class="nav-section">
                     <div class="nav-title">İDARƏETMƏ</div>
                     <a href="#" class="nav-item" data-page="works">
-                        <i class="fas fa-film"></i>
-                        <span>Portfolio</span>
-                        <span class="badge" id="worksCount">0</span>
+                        <i class="fas fa-film"></i><span>Portfolio</span><span class="badge" id="worksCount">0</span>
                     </a>
                     <a href="#" class="nav-item" data-page="services">
-                        <i class="fas fa-magic"></i>
-                        <span>Xidmətlər</span>
-                        <span class="badge" id="servicesCount">0</span>
+                        <i class="fas fa-magic"></i><span>Xidmətlər</span><span class="badge" id="servicesCount">0</span>
                     </a>
                     <a href="#" class="nav-item" data-page="messages">
-                        <i class="fas fa-envelope"></i>
-                        <span>Mesajlar</span>
-                        <span class="badge badge-danger" id="messagesCount">0</span>
+                        <i class="fas fa-envelope"></i><span>Mesajlar</span><span class="badge badge-danger" id="messagesCount">0</span>
                     </a>
                     <a href="#" class="nav-item" data-page="about">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Haqqımızda</span>
+                        <i class="fas fa-info-circle"></i><span>Haqqımızda</span>
                     </a>
                 </div>
                 
                 <div class="nav-section">
                     <div class="nav-title">SİSTEM</div>
                     <a href="#" class="nav-item" id="themeToggleNav">
-                        <i class="fas fa-moon"></i>
-                        <span>Dark Mode</span>
+                        <i class="fas fa-moon"></i><span>Dark Mode</span>
                         <div class="theme-switch">
                             <input type="checkbox" id="themeCheckbox">
                             <label for="themeCheckbox"></label>
@@ -111,303 +98,186 @@
             </nav>
             
             <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="info">
-                        <div class="name">Admin</div>
-                        <div class="role">Administrator</div>
-                    </div>
-                </div>
                 <button class="btn-logout" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Çıxış</span>
+                    <i class="fas fa-sign-out-alt"></i><span>Çıxış</span>
                 </button>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content">
             
-            <!-- DASHBOARD VIEW -->
             <div class="page-view active" id="view-dashboard">
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Dashboard</h1>
-                        <p class="page-subtitle">Ümumi statistika və məlumatlar</p>
+                        <p class="page-subtitle">Ümumi statistika</p>
                     </div>
-                    <div class="page-actions">
-                        <button class="btn-primary" onclick="loadDashboard()">
-                            <i class="fas fa-sync"></i> Yenilə
-                        </button>
-                    </div>
+                    <button class="btn-primary" onclick="loadDashboard()"><i class="fas fa-sync"></i></button>
                 </div>
 
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-icon blue"><i class="fas fa-film"></i></div>
-                            <div class="stat-info">
-                                <div class="stat-label">Toplam İşlər</div>
-                                <div class="stat-value" id="totalWorks">0</div>
-                            </div>
+                            <div class="stat-info"><div class="stat-label">İşlər</div><div class="stat-value" id="totalWorks">0</div></div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-icon purple"><i class="fas fa-magic"></i></div>
-                            <div class="stat-info">
-                                <div class="stat-label">Aktiv Xidmətlər</div>
-                                <div class="stat-value" id="totalServices">0</div>
-                            </div>
+                            <div class="stat-info"><div class="stat-label">Xidmətlər</div><div class="stat-value" id="totalServices">0</div></div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-icon pink"><i class="fas fa-envelope"></i></div>
-                            <div class="stat-info">
-                                <div class="stat-label">Yeni Mesajlar</div>
-                                <div class="stat-value" id="totalMessages">0</div>
-                            </div>
+                            <div class="stat-info"><div class="stat-label">Mesajlar</div><div class="stat-value" id="totalMessages">0</div></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-chart-line"></i> Son 7 Günün Statistikası</h3>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="worksChart" style="max-height: 250px;"></canvas>
-                        </div>
-                    </div>
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-chart-pie"></i> Kateqoriya Bölgüsü</h3>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="categoryChart" style="max-height: 250px;"></canvas>
-                        </div>
+                        <div class="card-header"><h3 class="card-title">İş Statistikası</h3></div>
+                        <div class="card-body"><canvas id="worksChart"></canvas></div>
                     </div>
                 </div>
             </div>
 
-            <!-- WORKS VIEW -->
             <div class="page-view" id="view-works">
                 <div class="page-header">
-                    <div>
-                        <h1 class="page-title">Portfolio İşləri</h1>
-                        <p class="page-subtitle">Video işlərinizi idarə edin</p>
-                    </div>
-                    <button class="btn-primary" onclick="openWorkModal()">
-                        <i class="fas fa-plus"></i> Yeni İş
-                    </button>
+                    <h1>Portfolio</h1>
+                    <button class="btn-primary" onclick="openWorkModal()"><i class="fas fa-plus"></i> Yeni İş</button>
                 </div>
-                
                 <div class="filters-bar">
-                    <div class="search-box-inline">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="workSearch" placeholder="İşlərdə axtar..." onkeyup="searchWorks()">
-                    </div>
+                    <input type="text" id="workSearch" placeholder="Axtar..." onkeyup="searchWorks()" class="form-control w-auto d-inline-block">
                     <select id="categoryFilter" class="category-select" onchange="filterWorks()">
                         <option value="">Bütün Kateqoriyalar</option>
                         <option value="FILM">Film</option>
                         <option value="COMMERCIAL">Commercial</option>
                         <option value="CLIP">Clip</option>
                         <option value="MUSIC_VIDEO">Music Video</option>
-                        <option value="DOCUMENTARY">Documentary</option>
-                        <option value="SOCIAL">Social</option>
                     </select>
                 </div>
-
                 <div id="bulkActionsBar" class="bulk-actions-bar" style="display: none;">
-                    <span class="bulk-count">0 iş seçildi</span>
-                    <button class="btn-danger" onclick="bulkDelete()"><i class="fas fa-trash"></i> Hamısını Sil</button>
-                    <button class="btn-secondary" onclick="clearBulkSelection()"><i class="fas fa-times"></i> Ləğv et</button>
+                    <span class="bulk-count">0 seçildi</span>
+                    <button class="btn-danger btn-sm" onclick="bulkDelete()">Sil</button>
                 </div>
-                
-                <div class="works-container" id="worksGrid">
-                    <div class="loading-state">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Yüklənir...</p>
-                    </div>
-                </div>
+                <div class="works-container" id="worksGrid"></div>
                 <div id="pagination" class="pagination-container"></div>
             </div>
 
-            <!-- SERVICES VIEW -->
             <div class="page-view" id="view-services">
                 <div class="page-header">
-                    <div>
-                        <h1 class="page-title">Xidmətlər</h1>
-                        <p class="page-subtitle">Şirkət xidmətlərinizi idarə edin</p>
-                    </div>
-                    <button class="btn-primary" onclick="openServiceModal()">
-                        <i class="fas fa-plus"></i> Yeni Xidmət
-                    </button>
+                    <h1>Xidmətlər</h1>
+                    <button class="btn-primary" onclick="openServiceModal()"><i class="fas fa-plus"></i> Yeni Xidmət</button>
                 </div>
                 <div class="services-grid" id="servicesGrid"></div>
             </div>
 
-            <!-- MESSAGES VIEW - REDESIGNED -->
             <div class="page-view" id="view-messages">
-                <div class="page-header">
-                    <div>
-                        <h1 class="page-title">Mesajlar</h1>
-                        <p class="page-subtitle">Müştəri mesajlarını idarə edin</p>
-                    </div>
-                </div>
-                <div class="messages-list" id="messagesList">
-                    <div class="loading-state">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Yüklənir...</p>
-                    </div>
-                </div>
+                <div class="page-header"><h1>Mesajlar</h1></div>
+                <div class="messages-list" id="messagesList"></div>
             </div>
 
-            <!-- ABOUT VIEW - REDESIGNED -->
             <div class="page-view" id="view-about">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Haqqımızda</h1>
-                        <p class="page-subtitle">Şirkət məlumatlarınızı yeniləyin</p>
+                        <h1 class="page-title">Haqqımızda Redaktəsi</h1>
+                        <p class="page-subtitle">Hero, Why CineChord və Komanda Üzvləri</p>
                     </div>
+                    <button type="button" id="saveAboutBtn" class="btn-primary" onclick="submitAbout()">
+                        <i class="fas fa-save"></i> Ümumi Yadda Saxla
+                    </button>
                 </div>
-                <form id="aboutForm" class="about-form">
-                    <!-- Video & Titles Section -->
-                    <div class="content-card">
+
+                <form id="aboutForm" onsubmit="return false;">
+                    <div class="content-card mb-4">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-video"></i> Video və Başlıqlar</h3>
+                            <h3 class="card-title"><i class="fas fa-video"></i> 1. Hero Bölməsi</h3>
                         </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Əsas Başlıq (İngilizcə)</label>
-                                <input type="text" id="aMainTitle" placeholder="OUR STORY">
+                        <div class="p-3 row g-3">
+                            <div class="col-md-6">
+                                <label>Ana Başlıq (EN)</label>
+                                <input type="text" id="aMainTitle" class="form-control" placeholder="ABOUT US">
                             </div>
-                            <div class="form-group">
-                                <label>Əsas Başlıq (Azərbaycan)</label>
-                                <input type="text" id="aMainTitleAz" placeholder="BİZİM HEKAYƏ">
+                            <div class="col-md-6">
+                                <label>Ana Başlıq (AZ)</label>
+                                <input type="text" id="aMainTitleAz" class="form-control" placeholder="HAQQIMIZDA">
                             </div>
-                            <div class="form-group">
-                                <label>Video Faylı</label>
-                                <input type="file" id="aVideoFile" accept="video/mp4">
+                            <div class="col-md-6">
+                                <label>Alt Başlıq (EN)</label>
+                                <textarea id="aSubTitle" class="form-control" rows="2"></textarea>
                             </div>
-                            <div class="form-group full-width">
-                                <label>Alt Başlıq (İngilizcə)</label>
-                                <textarea id="aSubTitle" rows="2" placeholder="Alt başlıq mətni..."></textarea>
-                            </div>
-                            <div class="form-group full-width">
-                                <label>Alt Başlıq (Azərbaycan)</label>
-                                <textarea id="aSubTitleAz" rows="2" placeholder="Alt başlıq mətni (Azərbaycan)...""></textarea>
+                            <div class="col-md-6">
+                                <label>Alt Başlıq (AZ)</label>
+                                <textarea id="aSubTitleAz" class="form-control" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Content Section -->
-                    <div class="content-card">
+                    <div class="content-card mb-4">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-align-left"></i> Məzmun</h3>
+                            <h3 class="card-title"><i class="fas fa-star"></i> 2. Why CineChord Media</h3>
                         </div>
-                        <div class="form-grid">
-                            <div class="form-group full-width">
-                                <label>Biz Kimik (İngilizcə)</label>
-                                <textarea id="aWho" rows="3" placeholder="Şirkət haqqında məlumat..."></textarea>
+                        <div class="p-3 row g-3">
+                            <div class="col-md-6">
+                                <label>Bölmə Başlığı (EN)</label>
+                                <input type="text" id="aWhyTitle" class="form-control" placeholder="WE CRAFT VISUAL STORIES">
                             </div>
-                            <div class="form-group full-width">
-                                <label>Biz Kimik (Azərbaycan)</label>
-                                <textarea id="aWhoAz" rows="3" placeholder="Şirkət haqqında məlumat (Azərbaycan)..."></textarea>
+                            <div class="col-md-6">
+                                <label>Bölmə Başlığı (AZ)</label>
+                                <input type="text" id="aWhyTitleAz" class="form-control" placeholder="VİZUAL HEKAYƏLƏR YARADIRIQ">
                             </div>
-                            <div class="form-group full-width">
-                                <label>Missiyamız (İngilizcə)</label>
-                                <textarea id="aMission" rows="3" placeholder="Missiya mətni..."></textarea>
+                            <div class="col-md-6">
+                                <label>Haqqımızda Mətn (EN) <small class="text-info">(2 abzas üçün qoşa Enter vurun)</small></label>
+                                <textarea id="aWhyDesc" class="form-control" rows="5"></textarea>
                             </div>
-                            <div class="form-group full-width">
-                                <label>Missiyamız (Azərbaycan)</label>
-                                <textarea id="aMissionAz" rows="3" placeholder="Missiya mətni (Azərbaycan)..."></textarea>
+                            <div class="col-md-6">
+                                <label>Haqqımızda Mətn (AZ) <small class="text-info">(2 abzas üçün qoşa Enter vurun)</small></label>
+                                <textarea id="aWhyDescAz" class="form-control" rows="5"></textarea>
                             </div>
-                            <div class="form-group full-width">
-                                <label>Yanaşmamız (İngilizcə)</label>
-                                <textarea id="aApproach" rows="3" placeholder="Yanaşma mətni..."></textarea>
-                            </div>
-                            <div class="form-group full-width">
-                                <label>Yanaşmamız (Azərbaycan)</label>
-                                <textarea id="aApproachAz" rows="3" placeholder="Yanaşma mətni (Azərbaycan)..."></textarea>
+                            <div class="col-12">
+                                <label>Media (Şəkil və ya Video)</label>
+                                <input type="file" id="aWhyMediaFile" class="form-control mb-2">
+                                <div id="whyMediaPreview" class="border rounded p-2 text-center text-muted bg-dark" style="min-height:150px">
+                                    Media önizləmə
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Address Section -->
-                    <div class="content-card">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> Ünvan və Əlaqə Məlumatları</h3>
-    </div>
-    <div class="form-grid">
-        <div class="form-group">
-            <label>Ünvan (İngilizcə)</label>
-            <input type="text" id="aAddress" placeholder="BAKU, AZERBAIJAN">
-        </div>
-        <div class="form-group">
-            <label>Ünvan (Azərbaycan)</label>
-            <input type="text" id="aAddressAz" placeholder="BAKI, AZƏRBAYCAN">
-        </div>
-        
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="aEmail" placeholder="example@cinechord.com">
-        </div>
-        <div class="form-group">
-            <label>Telefon</label>
-            <input type="text" id="aPhone" placeholder="+994 XX XXX XX XX">
-        </div>
-    </div>
-</div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="loadAbout()">
-                            <i class="fas fa-undo"></i> Sıfırla
-                        </button>
-                        <button type="button" id="saveAboutBtn" class="btn-primary">
-                            <i class="fas fa-save"></i> Yadda Saxla
-                        </button>
+                    <div class="content-card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-users"></i> 3. Komanda Üzvləri (Meet Us)</h3>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openTeamModal()">
+                                <i class="fas fa-plus"></i> Üzv Əlavə Et
+                            </button>
+                        </div>
+                        <div id="teamMembersGrid" class="p-3 row g-3">
+                            </div>
                     </div>
                 </form>
             </div>
         </main>
     </div>
 
-    <!-- WORK MODAL -->
     <div class="modal fade" id="workModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="workModalTitle">İş Formu</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header"><h5>İş Formu</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
                     <form id="workForm">
                         <input type="hidden" id="workId">
-                        
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Başlıq (Title) *</label>
-                                <input type="text" id="wTitle" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Slug (URL adı)</label>
-                                <input type="text" id="wSlug" class="form-control" placeholder="auto-generated-slug">
-                            </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6"><label>Başlıq *</label><input type="text" id="wTitle" class="form-control bg-secondary text-white border-0" required></div>
+                            <div class="col-md-6"><label>Slug</label><input type="text" id="wSlug" class="form-control bg-secondary text-white border-0"></div>
                         </div>
-
-                        <div class="row g-3 mb-3">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6"><label>Müştəri</label><input type="text" id="wClient" class="form-control bg-secondary text-white border-0"></div>
                             <div class="col-md-6">
-                                <label class="form-label">Müştəri (Client)</label>
-                                <input type="text" id="wClient" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Kateqoriya *</label>
-                                <select id="wCategory" class="form-select" required>
+                                <label>Kateqoriya *</label>
+                                <select id="wCategory" class="form-select bg-secondary text-white border-0" required>
                                     <option value="FILM">FILM</option>
                                     <option value="COMMERCIAL">COMMERCIAL</option>
                                     <option value="CLIP">CLIP</option>
@@ -417,105 +287,88 @@
                                 </select>
                             </div>
                         </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Agentlik</label>
-                                <input type="text" id="wAgency" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Məkan (Location)</label>
-                                <input type="text" id="wLocation" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">İl (Year)</label>
-                                <input type="text" id="wYear" class="form-control" placeholder="2024">
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-12">
-                                <label class="form-label">Video URL (Youtube/Vimeo)</label>
-                                <input type="url" id="wVideoUrl" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Poster Şəkli</label>
-                                <input type="file" id="wImage" class="form-control" accept="image/*">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Preview Video</label>
-                                <input type="file" id="wPreview" class="form-control" accept="video/*">
-                            </div>
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="wFeatured">
-                            <label class="form-check-label" for="wFeatured">Seçilmiş İş (Featured)</label>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Açıqlama</label>
-                            <textarea id="wDescription" class="form-control" rows="3"></textarea>
+                        <div class="row g-2">
+                            <div class="col-md-6"><label>Poster</label><input type="file" id="wImage" class="form-control bg-secondary text-white border-0"></div>
+                            <div class="col-md-6"><label>Video URL</label><input type="url" id="wVideoUrl" class="form-control bg-secondary text-white border-0"></div>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Bağla</button>
-                    <button type="button" class="btn-primary" onclick="submitWork()">
-                        <i class="fas fa-save"></i> Yadda Saxla
-                    </button>
+                <div class="modal-footer"><button type="button" class="btn btn-primary" onclick="submitWork()">Yadda Saxla</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="teamModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5>Komanda Üzvü Məlumatları</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="teamForm">
+                        <input type="hidden" id="teamId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label>Ad Soyad (EN/AZ)</label>
+                                <input type="text" id="tName" class="form-control bg-secondary text-white border-0 mb-2" placeholder="Full Name">
+                                <input type="text" id="tNameAz" class="form-control bg-secondary text-white border-0" placeholder="Ad Soyad">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Vəzifə (EN/AZ)</label>
+                                <input type="text" id="tRole" class="form-control bg-secondary text-white border-0 mb-2" placeholder="e.g. Director">
+                                <input type="text" id="tRoleAz" class="form-control bg-secondary text-white border-0" placeholder="məs. Rejissor">
+                            </div>
+                            <div class="col-12">
+                                <label class="text-info">Bioqrafiya (EN)</label>
+                                <textarea id="tBio" class="form-control bg-secondary text-white border-0" rows="3" placeholder="Member's short story..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="text-info">Bioqrafiya (AZ)</label>
+                                <textarea id="tBioAz" class="form-control bg-secondary text-white border-0" rows="3" placeholder="Üzv haqqında qısa məlumat..."></textarea>
+                            </div>
+                            <div class="col-md-8">
+                                <label>Profil Şəkli</label>
+                                <input type="file" id="tImage" class="form-control bg-secondary text-white border-0">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Sıralama</label>
+                                <input type="number" id="tOrder" class="form-control bg-secondary text-white border-0" value="0">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="button" class="btn btn-primary" onclick="submitTeamMember()">Yadda Saxla</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- SERVICE MODAL -->
-  <div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="serviceModalLabel">Yeni Xidmət</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="serviceForm">
-                    <input type="hidden" id="serviceId">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Başlıq (EN)</label>
-                            <input type="text" id="sTitle" class="form-control">
+    <div class="modal fade" id="serviceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-secondary"><h5>Xidmət Formu</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="serviceForm">
+                        <input type="hidden" id="serviceId">
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-6"><label>Başlıq (EN)</label><input type="text" id="sTitle" class="form-control bg-secondary text-white border-0"></div>
+                            <div class="col-md-6"><label>Başlıq (AZ)</label><input type="text" id="sTitleAz" class="form-control bg-secondary text-white border-0"></div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Başlıq (AZ)</label>
-                            <input type="text" id="sTitleAz" class="form-control">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Təsvir (EN)</label>
-                            <textarea id="sDesc" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Təsvir (AZ)</label>
-                            <textarea id="sDescAz" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Maddələr (EN) - Hər sətirdə bir dənə</label>
-                            <textarea id="sBulletPoints" class="form-control" rows="4"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Maddələr (AZ) - Hər sətirdə bir dənə</label>
-                            <textarea id="sBulletPointsAz" class="form-control" rows="4"></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv et</button>
-                <button type="button" class="btn btn-primary" onclick="submitService()">Yadda Saxla</button>
+                        <div class="mb-2"><label>Təsvir (EN)</label><textarea id="sDesc" class="form-control bg-secondary text-white border-0" rows="3"></textarea></div>
+                        <div class="mb-2"><label>Təsvir (AZ)</label><textarea id="sDescAz" class="form-control bg-secondary text-white border-0" rows="3"></textarea></div>
+                        <div class="mb-2"><label>Video (MP4)</label><input type="file" id="sVideoFile" class="form-control bg-secondary text-white border-0"></div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary"><button type="button" class="btn btn-primary" onclick="submitService()">Saxla</button></div>
             </div>
         </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="admin.js"></script>
+
 </body>
 </html>

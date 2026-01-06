@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 8.0 - FINAL FIX (Duplicates Removed + Full Features)
+   Version: 9.0 - DYNAMIC WHY & TEAM SECTIONS
    ============================================================ */
 
 (function() {
@@ -49,7 +49,6 @@
         overlay: document.getElementById('mobileMenuOverlay'),
         navBtns: document.querySelectorAll('.nav-btn'),
         
-        // Globe Selector Elements
         langSelector: document.getElementById('langSelector'),
         langGlobeBtn: document.getElementById('langGlobeBtn'),
         langOptions: document.querySelectorAll('.lang-option'),
@@ -65,7 +64,17 @@
         ourApproach: document.getElementById('our-approach'),
         emailLink: document.getElementById('email-link'),
         phoneLink: document.getElementById('phone-link'),
-        address: document.getElementById('address')
+        address: document.getElementById('address'),
+        
+        // Why CineChord Section
+        whyLabel: document.getElementById('why-label'),
+        whyMediaContainer: document.getElementById('why-media-container'),
+        whyTitle: document.getElementById('why-title'),
+        whyDescription1: document.getElementById('why-description-1'),
+        whyDescription2: document.getElementById('why-description-2'),
+        
+        // Team Section
+        teamGrid: document.getElementById('team-grid')
     };
 
     let isTransitioning = false;
@@ -165,7 +174,6 @@
             document.body.style.overflow = isActive ? '' : 'hidden';
         }
 
-        // Təkrar eventlərin qarşısını almaq üçün onclick istifadə edirik
         elements.hamburger.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -233,14 +241,12 @@
                 "en": {
                     "menu": "MENU", "close": "CLOSE", "home": "HOME", "work": "WORK",
                     "service": "SERVICE", "archive": "ARCHIVE", "about": "ABOUT", "contact": "CONTACT",
-                    "who_we_are": "WHO WE ARE", "our_mission": "OUR MISSION", "our_approach": "OUR APPROACH",
-                    "email": "EMAIL", "address": "ADDRESS", "phone": "PHONE"
+                    "who_we_are": "WHY CINECHORD", "meet_us": "MEET US"
                 },
                 "az": {
                     "menu": "MENYU", "close": "BAĞLA", "home": "ANA SƏHİFƏ", "work": "İŞLƏR",
                     "service": "XİDMƏTLƏR", "archive": "ARXİV", "about": "HAQQIMIZDA", "contact": "ƏLAQƏ",
-                    "who_we_are": "BİZ KİMİK", "our_mission": "MİSSİYAMIZ", "our_approach": "YANAŞMAMIZ",
-                    "email": "E-POÇT", "address": "ÜNVAN", "phone": "TELEFON"
+                    "who_we_are": "NİYƏ CINECHORD", "meet_us": "KOMANDA"
                 }
             };
             return window.translations;
@@ -269,21 +275,12 @@
             }
         });
 
-       const blockTitles = document.querySelectorAll('.block-title, .hero-rolling-text');
+        const blockTitles = document.querySelectorAll('.sidebar-label');
         blockTitles.forEach(title => {
             const key = title.getAttribute('data-key');
             if (key && t[key]) {
-                const span = title.querySelector('span');
-                if (span) span.textContent = t[key];
-                else title.textContent = t[key];
-                title.setAttribute('data-text', t[key]);
+                title.textContent = t[key];
             }
-        });
-
-        const labels = document.querySelectorAll('.label-small');
-        labels.forEach(label => {
-            const key = label.getAttribute('data-key');
-            if (key && t[key]) label.textContent = t[key];
         });
 
         if (lang === 'az') {
@@ -316,7 +313,6 @@
             }
         });
         
-        // Klik problemi burada həll edilir
         elements.langGlobeBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -451,16 +447,26 @@
         }
         
         const content = {
-            mainTitle: data.mainTitle || "OUR STORY",
-            subTitle: data.subTitle || "We are passionate filmmakers dedicated to cinematic storytelling",
+            mainTitle: data.mainTitle || (lang === 'az' ? "HAQQIMIZDA" : "ABOUT US"),
+            subTitle: data.subTitle || "",
             whoWeAreText: formatText(data.whoWeAreText || ''),
             ourMissionText: formatText(data.ourMissionText || ''),
             ourApproachText: formatText(data.ourApproachText || ''),
             email: data.email || "hello@cinechord.com",
             phone: data.phone || "+994 50 123 45 67",
-            address: data.address || "BAKU, AZERBAIJAN",
-            videoUrl: data.videoUrl || null
+            address: data.address || (lang === 'az' ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"),
+            videoUrl: data.videoUrl || null,
+            
+            // Why CineChord
+            whyTitle: data.whyTitle || (lang === 'az' ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES"),
+            whyDescription: data.whyDescription || "",
+            whyMediaUrl: data.whyMediaUrl || null,
+            whyMediaType: data.whyMediaType || 'video',
+            
+            // Team
+            teamMembers: data.teamMembers || []
         };
+        
         populateContent(content);
     }
 
@@ -472,68 +478,204 @@
             }
         };
 
+        // 1. Main Title
         if (elements.mainTitle) {
             const span = elements.mainTitle.querySelector('span');
-            if (span) span.textContent = content.mainTitle;
+            if (span) {
+                span.textContent = content.mainTitle;
+            } else {
+                elements.mainTitle.innerHTML = `<span>${content.mainTitle}</span>`;
+            }
             elements.mainTitle.setAttribute('data-text', content.mainTitle);
         }
         
+        // 2. Subtitle
         safeUpdate(elements.subtitle, content.subTitle);
         safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
         safeUpdate(elements.ourMission, content.ourMissionText, true);
         safeUpdate(elements.ourApproach, content.ourApproachText, true);
         safeUpdate(elements.address, content.address);
 
+        // 3. Email
         if (elements.emailLink) {
             elements.emailLink.href = `mailto:${content.email}`;
-            elements.emailLink.setAttribute('data-text', content.email);
-            const span = elements.emailLink.querySelector('span');
-            if(span) span.textContent = content.email;
+            const eSpan = elements.emailLink.querySelector('span');
+            if(eSpan) {
+                eSpan.textContent = content.email;
+                eSpan.setAttribute('data-text', content.email);
+            }
         }
 
+        // 4. Phone
         if (elements.phoneLink) {
             elements.phoneLink.href = `tel:${content.phone.replace(/\s/g, '')}`;
-            elements.phoneLink.setAttribute('data-text', content.phone);
-            const span = elements.phoneLink.querySelector('span');
-            if(span) span.textContent = content.phone;
+            const pSpan = elements.phoneLink.querySelector('span');
+            if(pSpan) {
+                pSpan.textContent = content.phone;
+                pSpan.setAttribute('data-text', content.phone);
+            }
         }
         
+        // 5. About Video
         if (content.videoUrl && elements.aboutVideo) {
             elements.aboutVideo.src = content.videoUrl;
-            elements.aboutVideo.muted = true;
-            elements.aboutVideo.loop = true;
-            elements.aboutVideo.playsInline = true;
             elements.aboutVideo.load();
             elements.aboutVideo.addEventListener('loadeddata', function() {
-                forceVideoPlay();
+                if (typeof forceVideoPlay === 'function') forceVideoPlay();
             }, { once: true });
         } else if (elements.aboutVideo) {
-            loadStaticVideo();
+            if (typeof loadStaticVideo === 'function') loadStaticVideo();
         }
+        
+        // 6. Why CineChord Section
+        populateWhySection(content);
+        
+        // 7. Team Members
+        populateTeamMembers(content.teamMembers);
+    }
+
+    function populateWhySection(content) {
+        // Title
+        if (elements.whyTitle) {
+            elements.whyTitle.textContent = content.whyTitle || 'WE CRAFT VISUAL STORIES';
+        }
+        
+        // Description (split into 2 paragraphs)
+        if (content.whyDescription) {
+            const parts = content.whyDescription.split('\n\n');
+            if (elements.whyDescription1) {
+                elements.whyDescription1.innerHTML = parts[0] || '';
+            }
+            if (elements.whyDescription2) {
+                elements.whyDescription2.innerHTML = parts[1] || parts[0] || '';
+            }
+        }
+        
+        // Media (Video or Image)
+        if (elements.whyMediaContainer) {
+            if (content.whyMediaUrl) {
+                if (content.whyMediaType === 'video') {
+                    elements.whyMediaContainer.innerHTML = `
+                        <video autoplay muted loop playsinline class="side-video">
+                            <source src="${content.whyMediaUrl}" type="video/mp4">
+                        </video>
+                    `;
+                    
+                    const video = elements.whyMediaContainer.querySelector('video');
+                    if (video) {
+                        video.muted = true;
+                        video.play().catch(() => {
+                            setTimeout(() => video.play().catch(() => {}), 500);
+                        });
+                    }
+                } else if (content.whyMediaType === 'image') {
+                    elements.whyMediaContainer.innerHTML = `
+                        <img src="${content.whyMediaUrl}" 
+                             alt="Why CineChord" 
+                             class="side-video" 
+                             style="object-fit: cover; width: 100%; height: 100%;"
+                             loading="lazy">
+                    `;
+                }
+            } else {
+                elements.whyMediaContainer.innerHTML = `
+                    <video autoplay muted loop playsinline class="side-video">
+                        <source src="${CONFIG.STATIC_VIDEO}" type="video/mp4">
+                    </video>
+                `;
+            }
+        }
+    }
+
+    function populateTeamMembers(teamMembers) {
+        if (!elements.teamGrid) return;
+        
+        if (!teamMembers || teamMembers.length === 0) {
+            elements.teamGrid.innerHTML = `
+                <div class="chew-card">
+                    <div class="chew-img-box">
+                        <img src="assets/images/team1.jpg" alt="Team Member">
+                    </div>
+                    <div class="member-name">Nicat Zeynallı</div>
+                    <div class="member-role">Founder / Director</div>
+                    <div class="member-bio">Cinematic vision and creative leadership.</div>
+                </div>
+                <div class="chew-card">
+                    <div class="chew-img-box">
+                        <img src="assets/images/team2.jpg" alt="Team Member">
+                    </div>
+                    <div class="member-name">Elvin Məmmədov</div>
+                    <div class="member-role">Cinematographer</div>
+                    <div class="member-bio">Capturing stories through the lens.</div>
+                </div>
+            `;
+            return;
+        }
+        
+        const teamHTML = teamMembers
+            .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+            .map(member => `
+                <div class="chew-card reveal-item">
+                    <div class="chew-img-box">
+                        <img src="${member.imageUrl || 'assets/images/default-avatar.jpg'}" 
+                             alt="${member.name}"
+                             loading="lazy">
+                    </div>
+                    <div class="member-name">${member.name || ''}</div>
+                    <div class="member-role">${member.role || ''}</div>
+                    <div class="member-bio">${member.bio || ''}</div>
+                </div>
+            `).join('');
+        
+        elements.teamGrid.innerHTML = teamHTML;
+        
+        setTimeout(() => {
+            const newCards = elements.teamGrid.querySelectorAll('.chew-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('active');
+                        }, index * 100);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+            
+            newCards.forEach(card => observer.observe(card));
+        }, 100);
     }
 
     function showFallbackContent(lang = 'en') {
         const isAz = lang === 'az';
         const fallback = {
-            mainTitle: isAz ? "BİZİM HEKAYƏMİZ" : "OUR STORY",
+            mainTitle: isAz ? "HAQQIMIZDA" : "ABOUT US",
             subTitle: isAz ? "Biz kinematik hekayəçilikə həsr olunmuş ehtiraslı film yaradıcılarıyıq." : "We are passionate filmmakers dedicated to cinematic storytelling.",
-            whoWeAreText: isAz ? "CineChord vizual hekayəçilik və film istehsalı üzrə ixtisaslaşmış yaradıcı studiyadır." : "CineChord is a creative studio specializing in visual storytelling and film production.",
-            ourMissionText: isAz ? "Missiyamız ideyaları güclü vizual təcrübələrə çevirməkdir." : "Our mission is to transform ideas into powerful visual experiences.",
-            ourApproachText: isAz ? "Biz hər layihəyə yaradıcılıq və texniki mükemməlliklə yanaşırıq." : "We approach every project with creativity and technical excellence.",
+            whoWeAreText: "",
+            ourMissionText: "",
+            ourApproachText: "",
             email: "hello@cinechord.com",
             phone: "+994 50 123 45 67",
             address: isAz ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN",
-            videoUrl: null
+            videoUrl: null,
+            
+            whyTitle: isAz ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES",
+            whyDescription: isAz 
+                ? "CineChord olaraq biz hekayənin gücünə inanırıq.\n\nHər bir layihəyə unikal vizual dil əlavə edirik."
+                : "At CineChord, we believe in the power of storytelling.\n\nWe bring unique visual language to every project.",
+            whyMediaUrl: null,
+            whyMediaType: 'video',
+            
+            teamMembers: []
         };
         populateContent(fallback);
     }
 
     /* ============================================================
-       11. SCROLL LOGIC: PROGRESS + REVEAL + HIDE/SHOW NAV
+       11. SCROLL LOGIC
        ============================================================ */
     
     function initScrollLogic() {
-        // A. Update Progress Bar
         const updateProgress = () => {
             if (!elements.progressBarTop) return;
             const target = elements.contentSection || document.documentElement;
@@ -543,69 +685,74 @@
             elements.progressBarTop.style.width = Math.min(scrolled, 100) + '%';
         };
 
-        // B. Reveal Animations
-        const revealElements = document.querySelectorAll('.reveal-item');
-        if (revealElements.length > 0) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
+        const revealElements = document.querySelectorAll('.reveal-item, .chew-card, .text-footer-block');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
                         entry.target.classList.add('active');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -30px 0px'
+                    }, index * 100); 
+                    observer.unobserve(entry.target);
+                }
             });
-            revealElements.forEach(el => observer.observe(el));
-        }
+        }, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        });
 
-        // C. Hide/Show Nav on Scroll (DÜZƏLDİLMİŞ HİSSƏ)
+        revealElements.forEach(el => observer.observe(el));
+
+        const parallaxMedia = document.querySelectorAll('.side-video, .chew-img-box img');
+        
+        const applyParallax = () => {
+            const target = elements.contentSection || window;
+            const scrollY = target.scrollTop !== undefined ? target.scrollTop : window.scrollY;
+
+            parallaxMedia.forEach(media => {
+                const speed = 0.05;
+                const rect = media.getBoundingClientRect();
+                const visible = rect.top < window.innerHeight && rect.bottom > 0;
+                
+                if (visible) {
+                    const yPos = (window.innerHeight - rect.top) * speed;
+                    media.style.transform = `scale(1.1) translateY(${yPos}px)`;
+                }
+            });
+        };
+
         let lastScrollY = 0;
         let ticking = false;
 
         function handleScroll() {
-            // About səhifəsində scroll pəncərədə deyil, .content-section div-ində olur
             const target = elements.contentSection || window;
             const currentScrollY = target.scrollTop !== undefined ? target.scrollTop : window.scrollY;
 
-            // Scroll aşağı (100px-dən çox) - gizlə
             if (currentScrollY > 100 && currentScrollY > lastScrollY) {
                 if (elements.centerLogo) elements.centerLogo.classList.add('hide-on-scroll');
                 if (elements.hamburger) elements.hamburger.classList.add('hide-on-scroll');
                 if (elements.langSelector) elements.langSelector.classList.add('hide-on-scroll');
-            }
-            // Scroll yuxarı və ya 100px-dən az - göstər
-            else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+            } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
                 if (elements.centerLogo) elements.centerLogo.classList.remove('hide-on-scroll');
                 if (elements.hamburger) elements.hamburger.classList.remove('hide-on-scroll');
                 if (elements.langSelector) elements.langSelector.classList.remove('hide-on-scroll');
             }
             
             lastScrollY = currentScrollY;
-            updateProgress(); // Progress barı da burada yeniləyirik
+            updateProgress();
+            applyParallax(); 
             ticking = false;
         }
 
-        // Event listener-i düzgün elementə əlavə edirik
-        if (elements.contentSection) {
-            elements.contentSection.addEventListener('scroll', () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(handleScroll);
-                    ticking = true;
-                }
-            }, { passive: true });
-        } else {
-            // Mobil və ya alternativ layout üçün fallback
-            window.addEventListener('scroll', () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(handleScroll);
-                    ticking = true;
-                }
-            }, { passive: true });
-        }
+        const scrollTarget = elements.contentSection || window;
+        scrollTarget.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(handleScroll);
+                ticking = true;
+            }
+        }, { passive: true });
     }
-    
+
     /* ============================================================
        12. GLOBAL NAVIGATION LINKS
        ============================================================ */
