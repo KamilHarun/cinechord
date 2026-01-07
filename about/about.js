@@ -412,264 +412,92 @@
         });
     }
 
-    /* ============================================================
-       10. DYNAMIC CONTENT LOADING
-       ============================================================ */
+   /* ============================================================
+    10. DYNAMIC CONTENT LOADING (GÜNCELLƏNMİŞ)
+   ============================================================ */
+
+function populateContent(content) {
+    const safeUpdate = (el, val, isHTML = false) => {
+        if (el) {
+            if (isHTML) el.innerHTML = val;
+            else el.textContent = val;
+        }
+    };
+
+    // 1. Main Title
+    if (elements.mainTitle) {
+        const span = elements.mainTitle.querySelector('span');
+        if (span) {
+            span.textContent = content.mainTitle;
+        } else {
+            elements.mainTitle.innerHTML = `<span>${content.mainTitle}</span>`;
+        }
+        elements.mainTitle.setAttribute('data-text', content.mainTitle);
+    }
     
-    let cachedApiData = null;
+    // 2. Subtitle & Descriptions
+    safeUpdate(elements.subtitle, content.subTitle);
+    safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
+    safeUpdate(elements.ourMission, content.ourMissionText, true);
+    safeUpdate(elements.ourApproach, content.ourApproachText, true);
+    safeUpdate(elements.address, content.address);
 
-    async function loadDynamicContent(lang = 'en') {
-        showFallbackContent(lang); 
-        try {
-            const langParam = lang === 'az' ? 'az' : 'en';
-            const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
-            
-            const response = await retryFetch(() => 
-                fetchWithTimeout(url, { method: 'GET' })
-            );
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const apiData = await response.json();
-            cachedApiData = apiData;
-            processApiData(apiData, lang);
-            
-        } catch (error) {
-            console.error('API error:', error);
-            if (cachedApiData) processApiData(cachedApiData, lang);
+    // 3. Email (Köhnə gizli sahə üçün)
+    if (elements.emailLink) {
+        elements.emailLink.href = `mailto:${content.email}`;
+        const eSpan = elements.emailLink.querySelector('span');
+        if(eSpan) {
+            eSpan.textContent = content.email;
+            eSpan.setAttribute('data-text', content.email);
         }
     }
 
-    function processApiData(data, lang = 'en') {
-        function formatText(text) {
-            if (!text) return '';
-            return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
-        }
-        
-        const content = {
-            mainTitle: data.mainTitle || (lang === 'az' ? "HAQQIMIZDA" : "ABOUT US"),
-            subTitle: data.subTitle || "",
-            whoWeAreText: formatText(data.whoWeAreText || ''),
-            ourMissionText: formatText(data.ourMissionText || ''),
-            ourApproachText: formatText(data.ourApproachText || ''),
-            email: data.email || "hello@cinechord.com",
-            phone: data.phone || "+994 50 123 45 67",
-            address: data.address || (lang === 'az' ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"),
-            videoUrl: data.videoUrl || null,
-            
-            // Why CineChord
-            whyTitle: data.whyTitle || (lang === 'az' ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES"),
-            whyDescription: data.whyDescription || "",
-            whyMediaUrl: data.whyMediaUrl || null,
-            whyMediaType: data.whyMediaType || 'video',
-            
-            // Team
-            teamMembers: data.teamMembers || []
-        };
-        
-        populateContent(content);
-    }
-
-    function populateContent(content) {
-        const safeUpdate = (el, val, isHTML = false) => {
-            if (el) {
-                if (isHTML) el.innerHTML = val;
-                else el.textContent = val;
-            }
-        };
-
-        // 1. Main Title
-        if (elements.mainTitle) {
-            const span = elements.mainTitle.querySelector('span');
-            if (span) {
-                span.textContent = content.mainTitle;
-            } else {
-                elements.mainTitle.innerHTML = `<span>${content.mainTitle}</span>`;
-            }
-            elements.mainTitle.setAttribute('data-text', content.mainTitle);
-        }
-        
-        // 2. Subtitle
-        safeUpdate(elements.subtitle, content.subTitle);
-        safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
-        safeUpdate(elements.ourMission, content.ourMissionText, true);
-        safeUpdate(elements.ourApproach, content.ourApproachText, true);
-        safeUpdate(elements.address, content.address);
-
-        // 3. Email
-        if (elements.emailLink) {
-            elements.emailLink.href = `mailto:${content.email}`;
-            const eSpan = elements.emailLink.querySelector('span');
-            if(eSpan) {
-                eSpan.textContent = content.email;
-                eSpan.setAttribute('data-text', content.email);
-            }
-        }
-
-        // 4. Phone
-        if (elements.phoneLink) {
-            elements.phoneLink.href = `tel:${content.phone.replace(/\s/g, '')}`;
-            const pSpan = elements.phoneLink.querySelector('span');
-            if(pSpan) {
-                pSpan.textContent = content.phone;
-                pSpan.setAttribute('data-text', content.phone);
-            }
-        }
-        
-        // 5. About Video
-        if (content.videoUrl && elements.aboutVideo) {
-            elements.aboutVideo.src = content.videoUrl;
-            elements.aboutVideo.load();
-            elements.aboutVideo.addEventListener('loadeddata', function() {
-                if (typeof forceVideoPlay === 'function') forceVideoPlay();
-            }, { once: true });
-        } else if (elements.aboutVideo) {
-            if (typeof loadStaticVideo === 'function') loadStaticVideo();
-        }
-        
-        // 6. Why CineChord Section
-        populateWhySection(content);
-        
-        // 7. Team Members
-        populateTeamMembers(content.teamMembers);
-    }
-
-    function populateWhySection(content) {
-        // Title
-        if (elements.whyTitle) {
-            elements.whyTitle.textContent = content.whyTitle || 'WE CRAFT VISUAL STORIES';
-        }
-        
-        // Description (split into 2 paragraphs)
-        if (content.whyDescription) {
-            const parts = content.whyDescription.split('\n\n');
-            if (elements.whyDescription1) {
-                elements.whyDescription1.innerHTML = parts[0] || '';
-            }
-            if (elements.whyDescription2) {
-                elements.whyDescription2.innerHTML = parts[1] || parts[0] || '';
-            }
-        }
-        
-        // Media (Video or Image)
-        if (elements.whyMediaContainer) {
-            if (content.whyMediaUrl) {
-                if (content.whyMediaType === 'video') {
-                    elements.whyMediaContainer.innerHTML = `
-                        <video autoplay muted loop playsinline class="side-video">
-                            <source src="${content.whyMediaUrl}" type="video/mp4">
-                        </video>
-                    `;
-                    
-                    const video = elements.whyMediaContainer.querySelector('video');
-                    if (video) {
-                        video.muted = true;
-                        video.play().catch(() => {
-                            setTimeout(() => video.play().catch(() => {}), 500);
-                        });
-                    }
-                } else if (content.whyMediaType === 'image') {
-                    elements.whyMediaContainer.innerHTML = `
-                        <img src="${content.whyMediaUrl}" 
-                             alt="Why CineChord" 
-                             class="side-video" 
-                             style="object-fit: cover; width: 100%; height: 100%;"
-                             loading="lazy">
-                    `;
-                }
-            } else {
-                elements.whyMediaContainer.innerHTML = `
-                    <video autoplay muted loop playsinline class="side-video">
-                        <source src="${CONFIG.STATIC_VIDEO}" type="video/mp4">
-                    </video>
-                `;
-            }
+    // 4. Phone (Köhnə gizli sahə üçün)
+    if (elements.phoneLink) {
+        elements.phoneLink.href = `tel:${content.phone.replace(/\s/g, '')}`;
+        const pSpan = elements.phoneLink.querySelector('span');
+        if(pSpan) {
+            pSpan.textContent = content.phone;
+            pSpan.setAttribute('data-text', content.phone);
         }
     }
 
-    function populateTeamMembers(teamMembers) {
-        if (!elements.teamGrid) return;
-        
-        if (!teamMembers || teamMembers.length === 0) {
-            elements.teamGrid.innerHTML = `
-                <div class="chew-card">
-                    <div class="chew-img-box">
-                        <img src="assets/images/team1.jpg" alt="Team Member">
-                    </div>
-                    <div class="member-name">Nicat Zeynallı</div>
-                    <div class="member-role">Founder / Director</div>
-                    <div class="member-bio">Cinematic vision and creative leadership.</div>
-                </div>
-                <div class="chew-card">
-                    <div class="chew-img-box">
-                        <img src="assets/images/team2.jpg" alt="Team Member">
-                    </div>
-                    <div class="member-name">Elvin Məmmədov</div>
-                    <div class="member-role">Cinematographer</div>
-                    <div class="member-bio">Capturing stories through the lens.</div>
-                </div>
-            `;
-            return;
-        }
-        
-        const teamHTML = teamMembers
-            .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-            .map(member => `
-                <div class="chew-card reveal-item">
-                    <div class="chew-img-box">
-                        <img src="${member.imageUrl || 'assets/images/default-avatar.jpg'}" 
-                             alt="${member.name}"
-                             loading="lazy">
-                    </div>
-                    <div class="member-name">${member.name || ''}</div>
-                    <div class="member-role">${member.role || ''}</div>
-                    <div class="member-bio">${member.bio || ''}</div>
-                </div>
-            `).join('');
-        
-        elements.teamGrid.innerHTML = teamHTML;
-        
-        setTimeout(() => {
-            const newCards = elements.teamGrid.querySelectorAll('.chew-card');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.classList.add('active');
-                        }, index * 100);
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
-            
-            newCards.forEach(card => observer.observe(card));
-        }, 100);
+    // ==========================================
+    // YENİ KONTAKT BÖLMƏSİ (DİNAMİK)
+    // ==========================================
+    const dynamicAddress = document.getElementById('dynamic-address');
+    const dynamicEmail = document.getElementById('dynamic-email');
+    const dynamicPhone = document.getElementById('dynamic-phone');
+
+    if (dynamicAddress) {
+        // API-dən gələn adres datası artıq processApiData-da dilə görə filtr olunub
+        dynamicAddress.innerText = content.address; 
     }
 
-    function showFallbackContent(lang = 'en') {
-        const isAz = lang === 'az';
-        const fallback = {
-            mainTitle: isAz ? "HAQQIMIZDA" : "ABOUT US",
-            subTitle: isAz ? "Biz kinematik hekayəçilikə həsr olunmuş ehtiraslı film yaradıcılarıyıq." : "We are passionate filmmakers dedicated to cinematic storytelling.",
-            whoWeAreText: "",
-            ourMissionText: "",
-            ourApproachText: "",
-            email: "hello@cinechord.com",
-            phone: "+994 50 123 45 67",
-            address: isAz ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN",
-            videoUrl: null,
-            
-            whyTitle: isAz ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES",
-            whyDescription: isAz 
-                ? "CineChord olaraq biz hekayənin gücünə inanırıq.\n\nHər bir layihəyə unikal vizual dil əlavə edirik."
-                : "At CineChord, we believe in the power of storytelling.\n\nWe bring unique visual language to every project.",
-            whyMediaUrl: null,
-            whyMediaType: 'video',
-            
-            teamMembers: []
-        };
-        populateContent(fallback);
+    if (dynamicEmail) {
+        dynamicEmail.innerText = content.email;
+        dynamicEmail.href = `mailto:${content.email}`;
     }
+
+    if (dynamicPhone) {
+        dynamicPhone.innerText = content.phone;
+    }
+    // ==========================================
+
+    // 5. About Video
+    if (content.videoUrl && elements.aboutVideo) {
+        elements.aboutVideo.src = content.videoUrl;
+        elements.aboutVideo.load();
+    } else if (elements.aboutVideo) {
+        if (typeof loadStaticVideo === 'function') loadStaticVideo();
+    }
+    
+    // 6. Why CineChord Section
+    populateWhySection(content);
+    
+    // 7. Team Members
+    populateTeamMembers(content.teamMembers);
+}
 
     /* ============================================================
        11. SCROLL LOGIC
@@ -772,6 +600,7 @@
             });
         });
     }
+    
 
     /* ============================================================
        13. INITIALIZATION
@@ -799,4 +628,34 @@
         init();
     }
 
-})();
+    /* ============================================================
+   14. DYNAMIC CONTACT LOADER
+   ============================================================ */
+
+function renderContactSection(data, lang) {
+    const addressField = document.getElementById('dynamic-address');
+    const emailField = document.getElementById('dynamic-email');
+    const phoneField = document.getElementById('dynamic-phone');
+
+    // 1. Adresi dilə görə set et (Entity: address / addressAz)
+    if (addressField) {
+        addressField.innerText = lang === 'az' ? (data.addressAz || "") : (data.address || "");
+    }
+
+    // 2. Email set et
+    if (emailField) {
+        emailField.innerText = data.email || "";
+        emailField.href = `mailto:${data.email}`;
+    }
+
+    // 3. Telefon set et
+    if (phoneField) {
+        phoneField.innerText = data.phone || "";
+    }
+    
+    // 4. Sosial linkləri set et (Əgər DB-dən gəlirsə)
+    // Məsələn: if(data.instagramUrl) document.getElementById('link-instagram').href = data.instagramUrl;
+}
+
+
+    })();
