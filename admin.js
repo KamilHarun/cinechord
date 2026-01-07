@@ -760,20 +760,25 @@ async function deleteMessage(id) {
 }
 
 // ============================================
-// CINECHORD ADMIN - ABOUT SECTION (COMPLETE FIXED)
+// CINECHORD ADMIN - ABOUT SECTION (FIXED & FINAL)
 // ============================================
 
 /**
  * 1. MƏLUMATLARIN YÜKLƏNMƏSİ
- * Həm ümumi mətnləri, həm də komanda üzvlərini gətirir.
  */
 async function loadAbout() {
     try {
         console.log('About məlumatları yüklənir...');
-        const res = await authFetch(`${API.ABOUT}/getAbout?t=${Date.now()}`);
-        if(!res || !res.ok) throw new Error("Backend-dən About datası gəlmədi");
+        // Cache problemini həll etmək üçün timestamp
+        const res = await authFetch(`${API.ABOUT}/getAbout?lang=en&t=${Date.now()}`);
+        
+        if(!res || !res.ok) {
+            console.error("Backend-dən About datası gəlmədi");
+            return;
+        }
         
         const data = await res.json();
+        console.log('About data:', data);
         
         // HTML ID-ləri ilə Java Data obyektini eşləşdiririk
         const fields = {
@@ -781,10 +786,10 @@ async function loadAbout() {
             'aMainTitleAz': data.mainTitleAz,
             'aSubTitle': data.subTitle,
             'aSubTitleAz': data.subTitleAz,
-            'aWhyTitle': data.whyTitle || data.whoWeAreText, // Sənin bazanda hansı addadırsa bura düşəcək
-            'aWhyTitleAz': data.whyTitleAz || data.whoWeAreTextAz,
-            'aWhyDesc': data.whyDesc || data.ourMissionText,
-            'aWhyDescAz': data.whyDescAz || data.ourMissionTextAz
+            'aWhyTitle': data.whyTitle,
+            'aWhyTitleAz': data.whyTitleAz,
+            'aWhyDesc': data.whyDescription,
+            'aWhyDescAz': data.whyDescriptionAz
         };
 
         // Sahələri doldururuq
@@ -795,20 +800,21 @@ async function loadAbout() {
 
         // Media önizləməni yükləyirik
         loadWhyMediaPreview(data); 
+        
         // Komandanı yükləyirik
         loadTeamMembers();
 
     } catch(error) {
-        console.error('About Error:', error);
-        // Səhifə ilk dəfə boşdursa xəta verməsin deyə Swal-ı bağlaya bilərsən
+        console.error('About Load Error:', error);
     }
 }
 
 /**
- * 2. ANA MƏLUMATLARI YADDA SAXLA (Text Fields)
+ * 2. ANA MƏLUMATLARI YADDA SAXLA (YALNIZ MƏTNLƏR)
  */
 async function submitAbout() {
     const fd = new FormData();
+    
     const aboutData = {
         mainTitle: document.getElementById('aMainTitle')?.value || '',
         mainTitleAz: document.getElementById('aMainTitleAz')?.value || '',
@@ -816,79 +822,126 @@ async function submitAbout() {
         subTitleAz: document.getElementById('aSubTitleAz')?.value || '',
         whyTitle: document.getElementById('aWhyTitle')?.value || '',
         whyTitleAz: document.getElementById('aWhyTitleAz')?.value || '',
-        whyDesc: document.getElementById('aWhyDesc')?.value || '',
-        whyDescAz: document.getElementById('aWhyDescAz')?.value || ''
+        whyDescription: document.getElementById('aWhyDesc')?.value || '',
+        whyDescriptionAz: document.getElementById('aWhyDescAz')?.value || ''
     };
 
     Object.keys(aboutData).forEach(key => fd.append(key, aboutData[key]));
 
-    Swal.fire({ title: 'Yadda saxlanılır...', didOpen: () => Swal.showLoading() });
+    // DİQQƏT: Fayl burada göndərilmir. Onu uploadWhyMedia edir.
+
+    Swal.fire({ 
+        title: 'Mətnlər yadda saxlanılır...', 
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading() 
+    });
 
     try {
         const res = await authFetch(`${API.ABOUT}/updateAbout`, { 
             method: 'PUT', 
             body: fd 
         });
-        if (res.ok) {
+        
+        if (res && res.ok) {
             Swal.fire('Uğurlu!', 'Mətn məlumatları yeniləndi', 'success');
-            loadAbout();
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            Swal.fire('Xəta', errData.message || 'Məlumat göndərilmədi', 'error');
         }
     } catch(e) {
-        Swal.fire('Xəta', 'Məlumat göndərilmədi: ' + e.message, 'error');
+        console.error('Submit About Error:', e);
+        Swal.fire('Xəta', 'Əlaqə xətası: ' + e.message, 'error');
     }
 }
 
 /**
  * 3. WHY CINECHORD MEDIA YÜKLƏ (Şəkil və ya Video)
+ * HTML-də: <input type="file" ... onchange="uploadWhyMedia()"> olmalıdır
  */
 async function uploadWhyMedia() {
-    const typeInput = document.getElementById('aWhyMediaType'); // select box
-    const fileInput = document.getElementById('aWhyMediaFile'); // file input
-    const file = fileInput.files[0];
+    const fileInput = document.getElementById('aWhyMediaFile');
+    const file = fileInput?.files[0];
 
-    if (!file) { 
-        Swal.fire('Xəta', 'Zəhmət olmasa fayl seçin', 'warning'); 
-        return; 
-    }
+    if (!file) return; 
 
     const fd = new FormData();
     fd.append('whyMediaFile', file);
-    fd.append('whyMediaType', typeInput?.value || 'image');
+    
+    // Fayl tipini təyin edirik
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const mediaType = ['mp4', 'mov', 'avi', 'webm', 'mkv'].includes(fileExt) ? 'video' : 'image';
+    
+    // Backend controller-də @RequestParam("whyMediaType") gözləyir (kiçik hərflə)
+    fd.append('whyMediaType', mediaType);
 
-    Swal.fire({ title: 'Media yüklənir...', didOpen: () => Swal.showLoading() });
+    Swal.fire({ 
+        title: 'Media serverə yüklənir...', 
+        text: 'Videonun həcmindən asılı olaraq gözləyin...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading() 
+    });
 
     try {
-        const res = await authFetch(`${API.ABOUT}/why-media`, { method: 'POST', body: fd });
-        if (res.ok) {
-            Swal.fire('Uğurlu!', 'Media faylı yeniləndi', 'success');
-            fileInput.value = ''; // Inputu təmizlə
-            loadAbout();
+        // Backend endpoint: /why-media
+        const res = await authFetch(`${API.ABOUT}/why-media`, { 
+            method: 'POST', 
+            body: fd 
+        });
+        
+        if (res && res.ok) {
+            const updatedData = await res.json();
+            Swal.fire('Uğurlu!', 'Media faylı uğurla yükləndi', 'success');
+            
+            // Preview yenilə
+            loadWhyMediaPreview(updatedData);
+            fileInput.value = ''; 
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            Swal.fire('Xəta', errData.message || 'Media yüklənmədi', 'error');
         }
     } catch (e) { 
-        Swal.fire('Xəta', 'Media yüklənmədi', 'error'); 
+        console.error('Upload Media Error:', e);
+        Swal.fire('Xəta', 'Sistem xətası: ' + e.message, 'error'); 
     }
 }
 
 /**
- * 4. MEDIA PREVIEW (Admin panelində görsənməsi üçün)
+ * 4. MEDIA PREVIEW (Admin paneldə göstərmək)
  */
 function loadWhyMediaPreview(data) {
     const previewDiv = document.getElementById('whyMediaPreview');
     if (!previewDiv) return;
 
-    const mediaUrl = data.whyCinechordMediaUrl || data.whyMediaUrl;
+    const mediaUrl = data.whyMediaUrl;
+    const mediaType = data.whyMediaType;
+
     if (!mediaUrl) {
         previewDiv.innerHTML = '<span class="text-muted">Media yoxdur</span>';
         return;
     }
 
+    // Sənin yazdığın getImageUrl funksiyasını işlədirik
     const fullUrl = getImageUrl(mediaUrl);
-    const isVideo = data.whyCinechordMediaType === 'video' || fullUrl.toLowerCase().endsWith('.mp4');
+    
+    const isVideo = mediaType === 'video' || 
+                    fullUrl.endsWith('.mp4') || 
+                    fullUrl.endsWith('.mov') || 
+                    fullUrl.endsWith('.webm');
 
     if (isVideo) {
-        previewDiv.innerHTML = `<video width="100%" height="150" controls style="border-radius:8px;"><source src="${fullUrl}"></video>`;
+        previewDiv.innerHTML = `
+            <video width="100%" height="200" controls style="border-radius:8px; background:black;">
+                <source src="${fullUrl}">
+                Brauzeriniz videonu dəstəkləmir.
+            </video>
+            <div class="mt-1"><small class="text-muted"><a href="${fullUrl}" target="_blank">Linkə keçid</a></small></div>
+        `;
     } else {
-        previewDiv.innerHTML = `<img src="${fullUrl}" style="max-height:150px; border-radius:8px; width:auto; max-width:100%;">`;
+        previewDiv.innerHTML = `
+            <img src="${fullUrl}" 
+                 style="max-height:200px; border-radius:8px; width:auto; max-width:100%; object-fit:contain;" 
+                 alt="Why Media">
+        `;
     }
 }
 
@@ -899,39 +952,91 @@ async function loadTeamMembers() {
     const list = document.getElementById('teamMembersGrid');
     if (!list) return;
 
+    list.innerHTML = '<div class="col-12 text-center"><i class="fas fa-spinner fa-spin"></i> Yüklənir...</div>';
+
     try {
-        const res = await authFetch(`${API.ABOUT}/team?t=${Date.now()}`);
-        if (res.ok) {
-            const members = await res.json();
-            list.innerHTML = members.map(m => `
-                <div class="col-md-4 mb-3">
-                    <div class="card bg-dark border-secondary">
-                        <img src="${getImageUrl(m.imagePath)}" class="card-img-top" style="height:120px; object-fit:cover;">
-                        <div class="card-body p-2 text-center">
-                            <h6 class="text-white small mb-1">${m.name}</h6>
-                            <p class="text-info" style="font-size:11px;">${m.roleAz || m.role}</p>
-                            <button class="btn btn-sm btn-danger w-100" onclick="deleteTeamMember(${m.id})">
-                                <i class="fas fa-trash"></i> Sil
+        const res = await authFetch(`${API.ABOUT}/team?lang=en&t=${Date.now()}`);
+        if (!res || !res.ok) {
+            list.innerHTML = '<div class="col-12 text-center text-danger">Yüklənmə xətası</div>';
+            return;
+        }
+        
+        const members = await res.json();
+        teamMembersCache = members; // Cache-ə yazırıq
+        
+        if (!Array.isArray(members) || members.length === 0) {
+            list.innerHTML = '<div class="col-12 text-center text-muted">Komanda üzvü yoxdur</div>';
+            return;
+        }
+        
+        list.innerHTML = members.map(m => `
+            <div class="col-md-4 mb-3">
+                <div class="card bg-dark border-secondary h-100">
+                    <img src="${getImageUrl(m.imageUrl)}" 
+                         class="card-img-top" 
+                         style="height:150px; object-fit:cover; object-position:top;" 
+                         alt="${m.name}"
+                         onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    <div class="card-body p-3 text-center">
+                        <h6 class="text-white mb-1">${m.name}</h6>
+                        <p class="text-info mb-2 small">${m.role}</p>
+                        
+                        <div class="btn-group w-100 mt-2" role="group">
+                            <button class="btn btn-sm btn-outline-warning" onclick="editTeamMember(${m.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTeamMember(${m.id})">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-            `).join('');
-        }
-    } catch (e) { console.error("Team loading error:", e); }
+            </div>
+        `).join('');
+        
+    } catch (e) { 
+        console.error("Team loading error:", e);
+        list.innerHTML = '<div class="col-12 text-center text-danger">Sistem xətası</div>';
+    }
 }
 
 /**
- * 6. YENİ KOMANDA ÜZVÜ ƏLAVƏ ETMƏ
+ * 6. KOMANDA REDAKTƏ (Modal Aç)
+ */
+function editTeamMember(id) {
+    const member = teamMembersCache.find(m => m.id === id);
+    if (!member) {
+        Swal.fire('Xəta', 'Üzv tapılmadı!', 'error');
+        return;
+    }
+
+    document.querySelector('#teamModal .modal-header h5').textContent = 'Komanda Üzvü Redaktəsi';
+
+    document.getElementById('teamId').value = member.id;
+    document.getElementById('tName').value = member.name || '';
+    document.getElementById('tNameAz').value = member.nameAz || '';
+    document.getElementById('tRole').value = member.role || '';
+    document.getElementById('tRoleAz').value = member.roleAz || '';
+    document.getElementById('tBio').value = member.bio || '';
+    document.getElementById('tBioAz').value = member.bioAz || '';
+    document.getElementById('tOrder').value = member.displayOrder || 0;
+
+    document.getElementById('tImage').value = '';
+    new bootstrap.Modal(document.getElementById('teamModal')).show();
+}
+
+/**
+ * 7. KOMANDA SAVE (Yeni və ya Update)
  */
 async function submitTeamMember() {
+    const teamId = document.getElementById('teamId')?.value;
     const fd = new FormData();
+    
     const name = document.getElementById('tName')?.value;
     const role = document.getElementById('tRole')?.value;
-    const img = document.getElementById('tImage')?.files[0];
 
     if (!name || !role) { 
-        Swal.fire('Xəta', 'Ad və Vəzifə mütləqdir', 'warning'); 
+        Swal.fire('Xəbərdarlıq', 'Ad və Vəzifə mütləqdir', 'warning'); 
         return; 
     }
 
@@ -941,53 +1046,98 @@ async function submitTeamMember() {
     fd.append('roleAz', document.getElementById('tRoleAz')?.value || role);
     fd.append('bio', document.getElementById('tBio')?.value || '');
     fd.append('bioAz', document.getElementById('tBioAz')?.value || '');
-    fd.append('order', document.getElementById('tOrder')?.value || 0);
-    if(img) fd.append('imageFile', img);
+    fd.append('displayOrder', document.getElementById('tOrder')?.value || 0);
+    
+    const img = document.getElementById('tImage')?.files[0];
+    if (img) {
+        fd.append('imageFile', img);
+    }
+
+    Swal.fire({ 
+        title: teamId ? 'Yenilənir...' : 'Əlavə edilir...', 
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading() 
+    });
 
     try {
-        const res = await authFetch(`${API.ABOUT}/team`, { method: 'POST', body: fd });
-        if (res.ok) {
-            Swal.fire('Uğurlu!', 'Üzv əlavə edildi', 'success');
-            loadTeamMembers();
+        const url = teamId 
+            ? `${API.ABOUT}/team/${teamId}` 
+            : `${API.ABOUT}/team`;
+        
+        const method = teamId ? 'PUT' : 'POST';
+
+        const res = await authFetch(url, { 
+            method: method, 
+            body: fd 
+        });
+        
+        if (res && res.ok) {
+            Swal.fire('Uğurlu!', teamId ? 'Üzv yeniləndi' : 'Üzv əlavə edildi', 'success');
+            
             const modalEl = document.getElementById('teamModal');
-            bootstrap.Modal.getInstance(modalEl).hide();
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+            
+            loadTeamMembers();
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            Swal.fire('Xəta', errData.message || 'Əməliyyat uğursuz oldu', 'error');
         }
-    } catch (e) { Swal.fire('Xəta', 'Sistem xətası: ' + e.message, 'error'); }
+    } catch (e) { 
+        console.error("Submit team error:", e);
+        Swal.fire('Xəta', 'Sistem xətası', 'error'); 
+    }
 }
 
 /**
- * 7. KOMANDA ÜZVÜ SİLMƏ
+ * 8. KOMANDA SİL
  */
 async function deleteTeamMember(id) {
     const confirmation = await Swal.fire({
-        title: 'Silinsin?',
-        text: "Bu üzv komandadan həmişəlik silinəcək!",
+        title: 'Əminsiniz?',
+        text: "Bu üzv silinəcək!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Bəli, sil!',
-        cancelButtonText: 'Ləğv et'
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Bəli, sil!'
     });
 
     if (confirmation.isConfirmed) {
-        const res = await authFetch(`${API.ABOUT}/team/${id}`, { method: 'DELETE' });
-        if (res.ok) { 
-            Swal.fire('Silindi!', '', 'success'); 
-            loadTeamMembers(); 
+        try {
+            const res = await authFetch(`${API.ABOUT}/team/${id}`, { method: 'DELETE' });
+            if (res && res.ok) { 
+                Swal.fire('Silindi!', 'Üzv silindi.', 'success'); 
+                loadTeamMembers(); 
+            } else {
+                Swal.fire('Xəta', 'Silinmə mümkün olmadı.', 'error');
+            }
+        } catch (e) {
+            Swal.fire('Xəta', 'Sistem xətası', 'error');
         }
     }
 }
 
-// Globala çıxarırıq ki, HTML-dən əlçatan olsun
+/**
+ * 9. YENİ ÜZV MODALINI AÇ (RESET)
+ */
+function openTeamModal() {
+    document.getElementById('teamForm').reset();
+    document.getElementById('teamId').value = '';
+    document.querySelector('#teamModal .modal-header h5').textContent = 'Yeni Komanda Üzvü';
+    document.getElementById('tImage').value = '';
+    
+    new bootstrap.Modal(document.getElementById('teamModal')).show();
+}
+
+// Global Exports (HTML-dən çağırmaq üçün)
 window.loadAbout = loadAbout;
 window.submitAbout = submitAbout;
 window.uploadWhyMedia = uploadWhyMedia;
+window.openTeamModal = openTeamModal;
+window.editTeamMember = editTeamMember;
 window.submitTeamMember = submitTeamMember;
 window.deleteTeamMember = deleteTeamMember;
-window.openTeamModal = () => {
-    const form = document.getElementById('teamForm');
-    if(form) form.reset();
-    new bootstrap.Modal(document.getElementById('teamModal')).show();
-};
 // ============================================
 // INITIALIZATION
 // ============================================
