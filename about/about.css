@@ -619,7 +619,21 @@ body.lang-az .nav-btn {
 }
 
 .video-section {
-    display: none !important;
+    display: block !important; /* Gizliliyi ləğv edirik */
+    width: 100%;
+    height: 100vh; /* Ekranın tam hündürlüyü qədər */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Videonun özünün konteynerə uyğunlaşdırılması */
+.video-section video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Videonun deformasiyaya uğramadan sahəni doldurması üçün */
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .content-section {
