@@ -453,7 +453,7 @@ function filterWorks() {
 }
 
 // ============================================
-// SERVICES
+// SERVICES - TƏHLÜKƏSİZ VERSİYA
 // ============================================
 
 async function loadServices() {
@@ -495,11 +495,27 @@ async function loadServices() {
 }
 
 function openServiceModal() {
-    document.getElementById('serviceForm').reset();
-    document.getElementById('serviceId').value = '';
-    document.getElementById('serviceModalLabel').textContent = 'Yeni Xidmət';
+    // Form-u sıfırla
+    const form = document.getElementById('serviceForm');
+    if (form) form.reset();
     
-    new bootstrap.Modal(document.getElementById('serviceModal')).show();
+    const serviceId = document.getElementById('serviceId');
+    if (serviceId) serviceId.value = '';
+    
+    // Modal başlığını yenilə (NULL CHECK ilə!)
+    const modalLabel = document.getElementById('serviceModalLabel');
+    if (modalLabel) {
+        modalLabel.textContent = 'Yeni Xidmət';
+    }
+    
+    // Modal-ı aç
+    const modalEl = document.getElementById('serviceModal');
+    if (modalEl) {
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    } else {
+        console.error('Service modal element tapılmadı!');
+    }
 }
 
 function editServiceById(id) {
@@ -509,9 +525,13 @@ function editServiceById(id) {
         return;
     }
 
+    // Modal başlığını dəyiş
     const modalLabel = document.getElementById('serviceModalLabel');
-    if (modalLabel) modalLabel.innerText = "Xidməti Redaktə Et";
+    if (modalLabel) {
+        modalLabel.textContent = 'Xidməti Redaktə Et';
+    }
 
+    // Sahələri doldur (NULL CHECK ilə!)
     const fields = {
         'serviceId': s.id,
         'sTitle': s.title,
@@ -526,11 +546,16 @@ function editServiceById(id) {
     }
 
     const bulletPoints = document.getElementById('sBulletPoints');
-    if (bulletPoints) bulletPoints.value = Array.isArray(s.bulletPoints) ? s.bulletPoints.join('\n') : '';
+    if (bulletPoints) {
+        bulletPoints.value = Array.isArray(s.bulletPoints) ? s.bulletPoints.join('\n') : '';
+    }
 
     const bulletPointsAz = document.getElementById('sBulletPointsAz');
-    if (bulletPointsAz) bulletPointsAz.value = Array.isArray(s.bulletPointsAz) ? s.bulletPointsAz.join('\n') : '';
+    if (bulletPointsAz) {
+        bulletPointsAz.value = Array.isArray(s.bulletPointsAz) ? s.bulletPointsAz.join('\n') : '';
+    }
 
+    // Modal-ı aç
     const modalEl = document.getElementById('serviceModal');
     if (modalEl) {
         const modalInstance = new bootstrap.Modal(modalEl);
@@ -539,13 +564,13 @@ function editServiceById(id) {
 }
 
 async function submitService() {
-    const id = document.getElementById('serviceId').value;
+    const id = document.getElementById('serviceId')?.value;
     const fd = new FormData();
     
-    const title = document.getElementById('sTitle').value;
-    const titleAz = document.getElementById('sTitleAz').value || title;
-    const desc = document.getElementById('sDesc').value;
-    const descAz = document.getElementById('sDescAz').value || desc;
+    const title = document.getElementById('sTitle')?.value;
+    const titleAz = document.getElementById('sTitleAz')?.value || title;
+    const desc = document.getElementById('sDesc')?.value;
+    const descAz = document.getElementById('sDescAz')?.value || desc;
     
     if(!title) {
         Swal.fire('Diqqət', 'Başlıq mütləqdir', 'warning');
@@ -557,16 +582,16 @@ async function submitService() {
     fd.append('description', desc);
     fd.append('descriptionAz', descAz);
     
-    const bulletInput = document.getElementById('sBulletPoints').value;
+    const bulletInput = document.getElementById('sBulletPoints')?.value || '';
     const bulletPoints = bulletInput.split('\n').filter(line => line.trim() !== '');
     bulletPoints.forEach(point => fd.append('bulletPoints', point.trim()));
     
-    const bulletInputAz = document.getElementById('sBulletPointsAz').value;
+    const bulletInputAz = document.getElementById('sBulletPointsAz')?.value || '';
     const bulletPointsAz = bulletInputAz.split('\n').filter(line => line.trim() !== '');
     bulletPointsAz.forEach(point => fd.append('bulletPointsAz', point.trim()));
     
     const videoFile = document.getElementById('sVideoFile');
-    if(videoFile && videoFile.files[0]) {
+    if(videoFile?.files?.[0]) {
         fd.append('videoFile', videoFile.files[0]);
     }
 
@@ -632,6 +657,9 @@ async function deleteService(id) {
         }
     }
 }
+
+console.log('✅ Services module loaded with null-safety checks');
+
 
 // ============================================
 // MESSAGES

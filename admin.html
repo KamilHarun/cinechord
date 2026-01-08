@@ -220,14 +220,6 @@
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-star"></i> 2. Why CineChord Media</h3>
                         </div>
-                        <div class="col-12">
-    <label>Media (Şəkil və ya Video)</label>
-    <input type="file" id="aWhyMediaFile" class="form-control mb-2" onchange="uploadWhyMedia()">
-    
-    <div id="whyMediaPreview" class="border rounded p-2 text-center text-muted bg-dark" style="min-height:150px">
-        Media önizləmə
-    </div>
-</div>
                         <div class="p-3 row g-3">
                             <div class="col-md-6">
                                 <label>Bölmə Başlığı (EN)</label>
@@ -263,45 +255,145 @@
                             </button>
                         </div>
                         <div id="teamMembersGrid" class="p-3 row g-3">
-                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
         </main>
     </div>
 
+    <!-- WORK MODAL - TAM ÇOX SAHƏLİ -->
     <div class="modal fade" id="workModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content bg-dark text-white">
-                <div class="modal-header"><h5>İş Formu</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">İş Formu</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                     <form id="workForm">
                         <input type="hidden" id="workId">
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6"><label>Başlıq *</label><input type="text" id="wTitle" class="form-control bg-secondary text-white border-0" required></div>
-                            <div class="col-md-6"><label>Slug</label><input type="text" id="wSlug" class="form-control bg-secondary text-white border-0"></div>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6"><label>Müştəri</label><input type="text" id="wClient" class="form-control bg-secondary text-white border-0"></div>
-                            <div class="col-md-6">
-                                <label>Kateqoriya *</label>
-                                <select id="wCategory" class="form-select bg-secondary text-white border-0" required>
-                                    <option value="FILM">FILM</option>
-                                    <option value="COMMERCIAL">COMMERCIAL</option>
-                                    <option value="CLIP">CLIP</option>
-                                    <option value="MUSIC_VIDEO">MUSIC VIDEO</option>
-                                    <option value="DOCUMENTARY">DOCUMENTARY</option>
-                                    <option value="SOCIAL">SOCIAL</option>
-                                </select>
+                        
+                        <!-- ƏSAS MƏLUMATLAR -->
+                        <div class="mb-4">
+                            <h6 class="text-warning mb-3"><i class="fas fa-info-circle"></i> Əsas Məlumatlar</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Başlıq * <small class="text-muted">(Əsas başlıq)</small></label>
+                                    <input type="text" id="wTitle" class="form-control bg-secondary text-white border-0" placeholder="ABB - Tam Gənc" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Slug <small class="text-muted">(URL üçün: abb-tam-genc)</small></label>
+                                    <input type="text" id="wSlug" class="form-control bg-secondary text-white border-0" placeholder="abb-tam-genc">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Müştəri <small class="text-muted">(Client Name)</small></label>
+                                    <input type="text" id="wClient" class="form-control bg-secondary text-white border-0" placeholder="ABB, Bakcell, Nike">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Kateqoriya *</label>
+                                    <select id="wCategory" class="form-select bg-secondary text-white border-0" required>
+                                        <option value="">Seçin...</option>
+                                        <option value="FILM">FILM</option>
+                                        <option value="COMMERCIAL">COMMERCIAL</option>
+                                        <option value="CLIP">CLIP</option>
+                                        <option value="MUSIC_VIDEO">MUSIC VIDEO</option>
+                                        <option value="DOCUMENTARY">DOCUMENTARY</option>
+                                        <option value="SOCIAL">SOCIAL</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Təsvir <small class="text-muted">(İş haqqında qısa məlumat)</small></label>
+                                    <textarea id="wDescription" class="form-control bg-secondary text-white border-0" rows="3" placeholder="Bu iş haqqında qısa məlumat..."></textarea>
+                                </div>
                             </div>
                         </div>
-                        <div class="row g-2">
-                            <div class="col-md-6"><label>Poster</label><input type="file" id="wImage" class="form-control bg-secondary text-white border-0"></div>
-                            <div class="col-md-6"><label>Video URL</label><input type="url" id="wVideoUrl" class="form-control bg-secondary text-white border-0"></div>
+
+                        <!-- MEDIA (Video və Şəkillər) -->
+                        <div class="mb-4">
+                            <h6 class="text-warning mb-3"><i class="fas fa-photo-video"></i> Media (Video və Şəkillər)</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Video URL <small class="text-muted">(YouTube, Vimeo, Cloudinary)</small></label>
+                                    <input type="url" id="wVideoUrl" class="form-control bg-secondary text-white border-0" placeholder="https://vimeo.com/123456789">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Preview Video URL <small class="text-muted">(Hover video - Qısa klip)</small></label>
+                                    <input type="url" id="wPreviewVideoUrl" class="form-control bg-secondary text-white border-0" placeholder="https://res.cloudinary.com/...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Thumbnail (Poster) <small class="text-muted">(Şəkil faylı)</small></label>
+                                    <input type="file" id="wThumbnail" class="form-control bg-secondary text-white border-0" accept="image/*">
+                                    <div id="thumbnailPreview" class="mt-2"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Thumbnail URL <small class="text-muted">(və ya birbaşa link)</small></label>
+                                    <input type="url" id="wThumbnailUrl" class="form-control bg-secondary text-white border-0" placeholder="https://res.cloudinary.com/...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ARCHIVE ÜÇÜN ƏLAVƏ DETALLAR -->
+                        <div class="mb-4">
+                            <h6 class="text-warning mb-3"><i class="fas fa-archive"></i> Archive Detalları</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Yer (Location)</label>
+                                    <input type="text" id="wLocation" class="form-control bg-secondary text-white border-0" placeholder="Baku, Global, Dubai">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Agentlik (Agency)</label>
+                                    <input type="text" id="wAgency" class="form-control bg-secondary text-white border-0" placeholder="INDEPENDENT, JWT, Leo Burnett">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">İstehsal İli</label>
+                                    <input type="text" id="wProductionYear" class="form-control bg-secondary text-white border-0" placeholder="2024, 2023">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GÖRÜNÜŞ PARAMETRLƏRI -->
+                        <div class="mb-4">
+                            <h6 class="text-warning mb-3"><i class="fas fa-cog"></i> Görünüş & Parametrlər</h6>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Sıralama (Sort Order)</label>
+                                    <input type="number" id="wSortOrder" class="form-control bg-secondary text-white border-0" placeholder="1, 2, 3..." value="0">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch mt-4">
+                                        <input class="form-check-input" type="checkbox" id="wFeatured">
+                                        <label class="form-check-label text-warning" for="wFeatured">
+                                            <i class="fas fa-star"></i> Featured (Seçilmiş)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch mt-4">
+                                        <input class="form-check-input" type="checkbox" id="wActive" checked>
+                                        <label class="form-check-label text-success" for="wActive">
+                                            <i class="fas fa-check-circle"></i> Aktiv
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch mt-4">
+                                        <input class="form-check-input" type="checkbox" id="wShowInGallery" checked>
+                                        <label class="form-check-label text-info" for="wShowInGallery">
+                                            <i class="fas fa-images"></i> Qalereyada Göstər
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-primary" onclick="submitWork()">Yadda Saxla</button></div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="button" class="btn btn-primary" onclick="submitWork()">
+                        <i class="fas fa-save"></i> Yadda Saxla
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -357,17 +449,28 @@
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content bg-dark text-white">
-                <div class="modal-header border-secondary"><h5>Xidmət Formu</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="serviceModalLabel">Xidmət Formu</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId">
                         <div class="row g-2 mb-2">
-                            <div class="col-md-6"><label>Başlıq (EN)</label><input type="text" id="sTitle" class="form-control bg-secondary text-white border-0"></div>
-                            <div class="col-md-6"><label>Başlıq (AZ)</label><input type="text" id="sTitleAz" class="form-control bg-secondary text-white border-0"></div>
+                            <div class="col-md-6"><label>Başlıq (EN)</label><input type="text" id="sTitle" class="form-control bg-secondary text-white border-0" placeholder="Film Production"></div>
+                            <div class="col-md-6"><label>Başlıq (AZ)</label><input type="text" id="sTitleAz" class="form-control bg-secondary text-white border-0" placeholder="Film İstehsalı"></div>
                         </div>
-                        <div class="mb-2"><label>Təsvir (EN)</label><textarea id="sDesc" class="form-control bg-secondary text-white border-0" rows="3"></textarea></div>
-                        <div class="mb-2"><label>Təsvir (AZ)</label><textarea id="sDescAz" class="form-control bg-secondary text-white border-0" rows="3"></textarea></div>
-                        <div class="mb-2"><label>Video (MP4)</label><input type="file" id="sVideoFile" class="form-control bg-secondary text-white border-0"></div>
+                        <div class="mb-2"><label>Təsvir (EN)</label><textarea id="sDesc" class="form-control bg-secondary text-white border-0" rows="3" placeholder="Service description..."></textarea></div>
+                        <div class="mb-2"><label>Təsvir (AZ)</label><textarea id="sDescAz" class="form-control bg-secondary text-white border-0" rows="3" placeholder="Xidmət təsviri..."></textarea></div>
+                        <div class="mb-2">
+                            <label>Bullet Points (EN) <small class="text-muted">- Hər sətirdə bir maddə</small></label>
+                            <textarea id="sBulletPoints" class="form-control bg-secondary text-white border-0" rows="4" placeholder="Professional cinematography&#10;4K/8K recording&#10;Color grading"></textarea>
+                        </div>
+                        <div class="mb-2">
+                            <label>Bullet Points (AZ) <small class="text-muted">- Hər sətirdə bir maddə</small></label>
+                            <textarea id="sBulletPointsAz" class="form-control bg-secondary text-white border-0" rows="4" placeholder="Peşəkar kinematoqrafiya&#10;4K/8K çəkiliş&#10;Rəng korreksiyası"></textarea>
+                        </div>
+                        <div class="mb-2"><label>Video (MP4)</label><input type="file" id="sVideoFile" class="form-control bg-secondary text-white border-0" accept="video/*"></div>
                     </form>
                 </div>
                 <div class="modal-footer border-secondary"><button type="button" class="btn btn-primary" onclick="submitService()">Saxla</button></div>
@@ -376,5 +479,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="admin.js?v=1.1"></script></body>
+    <script src="admin.js"></script>
+
+</body>
 </html>
