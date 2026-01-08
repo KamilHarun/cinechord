@@ -314,16 +314,40 @@
                             <h6 class="text-warning mb-3"><i class="fas fa-photo-video"></i> Media (Video və Şəkillər)</h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Video URL <small class="text-muted">(YouTube, Vimeo, Cloudinary)</small></label>
-                                    <input type="url" id="wVideoUrl" class="form-control bg-secondary text-white border-0" placeholder="https://vimeo.com/123456789">
+                                    <label class="form-label">
+                                        <i class="fas fa-video text-danger"></i> Ana Video (MP4/MOV) 
+                                        <small class="text-muted">(Əsas video faylı yüklə)</small>
+                                    </label>
+                                    <input type="file" id="wVideoFile" class="form-control bg-secondary text-white border-0" accept="video/*">
+                                    <div id="videoFilePreview" class="mt-2 text-info small"></div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Preview Video URL <small class="text-muted">(Hover video - Qısa klip)</small></label>
+                                    <label class="form-label">
+                                        Video URL <small class="text-muted">(YouTube, Vimeo, Cloudinary link)</small>
+                                    </label>
+                                    <input type="url" id="wVideoUrl" class="form-control bg-secondary text-white border-0" placeholder="https://vimeo.com/123456789">
+                                    <small class="text-warning d-block mt-1">Video faylı VƏ YA URL - biri mütləqdir!</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-film text-primary"></i> Preview Video (MP4) 
+                                        <small class="text-muted">(Hover video faylı - Qısa)</small>
+                                    </label>
+                                    <input type="file" id="wPreview" class="form-control bg-secondary text-white border-0" accept="video/*">
+                                    <div id="previewFilePreview" class="mt-2 text-info small"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Preview Video URL <small class="text-muted">(və ya birbaşa link)</small>
+                                    </label>
                                     <input type="url" id="wPreviewVideoUrl" class="form-control bg-secondary text-white border-0" placeholder="https://res.cloudinary.com/...">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Thumbnail (Poster) <small class="text-muted">(Şəkil faylı)</small></label>
-                                    <input type="file" id="wThumbnail" class="form-control bg-secondary text-white border-0" accept="image/*">
+                                    <label class="form-label">
+                                        <i class="fas fa-image text-success"></i> Thumbnail (Poster) 
+                                        <small class="text-muted">(Şəkil faylı - JPG/PNG)</small>
+                                    </label>
+                                    <input type="file" id="wImage" class="form-control bg-secondary text-white border-0" accept="image/*">
                                     <div id="thumbnailPreview" class="mt-2"></div>
                                 </div>
                                 <div class="col-md-6">
@@ -473,7 +497,10 @@
                         <div class="mb-2"><label>Video (MP4)</label><input type="file" id="sVideoFile" class="form-control bg-secondary text-white border-0" accept="video/*"></div>
                     </form>
                 </div>
-                <div class="modal-footer border-secondary"><button type="button" class="btn btn-primary" onclick="submitService()">Saxla</button></div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="button" class="btn btn-primary" onclick="submitService()"><i class="fas fa-save"></i> Saxla</button>
+                </div>
             </div>
         </div>
     </div>

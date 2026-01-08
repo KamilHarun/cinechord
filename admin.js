@@ -223,7 +223,7 @@ function initCharts(works) {
 }
 
 // ============================================
-// WORKS
+// WORKS - TAM FUNKSİYAL
 // ============================================
 
 async function loadWorks(page = 0) {
@@ -257,13 +257,13 @@ async function loadWorks(page = 0) {
                         <input type="checkbox" class="bulk-checkbox" data-id="${w.id}" onchange="toggleBulkSelect(${w.id})">
                     </div>
                     <div class="work-image-wrapper">
-                        <img src="${getImageUrl(w.imagePath || w.imageUrl)}" class="work-image" alt="${w.title}">
+                        <img src="${getImageUrl(w.imagePath || w.imageUrl || w.thumbnailUrl)}" class="work-image" alt="${w.title}">
                     </div>
                     <div class="work-body">
                         <h3 class="work-title">${w.title}</h3>
                         <div class="work-meta">
                             <span class="work-category">${w.category}</span>
-                            ${w.isFeatured ? '<i class="fas fa-star text-warning" title="Featured"></i>' : ''}
+                            ${w.isFeatured || w.featured ? '<i class="fas fa-star text-warning" title="Featured"></i>' : ''}
                         </div>
                         <div class="work-actions">
                             <button class="btn-edit" onclick='editWorkById(${w.id})'>
@@ -290,7 +290,300 @@ function renderPagination(totalPages, current) {
     for (let i = 0; i < totalPages; i++) {
         html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="loadWorks(${i})">${i + 1}</button>`;
     }
-    document.getElementById('pagination').innerHTML = html;
+    const pag = document.getElementById('pagination');
+    if (pag) pag.innerHTML = html;
+}
+
+function openWorkModal() {
+    const form = document.getElementById('workForm');
+    if (form) form.reset();
+    
+    const workId = document.getElementById('workId');
+    if (workId) workId.value = '';
+    
+    // Default dəyərlər
+    const setChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = value;
+    };
+    
+    setChecked('wActive', true);
+    setChecked('wShowInGallery', true);
+    setChecked('wFeatured', false);
+    
+    const sortOrder = document.getElementById('wSortOrder');
+    if (sortOrder) sortOrder.value = 0;
+    
+    // Preview təmizlə
+    ['videoFilePreview', 'previewFilePreview', 'thumbnailPreview'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+    });
+    
+    const modalEl = document.getElementById('workModal');
+    if (modalEl) new bootstrap.Modal(modalEl).show();
+}
+
+function editWorkById(id) {
+    const w = worksDataCache.find(work => work.id === id);
+    if (!w) {
+        Swal.fire('Xəta', 'Məlumat tapılmadı!', 'error');
+        return;
+    }
+    
+    // Helper - həm köhnə həm yeni ID-lərlə işləyir
+    const setValue = (ids, value) => {
+        const idList = Array.isArray(ids) ? ids : [ids];
+        for (const id of idList) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = value || '';
+                break;
+            }
+        }
+    };
+    
+    const setChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = value || false;
+    };
+    
+    const form = document.getElementById('workForm');
+    if (form) form.reset();
+
+    // ƏSAS MƏLUMATLAR
+    setValue('workId', w.id);
+    setValue('wTitle', w.title);
+    setValue('wSlug', w.slug);
+    setValue('wClient', w.clientName);
+    setValue('wCategory', w.category);
+    setValue('wDescription', w.description);
+    
+    // MEDIA
+    setValue('wVideoUrl', w.videoUrl);
+    setValue('wPreviewVideoUrl', w.previewVideoUrl);
+    setValue('wThumbnailUrl', w.thumbnailUrl);
+    
+    // ARCHIVE DETALLAR
+    setValue('wLocation', w.location);
+    setValue('wAgency', w.agency);
+    setValue(['wProductionYear', 'wYear'], w.productionYear); // Həm wProductionYear həm wYear
+    
+    // PARAMETRLƏR
+    setValue('wSortOrder', w.sortOrder || 0);
+    setChecked('wFeatured', w.featured || w.isFeatured);
+    setChecked('wActive', w.active !== false);
+    setChecked('wShowInGallery', w.showInGallery !== false);
+    
+    const modalEl = document.getElementById('workModal');
+    if (modalEl) new bootstrap.Modal(modalEl).show();
+}
+
+async function submitWork() {
+    // Helper funksiyalar - NULL-SAFE
+    const getValue = (ids, defaultValue = '') => {
+        const idList = Array.isArray(ids) ? ids : [ids];
+        for (const id of idList) {
+            const el = document.getElementById(id);
+            if (el && el.value) return el.value;
+        }
+        return defaultValue;
+    };
+    
+    const getChecked = (id, defaultValue = false) => {
+        const el = document.getElementById(id);
+        return el ? el.checked : defaultValue;
+    };
+    
+    const getFile = (id) => {
+        const el = document.getElementById(id);
+        return el && el.files && el.files[0] ? el.files[0] : null;
+    };
+
+    const id = getValue('workId');
+    const fd = new FormData();
+    
+    // ƏSAS MƏLUMATLAR (REQUIRED)
+    const title = getValue('wTitle');
+    const category = getValue('wCategory');
+
+    if(!title || !category) {
+        Swal.fire('Diqqət', 'Başlıq və Kateqoriya mütləqdir!', 'warning');
+        return;
+    }
+
+    fd.append('title', title);
+    fd.append('category', category);
+    
+    // OPTIONAL FIELDS
+    fd.append('clientName', getValue('wClient'));
+    fd.append('slug', getValue('wSlug'));
+    fd.append('description', getValue('wDescription'));
+    
+    // ARCHIVE DETALLAR
+    fd.append('agency', getValue('wAgency'));
+    fd.append('location', getValue('wLocation'));
+    fd.append('productionYear', getValue(['wProductionYear', 'wYear'])); // Həm köhnə həm yeni ID
+    
+    // PARAMETRLƏR
+    fd.append('sortOrder', getValue('wSortOrder', '0'));
+    fd.append('featured', getChecked('wFeatured', false));
+    fd.append('active', getChecked('wActive', true));
+    fd.append('showInGallery', getChecked('wShowInGallery', true));
+    
+    // 🔥 ANA VIDEO FAYLI
+    const videoFile = getFile('wVideoFile');
+    if (videoFile) {
+        fd.append('videoFile', videoFile);
+        console.log('✅ Ana video:', videoFile.name, '-', (videoFile.size / 1024 / 1024).toFixed(2), 'MB');
+    }
+    
+    // VIDEO URL
+    const videoUrl = getValue('wVideoUrl');
+    if (videoUrl) {
+        fd.append('videoUrl', videoUrl);
+        console.log('✅ Video URL:', videoUrl);
+    }
+    
+    // 🔥 PREVIEW VIDEO FAYLI
+    const previewFile = getFile('wPreview');
+    if (previewFile) {
+        fd.append('previewVideoFile', previewFile);
+        console.log('✅ Preview video:', previewFile.name);
+    }
+    
+    // PREVIEW VIDEO URL
+    const previewVideoUrl = getValue('wPreviewVideoUrl');
+    if (previewVideoUrl) {
+        fd.append('previewVideoUrl', previewVideoUrl);
+    }
+    
+    // 🔥 THUMBNAIL FAYLI
+    const thumbnailFile = getFile('wImage');
+    if (thumbnailFile) {
+        fd.append('imageFile', thumbnailFile);
+        console.log('✅ Thumbnail:', thumbnailFile.name);
+    }
+    
+    // THUMBNAIL URL
+    const thumbnailUrl = getValue('wThumbnailUrl');
+    if (thumbnailUrl) {
+        fd.append('thumbnailUrl', thumbnailUrl);
+    }
+
+    // VERİFİKASİYA: Ən azı video və ya URL
+    if (!videoFile && !videoUrl) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Video Yoxdur',
+            text: 'Ən azı Ana Video faylı VƏ YA Video URL daxil edin!',
+            confirmButtonText: 'Başa düşdüm'
+        });
+        return;
+    }
+
+    Swal.fire({
+        title: 'Yüklənir...',
+        html: '<div class="spinner-border text-primary" role="status"></div><p class="mt-3">Video yüklənir...</p>',
+        allowOutsideClick: false,
+        showConfirmButton: false
+    });
+    
+    try {
+        let url = id ? `${API.WORKS}/updateWork/${id}` : `${API.WORKS}/createWork`;
+        let method = id ? 'PUT' : 'POST';
+
+        const xhr = new XMLHttpRequest();
+        const token = localStorage.getItem('jwt_token');
+        
+        xhr.open(method, url);
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+        // Progress tracking
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                const loadedMB = (e.loaded / 1024 / 1024).toFixed(2);
+                const totalMB = (e.total / 1024 / 1024).toFixed(2);
+                
+                Swal.update({
+                    html: `
+                        <div style="padding: 20px;">
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                                     style="width: ${percent}%; font-size: 16px; line-height: 30px;">
+                                    ${percent}%
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0">${loadedMB} MB / ${totalMB} MB</p>
+                            <small class="text-muted">Böyük fayllarda bir neçə dəqiqə çəkə bilər</small>
+                        </div>
+                    `
+                });
+            }
+        });
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Uğurlu!',
+                    text: id ? 'İş yeniləndi!' : 'Yeni iş əlavə edildi!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                const modalEl = document.getElementById('workModal');
+                if (modalEl) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) modalInstance.hide();
+                }
+                
+                if (typeof loadWorks === 'function') loadWorks(currentPage || 0);
+                if (typeof loadDashboard === 'function') loadDashboard();
+            } else {
+                let errorMsg = 'Server xətası';
+                try {
+                    const errorData = JSON.parse(xhr.responseText);
+                    errorMsg = errorData.message || errorData.error || errorMsg;
+                } catch (e) {}
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Xəta!',
+                    text: `${errorMsg} (HTTP ${xhr.status})`,
+                    footer: 'Backend loglarını yoxlayın'
+                });
+            }
+        };
+
+        xhr.onerror = () => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Şəbəkə Xətası!',
+                text: 'İnternet bağlantısını yoxlayın'
+            });
+        };
+        
+        xhr.ontimeout = () => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Timeout!',
+                text: 'Video çox böyükdür və ya internet zəifdir'
+            });
+        };
+        
+        xhr.timeout = 300000; // 5 dəqiqə
+        xhr.send(fd);
+
+    } catch(e) { 
+        console.error('Submit error:', e);
+        Swal.fire({
+            icon: 'error',
+            title: 'JavaScript Xətası!',
+            text: e.message || 'Bilinməyən xəta'
+        });
+    }
 }
 
 async function deleteWork(id) {
@@ -309,7 +602,7 @@ async function deleteWork(id) {
             if (res && res.ok) {
                 Swal.fire('Silindi', '', 'success');
                 loadWorks(currentPage);
-                loadDashboard();
+                if (typeof loadDashboard === 'function') loadDashboard();
             } else {
                 Swal.fire('Xəta', 'Silmək mümkün olmadı.', 'error');
             }
@@ -319,139 +612,49 @@ async function deleteWork(id) {
     }
 }
 
-function openWorkModal() {
-    document.getElementById('workForm').reset();
-    document.getElementById('workId').value = ''; 
-    document.getElementById('imagePreviewContainer')?.remove();
-    new bootstrap.Modal(document.getElementById('workModal')).show();
-}
-
-function editWorkById(id) {
-    const w = worksDataCache.find(work => work.id === id);
-    if (!w) {
-        Swal.fire('Xəta', 'Məlumat tapılmadı!', 'error');
-        return;
-    }
-    
-    document.getElementById('workForm').reset();
-    document.getElementById('imagePreviewContainer')?.remove();
-
-    document.getElementById('workId').value = w.id;
-    document.getElementById('wTitle').value = w.title;
-    document.getElementById('wClient').value = w.clientName || '';
-    document.getElementById('wCategory').value = w.category;
-    document.getElementById('wSlug').value = w.slug || '';
-    document.getElementById('wAgency').value = w.agency || '';
-    document.getElementById('wLocation').value = w.location || '';
-    document.getElementById('wYear').value = w.productionYear || '';
-    document.getElementById('wFeatured').checked = w.isFeatured || false;
-    document.getElementById('wVideoUrl').value = w.videoUrl || '';
-    document.getElementById('wDescription').value = w.description || '';
-    
-    new bootstrap.Modal(document.getElementById('workModal')).show();
-}
-
-async function submitWork() {
-    const id = document.getElementById('workId').value;
-    const fd = new FormData();
-    
-    const title = document.getElementById('wTitle').value;
-    const category = document.getElementById('wCategory').value;
-
-    if(!title || !category) {
-        Swal.fire('Diqqət', 'Başlıq və Kateqoriya mütləqdir!', 'warning');
-        return;
-    }
-
-    fd.append('title', title);
-    fd.append('category', category);
-    fd.append('clientName', document.getElementById('wClient').value);
-    fd.append('slug', document.getElementById('wSlug').value);
-    fd.append('agency', document.getElementById('wAgency').value);
-    fd.append('location', document.getElementById('wLocation').value);
-    fd.append('productionYear', document.getElementById('wYear').value);
-    fd.append('isFeatured', document.getElementById('wFeatured').checked ? 'true' : 'false');
-    fd.append('videoUrl', document.getElementById('wVideoUrl').value);
-    fd.append('description', document.getElementById('wDescription').value);
-
-    const img = document.getElementById('wImage').files[0];
-    if(img) fd.append('imageFile', img); 
-    
-    const vid = document.getElementById('wPreview').files[0];
-    if(vid) fd.append('previewVideoFile', vid); 
-
-    Swal.fire({
-        title: 'Yüklənir...',
-        html: 'Zəhmət olmasa gözləyin...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-    });
-    
-    try {
-        let url = id ? `${API.WORKS}/updateWork/${id}` : `${API.WORKS}/createWork`;
-        let method = id ? 'PUT' : 'POST';
-
-        const xhr = new XMLHttpRequest();
-        const token = localStorage.getItem('jwt_token');
-        xhr.open(method, url);
-        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-
-        xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                Swal.fire('Uğurlu!', 'Əməliyyat tamamlandı', 'success');
-                bootstrap.Modal.getInstance(document.getElementById('workModal')).hide();
-                loadWorks(currentPage); 
-                loadDashboard();
-            } else {
-                Swal.fire('Xəta', `Server xətası: ${xhr.status}`, 'error');
-            }
-        };
-
-        xhr.onerror = () => Swal.fire('Xəta', 'Şəbəkə xətası', 'error');
-        xhr.send(fd);
-
-    } catch(e) { 
-        Swal.fire('Xəta', e.message, 'error'); 
-    }
-}
-
 function toggleBulkSelect(id) {
     const checkbox = document.querySelector(`.bulk-checkbox[data-id="${id}"]`);
-    if (checkbox.checked) selectedItems.push(id);
-    else selectedItems = selectedItems.filter(item => item !== id);
+    if (checkbox && checkbox.checked) {
+        selectedItems.push(id);
+    } else {
+        selectedItems = selectedItems.filter(item => item !== id);
+    }
     
     const bar = document.getElementById('bulkActionsBar');
     if(bar) {
         bar.style.display = selectedItems.length > 0 ? 'flex' : 'none';
-        bar.querySelector('.bulk-count').textContent = `${selectedItems.length} iş seçildi`;
+        const count = bar.querySelector('.bulk-count');
+        if (count) count.textContent = `${selectedItems.length} iş seçildi`;
     }
 }
 
 function clearBulkSelection() {
     selectedItems = [];
     document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = false);
-    document.getElementById('bulkActionsBar').style.display = 'none';
+    const bar = document.getElementById('bulkActionsBar');
+    if (bar) bar.style.display = 'none';
 }
 
 function searchWorks() {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-        const term = document.getElementById('workSearch').value.toLowerCase();
+        const term = document.getElementById('workSearch')?.value.toLowerCase() || '';
         document.querySelectorAll('.work-card').forEach(card => {
-            const title = card.querySelector('.work-title').textContent.toLowerCase();
+            const title = card.querySelector('.work-title')?.textContent.toLowerCase() || '';
             card.style.display = title.includes(term) ? '' : 'none';
         });
     }, 300);
 }
 
 function filterWorks() {
-    const cat = document.getElementById('categoryFilter').value;
+    const cat = document.getElementById('categoryFilter')?.value || '';
     document.querySelectorAll('.work-card').forEach(card => {
-        const wCat = card.querySelector('.work-category').textContent;
+        const wCat = card.querySelector('.work-category')?.textContent || '';
         card.style.display = (!cat || wCat === cat) ? '' : 'none';
     });
 }
 
+console.log('🚀 WORKS MODULE - VİDEO YÜKLƏMƏ İLƏ YÜKLƏNDI!');
 // ============================================
 // SERVICES - TƏHLÜKƏSİZ VERSİYA
 // ============================================
