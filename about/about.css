@@ -643,68 +643,113 @@ body.lang-az .nav-btn {
     line-height: 1.6;
 }
 
-/* =========================================
-   8. CHEW ROW (ASYMMETRIC GRID)
-   ========================================= */
+/* ============================================================
+   8.ROW (ULTRA-WIDE CINEMATIC GRID)
+   ============================================================ */
 .chew-row {
     display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 40px;
-    margin: 0 60px;
-    padding: 80px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* Sol tərəf daha incə edildi (120px), sağ tərəf tam sərbəst buraxıldı */
+    grid-template-columns: 120px 1fr; 
+    gap: 60px;
+    /* Yanlardakı margin minimuma (20px) endirildi */
+    margin: 0 20px; 
+    padding: 100px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     color: #FFA500;
     position: sticky;
-    top: 120px;
+    top: 100px;
+    opacity: 0.8;
 }
 
+/* Video Konteyneri - Maksimum Genişlik */
 .video-container {
     width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #111;
-    margin-bottom: 80px;
+    /* 21/9 nisbəti videonu daha enli və premium göstərir. 
+       Əgər videonun hündür qalmasını istəsən 16/9 saxla */
+    aspect-ratio: 21 / 9; 
+    background: #000;
+    margin-bottom: 60px;
     overflow: hidden;
+    /* Videonu divarın kənarına qədər uzatmaq üçün mənfi margin hiyləsi */
+    margin-right: -20px; 
 }
 
 .side-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* Zoom effekti ilə tam kənar-kənara oturtma */
+    transform: scale(1.03);
+    transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
+.video-container:hover .side-video {
+    transform: scale(1.05); /* Hover etdikdə yüngülcə yaxınlaşır */
+}
+
+/* Mətn bloklarının düzülüşü */
 .text-footer-block {
     display: flex;
     flex-direction: column;
-    gap: 60px;
+    gap: 80px;
+    /* Mətnlərin videodan daha içəridə, daha oxunaqlı qalması üçün */
+    padding-right: 40px; 
 }
 
 .big-statement {
-    font-size: clamp(32px, 5vw, 64px);
-    line-height: 1.05;
-    font-weight: 800;
-    max-width: 1100px;
+    /* Ölçü əvvəlki kimi balanslı qaldı */
+    font-size: clamp(28px, 4vw, 52px); 
+    line-height: 1.0; /* Sətir arasını daha da daraltdıq ki, mətn kütləvi dursun */
+    
+    /* QALINLIQ: Əgər fontun dəstəkləyirsə 900 ən qalın səviyyədir */
+    font-weight: 900; 
+    
+    /* Yazının daha "ağır" görünməsi üçün hərfləri bir-birinə yaxınlaşdırdıq */
+    letter-spacing: -2px; 
+    
+    max-width: 950px;
     text-transform: uppercase;
-    letter-spacing: -1px;
+    margin-bottom: 45px;
+    color: #ffffff;
+    
+    /* Yazını daha qabarıq etmək üçün çox yüngül bir kölgə (istəyə bağlı) */
+    text-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .description-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    max-width: 1100px;
+    gap: 50px;
+    max-width: 950px;
+    /* Başlıq çox qalın olduğu üçün altındakı mətni bir az daha şəffaf edirik ki, göz yorulmasın */
 }
 
 .desc-text {
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.45); /* 0.6-dan 0.45-ə endirdik */
+    font-weight: 400;
+}
+
+/* MOBİL İSTİSNA */
+@media (max-width: 768px) {
+    .chew-row {
+        grid-template-columns: 1fr;
+        margin: 0 15px;
+        padding: 60px 0;
+    }
+    
+    .video-container {
+        aspect-ratio: 16 / 9; /* Mobildə standart ölçü daha yaxşıdır */
+        margin-right: 0;
+    }
 }
 
 /* =========================================
@@ -836,206 +881,65 @@ body.lang-az .hero-rolling-text {
     line-height: 1.7;
 }
 
-/* =========================================
-   11. INFO GRID & SOCIALS
-   ========================================= */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 40px;
-    margin-top: 80px;
-    padding-top: 50px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.label-small {
-    font-family: 'Gabarito', sans-serif;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.4);
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-}
-
-.static-value {
-    font-family: 'Gabarito', sans-serif;
-    font-size: 15px;
-    color: #fff;
-    font-weight: 600;
-}
-
-.rolling-link {
-    font-family: 'Gabarito', sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-    color: #fff;
-    text-decoration: none;
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-    line-height: 1.2;
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
-}
-
-body.lang-az .rolling-link {
-    font-family: 'Montserrat', sans-serif;
-}
-
-.rolling-link span,
-.rolling-link::after {
-    display: block;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: inherit;
-}
-
-body.lang-az .rolling-link span,
-body.lang-az .rolling-link::after {
-    font-family: 'Montserrat', sans-serif;
-}
-
-.rolling-link::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    color: #FFA500;
-    clip-path: inset(100% 0 0 0);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: inherit;
-}
-
-.rolling-link:hover span,
-.rolling-link:hover::after {
-    transform: translateY(-100%);
-}
-
-.rolling-link:hover::after {
-    clip-path: inset(0 0 0 0);
-}
-
-.rolling-link:not(:hover)::after {
-    clip-path: inset(100% 0 0 0);
-}
-
-.social-icons-minimal {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 60px;
-    padding-bottom: 40px;
-}
-
-.minimal-social {
-    font-family: 'Gabarito', sans-serif;
-    font-size: 13px;
-    color: #fff;
-    text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 12px 25px;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.minimal-social:hover {
-    background: #FFA500;
-    border-color: #FFA500;
-    color: #000;
-}
-
-
-/* ============================================================
-   DYNAMIC CONTACT SECTION - FINAL FIX
-   ============================================================ */
 .contact-info-wrapper {
     display: grid;
-    /* 3 sütunlu struktur: Ofis, Əlaqə və Sosial Media yan-yana */
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 30px;
-    margin-top: 10px;
-    width: 100%;
+    grid-template-columns: repeat(3, 1fr); /* 3 tam bərabər sütun */
+    gap: 40px;
+    margin-top: 60px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Üst tərəfə incə bir xətt */
+    padding-top: 30px;
 }
 
 .contact-block {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    gap: 12px;
 }
 
 .contact-category {
-    display: block;
-    font-family: 'Montserrat', sans-serif;
     font-size: 10px;
-    font-weight: 600;
     letter-spacing: 2px;
-    color: rgba(255, 255, 255, 0.4); /* Sönük ağ */
-    margin-bottom: 15px;
     text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
 }
 
 .contact-value {
-    font-family: 'Gabarito', sans-serif;
-    font-size: 1.1rem;
-    color: #ffffff;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Rolling Effect */
+.rolling-link-item {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
     text-decoration: none;
-    line-height: 1.4;
-    margin-bottom: 5px;
-    transition: opacity 0.3s ease;
+    position: relative;
+    display: inline-block;
+    height: 1.2em;
+    overflow: hidden;
+    line-height: 1.2;
 }
 
-.underline-link {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-color: rgba(255, 255, 255, 0.3);
+.rolling-link-item span {
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.underline-link:hover {
-    opacity: 0.7;
-    text-decoration-color: #fff;
+.rolling-link-item::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    color: #FFA500; /* CineChord vurğusu üçün narıncı və ya qızılı rəng */
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.social-links-minimal {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.social-links-minimal a {
-    font-family: 'Gabarito', sans-serif;
-    font-size: 1rem;
-    color: #ffffff;
-    text-decoration: none;
-    opacity: 0.8;
-    transition: all 0.3s ease;
-}
-
-.social-links-minimal a:hover {
-    opacity: 0.4;
-    padding-left: 5px;
-}
-
-/* Mobil cihazlarda alt-alta görünsün */
-@media (max-width: 992px) {
-    .contact-info-wrapper {
-        grid-template-columns: 1fr 1fr; /* Planşetdə 2 sütun */
-    }
-}
-
-@media (max-width: 600px) {
-    .contact-info-wrapper {
-        grid-template-columns: 1fr; /* Mobildə tək sütun */
-        gap: 40px;
-    }
-}
+.rolling-link-item:hover span { transform: translateY(-100%); }
+.rolling-link-item:hover::after { transform: translateY(-100%); }
 
 /* =========================================
    12. SCROLL REVEAL ANIMATION
@@ -1075,6 +979,247 @@ body.lang-az .rolling-link::after {
 .lang-selector.hide-on-scroll {
     transform: translateY(-30px);
     opacity: 0;
+}
+
+    /* =========================================
+   16. CINEMATIC FOOTER
+   ========================================= */
+.main-footer {
+    background: #050505;
+    padding: 80px 60px 40px;
+    position: relative;
+    z-index: 10;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.footer-top-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.cta-text-link {
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
+}
+
+.cta-text {
+    font-family: 'Gabarito', sans-serif;
+    font-size: clamp(24px, 4vw, 48px);
+    color: transparent;
+    -webkit-text-stroke: 1px #fff;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: -1px;
+    position: relative;
+    line-height: 1.1;
+    display: block;
+    overflow: hidden;
+}
+
+.cta-text span {
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    font-family: inherit;
+}
+
+.cta-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #FFA500;
+    -webkit-text-stroke: 0;
+    font-family: inherit;
+    clip-path: inset(100% 0 0 0);
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+}
+
+.cta-text-link:hover .cta-text span {
+    transform: translateY(-100%);
+}
+
+.cta-text-link:hover .cta-text::after {
+    transform: translateY(-100%);
+    clip-path: inset(0 0 0 0);
+}
+
+.cta-text-link:not(:hover) .cta-text::after {
+    clip-path: inset(100% 0 0 0);
+}
+
+.cta-button {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 14px;
+    color: #000;
+    background: #FFA500;
+    padding: 15px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.cta-button:hover {
+    background: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+}
+
+.footer-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 60px;
+}
+
+.footer-wrapper {
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-label {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 12px;
+    color: #FFA500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-text {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+.mask-link {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    line-height: 1.2;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    cursor: pointer;
+}
+
+.mask-link span {
+    display: block;
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    font-family: 'Gabarito', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mask-link span::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    color: #FFA500;
+    font-weight: 600;
+    font-family: inherit;
+    clip-path: inset(100% 0 0 0);
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mask-link:hover span {
+    transform: translateY(-100%);
+}
+
+.mask-link:hover span::after {
+    clip-path: inset(0 0 0 0);
+}
+
+.mask-link:not(:hover) span::after {
+    clip-path: inset(100% 0 0 0);
+}
+
+.social-icons {
+    display: flex;
+    gap: 20px;
+}
+
+.mask-icon {
+    display: block;
+    height: 24px;
+    overflow: hidden;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.icon-wrap {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mask-icon i {
+    font-size: 22px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-icon {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.hover-icon {
+    color: #FFA500;
+    transform: translateY(5px);
+}
+
+.mask-icon:hover .icon-wrap {
+    transform: translateY(-29px);
+}
+
+.footer-bottom {
+    margin-top: 80px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+}
+
+.copyright {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
 }
 
 /* =========================================
@@ -1228,4 +1373,7 @@ body.lang-az .rolling-link::after {
         width: 80px;
         height: 80px;
     }
+
+
+
 }
