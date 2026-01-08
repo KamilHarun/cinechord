@@ -225,32 +225,40 @@
         }, CONFIG.LOGO_ENTRY_DELAY);
     }
 
-    /* ============================================================
-       7. TRANSLATION SYSTEM
+   /* ============================================================
+       7. TRANSLATION SYSTEM (LOCALIZED)
        ============================================================ */
 
     async function loadTranslations() {
-        try {
-            const response = await fetch('../lang/about.json');
-            if (!response.ok) throw new Error('Translation file not found');
-            window.translations = await response.json();
-            return window.translations;
-        } catch (error) {
-            console.error('Error loading translations:', error);
-            window.translations = {
-                "en": {
-                    "menu": "MENU", "close": "CLOSE", "home": "HOME", "work": "WORK",
-                    "service": "SERVICE", "archive": "ARCHIVE", "about": "ABOUT", "contact": "CONTACT",
-                    "who_we_are": "WHY CINECHORD", "meet_us": "MEET US"
-                },
-                "az": {
-                    "menu": "MENYU", "close": "BAĞLA", "home": "ANA SƏHİFƏ", "work": "İŞLƏR",
-                    "service": "XİDMƏTLƏR", "archive": "ARXİV", "about": "HAQQIMIZDA", "contact": "ƏLAQƏ",
-                    "who_we_are": "NİYƏ CINECHORD", "meet_us": "KOMANDA"
-                }
-            };
-            return window.translations;
-        }
+        // Konsoldakı 404 xətasını silmək üçün fetch sorğusunu ləğv edirik
+        // Məlumatları birbaşa JS obyektindən oxuyuruq
+        window.translations = {
+            "en": {
+                "menu": "MENU", 
+                "close": "CLOSE", 
+                "home": "HOME", 
+                "work": "WORK",
+                "service": "SERVICE", 
+                "archive": "ARCHIVE", 
+                "about": "ABOUT", 
+                "contact": "CONTACT",
+                "who_we_are": "WHY CINECHORD", 
+                "meet_us": "MEET US"
+            },
+            "az": {
+                "menu": "MENYU", 
+                "close": "BAĞLA", 
+                "home": "ANA SƏHİFƏ", 
+                "work": "İŞLƏR",
+                "service": "XİDMƏTLƏR", 
+                "archive": "ARXİV", 
+                "about": "HAQQIMIZDA", 
+                "contact": "ƏLAQƏ",
+                "who_we_are": "NİYƏ CINECHORD", 
+                "meet_us": "KOMANDA"
+            }
+        };
+        return window.translations;
     }
 
     function applyTranslations(lang) {
@@ -259,12 +267,14 @@
         const t = window.translations[lang];
         window.currentLang = lang;
 
+        // Hamburger mətnini yenilə
         const hamburgerTextEl = document.querySelector('.hamburger-text');
         if (hamburgerTextEl) {
             const isMenuOpen = elements.hamburger && elements.hamburger.classList.contains('active');
             hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
         }
 
+        // Naviqasiya düymələrini yenilə
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             const navText = btn.querySelector('.nav-text');
@@ -275,6 +285,7 @@
             }
         });
 
+        // Sidebar etiketlərini yenilə
         const blockTitles = document.querySelectorAll('.sidebar-label');
         blockTitles.forEach(title => {
             const key = title.getAttribute('data-key');
@@ -283,6 +294,7 @@
             }
         });
 
+        // HTML lang atributunu və body klassını yenilə
         if (lang === 'az') {
             document.body.classList.add('lang-az');
             document.documentElement.setAttribute('lang', 'az');
