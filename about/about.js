@@ -10,13 +10,15 @@
        1. CONFIGURATION & CONSTANTS
        ============================================================ */
     
-    const getBackendUrl = () => {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            return 'http://localhost:8080';
-        }
+  const getBackendUrl = () => {
+        // Localhost yoxlamasını müvəqqəti söndürürük ki, localda da serverə bağlansın
+        
+        // if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        //    return 'http://localhost:8080';
+        // }
+        
         return 'https://cinechord-admin-production.up.railway.app';
     };
-    
     const CONFIG = {
         BACKEND_URL: getBackendUrl(),
         ENDPOINTS: {
