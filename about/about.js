@@ -560,40 +560,38 @@
     }
 
     function populateWhySection(content) {
-        // Başlıq varsa yazırıq
+        // 1. Başlıq varsa yazırıq
         if (elements.whyTitle) {
             elements.whyTitle.textContent = content.whyTitle;
         }
         
-        // Təsvir mətni varsa
+        // 2. Mətnin təkrarlanmaması üçün ağıllı bölmə
         if (content.whyDescription) {
-            // 1. Mətni abzaslara bölürük (əgər admin paneldə enter vurulubsa)
+            // Əvvəlcə yoxlayırıq: Admin paneldə Enter vurulubmu?
             const parts = content.whyDescription.split('\n\n');
             
             if (parts.length > 1) {
-                // Əgər admin paneldə qoşa Enter vurulubsa, olduğu kimi bölürük
+                // Əgər Enter vurulubsa, hissələrə ayır
                 if (elements.whyDescription1) elements.whyDescription1.innerHTML = parts[0];
                 if (elements.whyDescription2) elements.whyDescription2.innerHTML = parts[1];
             } else {
-                // 2. Əgər tək parça mətnidirsə, onu avtomatik ortadan bölürük
+                // Əgər tək parça mətnidirsə, onu avtomatik ortadan böl
                 const fullText = content.whyDescription;
                 const midPoint = Math.floor(fullText.length / 2);
                 
-                // Cümlənin ortasında kəsməmək üçün ən yaxın boşluğu tapırıq (ortadan geriyə doğru)
-                const splitIndex = fullText.lastIndexOf(' ', midPoint);
+                // Sözü ortadan kəsməmək üçün ən yaxın boşluğu tapırıq
+                let splitIndex = fullText.lastIndexOf(' ', midPoint);
+                if (splitIndex === -1) splitIndex = midPoint; // Boşluq tapılmasa məcbur ortadan böl
                 
-                // Əgər boşluq tapılmasa (çox uzun söz olsa), məcburən ortadan böl
-                const finalSplitIndex = splitIndex > 0 ? splitIndex : midPoint;
-                
-                const firstHalf = fullText.substring(0, finalSplitIndex);
-                const secondHalf = fullText.substring(finalSplitIndex);
+                const firstHalf = fullText.substring(0, splitIndex);
+                const secondHalf = fullText.substring(splitIndex);
 
                 if (elements.whyDescription1) elements.whyDescription1.innerHTML = firstHalf;
                 if (elements.whyDescription2) elements.whyDescription2.innerHTML = secondHalf;
             }
         }
         
-        // Media (Video/Şəkil) hissəsi
+        // 3. Media (Video/Şəkil) hissəsi (Olduğu kimi saxlayırıq)
         if (elements.whyMediaContainer && content.whyMediaUrl) {
             if (content.whyMediaType === 'video') {
                 elements.whyMediaContainer.innerHTML = `
@@ -601,20 +599,21 @@
                         <source src="${content.whyMediaUrl}" type="video/mp4">
                     </video>
                 `;
-                 // Videonu məcbur oxutmaq üçün (brauzer bloklamasın deyə)
+                 // Videonu məcbur oxutmaq üçün
                 const video = elements.whyMediaContainer.querySelector('video');
-                if(video) {
+                if (video) {
                     video.play().catch(() => {
-                        // Əgər ilk cəhd alınmasa, səssiz rejimdə bir daha yoxla
-                        video.muted = true;
-                        video.play();
+                        setTimeout(() => video.play().catch(() => {}), 500);
                     });
                 }
             } else {
                 elements.whyMediaContainer.innerHTML = `
-                    <img src="${content.whyMediaUrl}" alt="Why CineChord" class="side-video">
+                    <img src="${content.whyMediaUrl}" alt="Why CineChord" class="side-video" style="object-fit: cover;">
                 `;
             }
+        } else if (elements.whyMediaContainer) {
+            // Media yoxdursa boş qutu göstər
+            elements.whyMediaContainer.innerHTML = `<div class="placeholder-video-bg"></div>`;
         }
     }
 
