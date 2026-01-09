@@ -28,10 +28,7 @@ body {
 }
 
 /* Azərbaycan dili üçün Montserrat */
-body.lang-az,
-body.lang-az *,
-body.lang-az *::after,
-body.lang-az *::before {
+body.lang-az :not(i):not(.fa):not(.fas):not(.fab):not(.far) {
     font-family: 'Montserrat', sans-serif !important;
 }
 
@@ -682,17 +679,14 @@ body.lang-az .nav-btn {
     opacity: 0.8;
 }
 
-/* Video Konteyneri - Maksimum Genişlik */
 .video-container {
-    width: 100%;
-    /* 21/9 nisbəti videonu daha enli və premium göstərir. 
-       Əgər videonun hündür qalmasını istəsən 16/9 saxla */
-    aspect-ratio: 21 / 9; 
+    width: 100% !important;      /* Yana tam açılması üçün */
+    max-width: 100% !important;  /* Limitləri ləğv edirik */
+    height: 750px !important;    /* Aşağı doğru hündürlük (Buranı artırıb-azalda bilərsən) */
     background: #000;
     margin-bottom: 60px;
     overflow: hidden;
-    /* Videonu divarın kənarına qədər uzatmaq üçün mənfi margin hiyləsi */
-    margin-right: -20px; 
+    margin-right: 0;             /* Mənfi margini ləğv etdik ki, düzgün otursun */
 }
 
 .side-video {

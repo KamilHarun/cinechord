@@ -560,38 +560,60 @@
     }
 
     function populateWhySection(content) {
+        // Başlıq varsa yazırıq
         if (elements.whyTitle) {
             elements.whyTitle.textContent = content.whyTitle;
         }
         
+        // Təsvir mətni varsa
         if (content.whyDescription) {
+            // 1. Mətni abzaslara bölürük (əgər admin paneldə enter vurulubsa)
             const parts = content.whyDescription.split('\n\n');
-            if (elements.whyDescription1) elements.whyDescription1.innerHTML = parts[0] || '';
-            if (elements.whyDescription2) elements.whyDescription2.innerHTML = parts[1] || parts[0] || '';
+            
+            if (parts.length > 1) {
+                // Əgər admin paneldə qoşa Enter vurulubsa, olduğu kimi bölürük
+                if (elements.whyDescription1) elements.whyDescription1.innerHTML = parts[0];
+                if (elements.whyDescription2) elements.whyDescription2.innerHTML = parts[1];
+            } else {
+                // 2. Əgər tək parça mətnidirsə, onu avtomatik ortadan bölürük
+                const fullText = content.whyDescription;
+                const midPoint = Math.floor(fullText.length / 2);
+                
+                // Cümlənin ortasında kəsməmək üçün ən yaxın boşluğu tapırıq (ortadan geriyə doğru)
+                const splitIndex = fullText.lastIndexOf(' ', midPoint);
+                
+                // Əgər boşluq tapılmasa (çox uzun söz olsa), məcburən ortadan böl
+                const finalSplitIndex = splitIndex > 0 ? splitIndex : midPoint;
+                
+                const firstHalf = fullText.substring(0, finalSplitIndex);
+                const secondHalf = fullText.substring(finalSplitIndex);
+
+                if (elements.whyDescription1) elements.whyDescription1.innerHTML = firstHalf;
+                if (elements.whyDescription2) elements.whyDescription2.innerHTML = secondHalf;
+            }
         }
         
-        if (elements.whyMediaContainer) {
-            if (content.whyMediaUrl) {
-                if (content.whyMediaType === 'video') {
-                    elements.whyMediaContainer.innerHTML = `
-                        <video autoplay muted loop playsinline class="side-video">
-                            <source src="${content.whyMediaUrl}" type="video/mp4">
-                        </video>
-                    `;
-                    const video = elements.whyMediaContainer.querySelector('video');
-                    if (video) {
-                        video.play().catch(() => {
-                            setTimeout(() => video.play().catch(() => {}), 500);
-                        });
-                    }
-                } else {
-                    elements.whyMediaContainer.innerHTML = `
-                        <img src="${content.whyMediaUrl}" alt="Why CineChord" class="side-video" style="object-fit: cover;">
-                    `;
+        // Media (Video/Şəkil) hissəsi
+        if (elements.whyMediaContainer && content.whyMediaUrl) {
+            if (content.whyMediaType === 'video') {
+                elements.whyMediaContainer.innerHTML = `
+                    <video autoplay muted loop playsinline class="side-video">
+                        <source src="${content.whyMediaUrl}" type="video/mp4">
+                    </video>
+                `;
+                 // Videonu məcbur oxutmaq üçün (brauzer bloklamasın deyə)
+                const video = elements.whyMediaContainer.querySelector('video');
+                if(video) {
+                    video.play().catch(() => {
+                        // Əgər ilk cəhd alınmasa, səssiz rejimdə bir daha yoxla
+                        video.muted = true;
+                        video.play();
+                    });
                 }
             } else {
-                // Video yoxdursa placeholder göstər (404-ün qarşısını almaq üçün)
-                elements.whyMediaContainer.innerHTML = `<div class="placeholder-video-bg"></div>`;
+                elements.whyMediaContainer.innerHTML = `
+                    <img src="${content.whyMediaUrl}" alt="Why CineChord" class="side-video">
+                `;
             }
         }
     }
