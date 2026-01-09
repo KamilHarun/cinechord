@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - About Page Stylesheet
-   Version: 5.0 - FINAL CLEAN (Contact Style Mask Effect)
+   Version: 5.7 - MASK EFFECT RESTORED + NO CLIPPING
    ========================================= */
 
 /* =========================================
@@ -252,10 +252,13 @@ body.lang-az .lang-check i {
 .mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
 .mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
 
+/* ✅ AZ DİLİNDƏ YALNIZ ÖLÇÜ VƏ FONT DƏYİŞİR - TRANSFORMu SİLDİK */
 body.lang-az .nav-btn {
-    font-size: 3.2vw;
-    letter-spacing: 2px;
-    margin: -0.5vh 0;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 4.0vw !important;          /* Scale əvəzinə daha kiçik font */
+    letter-spacing: -3px !important;      /* Daha dar */
+    /* transform silindi - indi slide effekt eyni işləyir! */
 }
 
 .nav-text {
@@ -616,18 +619,17 @@ body.lang-az .nav-btn {
 }
 
 .video-section {
-    display: block !important; /* Gizliliyi ləğv edirik */
+    display: block !important;
     width: 100%;
-    height: 100vh; /* Ekranın tam hündürlüyü qədər */
+    height: 100vh;
     position: relative;
     overflow: hidden;
 }
 
-/* Videonun özünün konteynerə uyğunlaşdırılması */
 .video-section video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Videonun deformasiyaya uğramadan sahəni doldurması üçün */
+    object-fit: cover;
     position: absolute;
     top: 0;
     left: 0;
@@ -636,7 +638,7 @@ body.lang-az .nav-btn {
 .content-section {
     width: 100%;
     height: auto;
-    padding: 160px 20px 100px;
+    padding: 160px 30px 100px;  /* Padding artırıldı */
     background: transparent;
     text-align: center;
 }
@@ -659,10 +661,8 @@ body.lang-az .nav-btn {
    ============================================================ */
 .chew-row {
     display: grid;
-    /* Sol tərəf daha incə edildi (120px), sağ tərəf tam sərbəst buraxıldı */
     grid-template-columns: 120px 1fr; 
     gap: 60px;
-    /* Yanlardakı margin minimuma (20px) endirildi */
     margin: 0 20px; 
     padding: 100px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -680,54 +680,43 @@ body.lang-az .nav-btn {
 }
 
 .video-container {
-    width: 100% !important;      /* Yana tam açılması üçün */
-    max-width: 100% !important;  /* Limitləri ləğv edirik */
-    height: 750px !important;    /* Aşağı doğru hündürlük (Buranı artırıb-azalda bilərsən) */
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 750px !important;
     background: #000;
     margin-bottom: 60px;
     overflow: hidden;
-    margin-right: 0;             /* Mənfi margini ləğv etdik ki, düzgün otursun */
+    margin-right: 0;
 }
 
 .side-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Zoom effekti ilə tam kənar-kənara oturtma */
     transform: scale(1.03);
     transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 .video-container:hover .side-video {
-    transform: scale(1.05); /* Hover etdikdə yüngülcə yaxınlaşır */
+    transform: scale(1.05);
 }
 
-/* Mətn bloklarının düzülüşü */
 .text-footer-block {
     display: flex;
     flex-direction: column;
     gap: 80px;
-    /* Mətnlərin videodan daha içəridə, daha oxunaqlı qalması üçün */
     padding-right: 40px; 
 }
 
 .big-statement {
-    /* Ölçü əvvəlki kimi balanslı qaldı */
     font-size: clamp(28px, 4vw, 52px); 
-    line-height: 1.0; /* Sətir arasını daha da daraltdıq ki, mətn kütləvi dursun */
-    
-    /* QALINLIQ: Əgər fontun dəstəkləyirsə 900 ən qalın səviyyədir */
+    line-height: 1.0;
     font-weight: 900; 
-    
-    /* Yazının daha "ağır" görünməsi üçün hərfləri bir-birinə yaxınlaşdırdıq */
     letter-spacing: -2px; 
-    
     max-width: 950px;
     text-transform: uppercase;
-    margin-bottom: 45px;
+    margin: 0 auto 45px auto;
     color: #ffffff;
-    
-    /* Yazını daha qabarıq etmək üçün çox yüngül bir kölgə (istəyə bağlı) */
     text-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -736,13 +725,13 @@ body.lang-az .nav-btn {
     grid-template-columns: 1fr 1fr;
     gap: 50px;
     max-width: 950px;
-    /* Başlıq çox qalın olduğu üçün altındakı mətni bir az daha şəffaf edirik ki, göz yorulmasın */
+    margin: 0 auto;
 }
 
 .desc-text {
     font-size: 16px;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.45); /* 0.6-dan 0.45-ə endirdik */
+    color: rgba(255, 255, 255, 0.45);
     font-weight: 400;
 }
 
@@ -755,7 +744,7 @@ body.lang-az .nav-btn {
     }
     
     .video-container {
-        aspect-ratio: 16 / 9; /* Mobildə standart ölçü daha yaxşıdır */
+        aspect-ratio: 16 / 9;
         margin-right: 0;
     }
 }
@@ -824,7 +813,7 @@ body.lang-az .nav-btn {
    ========================================= */
 .title-wrapper { 
     margin-bottom: 50px; 
-    overflow: hidden; /* ✅ BU ƏLAVƏ EDİLDİ */
+    overflow: hidden; 
     position: relative;
     width: 100%;
 }
@@ -832,7 +821,7 @@ body.lang-az .nav-btn {
 .hero-rolling-text {
     font-family: 'Gabarito', sans-serif;
     font-weight: 900;
-    line-height: 1.1;
+    line-height: 1.1; 
     margin: 0;
     text-transform: uppercase;
     cursor: pointer;
@@ -842,7 +831,13 @@ body.lang-az .nav-btn {
     display: inline-block;
     color: transparent;
     -webkit-text-stroke: 1.5px #fff;
-    overflow: hidden; /* ✅ BU ƏN VACİBDİR! */
+    overflow: hidden; 
+    padding: 0px 5px; /* Yanlardan azca boşluq */
+}
+
+body.lang-az .hero-rolling-text {
+    font-family: 'Montserrat', sans-serif !important;
+    line-height: 1.1;
 }
 
 .hero-rolling-text span {
@@ -853,26 +848,28 @@ body.lang-az .nav-btn {
 .hero-rolling-text::after {
     content: attr(data-text);
     position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
+    top: 0; /* Artıq top 100% deyil, tam üst-üstə qoyuruq */
+    left: 5px; 
+    width: calc(100% - 10px);
     height: 100%;
     color: #FFA500;
     -webkit-text-stroke: 0;
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
+    
+    /* BU HİSSƏ MÜTLƏQDİR: Normalda mətni aşağıda gizlədir və KƏSİR */
+    transform: translateY(105%); 
+    clip-path: inset(0 0 100% 0); /* Mətni aşağıdan yuxarıya doğru görünməz edir */
 }
 
 .hero-rolling-text:hover span {
-    transform: translateY(-100%);
+    transform: translateY(-105%);
 }
 
 .hero-rolling-text:hover::after {
-    transform: translateY(-100%);
-}
-
-body.lang-az .hero-rolling-text {
-    font-family: 'Montserrat', sans-serif !important;
+    /* Hover zamanı mətni həm yuxarı çəkirik, həm də kəsimi ləğv edirik */
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
 }
 
 .block-title {
@@ -891,10 +888,10 @@ body.lang-az .hero-rolling-text {
 
 .contact-info-wrapper {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 tam bərabər sütun */
+    grid-template-columns: repeat(3, 1fr);
     gap: 40px;
     margin-top: 60px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Üst tərəfə incə bir xətt */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 30px;
 }
 
@@ -918,7 +915,6 @@ body.lang-az .hero-rolling-text {
     font-weight: 500;
 }
 
-/* Rolling Effect */
 .rolling-link-item {
     font-size: 16px;
     font-weight: 700;
@@ -942,12 +938,29 @@ body.lang-az .hero-rolling-text {
     top: 100%;
     left: 0;
     width: 100%;
-    color: #FFA500; /* CineChord vurğusu üçün narıncı və ya qızılı rəng */
+    color: #FFA500;
     transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .rolling-link-item:hover span { transform: translateY(-100%); }
 .rolling-link-item:hover::after { transform: translateY(-100%); }
+
+/* =========================================
+   11. DESKTOP/WEB SOSIAL HİSSƏ (AZ DİLİ)
+   ========================================= */
+body.lang-az .menu-socials a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 13px !important;        /* 14px-dən kiçildildi */
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+}
+
+body.lang-az .menu-contact-info p,
+body.lang-az .menu-contact-info a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 12px !important;        /* 13px-dən kiçildildi */
+    letter-spacing: 1px !important;
+}
 
 /* =========================================
    12. SCROLL REVEAL ANIMATION
@@ -989,8 +1002,8 @@ body.lang-az .hero-rolling-text {
     opacity: 0;
 }
 
-    /* =========================================
-   16. CINEMATIC FOOTER
+/* =========================================
+   14. CINEMATIC FOOTER
    ========================================= */
 .main-footer {
     background: #050505;
@@ -1230,151 +1243,57 @@ body.lang-az .hero-rolling-text {
     letter-spacing: 1px;
 }
 
-/* =========================================
-   14. RESPONSIVE MEDIA QUERIES
-   ========================================= */
-@media (max-width: 1100px) {
-    .chew-row { 
-        grid-template-columns: 1fr; 
-        margin: 0 30px; 
-    }
-    
-    .chew-team-grid { 
-        grid-template-columns: 1fr; 
-    }
-    
-    .description-grid { 
-        grid-template-columns: 1fr; 
-    }
-    
-    .sidebar-label { 
-        position: static; 
-        margin-bottom: 20px; 
-        display: block; 
-    }
-}
-
-@media (max-width: 1024px) {
-    .mobile-menu { 
-        width: 50%; 
-    }
-    
-    .hero-rolling-text { 
-        font-size: 8vw; 
-    }
-}
+/* ============================================================
+   MOBILE RESPONSIVE - FINAL VERSION
+   ============================================================ */
 
 @media (max-width: 768px) {
-    .content-section {
-        padding-top: 120px;
-    }
     
-    .hero-rolling-text {
-        font-size: 10vw;
-    }
-    
+    /* --- 1. HEADER DÜYMƏLƏRİ --- */
     .lang-selector {
-        top: 38px !important;
-        right: 125px !important;
+        position: fixed !important;
+        top: 27px !important;    
+        right: 125px !important; 
         left: auto !important;
+        z-index: 30001 !important;
     }
     
     .lang-globe-btn {
         padding: 6px;
         gap: 8px;
+        display: flex;
+        align-items: center;
+        color: #fff !important; 
+        pointer-events: auto;
     }
-    
-    .globe-icon {
-        width: 18px;
-        height: 18px;
-    }
-    
-    .globe-icon::before {
-        width: 16px;
-        height: 16px;
-    }
-    
-    .globe-icon::after {
-        width: 16px;
-    }
-    
-    .globe-icon .globe-ellipse {
-        width: 8px;
-        height: 16px;
-    }
-    
-    .current-lang {
-        font-size: 11px;
-        letter-spacing: 1px;
-    }
-    
-    .lang-dropdown {
-        left: 0;
-        right: auto;
-        min-width: 150px;
-        transform-origin: top left;
-    }
-    
+
     .hamburger {
-        top: 35px;
-        right: 20px;
+        position: fixed !important;
+        top: 25px !important;    
+        right: 20px !important;  
         gap: 12px;
         padding: 8px;
+        z-index: 30002 !important;
+        display: flex;
+        align-items: center;
     }
-    
+
     .hamburger-text {
         font-size: 11px;
         letter-spacing: 1.5px;
-    }
-    
-    .hamburger-icon {
-        width: 28px;
-        height: 18px;
-        gap: 6px;
-    }
-    
-    .hamburger-line:nth-child(1) {
-        width: 28px;
-    }
-    
-    .hamburger-line:nth-child(2) {
-        width: 20px;
-    }
-    
-    .hamburger:hover .hamburger-line,
-    .hamburger.active .hamburger-line {
-        width: 28px;
-    }
-    
-    .hamburger.active .hamburger-line:nth-child(1) {
-        transform: translateY(4px) rotate(45deg);
-    }
-    
-    .hamburger.active .hamburger-line:nth-child(2) {
-        transform: translateY(-4px) rotate(-45deg);
-    }
-    
-    .mobile-menu {
-        width: 100%;
-    }
-    
-    .nav-btn {
-        font-size: 13vw !important;
-        margin: -1vh 0 !important;
-        line-height: 1.0 !important;
         display: block !important;
-        overflow: visible !important;
+        color: #fff !important;
+    }
+    
+    .hamburger-icon .hamburger-line {
+        background-color: #fff !important;
     }
 
-    body.lang-az .nav-btn {
-        font-size: 8.5vw !important;
-        line-height: 1.2 !important;
-        letter-spacing: 0px !important; 
-    }
-    
     .center-logo {
-        top: 15px;
-        left: 20px;
+        position: fixed !important;
+        top: 15px !important;   
+        left: 20px !important;
+        z-index: 30001 !important;
     }
     
     .logo-img {
@@ -1382,6 +1301,126 @@ body.lang-az .hero-rolling-text {
         height: 80px;
     }
 
+    /* --- 2. MOBİL MENU (İNGİLİS VƏ AZ DİLİ EYNİ EFFEKT) --- */
+    .mobile-menu {
+        width: 100% !important;
+        padding-top: 120px !important;
+        background-color: #000 !important;
+        z-index: 30000 !important;
+    }
 
+    .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 13vw !important;
+        margin: -1vh 0 !important;
+        line-height: 1.0 !important;
+        display: block !important;
+        color: #fff !important;
+    }
 
+    /* ✅ AZƏRBAYCAN DİLİ - EYNİ SLIDE EFFEKT İNGİLİS İLƏ */
+    body.lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;      
+        text-shadow: 1px 0 0 #fff;        
+        font-size: 10.5vw !important;     
+        line-height: 1.0 !important;    
+        margin: -0.5vh 0 !important;    
+        letter-spacing: -2px !important; 
+        width: 100% !important;
+        display: block !important;
+    }
+    
+    /* ✅ EYNİ SLIDE EFFEKT - HƏM İNGİLİS HƏM AZ DİLİ ÜÇÜN */
+    .mobile-menu.active .nav-btn:nth-child(odd) { 
+        transform: translateX(-10px) !important; 
+    }
+    .mobile-menu.active .nav-btn:nth-child(even) { 
+        transform: translateX(10px) !important; 
+    }
+
+    /* --- 3. ABOUT SƏHİFƏSİNİN LAYOUTU --- */
+    body {
+        overflow-x: hidden;
+    }
+
+    .content-section {
+        padding-top: 120px !important;
+        padding-left: 30px !important;  /* 20px-dən artırıldı */
+        padding-right: 30px !important;  /* 20px-dən artırıldı */
+        padding-bottom: 60px !important;
+    }
+
+    .chew-row, 
+    .chew-team-grid, 
+    .description-grid,
+    .footer-wrapper {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        margin: 0 !important;
+        gap: 40px !important;
+    }
+    
+    .video-container {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16 / 9 !important;
+        margin-bottom: 40px !important;
+    }
+    
+    .chew-img-box {
+        width: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+    }
+    
+    .hero-rolling-text {
+        font-size: 10vw !important;
+        padding: 6px 12px !important;  /* Mobil üçün geniş padding */
+    }
+    
+    .big-statement {
+        font-size: 22px !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* --- 4. SOSİAL BÖLMƏ (KİÇİLDİLMİŞ) --- */
+    body.lang-az .menu-socials a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 13px !important;        /* 14px-dən kiçildildi */
+        font-weight: 700 !important;       
+        letter-spacing: 1px !important;    
+    }
+
+    body.lang-az .menu-contact-info p, 
+    body.lang-az .menu-contact-info a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;        /* 13px-dən kiçildildi */
+        font-weight: 700 !important;       
+        letter-spacing: 1px !important;    
+    }
+}
+
+/* =========================================
+   DESKTOP PROTECTION
+   ========================================= */
+@media (min-width: 769px) {
+    /* Yalnız Azərbaycan dili üçün boşluq */
+    body.lang-az .mobile-menu .nav-btn,
+    body.lang-az .nav-btn,
+    .lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+        font-size: 4.0vw !important;
+        letter-spacing: -3px !important;
+        margin: -0.5vh 0 !important;  /* Bir-birinə yaxın, ingilisdən az aralı */
+    }
+    
+    body.lang-az .hero-rolling-text,
+    .lang-az .hero-rolling-text,
+    body.lang-az .big-statement,
+    .lang-az .big-statement {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+    }
 }

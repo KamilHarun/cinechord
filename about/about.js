@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 9.0 - DYNAMIC WHY & TEAM SECTIONS
+   Version: 9.1 - FIXED DUPLICATE TEXT ISSUE
    ============================================================ */
 
 (function() {
@@ -11,12 +11,6 @@
        ============================================================ */
     
   const getBackendUrl = () => {
-        // Localhost yoxlamasını müvəqqəti söndürürük ki, localda da serverə bağlansın
-        
-        // if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        //    return 'http://localhost:8080';
-        // }
-        
         return 'https://cinechord-admin-production.up.railway.app';
     };
     const CONFIG = {
@@ -232,8 +226,6 @@
        ============================================================ */
 
     async function loadTranslations() {
-        // Konsoldakı 404 xətasını silmək üçün fetch sorğusunu ləğv edirik
-        // Məlumatları birbaşa JS obyektindən oxuyuruq
         window.translations = {
             "en": {
                 "menu": "MENU", 
@@ -269,14 +261,12 @@
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        // Hamburger mətnini yenilə
         const hamburgerTextEl = document.querySelector('.hamburger-text');
         if (hamburgerTextEl) {
             const isMenuOpen = elements.hamburger && elements.hamburger.classList.contains('active');
             hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
         }
 
-        // Naviqasiya düymələrini yenilə
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             const navText = btn.querySelector('.nav-text');
@@ -287,7 +277,6 @@
             }
         });
 
-        // Sidebar etiketlərini yenilə
         const blockTitles = document.querySelectorAll('.sidebar-label');
         blockTitles.forEach(title => {
             const key = title.getAttribute('data-key');
@@ -296,7 +285,6 @@
             }
         });
 
-        // HTML lang atributunu və body klassını yenilə
         if (lang === 'az') {
             document.body.classList.add('lang-az');
             document.documentElement.setAttribute('lang', 'az');
@@ -388,7 +376,6 @@
         
         if (playPromise !== undefined) {
             playPromise.catch(error => {
-                // Brauzer avtomatik oxutmağa icazə verməsə, 500ms sonra yenidən cəhd et
                 setTimeout(() => {
                     if (elements.aboutVideo) elements.aboutVideo.play().catch(() => {});
                 }, 500);
@@ -396,11 +383,9 @@
         }
     }
 
-    // Bu funksiya artıq yalnız admin paneldən video gəlməyəndə işləyəcək
     function loadStaticVideo() {
         if (!elements.aboutVideo) return;
 
-        // Əgər admin paneldən video yoxdursa və CONFIG-də statik video təyin edilibsə
         if (CONFIG.STATIC_VIDEO) {
             elements.aboutVideo.src = CONFIG.STATIC_VIDEO;
             elements.aboutVideo.load();
@@ -414,7 +399,6 @@
         }, { once: true });
     }
 
-    // Video üçün ümumi dinləyicilər
     if (elements.aboutVideo) {
         elements.aboutVideo.addEventListener('pause', function() {
             if (!document.hidden) forceVideoPlay();
@@ -469,7 +453,6 @@
             return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
         }
 
-        // URL-ləri HTTPS-ə çevirən köməkçi funksiya
         const ensureHttps = (url) => {
             if (!url) return null;
             return url.replace('http://', 'https://');
@@ -552,7 +535,6 @@
                 if (typeof forceVideoPlay === 'function') forceVideoPlay();
             }, { once: true });
         } else if (elements.aboutVideo) {
-            // Əgər dinamik video yoxdursa və CONFIG-də statik video varsa
             if (typeof loadStaticVideo === 'function') loadStaticVideo();
         }
         
@@ -567,33 +549,89 @@
             elements.whyTitle.textContent = content.whyTitle;
         }
         
-        // 2. Mətnin təkrarlanmaması üçün ağıllı bölmə
-        if (content.whyDescription) {
-            // Əvvəlcə yoxlayırıq: Admin paneldə Enter vurulubmu?
-            const parts = content.whyDescription.split('\n\n');
+        // 2. IMPROVED: Daha etibarlı mətn bölməsi
+        if (content.whyDescription && elements.whyDescription1 && elements.whyDescription2) {
             
-            if (parts.length > 1) {
-                // Əgər Enter vurulubsa, hissələrə ayır
-                if (elements.whyDescription1) elements.whyDescription1.innerHTML = parts[0];
-                if (elements.whyDescription2) elements.whyDescription2.innerHTML = parts[1];
+            console.log('🔍 Original whyDescription:', content.whyDescription);
+            
+            // Trim edirik ki, əlavə boşluqlar olmasın
+            const cleanText = content.whyDescription.trim();
+            
+            // Method 1: Double line break ilə yoxla (\n\n, \r\n\r\n və ya <br><br>)
+            let parts = cleanText.split(/\n\n+|\r\n\r\n+|<br\s*\/?>\s*<br\s*\/?>/gi);
+            
+            console.log('📊 Split method 1 (double breaks) - Parts:', parts.length);
+            
+            if (parts.length >= 2 && parts[0].length > 10 && parts[1].length > 10) {
+                // Əgər iki aydın bölmə varsa
+                console.log('✅ Using double-break split');
+                elements.whyDescription1.innerHTML = parts[0].trim().replace(/\n/g, '<br>');
+                elements.whyDescription2.innerHTML = parts[1].trim().replace(/\n/g, '<br>');
             } else {
-                // Əgər tək parça mətnidirsə, onu avtomatik ortadan böl
-                const fullText = content.whyDescription;
-                const midPoint = Math.floor(fullText.length / 2);
+                // Method 2: Single line break ilə yoxla
+                parts = cleanText.split(/\n+|\r\n+/);
                 
-                // Sözü ortadan kəsməmək üçün ən yaxın boşluğu tapırıq
-                let splitIndex = fullText.lastIndexOf(' ', midPoint);
-                if (splitIndex === -1) splitIndex = midPoint; // Boşluq tapılmasa məcbur ortadan böl
+                console.log('📊 Split method 2 (single breaks) - Parts:', parts.length);
                 
-                const firstHalf = fullText.substring(0, splitIndex);
-                const secondHalf = fullText.substring(splitIndex);
-
-                if (elements.whyDescription1) elements.whyDescription1.innerHTML = firstHalf;
-                if (elements.whyDescription2) elements.whyDescription2.innerHTML = secondHalf;
+                if (parts.length >= 2) {
+                    // Paraqrafları qruplara böl (ortadan yarıya böl)
+                    const midIndex = Math.ceil(parts.length / 2);
+                    const firstHalf = parts.slice(0, midIndex).join('<br>').trim();
+                    const secondHalf = parts.slice(midIndex).join('<br>').trim();
+                    
+                    console.log('✅ Using grouped split');
+                    elements.whyDescription1.innerHTML = firstHalf;
+                    elements.whyDescription2.innerHTML = secondHalf;
+                } else {
+                    // Method 3: Mətn çox uzundursa ortadan böl
+                    console.log('📊 Using character-based split');
+                    
+                    const totalLength = cleanText.length;
+                    
+                    // Əgər mətn 100 simvoldan azdırsa, tək sütunda göstər
+                    if (totalLength < 100) {
+                        console.log('⚠️ Text too short, showing in first column only');
+                        elements.whyDescription1.innerHTML = cleanText;
+                        elements.whyDescription2.innerHTML = '';
+                    } else {
+                        // Ortadan bölmək üçün uyğun nöqtəni tap
+                        const midPoint = Math.floor(totalLength / 2);
+                        
+                        // Nöqtə, vergül və ya boşluqdan sonrakı yerə bölmək cəhdi
+                        const breakChars = ['. ', '! ', '? ', ', ', '; ', ' '];
+                        let splitIndex = midPoint;
+                        
+                        for (const breakChar of breakChars) {
+                            const nearestBreak = cleanText.indexOf(breakChar, midPoint - 100);
+                            if (nearestBreak > midPoint - 100 && nearestBreak < midPoint + 100) {
+                                splitIndex = nearestBreak + breakChar.length;
+                                break;
+                            }
+                        }
+                        
+                        // Əgər heç bir break char tapılmazsa, ən yaxın boşluğu tap
+                        if (splitIndex === midPoint) {
+                            splitIndex = cleanText.lastIndexOf(' ', midPoint);
+                            if (splitIndex === -1 || splitIndex < midPoint - 100) {
+                                splitIndex = cleanText.indexOf(' ', midPoint);
+                            }
+                        }
+                        
+                        const firstHalf = cleanText.substring(0, splitIndex).trim();
+                        const secondHalf = cleanText.substring(splitIndex).trim();
+                        
+                        console.log('✅ Split at index:', splitIndex);
+                        console.log('📝 First half length:', firstHalf.length);
+                        console.log('📝 Second half length:', secondHalf.length);
+                        
+                        elements.whyDescription1.innerHTML = firstHalf.replace(/\n/g, '<br>');
+                        elements.whyDescription2.innerHTML = secondHalf.replace(/\n/g, '<br>');
+                    }
+                }
             }
         }
         
-        // 3. Media (Video/Şəkil) hissəsi (Olduğu kimi saxlayırıq)
+        // 3. Media (Video/Şəkil) hissəsi
         if (elements.whyMediaContainer && content.whyMediaUrl) {
             if (content.whyMediaType === 'video') {
                 elements.whyMediaContainer.innerHTML = `
@@ -601,7 +639,6 @@
                         <source src="${content.whyMediaUrl}" type="video/mp4">
                     </video>
                 `;
-                 // Videonu məcbur oxutmaq üçün
                 const video = elements.whyMediaContainer.querySelector('video');
                 if (video) {
                     video.play().catch(() => {
@@ -614,7 +651,6 @@
                 `;
             }
         } else if (elements.whyMediaContainer) {
-            // Media yoxdursa boş qutu göstər
             elements.whyMediaContainer.innerHTML = `<div class="placeholder-video-bg"></div>`;
         }
     }
@@ -622,7 +658,6 @@
     function populateTeamMembers(teamMembers) {
         if (!elements.teamGrid) return;
         
-        // Şəkillərin HTTPS olmasını təmin edirik
         const teamHTML = (teamMembers && teamMembers.length > 0) 
             ? teamMembers.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
                 .map(member => `
@@ -639,7 +674,6 @@
             : '<p>Loading team...</p>';
         
         elements.teamGrid.innerHTML = teamHTML;
-        // Animation logic (IntersectionObserver) stays same...
     }
 
     function showFallbackContent(lang = 'en') {
@@ -788,32 +822,26 @@
     }
 
     /* ============================================================
-   14. DYNAMIC CONTACT LOADER
-   ============================================================ */
+       14. DYNAMIC CONTACT LOADER
+       ============================================================ */
 
-function renderContactSection(data, lang) {
-    const addressField = document.getElementById('dynamic-address');
-    const emailField = document.getElementById('dynamic-email');
-    const phoneField = document.getElementById('dynamic-phone');
+    function renderContactSection(data, lang) {
+        const addressField = document.getElementById('dynamic-address');
+        const emailField = document.getElementById('dynamic-email');
+        const phoneField = document.getElementById('dynamic-phone');
 
-    // 1. Adresi dilə görə set et (Entity: address / addressAz)
-    if (addressField) {
-        addressField.innerText = lang === 'az' ? (data.addressAz || "") : (data.address || "");
+        if (addressField) {
+            addressField.innerText = lang === 'az' ? (data.addressAz || "") : (data.address || "");
+        }
+
+        if (emailField) {
+            emailField.innerText = data.email || "";
+            emailField.href = `mailto:${data.email}`;
+        }
+
+        if (phoneField) {
+            phoneField.innerText = data.phone || "";
+        }
     }
 
-    // 2. Email set et
-    if (emailField) {
-        emailField.innerText = data.email || "";
-        emailField.href = `mailto:${data.email}`;
-    }
-
-    // 3. Telefon set et
-    if (phoneField) {
-        phoneField.innerText = data.phone || "";
-    }
-    
-    // 4. Sosial linkləri set et (Əgər DB-dən gəlirsə)
-    // Məsələn: if(data.instagramUrl) document.getElementById('link-instagram').href = data.instagramUrl;
-}
-
-    })();
+})();

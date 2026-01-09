@@ -125,7 +125,7 @@ body.lang-az .mask-icon .icon-wrap i {
 
 .lang-selector {
     position: fixed;
-    top: 33px;
+    top: 37px;
     right: 175px;
     z-index: 30001;
     pointer-events: auto;
@@ -156,7 +156,6 @@ body.lang-az .mask-icon .icon-wrap i {
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Globe - ince xətlərlə çəkilmiş */
 .globe-icon::before {
     content: '';
     position: absolute;
@@ -167,7 +166,6 @@ body.lang-az .mask-icon .icon-wrap i {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Üfüqi xətt */
 .globe-icon::after {
     content: '';
     position: absolute;
@@ -175,11 +173,6 @@ body.lang-az .mask-icon .icon-wrap i {
     height: 1.5px;
     background: rgba(255, 255, 255, 0.6);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Şaquli ellips */
-.globe-icon i {
-    display: none;
 }
 
 .globe-icon .globe-ellipse {
@@ -373,7 +366,6 @@ body.lang-az .mask-icon .icon-wrap i {
 /* ============================================================
    7. HAMBURGER MENU BUTTON
    ============================================================ */
-
 .hamburger {
     position: fixed;
     top: 38px;
@@ -385,15 +377,13 @@ body.lang-az .mask-icon .icon-wrap i {
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 10px;
+    padding: 15px; /* About-dakı kimi genişləndirildi */
     width: auto;
     height: auto;
     pointer-events: auto;
 }
 
-.hamburger * {
-    pointer-events: none;
-}
+.hamburger * { pointer-events: none; }
 
 .hamburger-text {
     font-family: 'Gabarito', sans-serif;
@@ -404,6 +394,12 @@ body.lang-az .mask-icon .icon-wrap i {
     text-transform: uppercase;
     transition: color 0.3s ease;
     white-space: nowrap;
+}
+
+/* AZ dili üçün hamburger mətni qalınlığı */
+body.lang-az .hamburger-text {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 800 !important;
 }
 
 .hamburger-icon {
@@ -424,25 +420,12 @@ body.lang-az .mask-icon .icon-wrap i {
     transform-origin: center;
 }
 
-.hamburger-line:nth-child(1) {
-    width: 32px;
-}
+.hamburger-line:nth-child(1) { width: 32px; }
+.hamburger-line:nth-child(2) { width: 24px; }
 
-.hamburger-line:nth-child(2) {
-    width: 24px;
-}
+.hamburger:hover .hamburger-text { color: #FFA500; }
+.hamburger:hover .hamburger-line { width: 32px; background: #FFA500; }
 
-/* HOVER */
-.hamburger:hover .hamburger-text {
-    color: #FFA500;
-}
-
-.hamburger:hover .hamburger-line {
-    width: 32px;
-    background: #FFA500;
-}
-
-/* ACTIVE */
 .hamburger.active .hamburger-line:nth-child(1) {
     width: 32px;
     transform: translateY(5px) rotate(45deg);
@@ -453,18 +436,9 @@ body.lang-az .mask-icon .icon-wrap i {
     transform: translateY(-5px) rotate(-45deg);
 }
 
-.hamburger.active:hover .hamburger-text {
-    color: #FFA500;
-}
-
-.hamburger.active:hover .hamburger-line {
-    background: #FFA500;
-}
-
 /* ============================================================
-   8. MOBILE MENU OVERLAY
+   8. MOBILE MENU OVERLAY & CONTENT
    ============================================================ */
-
 .mobile-menu-overlay {
     position: fixed;
     top: 0;
@@ -485,8 +459,100 @@ body.lang-az .mask-icon .icon-wrap i {
     pointer-events: all;
 }
 
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 35%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 29999;
+    transition: right 1.1s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    padding: 0 20px;
+    visibility: hidden;
+    opacity: 0;
+    box-shadow: -10px 0 50px rgba(0,0,0,0.5);
+}
+
+.mobile-menu.active {
+    right: 0;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* NAV BUTTONS */
+.nav-btn {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    margin: -1vh 0;
+    line-height: 0.95;
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: 4.5vw;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    color: transparent;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(150px);
+    transition: opacity 0.8s ease, transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mobile-menu.active .nav-btn {
+    opacity: 1;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mobile-menu.active .nav-btn:nth-child(odd) { transform: translateX(-10px); }
+.mobile-menu.active .nav-btn:nth-child(even) { transform: translateX(10px); }
+
+/* ✅ AZ DİLİNDƏ QALIN VƏ MONTSERRAT STİLİ */
+body.lang-az .nav-btn {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important; /* Maksimum Bold */
+    font-size: 4.0vw !important;
+    letter-spacing: -2px !important;
+}
+
+.nav-text {
+    display: block;
+    color: #fff;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-btn::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #FFA500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-btn:hover .nav-text { transform: translateY(-100%) skewY(5deg); }
+.nav-btn:hover::after { transform: translateY(-100%) skewY(0deg); }
 /* ============================================================
-   9. MOBILE MENU
+   9. MOBILE MENU & NAV BUTTONS
    ============================================================ */
 
 .mobile-menu {
@@ -546,7 +612,6 @@ body.lang-az .mask-icon .icon-wrap i {
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
     clip-path: inset(0 0 0 0);
-    -webkit-clip-path: inset(0 0 0 0);
 }
 
 .mobile-menu.active .nav-btn {
@@ -555,13 +620,9 @@ body.lang-az .mask-icon .icon-wrap i {
                 transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.mobile-menu.active .nav-btn:nth-child(odd) {
-    transform: translateX(-10px);
-}
-
-.mobile-menu.active .nav-btn:nth-child(even) {
-    transform: translateX(10px);
-}
+/* Slide effekti (About səhifəsindəki kimi) */
+.mobile-menu.active .nav-btn:nth-child(odd) { transform: translateX(-10px); }
+.mobile-menu.active .nav-btn:nth-child(even) { transform: translateX(10px); }
 
 .mobile-menu.active .nav-btn:nth-child(1) { transition-delay: 0.3s; }
 .mobile-menu.active .nav-btn:nth-child(2) { transition-delay: 0.4s; }
@@ -570,12 +631,20 @@ body.lang-az .mask-icon .icon-wrap i {
 .mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
 .mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
 
+/* ✅ AZƏRBAYCAN DİLİ - BOLD & MONTSERRAT */
+body.lang-az .nav-btn {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important; /* Tam Bold */
+    font-size: 4.0vw !important; /* Yazıların sığması üçün optimallaşdırıldı */
+    letter-spacing: -2px !important;
+    margin: -0.5vh 0 !important;
+}
+
 .nav-text {
     display: block;
     color: #fff;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
     transform: translateZ(0);
     will-change: transform;
     position: relative;
@@ -595,7 +664,6 @@ body.lang-az .mask-icon .icon-wrap i {
     justify-content: center;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
     transform: translateZ(0);
     will-change: transform;
     z-index: 1;
@@ -603,30 +671,13 @@ body.lang-az .mask-icon .icon-wrap i {
     clip-path: inset(100% 0 0 0);
 }
 
-.nav-btn:hover .nav-text {
-    transform: translateY(-100%) skewY(5deg) translateZ(0);
-}
-
-.nav-btn:hover::after {
+.nav-btn:hover .nav-text { transform: translateY(-100%) skewY(5deg) translateZ(0); }
+.nav-btn:hover::after { 
     transform: translateY(-100%) skewY(0deg) translateZ(0);
     clip-path: inset(0 0 0 0);
 }
 
-.nav-btn:not(:hover) .nav-text {
-    transform: translateY(0) skewY(0deg) translateZ(0);
-}
-
-.nav-btn:not(:hover)::after {
-    transform: translateY(0) translateZ(0);
-    clip-path: inset(100% 0 0 0);
-}
-
-body.lang-az .nav-btn {
-    font-size: 3.2vw;
-    letter-spacing: 2px;
-    margin: -0.5vh 0;
-}
-
+/* MENU FOOTER & SOCIALS */
 .menu-footer {
     margin-top: 60px;
     text-align: center;
@@ -658,8 +709,11 @@ body.lang-az .nav-btn {
     letter-spacing: 1px;
 }
 
-.menu-socials a:hover {
-    color: #FFA500;
+/* AZ Dili Sosial & Kontakt Bold */
+body.lang-az .menu-socials a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
 }
 
 .menu-contact-info p {
@@ -670,18 +724,11 @@ body.lang-az .nav-btn {
     letter-spacing: 1px;
 }
 
-.menu-contact-info p,
-.menu-contact-info p a,
-.menu-contact-info a {
-    color: rgba(255,255,255,0.4) !important;
-    text-decoration: none !important;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.menu-contact-info p:visited,
-.menu-contact-info p a:visited,
-.menu-contact-info a:visited {
-    color: rgba(255,255,255,0.4) !important;
+body.lang-az .menu-contact-info p,
+body.lang-az .menu-contact-info a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
 }
 
 /* ============================================================
@@ -1852,16 +1899,35 @@ body.lang-az .category-btn {
         width: 100%;
     }
     
- .nav-btn {
+    .nav-btn {
         font-size: 13vw;
         margin: -5px 0;
     }
 
+    /* ✅ AZƏRBAYCAN DİLİ ÜÇÜN ÖZƏL MENYU TƏNZİMLƏMƏSİ */
     body.lang-az .nav-btn {
-        font-size: 9vw;
-        letter-spacing: 1px;
-        margin: -0.5vh 0;
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+        font-size: 10.5vw !important; /* Uzun sözlərin sığması üçün tənzimləndi */
+        letter-spacing: -1px !important;
+        margin: -0.5vh 0 !important;
+        line-height: 1.0 !important;
     }
+
+    body.lang-az .menu-socials a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        letter-spacing: 1px !important;
+    }
+
+    body.lang-az .menu-contact-info p, 
+    body.lang-az .menu-contact-info a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+    /* ---------------------------------------------- */
     
     .center-logo {
         top: 15px;
@@ -1963,60 +2029,13 @@ body.lang-az .category-btn {
         text-align: left;
     }
 
+    /* Modal & Player Controls */
     .modal-play-btn {
         width: 120px !important;
         height: 60px !important;
         top: 50% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
-    }
-
-    .preview-container.active .modal-play-btn,
-    .preview-container.is-paused .modal-play-btn {
-        transform: translate(-50%, -50%) !important;
-    }
-
-    .preview-container.user-inactive .modal-play-btn {
-        transform: translate(-50%, -50%) !important;
-    }
-
-    .play-button-container {
-        width: 120px !important;
-        height: 60px !important;
-    }
-
-    .play-button {
-        width: 55px;
-        height: 22px;
-    }
-
-    .play-button::before {
-        width: 85px;
-        height: 30px;
-    }
-
-    .play-button::after {
-        width: 110px;
-        height: 38px;
-    }
-
-    .play-text {
-        font-size: 8px;
-        letter-spacing: 0.5px;
-    }
-
-    .play-button-container:hover .play-button {
-        width: 58px;
-    }
-
-    .play-button-container:hover .play-button::before {
-        width: 88px;
-        height: 32px;
-    }
-
-    .play-button-container:hover .play-button::after {
-        width: 115px;
-        height: 40px;
     }
 
     .preview-info {
@@ -2039,10 +2058,6 @@ body.lang-az .category-btn {
         padding: 0 10px 20px 10px;
     }
 
-    .controls-buttons {
-        gap: 5px;
-    }
-
     .ctrl-btn i {
         font-size: 14px !important;
     }
@@ -2053,18 +2068,8 @@ body.lang-az .category-btn {
 
     .time-display {
         font-size: 9px;
-        margin-left: 3px;
-    }
-
-    .right-controls-group {
-        gap: 8px;
     }
 }
-/* ============================================================
-   WORKS PAGE - SCROLL HIDE/SHOW CSS ADDON  
-   Bu kodu mövcud works.css faylına əlavə et
-   (Globe Language Selector bölməsindən əvvəl)
-   ============================================================ */
 
 /* ============================================================
    LOGO POSİTİON DÜZƏLİŞİ - VACİB!
@@ -2213,3 +2218,5 @@ body.lang-az .cta-text-link:hover .cta-text::after {
 body.lang-az .cta-text-link:not(:hover) .cta-text::after {
     clip-path: inset(100% 0 0 0) !important;
 }
+
+
