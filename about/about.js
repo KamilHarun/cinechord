@@ -656,26 +656,39 @@
     }
 
     function populateTeamMembers(teamMembers) {
-        if (!elements.teamGrid) return;
-        
-        const teamHTML = (teamMembers && teamMembers.length > 0) 
-            ? teamMembers.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-                .map(member => `
-                    <div class="chew-card reveal-item">
-                        <div class="chew-img-box">
-                            <img src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://', 'https://')}" 
-                                 alt="${member.name}" loading="lazy">
-                        </div>
-                        <div class="member-name">${member.name || ''}</div>
-                        <div class="member-role">${member.role || ''}</div>
-                        <div class="member-bio">${member.bio || ''}</div>
+    if (!elements.teamGrid) return;
+    
+    const teamHTML = (teamMembers && teamMembers.length > 0) 
+        ? teamMembers.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+            .map(member => `
+                <div class="chew-card reveal-item">
+                    <div class="chew-img-box">
+                        <img src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://', 'https://')}" 
+                             alt="${member.name}" loading="lazy">
                     </div>
-                `).join('')
-            : '<p>Loading team...</p>';
-        
-        elements.teamGrid.innerHTML = teamHTML;
-    }
+                    <div class="member-name">${member.name || ''}</div>
+                    <div class="member-role">${member.role || ''}</div>
+                    <div class="member-bio">${member.bio || ''}</div>
+                </div>
+            `).join('')
+        : '<p>Loading team...</p>';
+    
+    elements.teamGrid.innerHTML = teamHTML;
 
+    // --- BU HİSSƏNİ ƏLAVƏ ET (XƏTA BURADADIR) ---
+    const newItems = elements.teamGrid.querySelectorAll('.reveal-item');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    newItems.forEach(item => observer.observe(item));
+    // --------------------------------------------
+}
     function showFallbackContent(lang = 'en') {
         const isAz = lang === 'az';
         const fallback = {
