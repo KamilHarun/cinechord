@@ -1530,24 +1530,139 @@ body.lang-az .nav-btn {
 } 
 
 /* =========================================
-   MOBILE FIX - FORCE VISIBILITY
+   MOBILE FIX - ABSOLUTE VISIBILITY
+   Bu hissəni about.css faylınızın SONUNA əlavə edin
    ========================================= */
+
+/* Mobil üçün BÜTÜNLƏYİCİ qaydalar */
 @media (max-width: 768px) {
-    /* Animasiyanı ləğv edir və elementləri məcbur göstərir */
+    
+    /* ✅ HƏR ŞEY GÖRÜNƏN OLSUN */
     .reveal-item, 
     .chew-card, 
-    .chew-team-grid .reveal-item {
+    .chew-team-grid .reveal-item,
+    .chew-team-grid .chew-card,
+    .mobile-ready,
+    .mobile-instant {
         opacity: 1 !important;
         visibility: visible !important;
         transform: none !important;
         filter: none !important;
         transition: none !important;
         animation: none !important;
+        display: block !important;
     }
 
-    /* Şəklin yerini qoruyur və dərhal göstərir */
+    /* Aktiv və məcburi görünən */
+    .reveal-item.active,
+    .chew-card.active,
+    .mobile-ready.active,
+    .mobile-instant,
+    .force-visible {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+    /* Şəkil konteynerləri */
     .chew-img-box {
         opacity: 1 !important;
+        visibility: visible !important;
         background: #111;
+        display: block !important;
+    }
+    
+    .chew-img-box img {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
+    
+    /* Team grid və content */
+    .chew-team-grid {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: grid !important;
+    }
+    
+    /* Member info */
+    .member-name,
+    .member-role {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
+    
+    /* Grid container özü */
+    #team-grid {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: grid !important;
+    }
+    
+    /* Loading state üçün minimum hündürlük */
+    .chew-team-grid:empty::before {
+        content: 'Loading team members...';
+        display: block;
+        text-align: center;
+        padding: 40px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Desktop üçün normal reveal animation */
+@media (min-width: 769px) {
+    .reveal-item {
+        opacity: 0;
+        transform: translateY(60px);
+        filter: blur(5px);
+        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-item.active {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+    
+    /* Desktop-da instant class effekt verməməlidir */
+    .mobile-instant {
+        opacity: 0;
+        transform: translateY(60px);
+        filter: blur(5px);
+    }
+    
+    .mobile-instant.active {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* =========================================
+   UNIVERSAL SAFEGUARD (Həm mobil, həm desktop)
+   ========================================= */
+
+/* Əgər JavaScript işləməsə belə, minimum vizibilite */
+.chew-card {
+    min-height: 200px; /* Boş görünməsin */
+}
+
+.chew-img-box {
+    background-color: #111; /* Loading state-də boş olmasın */
+}
+
+/* Grid strukturu həmişə saxlanılsın */
+.chew-team-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px 40px;
+}
+
+@media (max-width: 768px) {
+    .chew-team-grid {
+        grid-template-columns: 1fr !important;
+        gap: 30px !important;
     }
 }

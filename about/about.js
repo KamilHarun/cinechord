@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 9.1 - FIXED DUPLICATE TEXT ISSUE
+   Version: 10.0 - MOBILE TEAM LOADING FIXED
    ============================================================ */
 
 (function() {
@@ -10,9 +10,10 @@
        1. CONFIGURATION & CONSTANTS
        ============================================================ */
     
-  const getBackendUrl = () => {
+    const getBackendUrl = () => {
         return 'https://cinechord-admin-production.up.railway.app';
     };
+    
     const CONFIG = {
         BACKEND_URL: getBackendUrl(),
         ENDPOINTS: {
@@ -221,7 +222,7 @@
         }, CONFIG.LOGO_ENTRY_DELAY);
     }
 
-   /* ============================================================
+    /* ============================================================
        7. TRANSLATION SYSTEM (LOCALIZED)
        ============================================================ */
 
@@ -361,7 +362,7 @@
         });
     }
 
-   /* ============================================================
+    /* ============================================================
        9. VIDEO HANDLING (DYNAMIC VERSION)
        ============================================================ */
     
@@ -419,7 +420,7 @@
         });
     }
 
-   /* ============================================================
+    /* ============================================================
        10. DYNAMIC CONTENT LOADING (SECURE & DYNAMIC)
        ============================================================ */
     
@@ -431,6 +432,8 @@
             const langParam = lang === 'az' ? 'az' : 'en';
             const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
             
+            console.log('🌐 Loading data from:', url);
+            
             const response = await retryFetch(() => 
                 fetchWithTimeout(url, { method: 'GET' })
             );
@@ -438,16 +441,21 @@
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
             const apiData = await response.json();
+            console.log('✅ API Response:', apiData);
+            
             cachedApiData = apiData;
             processApiData(apiData, lang);
             
         } catch (error) {
-            console.error('API error:', error);
+            console.error('❌ API error:', error);
             if (cachedApiData) processApiData(cachedApiData, lang);
         }
     }
 
     function processApiData(data, lang = 'en') {
+        console.log('🔧 processApiData called');
+        console.log('📦 API data received:', data);
+        
         function formatText(text) {
             if (!text) return '';
             return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
@@ -479,10 +487,15 @@
             teamMembers: data.teamMembers || []
         };
         
+        console.log('👥 Team members in content:', content.teamMembers.length);
+        
         populateContent(content);
     }
 
     function populateContent(content) {
+        console.log('🎨 populateContent called');
+        console.log('👥 Team members to populate:', content.teamMembers?.length || 0);
+        
         const safeUpdate = (el, val, isHTML = false) => {
             if (el) {
                 if (isHTML) el.innerHTML = val;
@@ -540,64 +553,49 @@
         
         // 5. Why Section & Team
         populateWhySection(content);
-        populateTeamMembers(content.teamMembers);
+        
+        // CRITICAL: Ensure team members are populated
+        console.log('🚀 Calling populateTeamMembers with', content.teamMembers?.length || 0, 'members');
+        populateTeamMembers(content.teamMembers || []);
     }
 
     function populateWhySection(content) {
-        // 1. Başlıq varsa yazırıq
+        // 1. Başlıq
         if (elements.whyTitle) {
             elements.whyTitle.textContent = content.whyTitle;
         }
         
-        // 2. IMPROVED: Daha etibarlı mətn bölməsi
+        // 2. Description split
         if (content.whyDescription && elements.whyDescription1 && elements.whyDescription2) {
             
-            console.log('🔍 Original whyDescription:', content.whyDescription);
-            
-            // Trim edirik ki, əlavə boşluqlar olmasın
             const cleanText = content.whyDescription.trim();
             
-            // Method 1: Double line break ilə yoxla (\n\n, \r\n\r\n və ya <br><br>)
+            // Method 1: Double line break
             let parts = cleanText.split(/\n\n+|\r\n\r\n+|<br\s*\/?>\s*<br\s*\/?>/gi);
             
-            console.log('📊 Split method 1 (double breaks) - Parts:', parts.length);
-            
             if (parts.length >= 2 && parts[0].length > 10 && parts[1].length > 10) {
-                // Əgər iki aydın bölmə varsa
-                console.log('✅ Using double-break split');
                 elements.whyDescription1.innerHTML = parts[0].trim().replace(/\n/g, '<br>');
                 elements.whyDescription2.innerHTML = parts[1].trim().replace(/\n/g, '<br>');
             } else {
-                // Method 2: Single line break ilə yoxla
+                // Method 2: Single line break
                 parts = cleanText.split(/\n+|\r\n+/);
                 
-                console.log('📊 Split method 2 (single breaks) - Parts:', parts.length);
-                
                 if (parts.length >= 2) {
-                    // Paraqrafları qruplara böl (ortadan yarıya böl)
                     const midIndex = Math.ceil(parts.length / 2);
                     const firstHalf = parts.slice(0, midIndex).join('<br>').trim();
                     const secondHalf = parts.slice(midIndex).join('<br>').trim();
                     
-                    console.log('✅ Using grouped split');
                     elements.whyDescription1.innerHTML = firstHalf;
                     elements.whyDescription2.innerHTML = secondHalf;
                 } else {
-                    // Method 3: Mətn çox uzundursa ortadan böl
-                    console.log('📊 Using character-based split');
-                    
+                    // Method 3: Character-based split
                     const totalLength = cleanText.length;
                     
-                    // Əgər mətn 100 simvoldan azdırsa, tək sütunda göstər
                     if (totalLength < 100) {
-                        console.log('⚠️ Text too short, showing in first column only');
                         elements.whyDescription1.innerHTML = cleanText;
                         elements.whyDescription2.innerHTML = '';
                     } else {
-                        // Ortadan bölmək üçün uyğun nöqtəni tap
                         const midPoint = Math.floor(totalLength / 2);
-                        
-                        // Nöqtə, vergül və ya boşluqdan sonrakı yerə bölmək cəhdi
                         const breakChars = ['. ', '! ', '? ', ', ', '; ', ' '];
                         let splitIndex = midPoint;
                         
@@ -609,7 +607,6 @@
                             }
                         }
                         
-                        // Əgər heç bir break char tapılmazsa, ən yaxın boşluğu tap
                         if (splitIndex === midPoint) {
                             splitIndex = cleanText.lastIndexOf(' ', midPoint);
                             if (splitIndex === -1 || splitIndex < midPoint - 100) {
@@ -620,10 +617,6 @@
                         const firstHalf = cleanText.substring(0, splitIndex).trim();
                         const secondHalf = cleanText.substring(splitIndex).trim();
                         
-                        console.log('✅ Split at index:', splitIndex);
-                        console.log('📝 First half length:', firstHalf.length);
-                        console.log('📝 Second half length:', secondHalf.length);
-                        
                         elements.whyDescription1.innerHTML = firstHalf.replace(/\n/g, '<br>');
                         elements.whyDescription2.innerHTML = secondHalf.replace(/\n/g, '<br>');
                     }
@@ -631,7 +624,7 @@
             }
         }
         
-        // 3. Media (Video/Şəkil) hissəsi
+        // 3. Media (Video/Image)
         if (elements.whyMediaContainer && content.whyMediaUrl) {
             if (content.whyMediaType === 'video') {
                 elements.whyMediaContainer.innerHTML = `
@@ -655,49 +648,104 @@
         }
     }
 
- function populateTeamMembers(teamMembers) {
-    if (!elements.teamGrid) return;
+    function populateTeamMembers(teamMembers) {
+        console.log('🔍 populateTeamMembers called');
+        console.log('📊 Team members data:', teamMembers);
+        console.log('📍 Team grid element:', elements.teamGrid);
+        
+        if (!elements.teamGrid) {
+            console.error('❌ Team grid element NOT FOUND!');
+            return;
+        }
 
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        console.log('📱 Is mobile:', isMobile);
 
-    const teamHTML = (teamMembers && teamMembers.length)
-        ? teamMembers
+        if (!teamMembers || !teamMembers.length) {
+            console.warn('⚠️ No team members data available');
+            elements.teamGrid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">No team members available.</p>';
+            return;
+        }
+
+        console.log('✅ Creating HTML for', teamMembers.length, 'team members');
+
+        const teamHTML = teamMembers
             .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-            .map(member => {
-                // Mobildə dərhal 'active' klassı veririk ki, CSS-dəki opacity: 0 onu gizlətməsin
-                const animationClass = isMobile ? 'reveal-item active' : 'reveal-item';
+            .map((member, index) => {
+                console.log(`  - Member ${index + 1}:`, member.name, member.imageUrl);
+                
+                // Mobil üçün instant class
+                const cardClass = isMobile ? 'chew-card mobile-instant' : 'chew-card reveal-item';
                 
                 return `
-                <div class="chew-card ${animationClass}">
-                    <div class="chew-img-box">
-                        <img 
-                            src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://','https://')}" 
-                            alt="${member.name || ''}"
-                            loading="lazy"
-                        >
+                    <div class="${cardClass}" data-member="${member.name}">
+                        <div class="chew-img-box">
+                            <img 
+                                src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://', 'https://')}" 
+                                alt="${member.name || 'Team Member'}"
+                                loading="eager"
+                                onerror="console.error('Image load error:', this.src)"
+                            >
+                        </div>
+                        <div class="member-name">${member.name || ''}</div>
+                        <div class="member-role">${member.role || ''}</div>
                     </div>
-                    <div class="member-name">${member.name || ''}</div>
-                    <div class="member-role">${member.role || ''}</div>
-                </div>
-            `}).join('')
-        : '';
+                `;
+            }).join('');
 
-    elements.teamGrid.innerHTML = teamHTML;
+        console.log('📝 Generated HTML length:', teamHTML.length);
+        
+        // HTML-i daxil edirik
+        elements.teamGrid.innerHTML = teamHTML;
+        
+        console.log('✅ HTML inserted into team grid');
+        console.log('👥 Cards in DOM:', elements.teamGrid.querySelectorAll('.chew-card').length);
 
-    // Əgər mobildirsə, Observer-ə ehtiyac yoxdur
-    if (isMobile) return;
+        // Mobil üçün dərhal göstər
+        if (isMobile) {
+            console.log('📱 Mobile detected - activating cards immediately');
+            
+            const activateCards = () => {
+                const cards = elements.teamGrid.querySelectorAll('.chew-card');
+                console.log('🎯 Activating', cards.length, 'cards');
+                cards.forEach((card, idx) => {
+                    card.style.opacity = '1';
+                    card.style.visibility = 'visible';
+                    card.style.transform = 'none';
+                    card.classList.add('active', 'force-visible');
+                    console.log(`  ✓ Card ${idx + 1} activated:`, card.dataset.member);
+                });
+            };
 
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                observer.unobserve(entry.target); 
-            }
+            // Triple activation
+            activateCards();
+            setTimeout(activateCards, 50);
+            setTimeout(activateCards, 200);
+            
+            return;
+        }
+
+        // Desktop üçün IntersectionObserver
+        console.log('🖥️ Desktop detected - setting up IntersectionObserver');
+        
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    console.log('👁️ Card visible:', entry.target.dataset.member);
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { 
+            threshold: 0.1,
+            rootMargin: '100px'
         });
-    }, { threshold: 0.1 });
 
-    elements.teamGrid.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
-}
+        const cards = elements.teamGrid.querySelectorAll('.reveal-item');
+        console.log('👀 Observing', cards.length, 'cards');
+        cards.forEach(el => observer.observe(el));
+    }
+
     function showFallbackContent(lang = 'en') {
         const isAz = lang === 'az';
         const fallback = {
@@ -719,27 +767,27 @@
        ============================================================ */
     
     function initScrollLogic() {
-    const revealElements = document.querySelectorAll(
-        '.text-footer-block, .hero-block, .why-section *'
-    );
+        const revealElements = document.querySelectorAll(
+            '.text-footer-block, .hero-block, .why-section *'
+        );
 
-    if (!revealElements.length) return;
+        if (!revealElements.length) return;
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                setTimeout(() => {
-                    entry.target.classList.add('active');
-                }, index * 80);
-            }
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('active');
+                    }, index * 80);
+                }
+            });
+        }, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
         });
-    }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px'
-    });
 
-    revealElements.forEach(el => observer.observe(el));
-}
+        revealElements.forEach(el => observer.observe(el));
+    }
 
     /* ============================================================
        12. GLOBAL NAVIGATION LINKS
@@ -760,49 +808,9 @@
             });
         });
     }
-    
 
     /* ============================================================
-       13. INITIALIZATION
-       ============================================================ */
- async function init() {
-        const currentLang = localStorage.getItem('selectedLang') || 'en';
-        
-        await loadTranslations();
-        applyTranslations(currentLang);
-        
-        initPageTransition();
-        initLanguageSelector(); 
-        initMenuSystem();       
-        initLogoAnimation();
-        setupNavLinks(); // Nav linklərini quraşdırırıq
-        
-        // 1. Əvvəl datanı yükləyirik və HTML-in yaranmasını gözləyirik
-        await loadDynamicContent(currentLang);
-        
-        // 2. HTML tam hazır olduqdan sonra animasiya skriptini işə salırıq
-        initScrollLogic();      
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-/* ============================================================
-   MOBILE BACK / FORWARD CACHE FIX
-   ============================================================ */
-
-window.addEventListener('pageshow', (e) => {
-    if (e.persisted) {
-        document
-            .querySelectorAll('.reveal-item')
-            .forEach(el => el.classList.add('active'));
-    }
-});
-
-    /* ============================================================
-       14. DYNAMIC CONTACT LOADER
+       13. DYNAMIC CONTACT LOADER
        ============================================================ */
 
     function renderContactSection(data, lang) {
@@ -825,10 +833,110 @@ window.addEventListener('pageshow', (e) => {
     }
 
     /* ============================================================
-       15. SCROLL HIDE/SHOW ADDON (WORKS İLƏ EYNİ)
+       14. INITIALIZATION
+       ============================================================ */
+    
+    async function init() {
+        console.log('🚀 Initializing About page...');
+        
+        const currentLang = localStorage.getItem('selectedLang') || 'en';
+        console.log('🌍 Current language:', currentLang);
+        
+        await loadTranslations();
+        applyTranslations(currentLang);
+        
+        initPageTransition();
+        initLanguageSelector(); 
+        initMenuSystem();       
+        initLogoAnimation();
+        setupNavLinks();
+        
+        // DOM tam hazır olduğundan əmin oluruq
+        console.log('⏳ Waiting for DOM to be fully ready...');
+        await new Promise(resolve => {
+            if (document.readyState === 'complete') {
+                resolve();
+            } else {
+                window.addEventListener('load', resolve);
+            }
+        });
+        
+        console.log('✅ DOM ready, loading content...');
+        
+        // Verify team grid exists
+        console.log('🔍 Checking team grid element:', !!elements.teamGrid);
+        if (!elements.teamGrid) {
+            console.error('❌ CRITICAL: Team grid element not found in DOM!');
+        }
+        
+        // Data yüklə
+        await loadDynamicContent(currentLang);
+        
+        console.log('✅ Content loaded');
+        
+        // Mobil üçün əlavə təminat
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (isMobile) {
+            console.log('📱 Mobile device - forcing visibility');
+            setTimeout(() => {
+                document.querySelectorAll('.chew-card, .reveal-item').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.visibility = 'visible';
+                    el.style.transform = 'none';
+                    el.classList.add('active', 'force-visible');
+                });
+            }, 300);
+        } else {
+            initScrollLogic();
+        }
+        
+        console.log('✅ About page initialization complete!');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    /* ============================================================
+       15. MOBILE BACK/FORWARD CACHE FIX
        ============================================================ */
 
-    // Scroll Hide/Show Funksionallığı
+    window.addEventListener('pageshow', (e) => {
+        console.log('📄 pageshow event fired, persisted:', e.persisted);
+        
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        
+        if (e.persisted || isMobile) {
+            console.log('🔄 Forcing all elements to be visible');
+            
+            requestAnimationFrame(() => {
+                document.querySelectorAll('.reveal-item, .chew-card').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.visibility = 'visible';
+                    el.style.transform = 'none';
+                    el.classList.add('active', 'force-visible');
+                });
+                
+                // Team grid-ə xüsusi diqqət
+                if (elements.teamGrid) {
+                    elements.teamGrid.querySelectorAll('.chew-card').forEach(el => {
+                        el.style.opacity = '1';
+                        el.style.visibility = 'visible';
+                        el.style.transform = 'none';
+                        el.classList.add('active', 'force-visible');
+                    });
+                    console.log('✅ Team cards forced visible');
+                }
+            });
+        }
+    });
+
+    /* ============================================================
+       16. SCROLL HIDE/SHOW ADDON
+       ============================================================ */
+
     (function() {
         let lastScrollY = 0;
         let ticking = false;
@@ -864,7 +972,6 @@ window.addEventListener('pageshow', (e) => {
             }
         }
         
-        // Scroll event listener (performanslı)
         window.addEventListener('scroll', requestScrollTick, { passive: true });
         
         console.log('✅ About page - Scroll hide/show initialized!');
