@@ -1741,3 +1741,26 @@ body.lang-az .nav-btn {
         gap: 30px !important;
     }
 }
+@media (max-width: 768px) {
+    /* Komanda üzvləri konteynerini məcburi göstər */
+    #team-grid, .chew-team-grid {
+        display: grid !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* Kartları və daxilindəki mətnləri məcburi üzə çıxar */
+    .chew-card, .reveal-item, .member-bio, .member-name, .member-role {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+    }
+    
+    /* Şəkillərin yüklənməsi üçün */
+    .chew-img-box img {
+        opacity: 1 !important;
+        display: block !important;
+    }
+}
