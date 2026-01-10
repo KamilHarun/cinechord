@@ -18,7 +18,7 @@
         ENDPOINTS: {
             ABOUT: '/api/about'
         },
-        STATIC_VIDEO: '../videos/Showreel.mp4',
+        // STATIC_VIDEO: '../videos/Showreel.mp4',
         
         PAGE_LOAD_DELAY: 100,
         NAVIGATION_DELAY: 600,
@@ -28,7 +28,7 @@
         SCROLL_THROTTLE: 16,
         RETRY_ATTEMPTS: 2,
         RETRY_DELAY: 1000,
-        REQUEST_TIMEOUT: 10000
+        REQUEST_TIMEOUT: 30000
     };
 
     /* ============================================================
@@ -658,11 +658,17 @@
  function populateTeamMembers(teamMembers) {
     if (!elements.teamGrid) return;
 
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
     const teamHTML = (teamMembers && teamMembers.length)
         ? teamMembers
             .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-            .map(member => `
-                <div class="chew-card reveal-item">
+            .map(member => {
+                // Mobildə dərhal 'active' klassı veririk ki, CSS-dəki opacity: 0 onu gizlətməsin
+                const animationClass = isMobile ? 'reveal-item active' : 'reveal-item';
+                
+                return `
+                <div class="chew-card ${animationClass}">
                     <div class="chew-img-box">
                         <img 
                             src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://','https://')}" 
@@ -673,36 +679,24 @@
                     <div class="member-name">${member.name || ''}</div>
                     <div class="member-role">${member.role || ''}</div>
                 </div>
-            `).join('')
+            `}).join('')
         : '';
 
     elements.teamGrid.innerHTML = teamHTML;
 
-    /* ================= MOBILE FIX ================= */
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    // Əgər mobildirsə, Observer-ə ehtiyac yoxdur
+    if (isMobile) return;
 
-    if (isMobile) {
-        elements.teamGrid
-            .querySelectorAll('.reveal-item')
-            .forEach(el => el.classList.add('active'));
-        return;
-    }
-
-    /* ================= DESKTOP OBSERVER ================= */
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
+                observer.unobserve(entry.target); 
             }
         });
-    }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px'
-    });
+    }, { threshold: 0.1 });
 
-    elements.teamGrid
-        .querySelectorAll('.reveal-item')
-        .forEach(el => observer.observe(el));
+    elements.teamGrid.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
 }
     function showFallbackContent(lang = 'en') {
         const isAz = lang === 'az';
@@ -771,8 +765,7 @@
     /* ============================================================
        13. INITIALIZATION
        ============================================================ */
-    
-    async function init() {
+ async function init() {
         const currentLang = localStorage.getItem('selectedLang') || 'en';
         
         await loadTranslations();
@@ -782,10 +775,13 @@
         initLanguageSelector(); 
         initMenuSystem();       
         initLogoAnimation();
-        initScrollLogic();      
-        setupNavLinks();
+        setupNavLinks(); // Nav linklərini quraşdırırıq
         
+        // 1. Əvvəl datanı yükləyirik və HTML-in yaranmasını gözləyirik
         await loadDynamicContent(currentLang);
+        
+        // 2. HTML tam hazır olduqdan sonra animasiya skriptini işə salırıq
+        initScrollLogic();      
     }
 
     if (document.readyState === 'loading') {
