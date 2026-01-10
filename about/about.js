@@ -655,39 +655,54 @@
         }
     }
 
-    function populateTeamMembers(teamMembers) {
+ function populateTeamMembers(teamMembers) {
     if (!elements.teamGrid) return;
-    
-    const teamHTML = (teamMembers && teamMembers.length > 0) 
-        ? teamMembers.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+
+    const teamHTML = (teamMembers && teamMembers.length)
+        ? teamMembers
+            .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
             .map(member => `
                 <div class="chew-card reveal-item">
                     <div class="chew-img-box">
-                        <img src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://', 'https://')}" 
-                             alt="${member.name}" loading="lazy">
+                        <img 
+                            src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://','https://')}" 
+                            alt="${member.name || ''}"
+                            loading="lazy"
+                        >
                     </div>
                     <div class="member-name">${member.name || ''}</div>
                     <div class="member-role">${member.role || ''}</div>
-                    <div class="member-bio">${member.bio || ''}</div>
                 </div>
             `).join('')
-        : '<p>Loading team...</p>';
-    
+        : '';
+
     elements.teamGrid.innerHTML = teamHTML;
 
-    // --- BU HİSSƏNİ ƏLAVƏ ET (XƏTA BURADADIR) ---
-    const newItems = elements.teamGrid.querySelectorAll('.reveal-item');
-    const observer = new IntersectionObserver((entries) => {
+    /* ================= MOBILE FIX ================= */
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    if (isMobile) {
+        elements.teamGrid
+            .querySelectorAll('.reveal-item')
+            .forEach(el => el.classList.add('active'));
+        return;
+    }
+
+    /* ================= DESKTOP OBSERVER ================= */
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                observer.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+    });
 
-    newItems.forEach(item => observer.observe(item));
-    // --------------------------------------------
+    elements.teamGrid
+        .querySelectorAll('.reveal-item')
+        .forEach(el => observer.observe(el));
 }
     function showFallbackContent(lang = 'en') {
         const isAz = lang === 'az';
@@ -710,82 +725,27 @@
        ============================================================ */
     
     function initScrollLogic() {
-        const updateProgress = () => {
-            if (!elements.progressBarTop) return;
-            const target = elements.contentSection || document.documentElement;
-            const scrollTop = target.scrollTop || window.pageYOffset;
-            const scrollHeight = target.scrollHeight - target.clientHeight;
-            let scrolled = (scrollTop / scrollHeight) * 100;
-            elements.progressBarTop.style.width = Math.min(scrolled, 100) + '%';
-        };
+    const revealElements = document.querySelectorAll(
+        '.text-footer-block, .hero-block, .why-section *'
+    );
 
-        const revealElements = document.querySelectorAll('.reveal-item, .chew-card, .text-footer-block');
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.classList.add('active');
-                    }, index * 100); 
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.15,
-            rootMargin: '0px 0px -50px 0px'
+    if (!revealElements.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('active');
+                }, index * 80);
+            }
         });
+    }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+    });
 
-        revealElements.forEach(el => observer.observe(el));
-
-        const parallaxMedia = document.querySelectorAll('.side-video, .chew-img-box img');
-        
-        const applyParallax = () => {
-            const target = elements.contentSection || window;
-            const scrollY = target.scrollTop !== undefined ? target.scrollTop : window.scrollY;
-
-            parallaxMedia.forEach(media => {
-                const speed = 0.05;
-                const rect = media.getBoundingClientRect();
-                const visible = rect.top < window.innerHeight && rect.bottom > 0;
-                
-                if (visible) {
-                    const yPos = (window.innerHeight - rect.top) * speed;
-                    media.style.transform = `scale(1.1) translateY(${yPos}px)`;
-                }
-            });
-        };
-
-        let lastScrollY = 0;
-        let ticking = false;
-
-        function handleScroll() {
-            const target = elements.contentSection || window;
-            const currentScrollY = target.scrollTop !== undefined ? target.scrollTop : window.scrollY;
-
-            if (currentScrollY > 100 && currentScrollY > lastScrollY) {
-                if (elements.centerLogo) elements.centerLogo.classList.add('hide-on-scroll');
-                if (elements.hamburger) elements.hamburger.classList.add('hide-on-scroll');
-                if (elements.langSelector) elements.langSelector.classList.add('hide-on-scroll');
-            } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
-                if (elements.centerLogo) elements.centerLogo.classList.remove('hide-on-scroll');
-                if (elements.hamburger) elements.hamburger.classList.remove('hide-on-scroll');
-                if (elements.langSelector) elements.langSelector.classList.remove('hide-on-scroll');
-            }
-            
-            lastScrollY = currentScrollY;
-            updateProgress();
-            applyParallax(); 
-            ticking = false;
-        }
-
-        const scrollTarget = elements.contentSection || window;
-        scrollTarget.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(handleScroll);
-                ticking = true;
-            }
-        }, { passive: true });
-    }
+    revealElements.forEach(el => observer.observe(el));
+}
 
     /* ============================================================
        12. GLOBAL NAVIGATION LINKS
@@ -833,6 +793,17 @@
     } else {
         init();
     }
+/* ============================================================
+   MOBILE BACK / FORWARD CACHE FIX
+   ============================================================ */
+
+window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+        document
+            .querySelectorAll('.reveal-item')
+            .forEach(el => el.classList.add('active'));
+    }
+});
 
     /* ============================================================
        14. DYNAMIC CONTACT LOADER
