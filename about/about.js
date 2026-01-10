@@ -818,7 +818,7 @@
     }
 
 /* ============================================================
-   14. INITIALIZATION (THE REAL FIX)
+   14. INITIALIZATION (THE FINAL & SECURE FIX)
    ============================================================ */
 async function init() {
     console.log('🚀 Initializing About page...');
@@ -834,34 +834,34 @@ async function init() {
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-    // 1. Datanı GÖZLƏYİRİK (await mütləqdir)
+    // 1. Datanı GÖZLƏYİRİK (Bu mütləqdir)
     await loadDynamicContent(currentLang);
     
-    // 2. Data gəldikdən dərhal sonra elementləri tapıb aktiv edirik
-    // IntersectionObserver-i də burada işə salırıq ki, yeni gələn elementləri görsün
+    // 2. Data gəldikdən sonra müşahidəni başlat (yalnız desktopda)
     if (!isMobile) {
         initScrollLogic(); 
     }
 
-    // 3. QƏTİ SIĞORTA: Elementləri ekrana çıxarırıq (Datanın gəlməsindən SONRA)
+    // 3. QƏTİ SIĞORTA: Elementləri və Videonu ekrana çıxarırıq
     setTimeout(() => {
         console.log('⚡ Running final visibility check...');
-        const items = document.querySelectorAll('.reveal-item, .chew-card');
         
-        document.querySelectorAll('#main-title, .subtitle, .big-statement, .desc-text').forEach(el => {
-            el.classList.add('content-ready');
-        });
+        // Videonu məcburi başladırıq
+        const video = document.getElementById('about-video');
+        if (video) {
+            video.style.opacity = "1";
+            video.play().catch(() => console.log("Video auto-play blocked by browser"));
+        }
 
-        items.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            // Əgər mobildirsə və ya ekranda görünürsə - DƏRHAL AÇ
-            if (isMobile || rect.top < window.innerHeight) {
-                el.classList.add('active');
-                el.style.opacity = "1";
-                el.style.filter = "blur(0)";
-            }
+        // Bütün gizli blokları (Rauf, Fidan və s.) məcburi açırıq
+        document.querySelectorAll('.reveal-item, .chew-card, #main-title, .subtitle, .big-statement, .desc-text').forEach(el => {
+            el.classList.add('active', 'content-ready');
+            el.style.opacity = "1";
+            el.style.visibility = "visible";
+            el.style.filter = "none";
+            el.style.transform = "none";
         });
-    }, 300); // Artıq 300ms bəs edir, çünki yuxarıda await etmişik
+    }, 800); // 800ms server gecikməsi üçün ideal vaxtdır
 
     console.log('✅ About page fully initialized!');
 }

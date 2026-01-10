@@ -973,23 +973,24 @@ body.lang-az .menu-contact-info a {
 }
 
 /* =========================================
-   12. SCROLL REVEAL (STABLE VERSION)
+   12. SCROLL REVEAL (THE FINAL FIX)
    ========================================= */
 .reveal-item, .chew-card {
     opacity: 0;
     transform: translateY(30px);
-    filter: blur(10px); /* Blur buradadır */
-    transition: all 0.8s ease-out;
+    filter: blur(0) !important; /* DUMANI KÖKÜNDƏN SİLDİK */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-/* Aktiv olanda blur-u mütləq silirik */
+/* Aktiv olanda mütləq göstər */
 .reveal-item.active, .chew-card.active {
     opacity: 1 !important;
+    visibility: visible !important;
     transform: translateY(0) !important;
-    filter: blur(0) !important; /* BU SƏTRİN OLDUĞUNDAN ƏMİN OL */
+    filter: blur(0) !important;
 }
 
-/* Mobildə animasiyanı tam söndürürük ki, qaranlıq qalmasın */
+/* Mobildə heç bir animasiya gözləmə, dərhal aç */
 @media (max-width: 768px) {
     .reveal-item, .chew-card, .mobile-instant {
         opacity: 1 !important;
