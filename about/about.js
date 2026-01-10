@@ -818,17 +818,14 @@
     }
 
 /* ============================================================
-   14. INITIALIZATION (STABLE & FINAL VERSION)
+   14. INITIALIZATION (THE REAL FIX)
    ============================================================ */
 async function init() {
     console.log('🚀 Initializing About page...');
-    
     const currentLang = localStorage.getItem('selectedLang') || 'en';
     
-    // 1. Dil və Tərcümə
     await loadTranslations();
     applyTranslations(currentLang);
-    
     initPageTransition();
     initLanguageSelector(); 
     initMenuSystem();       
@@ -837,42 +834,36 @@ async function init() {
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-    // 2. Desktopda animasiya müşahidəsini başlat
+    // 1. Datanı GÖZLƏYİRİK (await mütləqdir)
+    await loadDynamicContent(currentLang);
+    
+    // 2. Data gəldikdən dərhal sonra elementləri tapıb aktiv edirik
+    // IntersectionObserver-i də burada işə salırıq ki, yeni gələn elementləri görsün
     if (!isMobile) {
         initScrollLogic(); 
     }
 
-    // 3. Datanı yükləyirik (showFallbackContent JS-də silinib, ancaq catch-dadır)
-    await loadDynamicContent(currentLang);
-    
-    // 4. QƏTİ SIĞORTA: Elementləri ekrana çıxarırıq
+    // 3. QƏTİ SIĞORTA: Elementləri ekrana çıxarırıq (Datanın gəlməsindən SONRA)
     setTimeout(() => {
+        console.log('⚡ Running final visibility check...');
         const items = document.querySelectorAll('.reveal-item, .chew-card');
         
-        // Elementlərə "content-ready" klassı veririk (titrəməni bitirir)
         document.querySelectorAll('#main-title, .subtitle, .big-statement, .desc-text').forEach(el => {
             el.classList.add('content-ready');
         });
 
-        if (isMobile) {
-            // Mobildə hər şeyi dərhal göstər
-            items.forEach(el => {
+        items.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            // Əgər mobildirsə və ya ekranda görünürsə - DƏRHAL AÇ
+            if (isMobile || rect.top < window.innerHeight) {
                 el.classList.add('active');
                 el.style.opacity = "1";
-                el.style.transform = "none";
-            });
-        } else {
-            // Desktopda ekranda olanları dərhal aç, olmayanları skrolla saxla
-            items.forEach(el => {
-                const rect = el.getBoundingClientRect();
-                if (rect.top < window.innerHeight) {
-                    el.classList.add('active');
-                }
-            });
-        }
-    }, 500);
+                el.style.filter = "blur(0)";
+            }
+        });
+    }, 300); // Artıq 300ms bəs edir, çünki yuxarıda await etmişik
 
-    console.log('✅ About page initialization complete!');
+    console.log('✅ About page fully initialized!');
 }
 
 /* ============================================================
