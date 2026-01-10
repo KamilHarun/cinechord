@@ -766,28 +766,37 @@
        11. SCROLL LOGIC
        ============================================================ */
     
-    function initScrollLogic() {
-        const revealElements = document.querySelectorAll(
-            '.text-footer-block, .hero-block, .why-section *'
-        );
-
-        if (!revealElements.length) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.classList.add('active');
-                    }, index * 80);
-                }
-            });
-        }, {
-            threshold: 0.15,
-            rootMargin: '0px 0px -50px 0px'
+  function initScrollLogic() {
+    // 1. Mövcud statik elementləri tapırıq
+    const staticElements = document.querySelectorAll('.text-footer-block, .hero-block, .why-section *');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
         });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-        revealElements.forEach(el => observer.observe(el));
+    staticElements.forEach(el => observer.observe(el));
+
+    // 2. Dinamik gələn Team Members üçün (MÜTLƏQDİR)
+    const teamObserver = new MutationObserver((mutations) => {
+        const teamItems = document.querySelectorAll('#team-grid .reveal-item, #team-grid .mobile-instant');
+        teamItems.forEach(item => {
+            if (!item.dataset.observed) {
+                observer.observe(item);
+                item.dataset.observed = "true";
+            }
+        });
+    });
+
+    const teamGrid = document.getElementById('team-grid');
+    if (teamGrid) {
+        teamObserver.observe(teamGrid, { childList: true });
     }
+}
 
     /* ============================================================
        12. GLOBAL NAVIGATION LINKS
@@ -832,139 +841,105 @@
         }
     }
 
-    /* ============================================================
-       14. INITIALIZATION
-       ============================================================ */
-    
-   /* ============================================================
-   COMPLETE FIX - Replace entire init section (from line ~1100)
+  /* ============================================================
+   14. INITIALIZATION (FINAL STABLE VERSION)
    ============================================================ */
 
 async function init() {
     console.log('🚀 Initializing About page...');
-    console.log('📍 Document ready state:', document.readyState);
     
+    // 1. Dil sazlamaları
     const currentLang = localStorage.getItem('selectedLang') || 'en';
     console.log('🌍 Current language:', currentLang);
     
     await loadTranslations();
     applyTranslations(currentLang);
     
+    // 2. Vizual sistemlərin ilkin sazlanması
     initPageTransition();
     initLanguageSelector(); 
     initMenuSystem();       
     initLogoAnimation();
     setupNavLinks();
-    
-    // CRITICAL: DOM-un tam hazır olmasını gözlə
-    console.log('⏳ Waiting for DOM to be fully ready...');
-    
-    // Method 1: window.load event
+
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    // 3. DESKTOP ÜÇÜN: Animasiya müşahidəçisini datadan ƏVVAL işə salırıq
+    // Bu, MutationObserver-in yeni gələn datanı dərhal tutması üçün MÜTLƏQDİR.
+    if (!isMobile) {
+        console.log('🖥️ Desktop device - Setting up scroll monitor...');
+        initScrollLogic(); 
+    }
+
+    // 4. DOM-un tam hazır olmasını gözləyirik
     if (document.readyState !== 'complete') {
         await new Promise(resolve => {
             window.addEventListener('load', resolve, { once: true });
         });
     }
-    
-    // Method 2: Small delay to ensure everything is painted
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    console.log('✅ DOM ready, loading content...');
-    
-    // Verify critical elements
-    console.log('🔍 Checking critical elements:');
-    console.log('  - Team grid:', !!elements.teamGrid);
-    console.log('  - Main title:', !!elements.mainTitle);
-    console.log('  - Why section:', !!elements.whyTitle);
-    
-    if (!elements.teamGrid) {
-        console.error('❌ CRITICAL: Team grid element not found!');
-        console.log('🔧 Attempting to re-query team grid...');
-        elements.teamGrid = document.getElementById('team-grid');
-        console.log('  - Re-query result:', !!elements.teamGrid);
-    }
-    
-    // Load content
+
+    // 5. ƏN VACİB: Datanı yükləyirik
+    console.log('⏳ Loading dynamic content...');
     await loadDynamicContent(currentLang);
     
-    console.log('✅ Content loaded, applying mobile fixes...');
-    
-    // Mobile-specific fixes
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    // 6. MOBİL ÜÇÜN: Məcburi görünürlük fiksasiyası
     if (isMobile) {
-        console.log('📱 Mobile device detected - applying instant visibility');
+        console.log('📱 Mobile device detected - Applying instant visibility fixes');
         
-        // Triple check with delays
         const applyMobileFixes = () => {
-            console.log('🔧 Applying mobile visibility fixes...');
+            // Həm reveal-item, həm də card-ları tapırıq
+            const items = document.querySelectorAll('.chew-card, .reveal-item, .mobile-instant');
             
-            document.querySelectorAll('.chew-card, .reveal-item').forEach((el, idx) => {
+            items.forEach((el) => {
                 el.style.opacity = '1';
                 el.style.visibility = 'visible';
                 el.style.transform = 'none';
                 el.style.filter = 'none';
                 el.classList.add('active', 'force-visible');
-                
-                if (idx < 5) console.log(`  ✓ Fixed element ${idx + 1}:`, el.className);
             });
             
-            // Extra check for team grid
+            // Team grid-in özünü də yoxlayırıq
             if (elements.teamGrid) {
-                const cards = elements.teamGrid.querySelectorAll('.chew-card');
-                console.log(`  👥 Team cards found: ${cards.length}`);
-                cards.forEach((card, idx) => {
-                    card.style.opacity = '1';
-                    card.style.visibility = 'visible';
-                    card.style.transform = 'none';
-                    card.classList.add('active', 'force-visible');
-                });
+                elements.teamGrid.style.opacity = '1';
+                elements.teamGrid.style.visibility = 'visible';
             }
         };
-        
-        // Apply immediately
+
+        // Triple-check: Datanın gəlmə sürətinə görə 3 dəfə yoxlayırıq
         applyMobileFixes();
-        
-        // Apply again after 100ms
-        setTimeout(applyMobileFixes, 100);
-        
-        // Apply again after 300ms
-        setTimeout(applyMobileFixes, 300);
-        
-        // Apply again after 500ms (final check)
-        setTimeout(applyMobileFixes, 500);
-    } else {
-        console.log('🖥️ Desktop device - using scroll logic');
-        initScrollLogic();
+        setTimeout(applyMobileFixes, 150);
+        setTimeout(applyMobileFixes, 400);
+        setTimeout(applyMobileFixes, 800); // Server geciksə belə ən sonda açacaq
     }
-    
+
     console.log('✅ About page initialization complete!');
 }
 
-// CRITICAL: Run on BOTH DOMContentLoaded AND load events
+/* ============================================================
+   15. EXECUTION & BACK-BUTTON FIX
+   ============================================================ */
+
+// Skripti dərhal və ya DOM hazır olanda başladırıq
 if (document.readyState === 'loading') {
-    console.log('📄 Document still loading, waiting for DOMContentLoaded...');
     document.addEventListener('DOMContentLoaded', init);
 } else {
-    console.log('📄 Document already loaded, running init immediately...');
     init();
 }
 
-// ADDITIONAL: Ensure init runs on window load too
-window.addEventListener('load', () => {
-    console.log('🔄 Window load event fired');
+// Brauzerdə geri (Back) düyməsi basılanda datanın itməməsi üçün sığorta
+window.addEventListener('pageshow', (e) => {
+    console.log('📄 pageshow event fired, persisted:', e.persisted);
     
-    // If mobile, force visibility again
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (isMobile) {
-        console.log('📱 Re-applying mobile fixes on window load...');
-        setTimeout(() => {
-            document.querySelectorAll('.chew-card, .reveal-item').forEach(el => {
-                el.style.opacity = '1';
-                el.style.visibility = 'visible';
-                el.style.transform = 'none';
-                el.classList.add('active', 'force-visible');
-            });
-        }, 100);
+    if (e.persisted) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        
+        if (isMobile) {
+            // Mobildə keşdən gəlibsə səhifəni təzələmək ən təhlükəsiz yoldur
+            window.location.reload();
+        } else {
+            // Desktop-da sadəcə animasiya müşahidəçilərini təzədən quraşdırırıq
+            init();
+        }
     }
 });
 

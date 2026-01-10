@@ -6,6 +6,16 @@
 /* =========================================
    1. GLOBAL & RESET
    ========================================= */
+.loading-content {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* Məlumat gələndə üzərinə çıxacaq klass */
+.content-ready {
+    opacity: 1 !important;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -1614,7 +1624,7 @@ body.lang-az .nav-btn {
 /* Desktop üçün normal reveal animation */
 @media (min-width: 769px) {
     .reveal-item {
-        opacity: 0;
+        opacity: 1;
         transform: translateY(60px);
         filter: blur(5px);
         transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
