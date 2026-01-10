@@ -426,31 +426,24 @@
     
     let cachedApiData = null;
 
-    async function loadDynamicContent(lang = 'en') {
-        showFallbackContent(lang); 
-        try {
-            const langParam = lang === 'az' ? 'az' : 'en';
-            const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
-            
-            console.log('🌐 Loading data from:', url);
-            
-            const response = await retryFetch(() => 
-                fetchWithTimeout(url, { method: 'GET' })
-            );
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const apiData = await response.json();
-            console.log('✅ API Response:', apiData);
-            
-            cachedApiData = apiData;
-            processApiData(apiData, lang);
-            
-        } catch (error) {
-            console.error('❌ API error:', error);
-            if (cachedApiData) processApiData(cachedApiData, lang);
-        }
+   async function loadDynamicContent(lang = 'en') {
+    // BURADAN SİLDİK! (Titrəməni yaradan budur)
+    try {
+        const langParam = lang === 'az' ? 'az' : 'en';
+        const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
+        
+        const response = await retryFetch(() => 
+            fetchWithTimeout(url, { method: 'GET' })
+        );
+        
+        const apiData = await response.json();
+        processApiData(apiData, lang);
+        
+    } catch (error) {
+        console.error('❌ API error:', error);
+        showFallbackContent(lang); // Yalnız xəta olanda köhnə sözləri göstər
     }
+}
 
     function processApiData(data, lang = 'en') {
         console.log('🔧 processApiData called');
@@ -669,29 +662,21 @@
 
         console.log('✅ Creating HTML for', teamMembers.length, 'team members');
 
-        const teamHTML = teamMembers
-            .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-            .map((member, index) => {
-                console.log(`  - Member ${index + 1}:`, member.name, member.imageUrl);
-                
-                // Mobil üçün instant class
-                const cardClass = isMobile ? 'chew-card mobile-instant' : 'chew-card reveal-item';
-                
-                return `
-                    <div class="${cardClass}" data-member="${member.name}">
-                        <div class="chew-img-box">
-                            <img 
-                                src="${(member.imageUrl || 'assets/images/default-avatar.jpg').replace('http://', 'https://')}" 
-                                alt="${member.name || 'Team Member'}"
-                                loading="eager"
-                                onerror="console.error('Image load error:', this.src)"
-                            >
-                        </div>
-                        <div class="member-name">${member.name || ''}</div>
-                        <div class="member-role">${member.role || ''}</div>
+      const teamHTML = teamMembers
+        .map((member, index) => {
+            // Əgər mobildirsə və ya localda gecikirsə, başdan 'active' klassı verə bilərsən
+            const cardClass = isMobile ? 'chew-card active' : 'chew-card reveal-item';
+            
+            return `
+                <div class="${cardClass}" data-member="${member.name}">
+                    <div class="chew-img-box">
+                        <img src="${(member.imageUrl || '').replace('http://', 'https://')}" alt="${member.name}">
                     </div>
-                `;
-            }).join('');
+                    <div class="member-name">${member.name}</div>
+                    <div class="member-role">${member.role}</div>
+                </div>
+            `;
+        }).join('');
 
         console.log('📝 Generated HTML length:', teamHTML.length);
         
@@ -767,35 +752,26 @@
        ============================================================ */
     
   function initScrollLogic() {
-    // 1. Mövcud statik elementləri tapırıq
-    const staticElements = document.querySelectorAll('.text-footer-block, .hero-block, .why-section *');
-    
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
+                // Element görünən kimi 'active' klassını veririk
                 entry.target.classList.add('active');
+                
+                // Məcburi: Əgər blur hələ də getmirsə, inline olaraq silirik
+                entry.target.style.filter = "blur(0)";
+                entry.target.style.opacity = "1";
+                
                 observer.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-    staticElements.forEach(el => observer.observe(el));
-
-    // 2. Dinamik gələn Team Members üçün (MÜTLƏQDİR)
-    const teamObserver = new MutationObserver((mutations) => {
-        const teamItems = document.querySelectorAll('#team-grid .reveal-item, #team-grid .mobile-instant');
-        teamItems.forEach(item => {
-            if (!item.dataset.observed) {
-                observer.observe(item);
-                item.dataset.observed = "true";
-            }
-        });
+    }, { 
+        threshold: 0.1, // Elementin 10%-i görünən kimi animasiya başlasın
+        rootMargin: '0px 0px -50px 0px' 
     });
 
-    const teamGrid = document.getElementById('team-grid');
-    if (teamGrid) {
-        teamObserver.observe(teamGrid, { childList: true });
-    }
+    // Statik və dinamik gələn bütün elementləri müşahidə et
+    document.querySelectorAll('.reveal-item, .chew-card').forEach(el => observer.observe(el));
 }
 
     /* ============================================================
@@ -841,21 +817,18 @@
         }
     }
 
-  /* ============================================================
-   14. INITIALIZATION (FINAL STABLE VERSION)
+/* ============================================================
+   14. INITIALIZATION (STABLE & FINAL VERSION)
    ============================================================ */
-
 async function init() {
     console.log('🚀 Initializing About page...');
     
-    // 1. Dil sazlamaları
     const currentLang = localStorage.getItem('selectedLang') || 'en';
-    console.log('🌍 Current language:', currentLang);
     
+    // 1. Dil və Tərcümə
     await loadTranslations();
     applyTranslations(currentLang);
     
-    // 2. Vizual sistemlərin ilkin sazlanması
     initPageTransition();
     initLanguageSelector(); 
     initMenuSystem();       
@@ -864,145 +837,61 @@ async function init() {
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-    // 3. DESKTOP ÜÇÜN: Animasiya müşahidəçisini datadan ƏVVAL işə salırıq
-    // Bu, MutationObserver-in yeni gələn datanı dərhal tutması üçün MÜTLƏQDİR.
+    // 2. Desktopda animasiya müşahidəsini başlat
     if (!isMobile) {
-        console.log('🖥️ Desktop device - Setting up scroll monitor...');
         initScrollLogic(); 
     }
 
-    // 4. DOM-un tam hazır olmasını gözləyirik
-    if (document.readyState !== 'complete') {
-        await new Promise(resolve => {
-            window.addEventListener('load', resolve, { once: true });
-        });
-    }
-
-    // 5. ƏN VACİB: Datanı yükləyirik
-    console.log('⏳ Loading dynamic content...');
+    // 3. Datanı yükləyirik (showFallbackContent JS-də silinib, ancaq catch-dadır)
     await loadDynamicContent(currentLang);
     
-    // 6. MOBİL ÜÇÜN: Məcburi görünürlük fiksasiyası
-    if (isMobile) {
-        console.log('📱 Mobile device detected - Applying instant visibility fixes');
+    // 4. QƏTİ SIĞORTA: Elementləri ekrana çıxarırıq
+    setTimeout(() => {
+        const items = document.querySelectorAll('.reveal-item, .chew-card');
         
-        const applyMobileFixes = () => {
-            // Həm reveal-item, həm də card-ları tapırıq
-            const items = document.querySelectorAll('.chew-card, .reveal-item, .mobile-instant');
-            
-            items.forEach((el) => {
-                el.style.opacity = '1';
-                el.style.visibility = 'visible';
-                el.style.transform = 'none';
-                el.style.filter = 'none';
-                el.classList.add('active', 'force-visible');
-            });
-            
-            // Team grid-in özünü də yoxlayırıq
-            if (elements.teamGrid) {
-                elements.teamGrid.style.opacity = '1';
-                elements.teamGrid.style.visibility = 'visible';
-            }
-        };
+        // Elementlərə "content-ready" klassı veririk (titrəməni bitirir)
+        document.querySelectorAll('#main-title, .subtitle, .big-statement, .desc-text').forEach(el => {
+            el.classList.add('content-ready');
+        });
 
-        // Triple-check: Datanın gəlmə sürətinə görə 3 dəfə yoxlayırıq
-        applyMobileFixes();
-        setTimeout(applyMobileFixes, 150);
-        setTimeout(applyMobileFixes, 400);
-        setTimeout(applyMobileFixes, 800); // Server geciksə belə ən sonda açacaq
-    }
+        if (isMobile) {
+            // Mobildə hər şeyi dərhal göstər
+            items.forEach(el => {
+                el.classList.add('active');
+                el.style.opacity = "1";
+                el.style.transform = "none";
+            });
+        } else {
+            // Desktopda ekranda olanları dərhal aç, olmayanları skrolla saxla
+            items.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight) {
+                    el.classList.add('active');
+                }
+            });
+        }
+    }, 500);
 
     console.log('✅ About page initialization complete!');
 }
 
 /* ============================================================
-   15. EXECUTION & BACK-BUTTON FIX
+   15. EXECUTION & PERSISTENCE
    ============================================================ */
 
-// Skripti dərhal və ya DOM hazır olanda başladırıq
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
 }
 
-// Brauzerdə geri (Back) düyməsi basılanda datanın itməməsi üçün sığorta
-window.addEventListener('pageshow', (e) => {
-    console.log('📄 pageshow event fired, persisted:', e.persisted);
-    
-    if (e.persisted) {
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        
-        if (isMobile) {
-            // Mobildə keşdən gəlibsə səhifəni təzələmək ən təhlükəsiz yoldur
-            window.location.reload();
-        } else {
-            // Desktop-da sadəcə animasiya müşahidəçilərini təzədən quraşdırırıq
-            init();
-        }
+// Geri qayıdanda datanın itməməsi üçün tək bir sığorta
+window.onpageshow = function(event) {
+    if (event.persisted) {
+        // Keşdən gələndə səhifəni təzələyib təmiz data çəkirik
+        window.location.reload();
     }
-});
-
-/* ============================================================
-   ENHANCED pageshow event - for back/forward navigation
-   ============================================================ */
-
-window.addEventListener('pageshow', (e) => {
-    console.log('📄 pageshow event fired');
-    console.log('  - persisted (from cache):', e.persisted);
-    console.log('  - document ready state:', document.readyState);
-    
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    
-    // If page is from cache OR mobile device
-    if (e.persisted || isMobile) {
-        console.log('🔄 Page from cache or mobile - forcing visibility');
-        
-        // Force immediate visibility
-        requestAnimationFrame(() => {
-            document.querySelectorAll('.reveal-item, .chew-card').forEach((el, idx) => {
-                el.style.opacity = '1';
-                el.style.visibility = 'visible';
-                el.style.transform = 'none';
-                el.style.filter = 'none';
-                el.classList.add('active', 'force-visible');
-            });
-            
-            // Special attention to team grid
-            const teamGrid = document.getElementById('team-grid');
-            if (teamGrid) {
-                console.log('👥 Forcing team grid visibility...');
-                const cards = teamGrid.querySelectorAll('.chew-card');
-                console.log(`  - Found ${cards.length} team cards`);
-                
-                cards.forEach((card, idx) => {
-                    card.style.opacity = '1';
-                    card.style.visibility = 'visible';
-                    card.style.transform = 'none';
-                    card.classList.add('active', 'force-visible');
-                    
-                    if (idx < 3) console.log(`  ✓ Card ${idx + 1} forced visible`);
-                });
-            } else {
-                console.error('❌ Team grid not found in pageshow event!');
-            }
-        });
-        
-        // Double-check after delay
-        setTimeout(() => {
-            console.log('🔄 Double-checking visibility after 200ms...');
-            document.querySelectorAll('.chew-card').forEach(el => {
-                if (el.style.opacity !== '1') {
-                    console.warn('⚠️ Found hidden card, fixing:', el);
-                    el.style.opacity = '1';
-                    el.style.visibility = 'visible';
-                    el.style.transform = 'none';
-                }
-            });
-        }, 200);
-    }
-});
-
+};
     /* ============================================================
        16. SCROLL HIDE/SHOW ADDON
        ============================================================ */

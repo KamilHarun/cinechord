@@ -973,19 +973,31 @@ body.lang-az .menu-contact-info a {
 }
 
 /* =========================================
-   12. SCROLL REVEAL ANIMATION
+   12. SCROLL REVEAL (STABLE VERSION)
    ========================================= */
-.reveal-item {
+.reveal-item, .chew-card {
     opacity: 0;
-    transform: translateY(60px);
-    filter: blur(5px);
-    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(30px);
+    filter: blur(10px); /* Blur buradadır */
+    transition: all 0.8s ease-out;
 }
 
-.reveal-item.active {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
+/* Aktiv olanda blur-u mütləq silirik */
+.reveal-item.active, .chew-card.active {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    filter: blur(0) !important; /* BU SƏTRİN OLDUĞUNDAN ƏMİN OL */
+}
+
+/* Mobildə animasiyanı tam söndürürük ki, qaranlıq qalmasın */
+@media (max-width: 768px) {
+    .reveal-item, .chew-card, .mobile-instant {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+    }
 }
 
 /* =========================================
