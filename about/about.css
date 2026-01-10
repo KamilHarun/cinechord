@@ -1528,4 +1528,29 @@ body.lang-az .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 900 !important;
     }
+
+    /* =========================================
+   OPERA & MOBILE FIX - FORCE VISIBILITY
+   (Bunu kodların ƏN SONUNA ayrıca yapışdır)
+   ========================================= */
+
+@media (max-width: 768px) {
+    /* Animasiyanı ləğv edir və elementləri məcbur göstərir */
+    .reveal-item, 
+    .chew-card, 
+    .chew-team-grid .reveal-item {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+        animation: none !important;
+    }
+
+    /* Şəklin yerini qoruyur və dərhal göstərir */
+    .chew-img-box {
+        opacity: 1 !important;
+        background: #111;
+    }
+}
 }
