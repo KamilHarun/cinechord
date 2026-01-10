@@ -1011,6 +1011,54 @@ body::before {
 }
 
 /* ===============================================
+   TOGGLE SWITCH STYLING (MODAL)
+   =============================================== */
+
+/* Toggle-ı biraz böyüdək ki, rahat basılsın */
+.custom-switch .form-check-input {
+    width: 3em;      /* Eni */
+    height: 1.5em;   /* Hündürlüyü */
+    cursor: pointer;
+    background-color: #2a2a2a; /* Sönülü rəng (boz) */
+    border-color: #444;
+    transition: background-color 0.3s ease;
+}
+
+.custom-switch .form-check-label {
+    padding-left: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    user-select: none;
+}
+
+/* 1. FEATURED (SEÇİLMİŞ) - SARI */
+#wFeatured:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+}
+
+/* 2. ACTIVE (AKTİV) - YAŞIL */
+#wActive:checked {
+    background-color: #198754;
+    border-color: #198754;
+    box-shadow: 0 0 10px rgba(25, 135, 84, 0.4);
+}
+
+/* 3. GALLERY (QALEREYA) - MAVİ */
+#wShowInGallery:checked {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+    box-shadow: 0 0 10px rgba(13, 202, 240, 0.4);
+}
+
+/* Hover effektləri */
+.custom-switch:hover .form-check-input {
+    filter: brightness(1.2);
+}
+
+/* ===============================================
    SERVICES GRID - COMPACT
    =============================================== */
 

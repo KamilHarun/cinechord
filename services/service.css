@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - Service Page Stylesheet
-   Version: 3.2 - SERVICE TITLE ORANGE + ICON ANIMATION
+   Version: 3.3 - AZ LANGUAGE MENU SAME AS INDEX
    ========================================= */
 
 /* =========================================
@@ -400,6 +400,12 @@ body.lang-az .lang-check i {
     white-space: nowrap;
 }
 
+/* AZ dili üçün hamburger mətni qalınlığı */
+body.lang-az .hamburger-text {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 800 !important;
+}
+
 .hamburger-icon {
     display: flex;
     flex-direction: column;
@@ -618,10 +624,13 @@ body.modal-open .hamburger {
     clip-path: inset(100% 0 0 0);
 }
 
+/* ✅ AZƏRBAYCAN DİLİ - DESKTOP MENU (INDEX İLƏ EYNİ) */
 body.lang-az .nav-btn {
-    font-size: 3.2vw;
-    letter-spacing: 2px;
-    margin: -0.5vh 0;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important;      /* Index ilə eyni */
+    font-size: 4.0vw !important;      /* Index ilə eyni */
+    letter-spacing: -2px !important;  /* Index ilə eyni */
+    margin: -0.5vh 0 !important;
 }
 
 .menu-footer {
@@ -659,12 +668,26 @@ body.lang-az .nav-btn {
     color: #FFA500;
 }
 
+/* ✅ AZ Dili Sosial & Kontakt Bold (INDEX İLƏ EYNİ) */
+body.lang-az .menu-socials a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+}
+
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
     font-size: 13px;
     color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
+}
+
+body.lang-az .menu-contact-info p,
+body.lang-az .menu-contact-info a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
 }
 
 .menu-contact-info p,
@@ -1268,7 +1291,7 @@ body.lang-az .mask-link span::after {
 }
 
 /* ============================================================
-   17. RESPONSIVE - MOBILE (768px)
+   17. RESPONSIVE - MOBILE (768px) - INDEX İLƏ EYNİ
    ============================================================ */
 
 @media (max-width: 768px) {
@@ -1357,18 +1380,57 @@ body.lang-az .mask-link span::after {
     
     .mobile-menu {
         width: 100%;
+        background-color: #000 !important;
     }
     
+    /* İNGİLİS DİLİ (Standart) */
     .nav-btn {
-        font-size: 13vw;
-        margin: -5px 0;
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 13vw !important;
+        margin: 0.01vh 0 !important;
+        line-height: 1.0 !important;
+        display: block !important;
+        overflow: visible !important;
+        color: #fff !important;
+    }
+    
+    /* ✅ AZƏRBAYCAN DİLİ - MOBİL MENU (INDEX İLƏ TAM EYNİ) */
+    body.lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;              /* Index ilə eyni */
+        text-shadow: 1px 0 0 #fff !important;    /* Index ilə eyni - QALINLIQ */
+        font-size: 10.5vw !important;             /* Index ilə eyni */
+        line-height: 1.0 !important;    
+        margin: 0.01vh 0 !important;              /* Index ilə eyni - ÇOX SIX */
+        letter-spacing: -2px !important;          /* Index ilə eyni */
+        width: 100% !important;
         display: block !important;
     }
     
-  body.lang-az .nav-btn {
-        font-size: 9vw;
-        letter-spacing: 1px;
-        margin: -0.5vh 0;
+    /* Menyu açılarkən sürüşmə effekti (INDEX İLƏ EYNİ) */
+    body.lang-az .mobile-menu.active .nav-btn:nth-child(odd) { 
+        transform: translateX(-5px) !important; 
+    }
+    body.lang-az .mobile-menu.active .nav-btn:nth-child(even) { 
+        transform: translateX(5px) !important; 
+    }
+
+    /* ✅ SOSİAL BÖLMƏ (INDEX İLƏ EYNİ - SABİTLƏNMİŞ) */
+    body.lang-az .menu-socials a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;      
+        letter-spacing: 0.5px !important; 
+        transform: none !important;
+    }
+
+    body.lang-az .menu-contact-info p, 
+    body.lang-az .menu-contact-info a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;      
+        letter-spacing: 0.5px !important; 
+        transform: none !important;
     }
 
     body.lang-az .hero-rolling-text,
@@ -1541,12 +1603,6 @@ body {
     white-space: normal;
     word-wrap: break-word;
 }
-
-/* ============================================================
-   WORKS PAGE - SCROLL HIDE/SHOW CSS ADDON  
-   Bu kodu mövcud works.css faylına əlavə et
-   (Globe Language Selector bölməsindən əvvəl)
-   ============================================================ */
 
 /* ============================================================
    SCROLL HIDE/SHOW ANIMATION

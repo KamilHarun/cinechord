@@ -1392,6 +1392,54 @@ body.lang-az .menu-contact-info a {
         letter-spacing: 1px !important;    
     }
 
+    /* ===============================
+   MEET US / KOMANDA - MOBILE
+   =============================== */
+.chew-team-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important; /* tək sütun */
+    gap: 30px !important; /* üzvlər arası boşluq */
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+.team-member {
+    display: flex !important;
+    flex-direction: column !important; /* şəkil üst, text alt */
+    align-items: center !important;
+    text-align: center !important;
+    gap: 15px !important; /* şəkil və mətn arası */
+    width: 100% !important;
+}
+
+.team-member .chew-img-box {
+    width: 80% !important; /* mobil üçün biraz kiçildilmiş şəkil */
+    max-width: 250px !important; /* limit */
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
+    border-radius: 50% !important; /* istəsən dairəvi */
+}
+
+.team-member .chew-img-box img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* şəkil qutuya sığsın */
+    display: block !important;
+}
+
+.team-member .member-name {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+}
+
+.team-member .member-position {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #ccc !important;
+}
+
+
     body.lang-az .menu-contact-info p, 
     body.lang-az .menu-contact-info a {
         font-family: 'Montserrat', sans-serif !important;

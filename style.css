@@ -1568,7 +1568,7 @@ body.lang-az .play-text {
 @media (max-width: 768px) {
     /* --- 1. HEADER DÜYMƏLƏRİ (SƏNİN KODUNDAKI KOORDİNATLAR - TOXUNULMADI) --- */
     .lang-selector {
-        top: 24px !important;
+        top: 20px !important;
         right: 125px !important;
         left: auto !important;
         z-index: 30001;
@@ -1618,30 +1618,29 @@ body.lang-az .play-text {
         background-color: #000 !important;
     }
     
-    /* İNGİLİS DİLİ (Standart) */
-    .nav-btn {
-        font-family: 'Montserrat', sans-serif !important;
-        font-size: 13vw !important;
-        margin: -1vh 0 !important;
-        line-height: 1.0 !important;
-        display: block !important;
-        overflow: visible !important;
-        color: #fff !important;
-    }
+   /* İNGİLİS DİLİ (Standart) */
+.nav-btn {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 13vw !important;
+    margin: 0.01vh 0 !important;   /* daha sıx */
+    line-height: 1.0 !important;
+    display: block !important;
+    overflow: visible !important;
+    color: #fff !important;
+}
 
-    /* AZƏRBAYCAN DİLİ - EFFEKTİN İŞLƏMƏSİ ÜÇÜN DÜZƏLİŞLƏR */
-    body.lang-az .nav-btn {
-        font-family: 'Montserrat', sans-serif !important;
-        font-weight: 900 !important;      
-        text-shadow: 1px 0 0 #fff;        
-        font-size: 10.5vw !important;     
-        line-height: 1.0 !important;    
-        margin: -0.5vh 0 !important;    
-        letter-spacing: -2px !important; 
-        width: 100% !important;
-        display: block !important;
-        /* Transform: none silindi ki, açılış animasiyası işləsin */
-    }
+/* AZƏRBAYCAN DİLİ - EFFEKTİN İŞLƏMƏSİ ÜÇÜN DÜZƏLİŞLƏR */
+body.lang-az .nav-btn {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important;      
+    text-shadow: 1px 0 0 #fff;        
+    font-size: 10.5vw !important;     
+    line-height: 1.0 !important;    
+    margin: 0.01vh 0 !important;       /* daha sıx */
+    letter-spacing: -2px !important; 
+    width: 100% !important;
+    display: block !important;
+}
     
     /* Menyu açılarkən sürüşmə effekti (İngilis dili ilə eyni) */
     body.lang-az .mobile-menu.active .nav-btn:nth-child(odd) { 
