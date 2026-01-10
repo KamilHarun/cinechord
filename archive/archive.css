@@ -1478,7 +1478,7 @@ body.lang-az .menu-contact-info a {
    ========================================= */
 @media (max-width: 768px) {
     .lang-selector {
-        top: 35px !important;
+        top: 29px !important;
         right: 125px !important;
         left: auto !important;
         z-index: 30001;
@@ -1522,7 +1522,7 @@ body.lang-az .menu-contact-info a {
     }
     
     .hamburger {
-        top: 35px;
+        top: 23px;
         right: 20px;
         gap: 12px;
         padding: 8px;
@@ -1569,25 +1569,27 @@ body.lang-az .menu-contact-info a {
     .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 13vw !important;
-        margin: 0.01vh 0 !important;
+        margin: -0.3vh 0 !important;      
         line-height: 1.0 !important;
         display: block !important;
         overflow: visible !important;
         color: #fff !important;
     }
     
-    /* ✅ AZƏRBAYCAN DİLİ - MOBİL MENU (INDEX İLƏ TAM EYNİ) */
-    body.lang-az .nav-btn {
-        font-family: 'Montserrat', sans-serif !important;
-        font-weight: 900 !important;              /* Index ilə eyni */
-        text-shadow: 1px 0 0 #fff !important;    /* Index ilə eyni - QALINLIQ */
-        font-size: 10.5vw !important;             /* Index ilə eyni */
-        line-height: 1.0 !important;    
-        margin: 0.01vh 0 !important;              /* Index ilə eyni - ÇOX SIX */
-        letter-spacing: -2px !important;          /* Index ilə eyni */
-        width: 100% !important;
-        display: block !important;
-    }
+    /* ✅ AZƏRBAYCAN DİLİ - İ HƏRFİ PROBLEMSIZ + SIX MARGIN */
+body.lang-az .nav-btn {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important;
+    text-shadow: 1px 0 0 #fff !important;
+    font-size: 10.5vw !important;
+    line-height: 1.2 !important;              /* 1.3-dən 1.2-yə endirdim */
+    margin: -0.3vh 0 !important;              /* Daha sıx (0.01vh-dən sıx) */
+    letter-spacing: -2px !important;
+    width: 100% !important;
+    display: block !important;
+    overflow: visible !important;             /* İ hərfi üçün */
+    /* padding-lər silindi */
+}
     
     /* Menyu açılarkən sürüşmə effekti (INDEX İLƏ EYNİ) */
     body.lang-az .mobile-menu.active .nav-btn:nth-child(odd) { 
@@ -1595,6 +1597,35 @@ body.lang-az .menu-contact-info a {
     }
     body.lang-az .mobile-menu.active .nav-btn:nth-child(even) { 
         transform: translateX(5px) !important; 
+    }
+
+      /* ✅ SOSİAL BÖLMƏ (INDEX İLƏ EYNİ - SABİTLƏNMİŞ) */
+    body.lang-az .menu-socials a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;      
+        letter-spacing: 0.5px !important; 
+        transform: none !important;
+    }
+
+    /* ✅ KONTAKT BÖLMƏ - XƏTT OLMADAN */
+    body.lang-az .menu-contact-info p, 
+    body.lang-az .menu-contact-info a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;      
+        letter-spacing: 0.5px !important; 
+        transform: none !important;
+    }
+    
+    /* ✅ EMAIL VƏ TELEFON - XƏTT SİLİNDİ */
+    .menu-contact-info p,
+    .menu-contact-info p a,
+    .menu-contact-info a {
+        color: rgba(255,255,255,0.4) !important;
+        text-decoration: none !important;
+        border-bottom: none !important;           /* Alt xətt yox */
+        -webkit-tap-highlight-color: transparent;
     }
     
     .center-logo {

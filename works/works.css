@@ -1813,7 +1813,7 @@ body.lang-az .category-btn {
    ========================================= */
 @media (max-width: 768px) {
     .lang-selector {
-        top: 35px !important;
+        top: 30px !important;
         right: 125px !important;
         left: auto !important;
         z-index: 30001;
@@ -1857,7 +1857,7 @@ body.lang-az .category-btn {
     }
     
     .hamburger {
-        top: 33px;
+        top: 27px;
         right: 20px;
         gap: 12px;
         padding: 8px;
@@ -1899,20 +1899,31 @@ body.lang-az .category-btn {
         width: 100%;
     }
     
+   /* İNGİLİS DİLİ (Standart) */
     .nav-btn {
-        font-size: 13vw;
-        margin: -5px 0;
-    }
-
-    /* ✅ AZƏRBAYCAN DİLİ ÜÇÜN ÖZƏL MENYU TƏNZİMLƏMƏSİ */
-    body.lang-az .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
-        font-weight: 900 !important;
-        font-size: 10.5vw !important; /* Uzun sözlərin sığması üçün tənzimləndi */
-        letter-spacing: -1px !important;
-        margin: -0.5vh 0 !important;
+        font-size: 13vw !important;
+        margin: -0.3vh 0 !important;      
         line-height: 1.0 !important;
+        display: block !important;
+        overflow: visible !important;
+        color: #fff !important;
     }
+    
+    /* ✅ AZƏRBAYCAN DİLİ - İ HƏRFİ PROBLEMSIZ + SIX MARGIN */
+body.lang-az .nav-btn {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important;
+    text-shadow: 1px 0 0 #fff !important;
+    font-size: 10.5vw !important;
+    line-height: 1.2 !important;              /* 1.3-dən 1.2-yə endirdim */
+    margin: -0.3vh 0 !important;              /* Daha sıx (0.01vh-dən sıx) */
+    letter-spacing: -2px !important;
+    width: 100% !important;
+    display: block !important;
+    overflow: visible !important;             /* İ hərfi üçün */
+    /* padding-lər silindi */
+}
 
     body.lang-az .menu-socials a {
         font-family: 'Montserrat', sans-serif !important;
@@ -1926,6 +1937,16 @@ body.lang-az .category-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 12px !important;
         font-weight: 700 !important;
+    }
+
+     /* ✅ EMAIL VƏ TELEFON - XƏTT SİLİNDİ */
+    .menu-contact-info p,
+    .menu-contact-info p a,
+    .menu-contact-info a {
+        color: rgba(255,255,255,0.4) !important;
+        text-decoration: none !important;
+        border-bottom: none !important;           /* Alt xətt yox */
+        -webkit-tap-highlight-color: transparent;
     }
     /* ---------------------------------------------- */
     
