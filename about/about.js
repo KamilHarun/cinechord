@@ -836,102 +836,197 @@
        14. INITIALIZATION
        ============================================================ */
     
-    async function init() {
-        console.log('🚀 Initializing About page...');
-        
-        const currentLang = localStorage.getItem('selectedLang') || 'en';
-        console.log('🌍 Current language:', currentLang);
-        
-        await loadTranslations();
-        applyTranslations(currentLang);
-        
-        initPageTransition();
-        initLanguageSelector(); 
-        initMenuSystem();       
-        initLogoAnimation();
-        setupNavLinks();
-        
-        // DOM tam hazır olduğundan əmin oluruq
-        console.log('⏳ Waiting for DOM to be fully ready...');
+   /* ============================================================
+   COMPLETE FIX - Replace entire init section (from line ~1100)
+   ============================================================ */
+
+async function init() {
+    console.log('🚀 Initializing About page...');
+    console.log('📍 Document ready state:', document.readyState);
+    
+    const currentLang = localStorage.getItem('selectedLang') || 'en';
+    console.log('🌍 Current language:', currentLang);
+    
+    await loadTranslations();
+    applyTranslations(currentLang);
+    
+    initPageTransition();
+    initLanguageSelector(); 
+    initMenuSystem();       
+    initLogoAnimation();
+    setupNavLinks();
+    
+    // CRITICAL: DOM-un tam hazır olmasını gözlə
+    console.log('⏳ Waiting for DOM to be fully ready...');
+    
+    // Method 1: window.load event
+    if (document.readyState !== 'complete') {
         await new Promise(resolve => {
-            if (document.readyState === 'complete') {
-                resolve();
+            window.addEventListener('load', resolve, { once: true });
+        });
+    }
+    
+    // Method 2: Small delay to ensure everything is painted
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    console.log('✅ DOM ready, loading content...');
+    
+    // Verify critical elements
+    console.log('🔍 Checking critical elements:');
+    console.log('  - Team grid:', !!elements.teamGrid);
+    console.log('  - Main title:', !!elements.mainTitle);
+    console.log('  - Why section:', !!elements.whyTitle);
+    
+    if (!elements.teamGrid) {
+        console.error('❌ CRITICAL: Team grid element not found!');
+        console.log('🔧 Attempting to re-query team grid...');
+        elements.teamGrid = document.getElementById('team-grid');
+        console.log('  - Re-query result:', !!elements.teamGrid);
+    }
+    
+    // Load content
+    await loadDynamicContent(currentLang);
+    
+    console.log('✅ Content loaded, applying mobile fixes...');
+    
+    // Mobile-specific fixes
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) {
+        console.log('📱 Mobile device detected - applying instant visibility');
+        
+        // Triple check with delays
+        const applyMobileFixes = () => {
+            console.log('🔧 Applying mobile visibility fixes...');
+            
+            document.querySelectorAll('.chew-card, .reveal-item').forEach((el, idx) => {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.transform = 'none';
+                el.style.filter = 'none';
+                el.classList.add('active', 'force-visible');
+                
+                if (idx < 5) console.log(`  ✓ Fixed element ${idx + 1}:`, el.className);
+            });
+            
+            // Extra check for team grid
+            if (elements.teamGrid) {
+                const cards = elements.teamGrid.querySelectorAll('.chew-card');
+                console.log(`  👥 Team cards found: ${cards.length}`);
+                cards.forEach((card, idx) => {
+                    card.style.opacity = '1';
+                    card.style.visibility = 'visible';
+                    card.style.transform = 'none';
+                    card.classList.add('active', 'force-visible');
+                });
+            }
+        };
+        
+        // Apply immediately
+        applyMobileFixes();
+        
+        // Apply again after 100ms
+        setTimeout(applyMobileFixes, 100);
+        
+        // Apply again after 300ms
+        setTimeout(applyMobileFixes, 300);
+        
+        // Apply again after 500ms (final check)
+        setTimeout(applyMobileFixes, 500);
+    } else {
+        console.log('🖥️ Desktop device - using scroll logic');
+        initScrollLogic();
+    }
+    
+    console.log('✅ About page initialization complete!');
+}
+
+// CRITICAL: Run on BOTH DOMContentLoaded AND load events
+if (document.readyState === 'loading') {
+    console.log('📄 Document still loading, waiting for DOMContentLoaded...');
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    console.log('📄 Document already loaded, running init immediately...');
+    init();
+}
+
+// ADDITIONAL: Ensure init runs on window load too
+window.addEventListener('load', () => {
+    console.log('🔄 Window load event fired');
+    
+    // If mobile, force visibility again
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) {
+        console.log('📱 Re-applying mobile fixes on window load...');
+        setTimeout(() => {
+            document.querySelectorAll('.chew-card, .reveal-item').forEach(el => {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.transform = 'none';
+                el.classList.add('active', 'force-visible');
+            });
+        }, 100);
+    }
+});
+
+/* ============================================================
+   ENHANCED pageshow event - for back/forward navigation
+   ============================================================ */
+
+window.addEventListener('pageshow', (e) => {
+    console.log('📄 pageshow event fired');
+    console.log('  - persisted (from cache):', e.persisted);
+    console.log('  - document ready state:', document.readyState);
+    
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    
+    // If page is from cache OR mobile device
+    if (e.persisted || isMobile) {
+        console.log('🔄 Page from cache or mobile - forcing visibility');
+        
+        // Force immediate visibility
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.reveal-item, .chew-card').forEach((el, idx) => {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.transform = 'none';
+                el.style.filter = 'none';
+                el.classList.add('active', 'force-visible');
+            });
+            
+            // Special attention to team grid
+            const teamGrid = document.getElementById('team-grid');
+            if (teamGrid) {
+                console.log('👥 Forcing team grid visibility...');
+                const cards = teamGrid.querySelectorAll('.chew-card');
+                console.log(`  - Found ${cards.length} team cards`);
+                
+                cards.forEach((card, idx) => {
+                    card.style.opacity = '1';
+                    card.style.visibility = 'visible';
+                    card.style.transform = 'none';
+                    card.classList.add('active', 'force-visible');
+                    
+                    if (idx < 3) console.log(`  ✓ Card ${idx + 1} forced visible`);
+                });
             } else {
-                window.addEventListener('load', resolve);
+                console.error('❌ Team grid not found in pageshow event!');
             }
         });
         
-        console.log('✅ DOM ready, loading content...');
-        
-        // Verify team grid exists
-        console.log('🔍 Checking team grid element:', !!elements.teamGrid);
-        if (!elements.teamGrid) {
-            console.error('❌ CRITICAL: Team grid element not found in DOM!');
-        }
-        
-        // Data yüklə
-        await loadDynamicContent(currentLang);
-        
-        console.log('✅ Content loaded');
-        
-        // Mobil üçün əlavə təminat
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        if (isMobile) {
-            console.log('📱 Mobile device - forcing visibility');
-            setTimeout(() => {
-                document.querySelectorAll('.chew-card, .reveal-item').forEach(el => {
+        // Double-check after delay
+        setTimeout(() => {
+            console.log('🔄 Double-checking visibility after 200ms...');
+            document.querySelectorAll('.chew-card').forEach(el => {
+                if (el.style.opacity !== '1') {
+                    console.warn('⚠️ Found hidden card, fixing:', el);
                     el.style.opacity = '1';
                     el.style.visibility = 'visible';
                     el.style.transform = 'none';
-                    el.classList.add('active', 'force-visible');
-                });
-            }, 300);
-        } else {
-            initScrollLogic();
-        }
-        
-        console.log('✅ About page initialization complete!');
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-
-    /* ============================================================
-       15. MOBILE BACK/FORWARD CACHE FIX
-       ============================================================ */
-
-    window.addEventListener('pageshow', (e) => {
-        console.log('📄 pageshow event fired, persisted:', e.persisted);
-        
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        
-        if (e.persisted || isMobile) {
-            console.log('🔄 Forcing all elements to be visible');
-            
-            requestAnimationFrame(() => {
-                document.querySelectorAll('.reveal-item, .chew-card').forEach(el => {
-                    el.style.opacity = '1';
-                    el.style.visibility = 'visible';
-                    el.style.transform = 'none';
-                    el.classList.add('active', 'force-visible');
-                });
-                
-                // Team grid-ə xüsusi diqqət
-                if (elements.teamGrid) {
-                    elements.teamGrid.querySelectorAll('.chew-card').forEach(el => {
-                        el.style.opacity = '1';
-                        el.style.visibility = 'visible';
-                        el.style.transform = 'none';
-                        el.classList.add('active', 'force-visible');
-                    });
-                    console.log('✅ Team cards forced visible');
                 }
             });
-        }
-    });
+        }, 200);
+    }
+});
 
     /* ============================================================
        16. SCROLL HIDE/SHOW ADDON
