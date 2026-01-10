@@ -641,112 +641,73 @@
         }
     }
 
-    function populateTeamMembers(teamMembers) {
-        console.log('🔍 populateTeamMembers called');
-        console.log('📊 Team members data:', teamMembers);
-        console.log('📍 Team grid element:', elements.teamGrid);
-        
-        if (!elements.teamGrid) {
-            console.error('❌ Team grid element NOT FOUND!');
-            return;
-        }
+function populateTeamMembers(teamMembers) {
+    console.log('🔍 populateTeamMembers called');
+    
+    if (!elements.teamGrid) {
+        console.error('❌ Team grid element NOT FOUND!');
+        return;
+    }
 
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        console.log('📱 Is mobile:', isMobile);
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const currentLang = localStorage.getItem('selectedLang') || 'en';
 
-        if (!teamMembers || !teamMembers.length) {
-            console.warn('⚠️ No team members data available');
-            elements.teamGrid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">No team members available.</p>';
-            return;
-        }
+    if (!teamMembers || !teamMembers.length) {
+        console.warn('⚠️ No team members data available');
+        elements.teamGrid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">No team members available.</p>';
+        return;
+    }
 
-        console.log('✅ Creating HTML for', teamMembers.length, 'team members');
-
-      const teamHTML = teamMembers
-        .map((member, index) => {
-            // Əgər mobildirsə və ya localda gecikirsə, başdan 'active' klassı verə bilərsən
-            const cardClass = isMobile ? 'chew-card active' : 'chew-card reveal-item';
+    const teamHTML = teamMembers
+        .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+        .map((member) => {
+            // MOBİL SIĞORTA: Mobildə birbaşa 'active' klassı veririk ki, gizli qalmasın
+            const cardClass = isMobile ? 'chew-card active force-visible' : 'chew-card reveal-item';
             
+            const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
+            const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
+            const bio = currentLang === 'az' ? (member.bioAz || member.bio) : (member.bio || "");
+
             return `
-                <div class="${cardClass}" data-member="${member.name}">
+                <div class="${cardClass}" data-member="${name}">
                     <div class="chew-img-box">
-                        <img src="${(member.imageUrl || '').replace('http://', 'https://')}" alt="${member.name}">
+                        <img src="${(member.imageUrl || '').replace('http://', 'https://')}" 
+                             alt="${name}" 
+                             loading="lazy">
                     </div>
-                    <div class="member-name">${member.name}</div>
-                    <div class="member-role">${member.role}</div>
+                    <div class="member-name">${name}</div>
+                    <div class="member-role">${role}</div>
+                    ${bio ? `<div class="member-bio" style="${isMobile ? 'opacity:1 !important; visibility:visible !important;' : ''}">${bio}</div>` : ''}
                 </div>
             `;
         }).join('');
 
-        console.log('📝 Generated HTML length:', teamHTML.length);
-        
-        // HTML-i daxil edirik
-        elements.teamGrid.innerHTML = teamHTML;
-        
-        console.log('✅ HTML inserted into team grid');
-        console.log('👥 Cards in DOM:', elements.teamGrid.querySelectorAll('.chew-card').length);
+    elements.teamGrid.innerHTML = teamHTML;
 
-        // Mobil üçün dərhal göstər
-        if (isMobile) {
-            console.log('📱 Mobile detected - activating cards immediately');
-            
-            const activateCards = () => {
-                const cards = elements.teamGrid.querySelectorAll('.chew-card');
-                console.log('🎯 Activating', cards.length, 'cards');
-                cards.forEach((card, idx) => {
-                    card.style.opacity = '1';
-                    card.style.visibility = 'visible';
-                    card.style.transform = 'none';
-                    card.classList.add('active', 'force-visible');
-                    console.log(`  ✓ Card ${idx + 1} activated:`, card.dataset.member);
-                });
-            };
-
-            // Triple activation
-            activateCards();
-            setTimeout(activateCards, 50);
-            setTimeout(activateCards, 200);
-            
-            return;
-        }
-
-        // Desktop üçün IntersectionObserver
-        console.log('🖥️ Desktop detected - setting up IntersectionObserver');
-        
+    // Aktivasiya məntiqi
+    if (isMobile) {
+        // Mobildə heç bir gecikmə olmadan hər şeyi dərhal göstər
+        const cards = elements.teamGrid.querySelectorAll('.chew-card');
+        cards.forEach(card => {
+            card.style.opacity = '1';
+            card.style.visibility = 'visible';
+            card.style.transform = 'none';
+            card.style.filter = 'none'; // Blur-u mobildə JS ilə də silirik
+        });
+    } else {
+        // Desktopda skroll animasiyasını saxla
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    console.log('👁️ Card visible:', entry.target.dataset.member);
                     entry.target.classList.add('active');
                     observer.unobserve(entry.target);
                 }
             });
-        }, { 
-            threshold: 0.1,
-            rootMargin: '100px'
-        });
+        }, { threshold: 0.1, rootMargin: '100px' });
 
-        const cards = elements.teamGrid.querySelectorAll('.reveal-item');
-        console.log('👀 Observing', cards.length, 'cards');
-        cards.forEach(el => observer.observe(el));
+        elements.teamGrid.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
     }
-
-    function showFallbackContent(lang = 'en') {
-        const isAz = lang === 'az';
-        const fallback = {
-            mainTitle: isAz ? "HAQQIMIZDA" : "ABOUT US",
-            subTitle: isAz ? "Biz kinematik hekayəçilikə həsr olunmuş ehtiraslı film yaradıcılarıyıq." : "We are passionate filmmakers dedicated to cinematic storytelling.",
-            email: "hello@cinechord.com",
-            phone: "+994 50 123 45 67",
-            address: isAz ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN",
-            videoUrl: null,
-            whyTitle: isAz ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES",
-            whyMediaUrl: null,
-            teamMembers: []
-        };
-        populateContent(fallback);
-    }
-
+}
     /* ============================================================
        11. SCROLL LOGIC
        ============================================================ */
@@ -824,8 +785,17 @@ async function init() {
     console.log('🚀 Initializing About page...');
     const currentLang = localStorage.getItem('selectedLang') || 'en';
     
+    // Səhifəni gizli saxlayırıq
+    document.body.classList.add('loading-state');
+
     await loadTranslations();
+    
+    // ƏSAS: Datanı bazadan çəkirik
+    await loadDynamicContent(currentLang);
+    
+    // Statik hissələri (menyu və s.) tərcümə edirik
     applyTranslations(currentLang);
+    
     initPageTransition();
     initLanguageSelector(); 
     initMenuSystem();       
@@ -833,37 +803,16 @@ async function init() {
     setupNavLinks();
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) { initScrollLogic(); }
 
-    // 1. Datanı GÖZLƏYİRİK (Bu mütləqdir)
-    await loadDynamicContent(currentLang);
-    
-    // 2. Data gəldikdən sonra müşahidəni başlat (yalnız desktopda)
-    if (!isMobile) {
-        initScrollLogic(); 
-    }
-
-    // 3. QƏTİ SIĞORTA: Elementləri və Videonu ekrana çıxarırıq
+    // Hər şey hazır olandan sonra pərdəni açırıq
     setTimeout(() => {
-        console.log('⚡ Running final visibility check...');
-        
-        // Videonu məcburi başladırıq
-        const video = document.getElementById('about-video');
-        if (video) {
-            video.style.opacity = "1";
-            video.play().catch(() => console.log("Video auto-play blocked by browser"));
-        }
-
-        // Bütün gizli blokları (Rauf, Fidan və s.) məcburi açırıq
-        document.querySelectorAll('.reveal-item, .chew-card, #main-title, .subtitle, .big-statement, .desc-text').forEach(el => {
-            el.classList.add('active', 'content-ready');
-            el.style.opacity = "1";
-            el.style.visibility = "visible";
-            el.style.filter = "none";
-            el.style.transform = "none";
-        });
-    }, 800); // 800ms server gecikməsi üçün ideal vaxtdır
-
-    console.log('✅ About page fully initialized!');
+        document.body.classList.remove('loading-state');
+        document.querySelectorAll('.reveal-item, .chew-card, #main-title span, .subtitle, .big-statement, .desc-text, .member-bio')
+            .forEach(el => {
+                el.classList.add('active', 'content-ready');
+            });
+    }, 400);
 }
 
 /* ============================================================

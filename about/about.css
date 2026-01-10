@@ -1266,6 +1266,28 @@ body.lang-az .menu-contact-info a {
     letter-spacing: 1px;
 }
 
+/* =========================================
+   15. TRANSLATION SYNC SAFEGUARD
+   ========================================= */
+
+/* Səhifə yüklənən müddətdə köhnə (statik) yazıları gizlədirik */
+.loading-state #main-title span, 
+.loading-state .subtitle, 
+.loading-state .big-statement, 
+.loading-state .desc-text,
+.loading-state .member-bio,
+.loading-state .member-name,
+.loading-state .member-role {
+    opacity: 0 !important;
+    transition: none !important;
+}
+
+/* Data tam hazır olandan sonra yumşaq şəkildə üzə çıxarırıq */
+.content-ready {
+    opacity: 1 !important;
+    transition: opacity 0.5s ease-in-out !important;
+}
+
 /* ============================================================
    MOBILE RESPONSIVE - FINAL VERSION
    ============================================================ */
@@ -1526,6 +1548,36 @@ body.lang-az .nav-btn {
         font-size: 12px !important;        /* 13px-dən kiçildildi */
         font-weight: 700 !important;       
         letter-spacing: 1px !important;    
+    }
+}
+@media (max-width: 768px) {
+    /* 1. Bioqrafiya mətnini məcburi üzə çıxarırıq */
+    .member-bio {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        filter: none !important;
+        transform: none !important;
+        
+        /* Vizual düzəlişlər */
+        margin-top: 12px !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        padding-bottom: 10px;
+    }
+
+    /* 2. Kartın hündürlüyünü avtomatik edirik ki, mətn içində sıxılmasın */
+    .chew-card {
+        height: auto !important;
+        min-height: 100px;
+        margin-bottom: 35px !important;
+    }
+
+    /* 3. Şəkil qutusunun dumanını mobildə tam söndürürük */
+    .chew-img-box img {
+        filter: grayscale(0%) !important; /* Mobildə rəngli qalsın ki, cəlbedici olsun */
+        opacity: 1 !important;
     }
 }
 /* =========================================
