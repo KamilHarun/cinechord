@@ -261,52 +261,72 @@
        7. TRANSLATION SYSTEM
        ============================================================ */
 
-    async function loadTranslations() {
-        try {
-            const response = await fetch('../lang/translation.json');
-            if (!response.ok) throw new Error('Translation file not found');
-            window.translations = await response.json();
-            return window.translations;
-        } catch (error) {
-            console.error('Error loading translations:', error);
-            // Fallback translations
-            window.translations = {
-                "en": { 
-                    "menu": "MENU", 
-                    "close": "CLOSE", 
-                    "send_message": "SEND MESSAGE", 
-                    "sending": "SENDING...", 
-                    "message_sent": "MESSAGE SENT!", 
-                    "error": "ERROR! TRY AGAIN",
-                    "home": "HOME",
-                    "work": "WORK",
-                    "service": "SERVICE",
-                    "archive": "ARCHIVE",
-                    "about": "ABOUT",
-                    "contact": "CONTACT",
-                    "lets_work": "LET'S WORK",
-                    "together": "TOGETHER"
-                },
-                "az": { 
-                    "menu": "MENYU", 
-                    "close": "BAĞLA", 
-                    "send_message": "GÖNDƏRİN", 
-                    "sending": "GÖNDƏRİLİR...", 
-                    "message_sent": "MESAJ GÖNDƏRİLDİ!", 
-                    "error": "XƏTA! YENIDƏN CƏHD EDİN",
-                    "home": "ANA SƏHİFƏ",
-                    "work": "İŞLƏR",
-                    "service": "XİDMƏTLƏR",
-                    "archive": "ARXİV",
-                    "about": "HAQQIMIZDA",
-                    "contact": "ƏLAQƏ",
-                    "lets_work": "GƏLİN BİRLİKDƏ",
-                    "together": "İŞLƏYƏK"
-                }
-            };
-            return window.translations;
-        }
+async function loadTranslations() {
+    try {
+        const response = await fetch('../lang/translation.json');
+        if (!response.ok) throw new Error('Translation file not found');
+        window.translations = await response.json();
+        return window.translations;
+    } catch (error) {
+        console.error('Error loading translations:', error);
+        // Fallback translations
+        window.translations = {
+            "en": { 
+                "menu": "MENU", 
+                "close": "CLOSE", 
+                "send_message": "SEND MESSAGE", 
+                "sending": "SENDING...", 
+                "message_sent": "MESSAGE SENT!", 
+                "error": "ERROR! TRY AGAIN",
+                "home": "HOME",
+                "work": "WORK",
+                "service": "SERVICE",
+                "archive": "ARCHIVE",
+                "about": "ABOUT",
+                "contact": "CONTACT",
+                "lets_work": "LET'S WORK",
+                "together": "TOGETHER",
+                "name_label": "WHAT'S YOUR NAME?",
+                "email_label": "EMAIL ADDRESS",
+                "message_label": "TELL US ABOUT YOUR PROJECT",
+                "newsletter": "Stay in the loop with updates",
+                "description": "We are always looking for new talent and exciting projects.\nLet's create something visual.",
+                "email": "EMAIL",
+                "phone": "PHONE",
+                "address": "ADDRESS",
+                "get_in_touch": "GET IN TOUCH",
+                "follow_us": "FOLLOW US"
+            },
+            "az": { 
+                "menu": "MENYU", 
+                "close": "BAĞLA", 
+                "send_message": "GÖNDƏRİN", 
+                "sending": "GÖNDƏRİLİR...", 
+                "message_sent": "MESAJ GÖNDƏRİLDİ!", 
+                "error": "XƏTA! YENIDƏN CƏHD EDİN",
+                "home": "ANA SƏHİFƏ",
+                "work": "İŞLƏR",
+                "service": "XİDMƏTLƏR",
+                "archive": "ARXİV",
+                "about": "HAQQIMIZDA",
+                "contact": "ƏLAQƏ",
+                "lets_work": "GƏLİN BİRLİKDƏ",
+                "together": "İŞLƏYƏK",
+                "name_label": "ADIN NEDİR?",
+                "email_label": "E-POÇT ÜNVANı",
+                "message_label": "LAYİHƏNİZ HAQQINDA",
+                "newsletter": "Yeniliklərdən xəbərdar ol",
+                "description": "Biz həmişə yeni istedadlar və maraqlı layihələr axtarırıq.\nGəlin birlikdə vizual bir şey yaradaq.",
+                "email": "E-POÇT",
+                "phone": "TELEFON",
+                "address": "ÜNVAN",
+                "get_in_touch": "ƏLAQƏ SAXLAYIN",
+                "follow_us": "BİZİ İZLƏYİN"
+            }
+        };
+        return window.translations;
     }
+}
 
     function applyTranslations(lang) {
         if (!window.translations || !window.translations[lang]) return;

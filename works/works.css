@@ -840,9 +840,9 @@ body.lang-az .menu-contact-info a {
     display: inline-block;
     position: relative;
     cursor: default;
-    color: transparent;
-    -webkit-text-stroke: 1.5px #fff;
-    text-shadow: none;
+    color: #fff;  /* ✅ transparent əvəzinə #fff */
+    -webkit-text-stroke: 0;  /* ✅ 1.5px #fff əvəzinə 0 */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);  /* ✅ Dərinlik üçün kölgə */
 }
 
 .title-main span {
@@ -974,11 +974,10 @@ body.lang-az .menu-contact-info a {
     font-weight: 900;
     letter-spacing: -1.5px;
     line-height: 0.9;
-    -webkit-text-stroke: 0.8px rgba(255, 165, 0, 0.4);
-    color: transparent;
+    -webkit-text-stroke: 0;
+    color: rgba(255, 255, 255, 0.3);  /* ✅ Qeyri-aktiv: tutqun ağ */
     text-transform: uppercase;
     margin: 0;
-    opacity: 0.4;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform: scale(1);
 }
@@ -989,15 +988,15 @@ body.lang-az .category-btn {
 }
 
 .category-btn:hover {
-    opacity: 0.7;
+    color: rgba(255, 255, 255, 0.6);  /* ✅ Hover: daha açıq */
     transform: scale(1.08);
 }
 
 .category-btn.active {
-    -webkit-text-stroke: 1px #FFA500;
-    opacity: 1;
+    -webkit-text-stroke: 0;
+    color: #FFA500;  /* ✅ Aktiv: Parlaq narıncı */
     transform: scale(1.15);
-    text-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+    text-shadow: 0 0 30px rgba(255, 165, 0, 0.6);  /* ✅ Güclü parıltı */
 }
 
 .works-section {
@@ -1587,8 +1586,8 @@ body.lang-az .category-btn {
 .cta-text {
     font-family: 'Gabarito', sans-serif;
     font-size: clamp(24px, 4vw, 48px);
-    color: transparent;
-    -webkit-text-stroke: 1px #fff;
+    color: #fff;  /* ✅ transparent əvəzinə #fff */
+    -webkit-text-stroke: 0;  /* ✅ 1px #fff əvəzinə 0 */
     font-weight: 900;
     text-transform: uppercase;
     margin: 0;
@@ -1597,6 +1596,7 @@ body.lang-az .category-btn {
     line-height: 1.1;
     display: block;
     overflow: hidden;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .cta-text span {
@@ -2050,14 +2050,30 @@ body.lang-az .nav-btn {
         text-align: left;
     }
 
-    /* Modal & Player Controls */
-    .modal-play-btn {
-        width: 120px !important;
-        height: 60px !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-    }
+  /* Modal & Player Controls hissəsini tapın və bunu tətbiq edin */
+.modal-play-btn {
+    /* Ölçüləri bir az kiçildirik (məsələn: 120x60-dan 100x45-ə) */
+    width: 100px !important; 
+    height: 45px !important; 
+    
+    /* Mərkəzləmə kodları olduğu kimi qalır */
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+
+    /* Kəsilmənin qarşısını alan əsas hissə */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important; /* Daxili boşluğu sıfırlayırıq ki, ölçü sabit qalsın */
+    overflow: visible !important; /* Kənara çıxan element varsa görünsün */
+    
+    /* Yazı tənzimləməsi */
+    font-size: 12px !important; /* Yazını bir az kiçildirik ki, düyməyə sığsın */
+    line-height: 1 !important;
+    border: 1px solid #fff !important; /* Əgər border kəsilirsə bura diqqət */
+    border-radius: 50px !important; /* Oval görünüş üçün */
+}
 
     .preview-info {
         top: 70px;

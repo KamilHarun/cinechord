@@ -771,8 +771,9 @@ body.lang-az .menu-contact-info a {
     letter-spacing: -1px;
     position: relative;
     display: inline-block;
-    color: transparent;
-    -webkit-text-stroke: 1.5px #fff;
+    color: #fff;  /* ✅ transparent əvəzinə #fff */
+    -webkit-text-stroke: 0;  /* ✅ 1.5px #fff əvəzinə 0 */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .services-title span {
@@ -1013,10 +1014,11 @@ body.lang-az .menu-contact-info a {
     font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 900;
     margin-bottom: 30px;
-    -webkit-text-stroke: 1px #fff;
-    color: transparent;
+    -webkit-text-stroke: 0;  /* ✅ 1px #fff əvəzinə 0 */
+    color: #fff;  /* ✅ transparent əvəzinə #fff */
     text-transform: uppercase;
     text-align: center;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .chat-video-container {
@@ -1672,12 +1674,14 @@ body {
 
 body.lang-az .services-title,
 body.lang-az .services-title span {
+    font-size: clamp(2.5rem, 6vw, 4.2rem) !important;  /* ✅ İngilis dilindən 15% kiçik */
     line-height: 1.3 !important;
     padding-top: 8px !important;
     padding-bottom: 8px !important;
     display: inline-block !important;
     clip-path: none !important;
     -webkit-clip-path: none !important;
+    letter-spacing: -1.5px !important;  /* ✅ Daha sıx */
 }
 
 body.lang-az .services-title-container {
@@ -1686,6 +1690,7 @@ body.lang-az .services-title-container {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     display: block !important;
+    text-align: center !important;  /* ✅ Mərkəzdə qalsın */
 }
 
 body.lang-az .services-title::after {
@@ -1698,6 +1703,7 @@ body.lang-az .services-title::after {
     padding-top: 8px !important;
     padding-bottom: 8px !important;
     transform: translateY(0);
+    font-size: inherit !important;  /* ✅ Əsas elementdən font götürsün */
 }
 
 body.lang-az .services-title:hover span {

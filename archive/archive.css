@@ -774,13 +774,14 @@ body.lang-az .menu-contact-info a {
     font-weight: 900;
     letter-spacing: -2px;
     line-height: 1.15;
-    -webkit-text-stroke: 1.2px #FFA500;
-    color: transparent;
+    -webkit-text-stroke: 0;  /* ✅ 1.2px #FFA500 əvəzinə 0 */
+    color: #FFA500;  /* ✅ transparent əvəzinə #FFA500 */
     text-transform: uppercase;
     position: absolute;
     opacity: 0;
     transform: translateY(100px);
     animation: cycleWords 9s infinite;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .video-word:nth-child(1) { animation: cycleWords 9s infinite 0s; }
@@ -819,13 +820,14 @@ body.lang-az .menu-contact-info a {
     letter-spacing: -2px;
     line-height: 1.15;
     margin-bottom: 15px;
-    -webkit-text-stroke: 1.2px #FFA500;
-    color: transparent;
+    -webkit-text-stroke: 0;  /* ✅ 1.2px #FFA500 əvəzinə 0 */
+    color: #FFA500;  /* ✅ transparent əvəzinə #FFA500 */
     text-transform: uppercase;
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
     box-sizing: border-box;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .archive-subtitle {
@@ -1043,14 +1045,15 @@ body.lang-az .menu-contact-info a {
 .preview-title {
     font-family: 'Gabarito', sans-serif;
     font-weight: 900;
-    color: transparent;
-    -webkit-text-stroke: 1px #fff;
+    color: #fff;  /* ✅ transparent əvəzinə #fff */
+    -webkit-text-stroke: 0;  /* ✅ 1px #fff əvəzinə 0 */
     font-size: clamp(24px, 4vw, 50px);
     margin: 0;
     text-transform: uppercase;
     transform: translateY(105%);
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .preview-title::after {

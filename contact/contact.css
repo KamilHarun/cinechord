@@ -764,9 +764,10 @@ body.lang-az .hero-line {
 
 .outline-text {
     font-family: 'Gabarito', sans-serif;
-    color: transparent;
-    -webkit-text-stroke: 1.5px #fff;
+    color: #fff;  /* ✅ transparent əvəzinə #fff */
+    -webkit-text-stroke: 0;  /* ✅ 1.5px #fff əvəzinə 0 */
     font-weight: 900;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .hero-rolling-container {
@@ -785,10 +786,11 @@ body.lang-az .hero-rolling-container {
 .hero-rolling-text {
     font-family: 'Gabarito', sans-serif;
     font-size: clamp(3rem, 8vw, 6.5rem);
-    color: #FFA500;
+    color: #FFA500;  /* ✅ Bu onsuz da narıncıdır, dəyişməz */
     font-weight: 900;
     text-transform: uppercase;
     line-height: 1;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 /* Azerbaycan dilinde Montserrat kullan ve küçük font */
@@ -1707,6 +1709,7 @@ body.lang-az .menu-contact-info a {
     opacity: 0;
 }
 
+
 /* =========================================
    17. TOUCH IMPROVEMENTS
    ========================================= */
@@ -1724,3 +1727,6 @@ body.lang-az .menu-contact-info a {
         transform: none !important;
     }
 }
+
+
+

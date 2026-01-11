@@ -1582,7 +1582,7 @@ body.lang-az .play-text {
         left: auto !important;
         z-index: 30001;
     }
-    
+
     .lang-globe-btn {
         padding: 8px 6px;
         gap: 8px;
@@ -1754,47 +1754,73 @@ body.lang-az .nav-btn {
         height: 40px;
     }
 }
-    /* ============================================================
-       ✅ MODAL PLAY BUTTON - HOME İLƏ EYNİ + HOVER BLOK
-       ============================================================ */
+
+@media (max-width: 768px) {
+  video {
+    width: 100vw;
+    height: 100dvh;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+  /* Modal & Player Controls hissəsini tapın və bunu tətbiq edin */
+.modal-play-btn {
+    /* Ölçüləri bir az kiçildirik (məsələn: 120x60-dan 100x45-ə) */
+    width: 100px !important; 
+    height: 45px !important; 
     
-    .modal-play-btn {
-        width: 140px !important;
-        height: 90px !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        pointer-events: auto !important;
-    }
+     /* Mərkəzləmə kodları olduğu kimi qalır */
+    top: 70% !important;  /* 50%-dən 70%-ə qaldırdıq ki, düymə aşağı düşsün */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+
+    /* Kəsilmənin qarşısını alan əsas hissə */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important; /* Daxili boşluğu sıfırlayırıq ki, ölçü sabit qalsın */
+    overflow: visible !important; /* Kənara çıxan element varsa görünsün */
     
-    .modal-play-btn .play-button-container {
-        width: 140px !important;
-        height: 90px !important;
+    /* Yazı tənzimləməsi */
+    font-size: 12px !important; /* Yazını bir az kiçildirik ki, düyməyə sığsın */
+    line-height: 1 !important;
+    border: 1px solid #fff !important; /* Əgər border kəsilirsə bura diqqət */
+    border-radius: 50px !important; /* Oval görünüş üçün */
+}
+
+    .preview-info {
+        top: 70px;
+        left: 20px;
     }
-    
-    .modal-play-btn .play-button {
-        width: 60px !important;
-        height: 24px !important;
-        transition: none !important;
+
+    .preview-title {
+        font-size: 24px;
     }
-    
-    .modal-play-btn .play-button::before {
-        width: 90px !important;
-        height: 32px !important;
-        transition: none !important;
+
+    .close-preview {
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
     }
-    
-    .modal-play-btn .play-button::after {
-        width: 120px !important;
-        height: 40px !important;
-        transition: none !important;
+
+    .custom-controls {
+        padding: 0 10px 20px 10px;
     }
-    
-    .modal-play-btn .play-text {
-        font-size: 9px !important;
-        letter-spacing: 0.5px !important;
-        transition: none !important;
+
+    .ctrl-btn i {
+        font-size: 14px !important;
     }
+
+    .main-play-btn i {
+        font-size: 20px !important;
+    }
+
+    .time-display {
+        font-size: 9px;
+    }
+
     
     /* ✅ AZƏRBAYCAN DİLİ - MODAL */
     body.lang-az .modal-play-btn .play-text {
@@ -1904,6 +1930,7 @@ body.lang-az .nav-btn {
         left: 82px;
         z-index: 30001;
     }
+    
     
     .lang-globe-btn {
         padding: 8px 5px;

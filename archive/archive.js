@@ -192,46 +192,50 @@
             // Fallback translations
             window.translations = {
                 "en": {
-                    "menu": "MENU",
-                    "close": "CLOSE",
-                    "home": "HOME",
-                    "work": "WORK",
-                    "service": "SERVICE",
-                    "archive": "ARCHIVE",
-                    "about": "ABOUT",
-                    "contact": "CONTACT",
-                    "archive_title": "ARCHIVE",
-                    "play": "PLAY",
-                    "address": "ADDRESS",
-                    "get_in_touch": "GET IN TOUCH",
-                    "follow_us": "FOLLOW US",
-                    "category_film": "FILM",
-                    "category_commercial": "COMMERCIAL",
-                    "category_clip": "CLIP",
-                    "category_music_video": "MUSIC VIDEO",
-                    "category_documentary": "DOCUMENTARY",
-                    "category_social": "SOCIAL"
-                },
-                "az": {
-                    "menu": "MENYU",
-                    "close": "BAĞLA",
-                    "home": "ANA SƏHİFƏ",
-                    "work": "İŞLƏR",
-                    "service": "XİDMƏTLƏR",
-                    "archive": "ARXİV",
-                    "about": "HAQQIMIZDA",
-                    "contact": "ƏLAQƏ",
-                    "archive_title": "ARXİV",
-                    "play": "BAŞLAT",
-                    "address": "ÜNVAN",
-                    "get_in_touch": "ƏLAQƏ SAXLAYIN",
-                    "follow_us": "BİZİ İZLƏYİN",
-                    "category_film": "FİLM",
-                    "category_commercial": "REKLAM",
-                    "category_clip": "KLİP",
-                    "category_music_video": "MUSİQİ VİDEOSU",
-                    "category_documentary": "SƏNƏDLI",
-                    "category_social": "SOSIAL"
+        "menu": "MENU",
+        "close": "CLOSE",
+        "home": "HOME",
+        "work": "WORK",
+        "service": "SERVICE",
+        "archive": "ARCHIVE",
+        "about": "ABOUT",
+        "contact": "CONTACT",
+        "archive_title": "ARCHIVE",
+        "play": "PLAY",
+        "address": "ADDRESS",
+        "get_in_touch": "GET IN TOUCH",
+        "follow_us": "FOLLOW US",
+        "category_film": "FILM",
+        "category_commercial": "COMMERCIAL",
+        "category_clip": "CLIP",
+        "category_music_video": "MUSIC VIDEO",
+        "category_documentary": "DOCUMENTARY",
+        "category_social": "SOCIAL",
+        "archive_subtitle_1": "EXPLORE MORE",
+        "archive_subtitle_2": "CONTACT"
+    },
+    "az": {
+        "menu": "MENYU",
+        "close": "BAĞLA",
+        "home": "ANA SƏHİFƏ",
+        "work": "İŞLƏR",
+        "service": "XİDMƏTLƏR",
+        "archive": "ARXİV",
+        "about": "HAQQIMIZDA",
+        "contact": "ƏLAQƏ",
+        "archive_title": "ARXİV",
+        "play": "BAŞLAT",
+        "address": "ÜNVAN",
+        "get_in_touch": "ƏLAQƏ SAXLAYIN",
+        "follow_us": "BİZİ İZLƏYİN",
+        "category_film": "FİLM",
+        "category_commercial": "REKLAM",
+        "category_clip": "KLİP",
+        "category_music_video": "MUSİQİ VİDEOSU",
+        "category_documentary": "SƏNƏDLI",
+        "category_social": "SOSIAL",
+        "archive_subtitle_1": "DAHA ÇOXUNU KƏŞF ET",
+        "archive_subtitle_2": "ƏLAQƏ"
                 }
             };
             return window.translations;
@@ -315,19 +319,19 @@
         // ========== YENİ KOD BİTİR ==========
 
         // Archive Subtitle
-        const archiveSubtitle = document.querySelector('.archive-subtitle');
-        if (archiveSubtitle) {
-            const fullFilmSpan = archiveSubtitle.querySelector('span[data-key="full_film_available"]');
-            const shootMessageLink = archiveSubtitle.querySelector('a[data-key="shoot_message"]');
-            
-            if (fullFilmSpan && t.full_film_available) {
-                fullFilmSpan.textContent = t.full_film_available;
-            }
-            
-            if (shootMessageLink && t.shoot_message) {
-                shootMessageLink.textContent = t.shoot_message;
-            }
-        }
+const archiveSubtitle = document.querySelector('.archive-subtitle');
+if (archiveSubtitle) {
+    const fullFilmSpan = archiveSubtitle.querySelector('span[data-key="archive_subtitle_1"]');
+    const shootMessageLink = archiveSubtitle.querySelector('a[data-key="archive_subtitle_2"]');
+    
+    if (fullFilmSpan && t.archive_subtitle_1) {
+        fullFilmSpan.textContent = t.archive_subtitle_1;
+    }
+    
+    if (shootMessageLink && t.archive_subtitle_2) {
+        shootMessageLink.textContent = t.archive_subtitle_2;
+    }
+}
 
         // Re-render table with translated categories
         console.log('🔄 Calling reloadTableWithTranslations from applyTranslations');

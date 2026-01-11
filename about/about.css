@@ -819,7 +819,7 @@ body.lang-az .nav-btn {
 }
 
 /* =========================================
-   10. CONTENT STYLING & BRANDING (MASK EFFECT - SERVICE STYLE)
+   10. CONTENT STYLING & BRANDING (STATIC - NO HOVER EFFECT)
    ========================================= */
 .title-wrapper { 
     margin-bottom: 50px; 
@@ -834,15 +834,22 @@ body.lang-az .nav-btn {
     line-height: 1.1; 
     margin: 0;
     text-transform: uppercase;
-    cursor: pointer;
+    
+    /* MOUSE İLƏ ÜSTÜNƏ GƏLƏNDƏ HƏRƏKƏT YOXDUR */
+    cursor: default; 
+    
     font-size: clamp(3rem, 7vw, 5rem);
     letter-spacing: -1px;
     position: relative;
     display: inline-block;
-    color: transparent;
-    -webkit-text-stroke: 1.5px #fff;
+    color: #fff;
+    -webkit-text-stroke: 0;
     overflow: hidden; 
-    padding: 0px 5px; /* Yanlardan azca boşluq */
+    padding: 0px 5px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    
+    /* TRANSITION LƏĞV EDİLDİ */
+    transition: none !important;
 }
 
 body.lang-az .hero-rolling-text {
@@ -850,37 +857,30 @@ body.lang-az .hero-rolling-text {
     line-height: 1.1;
 }
 
+/* SPAN SABİTDİR - TƏRPƏNMİR */
 .hero-rolling-text span {
     display: block;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: none !important;
+    transition: none !important;
 }
 
-.hero-rolling-text::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0; /* Artıq top 100% deyil, tam üst-üstə qoyuruq */
-    left: 5px; 
-    width: calc(100% - 10px);
-    height: 100%;
-    color: #FFA500;
-    -webkit-text-stroke: 0;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-    
-    /* BU HİSSƏ MÜTLƏQDİR: Normalda mətni aşağıda gizlədir və KƏSİR */
-    transform: translateY(105%); 
-    clip-path: inset(0 0 100% 0); /* Mətni aşağıdan yuxarıya doğru görünməz edir */
-}
-
+/* HOVER ZAMANI HEÇ NƏ DƏYİŞMƏSİN */
+.hero-rolling-text:hover,
 .hero-rolling-text:hover span {
-    transform: translateY(-105%);
+    color: #fff !important; /* Rəng dəyişməsin */
+    transform: none !important; /* Tərpənməsin */
 }
 
-.hero-rolling-text:hover::after {
-    /* Hover zamanı mətni həm yuxarı çəkirik, həm də kəsimi ləğv edirik */
-    transform: translateY(0);
-    clip-path: inset(0 0 0 0);
+/* ALTDAN ÇIXAN YAZINI TAMAMİLƏ SİLİRİK */
+.hero-rolling-text::after {
+    display: none !important;
+    content: none !important;
 }
+
+
+/* =========================================
+   OTHER BLOCKS (CONTACT & LINKS)
+   ========================================= */
 
 .block-title {
     font-size: 14px;
@@ -925,6 +925,9 @@ body.lang-az .hero-rolling-text {
     font-weight: 500;
 }
 
+/* AŞAĞIDAKI KİÇİK LİNKLƏR ÜÇÜN EFFEKT QALIR 
+   (Əgər bunları da ləğv etmək istəsən de, silim) 
+*/
 .rolling-link-item {
     font-size: 16px;
     font-weight: 700;
@@ -952,9 +955,22 @@ body.lang-az .hero-rolling-text {
     transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.rolling-link-item:hover span { transform: translateY(-100%); }
-.rolling-link-item:hover::after { transform: translateY(-100%); }
+.rolling-link-item:hover span { 
+    transform: translateY(-100%); 
+}
 
+.rolling-link-item:hover::after { 
+    transform: translateY(-100%); 
+}
+
+/* Rolling link üçün variable dəstəyi */
+.rolling-link-item {
+    --link-text: "";
+}
+
+.rolling-link-item::after {
+    content: var(--link-text, attr(data-text));
+}
 /* =========================================
    11. DESKTOP/WEB SOSIAL HİSSƏ (AZ DİLİ)
    ========================================= */
@@ -1058,8 +1074,8 @@ body.lang-az .menu-contact-info a {
 .cta-text {
     font-family: 'Gabarito', sans-serif;
     font-size: clamp(24px, 4vw, 48px);
-    color: transparent;
-    -webkit-text-stroke: 1px #fff;
+    color: #fff;  /* ✅ Solid ağ - contact.css ilə EYNI */
+    -webkit-text-stroke: 0;  /* ✅ Stroke YOX */
     font-weight: 900;
     text-transform: uppercase;
     margin: 0;
@@ -1068,6 +1084,7 @@ body.lang-az .menu-contact-info a {
     line-height: 1.1;
     display: block;
     overflow: hidden;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə */
 }
 
 .cta-text span {
@@ -1079,29 +1096,23 @@ body.lang-az .menu-contact-info a {
 .cta-text::after {
     content: attr(data-text);
     position: absolute;
-    top: 100%;
+    top: 100%;  /* ✅ Aşağıda başlayır - service.css ilə EYNI */
     left: 0;
     width: 100%;
     height: 100%;
-    color: #FFA500;
+    color: #FFA500;  /* ✅ Narıncı */
     -webkit-text-stroke: 0;
     font-family: inherit;
-    clip-path: inset(100% 0 0 0);
-    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
     pointer-events: none;
 }
 
 .cta-text-link:hover .cta-text span {
-    transform: translateY(-100%);
+    transform: translateY(-100%);  /* ✅ service.css ilə EYNI */
 }
 
 .cta-text-link:hover .cta-text::after {
-    transform: translateY(-100%);
-    clip-path: inset(0 0 0 0);
-}
-
-.cta-text-link:not(:hover) .cta-text::after {
-    clip-path: inset(100% 0 0 0);
+    transform: translateY(-100%);  /* ✅ service.css ilə EYNI */
 }
 
 .cta-button {
@@ -1265,7 +1276,6 @@ body.lang-az .menu-contact-info a {
     color: rgba(255, 255, 255, 0.3);
     letter-spacing: 1px;
 }
-
 /* =========================================
    15. TRANSLATION SYNC SAFEGUARD
    ========================================= */
@@ -1550,36 +1560,7 @@ body.lang-az .nav-btn {
         letter-spacing: 1px !important;    
     }
 }
-@media (max-width: 768px) {
-    /* 1. Bioqrafiya mətnini məcburi üzə çıxarırıq */
-    .member-bio {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        filter: none !important;
-        transform: none !important;
-        
-        /* Vizual düzəlişlər */
-        margin-top: 12px !important;
-        font-size: 14px !important;
-        line-height: 1.5 !important;
-        color: rgba(255, 255, 255, 0.7) !important;
-        padding-bottom: 10px;
-    }
 
-    /* 2. Kartın hündürlüyünü avtomatik edirik ki, mətn içində sıxılmasın */
-    .chew-card {
-        height: auto !important;
-        min-height: 100px;
-        margin-bottom: 35px !important;
-    }
-
-    /* 3. Şəkil qutusunun dumanını mobildə tam söndürürük */
-    .chew-img-box img {
-        filter: grayscale(0%) !important; /* Mobildə rəngli qalsın ki, cəlbedici olsun */
-        opacity: 1 !important;
-    }
-}
 /* =========================================
    DESKTOP PROTECTION
    ========================================= */
@@ -1741,4 +1722,3 @@ body.lang-az .nav-btn {
         gap: 30px !important;
     }
 }
-

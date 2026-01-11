@@ -40,7 +40,10 @@
     "category_clip": "CLIP",
     "category_music_video": "MUSIC VIDEO",
     "category_documentary": "DOCUMENTARY",
-    "category_social": "SOCIAL"
+    "category_social": "SOCIAL",
+    "archive_subtitle_1": "EXPLORE MORE",
+    "archive_subtitle_2": "CONTACT"
+    
   },
   "az": {
     "menu": "MENYU",
@@ -83,6 +86,8 @@
     "category_clip": "KLİP",
     "category_music_video": "MUSİQİ VİDEOSU",
     "category_documentary": "SƏNƏDLI",
-    "category_social": "SOSIAL"
+    "category_social": "SOSIAL",
+   "archive_subtitle_1": "DAHA ÇOXUNU KƏŞF ET",
+    "archive_subtitle_2": "ƏLAQƏ"
   }
 }
