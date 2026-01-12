@@ -1492,8 +1492,9 @@ body.lang-az .nav-btn {
     }
     
     .big-statement {
-        font-size: 22px !important;
+        font-size: 25px !important;
         line-height: 1.4 !important;
+        letter-spacing: 0.5px !important; /* ✅ Hərfləri bir-birindən 4px araladıq */
     }
     
     /* --- 4. SOSİAL BÖLMƏ (KİÇİLDİLMİŞ) --- */
@@ -1503,62 +1504,91 @@ body.lang-az .nav-btn {
         font-weight: 700 !important;       
         letter-spacing: 1px !important;    
     }
-
-    /* ===============================
-   MEET US / KOMANDA - MOBILE
+/* ===============================
+   MEET US / KOMANDA - MOBILE (TAM DÜZƏLDİLMİŞ)
    =============================== */
 .chew-team-grid {
     display: grid !important;
-    grid-template-columns: 1fr !important; /* tək sütun */
-    gap: 30px !important; /* üzvlər arası boşluq */
+    grid-template-columns: 1fr !important;
+    gap: 50px !important; /* Kartlar arası məsafə */
     width: 100% !important;
-    margin: 0 auto !important;
+    margin: 60px auto 0 !important;
+    padding: 0 !important;
 }
 
 .team-member {
     display: flex !important;
-    flex-direction: column !important; /* şəkil üst, text alt */
-    align-items: center !important;
-    text-align: center !important;
-    gap: 15px !important; /* şəkil və mətn arası */
+    flex-direction: column !important;
+    align-items: center !important; /* Konteynerin içindəkiləri mərkəzə çəkir */
+    justify-content: flex-start !important;
+    text-align: center !important; /* Mətnləri mərkəzləyir */
     width: 100% !important;
+    padding: 0 15px !important; /* Ekran kənarlarına yapışmasın deyə bir az boşluq */
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
 }
 
+/* Şəkil hissəsi */
 .team-member .chew-img-box {
-    width: 80% !important; /* mobil üçün biraz kiçildilmiş şəkil */
-    max-width: 250px !important; /* limit */
+    width: 80% !important;
+    max-width: 250px !important;
     aspect-ratio: 1 / 1 !important;
     overflow: hidden !important;
-    border-radius: 50% !important; /* istəsən dairəvi */
+    border-radius: 50% !important; 
+    margin: 0 auto 25px auto !important; /* Şəklin altında boşluq */
+    display: block !important;
+    background: #111; /* Şəkil yüklənməyibsə fon */
 }
 
 .team-member .chew-img-box img {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important; /* şəkil qutuya sığsın */
+    object-fit: cover !important;
     display: block !important;
 }
 
+/* Ad hissəsi */
 .team-member .member-name {
-    font-size: 16px !important;
+    font-size: 20px !important; /* Adı biraz böyütdüm */
     font-weight: 700 !important;
     color: #fff !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 0 5px 0 !important;
 }
 
+/* Vəzifə hissəsi */
 .team-member .member-position {
-    font-size: 14px !important;
-    font-weight: 400 !important;
-    color: #ccc !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #e6b32e !important; /* Narıncı rəng (şəkildəki kimi) */
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 0 20px 0 !important; /* Mətnlə arası */
 }
 
-
-    body.lang-az .menu-contact-info p, 
-    body.lang-az .menu-contact-info a {
-        font-family: 'Montserrat', sans-serif !important;
-        font-size: 12px !important;        /* 13px-dən kiçildildi */
-        font-weight: 700 !important;       
-        letter-spacing: 1px !important;    
-    }
+/* ✅ ƏSAS HƏLL: Uzun mətn (Paraqraf) */
+.team-member p,
+.team-member span,
+.team-member div:not(.chew-img-box) {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important; /* Sətirlər arası məsafə rahat oxunsun */
+    color: #cccccc !important;
+    
+    /* Mərkəzləmə kodları */
+    text-align: center !important;
+    text-align-last: center !important; /* Son sətri də mərkəzləyir */
+    
+    width: 100% !important;
+    max-width: 100% !important;
+    
+    /* Boşluqları sıfırlayırıq ki, sola çəkməsin */
+    margin: 0 auto !important;
+    padding: 0 !important;
+}
 }
 
 /* =========================================
@@ -1722,3 +1752,54 @@ body.lang-az .nav-btn {
         gap: 30px !important;
     }
 }
+/* ============================================================
+   THE "NÖQTƏ" FIX - MEET US TEXT ALIGNMENT
+   ============================================================ */
+@media (max-width: 768px) {
+    /* 1. Əsas seksiyanın yaratdığı asimmetrik boşluğu ləğv edirik */
+    .content-section {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* 2. Grid-in kənarlara yapışmamasını təmin edirik */
+    .chew-team-grid {
+        width: 100% !important;
+        padding: 0 20px !important; /* Hər iki tərəfdən riyazi olaraq bərabər boşluq */
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 3. Team Member konteynerini tam mərkəzləyirik */
+    .team-member {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    /* 4. VƏ ƏN VACİBİ: Mətn blokunu mərkəzləyirik */
+    .team-member p, 
+    .team-member .member-bio {
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: center !important;
+        text-align-last: center !important; /* Son sətir sola qaçmasın */
+        margin: 0 auto !important;
+        padding: 0 !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 5. Şəklin sürüşməməsi üçün */
+    .team-member .chew-img-box {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
+
+
+

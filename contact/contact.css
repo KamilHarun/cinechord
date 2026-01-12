@@ -1481,7 +1481,7 @@ body.lang-az .nav-btn {
     
   body.lang-az .hero-line,
    body.lang-az .hero-rolling-text {
-       font-size: 8vw !important;      /* Ölçünü kiçiltdik */
+       font-size: 10vw !important;      /* Ölçünü kiçiltdik */
        line-height: 1.3 !important;    /* Sətir aralığını artırdıq */
        width: 100%;
        display: block;
