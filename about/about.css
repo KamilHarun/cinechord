@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - About Page Stylesheet
-   Version: 5.7 - MASK EFFECT RESTORED + NO CLIPPING
+   Version: 6.1 - MOBILE FOOTER PADDING FIXED
    ========================================= */
 
 /* =========================================
@@ -262,13 +262,12 @@ body.lang-az .lang-check i {
 .mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
 .mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
 
-/* ✅ AZ DİLİNDƏ YALNIZ ÖLÇÜ VƏ FONT DƏYİŞİR - TRANSFORMu SİLDİK */
+/* ✅ AZ DİLİNDƏ YALNIZ ÖLÇÜ VƏ FONT DƏYİŞİR */
 body.lang-az .nav-btn {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 900 !important;
-    font-size: 4.0vw !important;          /* Scale əvəzinə daha kiçik font */
-    letter-spacing: -3px !important;      /* Daha dar */
-    /* transform silindi - indi slide effekt eyni işləyir! */
+    font-size: 4.0vw !important;
+    letter-spacing: -3px !important;
 }
 
 .nav-text {
@@ -648,7 +647,7 @@ body.lang-az .nav-btn {
 .content-section {
     width: 100%;
     height: auto;
-    padding: 160px 30px 100px;  /* Padding artırıldı */
+    padding: 160px 30px 100px;
     background: transparent;
     text-align: center;
 }
@@ -667,7 +666,7 @@ body.lang-az .nav-btn {
 }
 
 /* ============================================================
-   8.ROW (ULTRA-WIDE CINEMATIC GRID)
+   8. ROW (ULTRA-WIDE CINEMATIC GRID)
    ============================================================ */
 .chew-row {
     display: grid;
@@ -745,20 +744,6 @@ body.lang-az .nav-btn {
     font-weight: 400;
 }
 
-/* MOBİL İSTİSNA */
-@media (max-width: 768px) {
-    .chew-row {
-        grid-template-columns: 1fr;
-        margin: 0 15px;
-        padding: 60px 0;
-    }
-    
-    .video-container {
-        aspect-ratio: 16 / 9;
-        margin-right: 0;
-    }
-}
-
 /* =========================================
    9. MEET US (TEAM GRID)
    ========================================= */
@@ -819,7 +804,7 @@ body.lang-az .nav-btn {
 }
 
 /* =========================================
-   10. CONTENT STYLING & BRANDING (STATIC - NO HOVER EFFECT)
+   10. CONTENT STYLING & BRANDING
    ========================================= */
 .title-wrapper { 
     margin-bottom: 50px; 
@@ -834,10 +819,7 @@ body.lang-az .nav-btn {
     line-height: 1.1; 
     margin: 0;
     text-transform: uppercase;
-    
-    /* MOUSE İLƏ ÜSTÜNƏ GƏLƏNDƏ HƏRƏKƏT YOXDUR */
     cursor: default; 
-    
     font-size: clamp(3rem, 7vw, 5rem);
     letter-spacing: -1px;
     position: relative;
@@ -847,8 +829,6 @@ body.lang-az .nav-btn {
     overflow: hidden; 
     padding: 0px 5px;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-    
-    /* TRANSITION LƏĞV EDİLDİ */
     transition: none !important;
 }
 
@@ -857,31 +837,26 @@ body.lang-az .hero-rolling-text {
     line-height: 1.1;
 }
 
-/* SPAN SABİTDİR - TƏRPƏNMİR */
 .hero-rolling-text span {
     display: block;
     transform: none !important;
     transition: none !important;
 }
 
-/* HOVER ZAMANI HEÇ NƏ DƏYİŞMƏSİN */
 .hero-rolling-text:hover,
 .hero-rolling-text:hover span {
-    color: #fff !important; /* Rəng dəyişməsin */
-    transform: none !important; /* Tərpənməsin */
+    color: #fff !important;
+    transform: none !important;
 }
 
-/* ALTDAN ÇIXAN YAZINI TAMAMİLƏ SİLİRİK */
 .hero-rolling-text::after {
     display: none !important;
     content: none !important;
 }
 
-
 /* =========================================
-   OTHER BLOCKS (CONTACT & LINKS)
+   11. OTHER BLOCKS (CONTACT & LINKS)
    ========================================= */
-
 .block-title {
     font-size: 14px;
     color: #FFA500;
@@ -925,9 +900,6 @@ body.lang-az .hero-rolling-text {
     font-weight: 500;
 }
 
-/* AŞAĞIDAKI KİÇİK LİNKLƏR ÜÇÜN EFFEKT QALIR 
-   (Əgər bunları da ləğv etmək istəsən de, silim) 
-*/
 .rolling-link-item {
     font-size: 16px;
     font-weight: 700;
@@ -963,7 +935,6 @@ body.lang-az .hero-rolling-text {
     transform: translateY(-100%); 
 }
 
-/* Rolling link üçün variable dəstəyi */
 .rolling-link-item {
     --link-text: "";
 }
@@ -971,12 +942,13 @@ body.lang-az .hero-rolling-text {
 .rolling-link-item::after {
     content: var(--link-text, attr(data-text));
 }
+
 /* =========================================
-   11. DESKTOP/WEB SOSIAL HİSSƏ (AZ DİLİ)
+   12. DESKTOP/WEB SOSIAL HİSSƏ (AZ DİLİ)
    ========================================= */
 body.lang-az .menu-socials a {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 13px !important;        /* 14px-dən kiçildildi */
+    font-size: 13px !important;
     font-weight: 700 !important;
     letter-spacing: 1px !important;
 }
@@ -984,21 +956,20 @@ body.lang-az .menu-socials a {
 body.lang-az .menu-contact-info p,
 body.lang-az .menu-contact-info a {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 12px !important;        /* 13px-dən kiçildildi */
+    font-size: 12px !important;
     letter-spacing: 1px !important;
 }
 
 /* =========================================
-   12. SCROLL REVEAL (THE FINAL FIX)
+   13. SCROLL REVEAL
    ========================================= */
 .reveal-item, .chew-card {
     opacity: 0;
     transform: translateY(30px);
-    filter: blur(0) !important; /* DUMANI KÖKÜNDƏN SİLDİK */
+    filter: blur(0) !important;
     transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-/* Aktiv olanda mütləq göstər */
 .reveal-item.active, .chew-card.active {
     opacity: 1 !important;
     visibility: visible !important;
@@ -1006,19 +977,8 @@ body.lang-az .menu-contact-info a {
     filter: blur(0) !important;
 }
 
-/* Mobildə heç bir animasiya gözləmə, dərhal aç */
-@media (max-width: 768px) {
-    .reveal-item, .chew-card, .mobile-instant {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        filter: none !important;
-        transition: none !important;
-    }
-}
-
 /* =========================================
-   13. SCROLL HIDE/SHOW ANIMATION
+   14. SCROLL HIDE/SHOW ANIMATION
    ========================================= */
 .hide-on-scroll {
     opacity: 0 !important;
@@ -1042,7 +1002,7 @@ body.lang-az .menu-contact-info a {
 }
 
 /* =========================================
-   14. CINEMATIC FOOTER
+   15. CINEMATIC FOOTER
    ========================================= */
 .main-footer {
     background: #050505;
@@ -1074,8 +1034,8 @@ body.lang-az .menu-contact-info a {
 .cta-text {
     font-family: 'Gabarito', sans-serif;
     font-size: clamp(24px, 4vw, 48px);
-    color: #fff;  /* ✅ Solid ağ - contact.css ilə EYNI */
-    -webkit-text-stroke: 0;  /* ✅ Stroke YOX */
+    color: #fff;
+    -webkit-text-stroke: 0;
     font-weight: 900;
     text-transform: uppercase;
     margin: 0;
@@ -1084,7 +1044,7 @@ body.lang-az .menu-contact-info a {
     line-height: 1.1;
     display: block;
     overflow: hidden;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .cta-text span {
@@ -1096,11 +1056,11 @@ body.lang-az .menu-contact-info a {
 .cta-text::after {
     content: attr(data-text);
     position: absolute;
-    top: 100%;  /* ✅ Aşağıda başlayır - service.css ilə EYNI */
+    top: 100%;
     left: 0;
     width: 100%;
     height: 100%;
-    color: #FFA500;  /* ✅ Narıncı */
+    color: #FFA500;
     -webkit-text-stroke: 0;
     font-family: inherit;
     transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
@@ -1108,11 +1068,11 @@ body.lang-az .menu-contact-info a {
 }
 
 .cta-text-link:hover .cta-text span {
-    transform: translateY(-100%);  /* ✅ service.css ilə EYNI */
+    transform: translateY(-100%);
 }
 
 .cta-text-link:hover .cta-text::after {
-    transform: translateY(-100%);  /* ✅ service.css ilə EYNI */
+    transform: translateY(-100%);
 }
 
 .cta-button {
@@ -1276,11 +1236,10 @@ body.lang-az .menu-contact-info a {
     color: rgba(255, 255, 255, 0.3);
     letter-spacing: 1px;
 }
-/* =========================================
-   15. TRANSLATION SYNC SAFEGUARD
-   ========================================= */
 
-/* Səhifə yüklənən müddətdə köhnə (statik) yazıları gizlədirik */
+/* =========================================
+   16. TRANSLATION SYNC SAFEGUARD
+   ========================================= */
 .loading-state #main-title span, 
 .loading-state .subtitle, 
 .loading-state .big-statement, 
@@ -1292,16 +1251,16 @@ body.lang-az .menu-contact-info a {
     transition: none !important;
 }
 
-/* Data tam hazır olandan sonra yumşaq şəkildə üzə çıxarırıq */
 .content-ready {
     opacity: 1 !important;
     transition: opacity 0.5s ease-in-out !important;
 }
 
 /* ============================================================
-   MOBILE RESPONSIVE - FINAL VERSION
+   17. MOBILE RESPONSIVE - PERFECTLY CENTERED
    ============================================================ */
 @media (max-width: 768px) {
+    /* ===== NAVİQASİYA ===== */
     .lang-selector {
         top: 33px !important;
         right: 125px !important;
@@ -1380,7 +1339,7 @@ body.lang-az .menu-contact-info a {
         height: 80px;
     }
 
-    /* --- 2. MOBİL MENU (İNGİLİS VƏ AZ DİLİ EYNİ EFFEKT) --- */
+    /* ===== MOBİL MENU ===== */
     .mobile-menu {
         width: 100% !important;
         padding-top: 120px !important;
@@ -1388,7 +1347,6 @@ body.lang-az .menu-contact-info a {
         z-index: 30000 !important;
     }
 
-   /* İNGİLİS DİLİ (Standart) */
     .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 13vw !important;
@@ -1399,22 +1357,19 @@ body.lang-az .menu-contact-info a {
         color: #fff !important;
     }
     
-    /* ✅ AZƏRBAYCAN DİLİ - İ HƏRFİ PROBLEMSIZ + SIX MARGIN */
-body.lang-az .nav-btn {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 900 !important;
-    text-shadow: 1px 0 0 #fff !important;
-    font-size: 10.5vw !important;
-    line-height: 1.2 !important;              /* 1.3-dən 1.2-yə endirdim */
-    margin: -0.3vh 0 !important;              /* Daha sıx (0.01vh-dən sıx) */
-    letter-spacing: -2px !important;
-    width: 100% !important;
-    display: block !important;
-    overflow: visible !important;             /* İ hərfi üçün */
-    /* padding-lər silindi */
-}
+    body.lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+        text-shadow: 1px 0 0 #fff !important;
+        font-size: 10.5vw !important;
+        line-height: 1.2 !important;
+        margin: -0.3vh 0 !important;
+        letter-spacing: -2px !important;
+        width: 100% !important;
+        display: block !important;
+        overflow: visible !important;
+    }
     
-    /* ✅ EYNİ SLIDE EFFEKT - HƏM İNGİLİS HƏM AZ DİLİ ÜÇÜN */
     .mobile-menu.active .nav-btn:nth-child(odd) { 
         transform: translateX(-10px) !important; 
     }
@@ -1422,19 +1377,76 @@ body.lang-az .nav-btn {
         transform: translateX(10px) !important; 
     }
 
-    /* --- 3. ABOUT SƏHİFƏSİNİN LAYOUTU --- */
+    /* ===== ✅ ƏSAS KONTEYNER - MÜKƏMMƏLLƏŞDİRİLMİŞ MƏRKƏZLƏŞDIRMƏ ===== */
     body {
         overflow-x: hidden;
     }
 
+    /* ✅ YALNIZ BU KONTEYNER PADDİNG VERİR - HƏR TƏRƏFDƏN EYNİ */
     .content-section {
-        padding-top: 120px !important;
-        padding-left: 30px !important;  /* 20px-dən artırıldı */
-        padding-right: 30px !important;  /* 20px-dən artırıldı */
-        padding-bottom: 60px !important;
+        padding: 120px 25px 60px 25px !important; /* ✅ SOL VƏ SAĞ TAM EYNİ */
+        width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
-      /* ✅ SOSİAL BÖLMƏ (INDEX İLƏ EYNİ - SABİTLƏNMİŞ) */
+    /* ===== ✅ ALT ELEMENTLƏR - ƏLAVƏ PADDİNG/MARGİN YOX ===== */
+    .chew-row, 
+    .chew-team-grid, 
+    .description-grid,
+    .footer-wrapper {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        margin: 0 !important;           /* ✅ Əlavə margin YOX */
+        padding: 0 !important;          /* ✅ Content-section artıq padding verdi */
+        gap: 40px !important;
+        box-sizing: border-box !important;
+    }
+    
+    .video-container {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16 / 9 !important;
+        margin: 0 0 40px 0 !important;  /* ✅ Yalnız altdan boşluq */
+        padding: 0 !important;
+    }
+    
+    .chew-img-box {
+        width: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    /* ===== MƏTN ELEMENTLƏR ===== */
+    .hero-rolling-text {
+        font-size: 10vw !important;
+        padding: 6px 0 !important;      /* ✅ Horizontal padding silindi */
+        margin: 0 auto 80px auto !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+    
+    .big-statement {
+        font-size: 25px !important;
+        line-height: 1.4 !important;
+        letter-spacing: 0.5px !important;
+        margin: 0 auto !important;      /* ✅ Mərkəzdə */
+        padding: 0 !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+
+    .desc-text,
+    .subtitle {
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    /* ===== SOSİAL VƏ KONTAKT ===== */
     body.lang-az .menu-socials a {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 12px !important;
@@ -1443,7 +1455,6 @@ body.lang-az .nav-btn {
         transform: none !important;
     }
 
-    /* ✅ KONTAKT BÖLMƏ - XƏTT OLMADAN */
     body.lang-az .menu-contact-info p, 
     body.lang-az .menu-contact-info a {
         font-family: 'Montserrat', sans-serif !important;
@@ -1453,149 +1464,180 @@ body.lang-az .nav-btn {
         transform: none !important;
     }
     
-    /* ✅ EMAIL VƏ TELEFON - XƏTT SİLİNDİ */
     .menu-contact-info p,
     .menu-contact-info p a,
     .menu-contact-info a {
         color: rgba(255,255,255,0.4) !important;
         text-decoration: none !important;
-        border-bottom: none !important;           /* Alt xətt yox */
+        border-bottom: none !important;
         -webkit-tap-highlight-color: transparent;
     }
 
-    .chew-row, 
-    .chew-team-grid, 
-    .description-grid,
-    .footer-wrapper {
+    /* ===== ✅ KOMANDA SEKSİYASI - TAM DÜZƏLDİLMİŞ ===== */
+    .sidebar-label {
+        position: relative !important;
+        top: 0 !important;
+        display: block !important;
+        text-align: center !important;
+        width: 100% !important;
+        margin: 40px auto 80px auto !important;
+        padding: 0 !important;
+        font-size: 14px !important;
+        letter-spacing: 3px !important;
+        color: #FFA500 !important;
+    }
+
+    /* ✅ Team grid - ƏLAVƏ PADDİNG YOX */
+    .chew-team-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
+        gap: 50px !important;
         width: 100% !important;
-        margin: 0 !important;
-        gap: 40px !important;
+        margin: 100px 0 0 0 !important; /* ✅ Sol/sağ margin yoxdur */
+        padding: 0 !important;          /* ✅ ƏLAVƏ padding yoxdur */
+        box-sizing: border-box !important;
     }
-    
-    .video-container {
+
+    /* ✅ Team member - ƏLAVƏ PADDİNG YOX */
+    .team-member {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        text-align: center !important;
         width: 100% !important;
-        height: auto !important;
-        aspect-ratio: 16 / 9 !important;
-        margin-bottom: 40px !important;
+        padding: 0 !important;          /* ✅ 15px silindi */
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
     }
-    
-    .chew-img-box {
-        width: 100% !important;
+
+    /* Şəkil */
+    .team-member .chew-img-box {
+        width: 80% !important;
+        max-width: 250px !important;
         aspect-ratio: 1 / 1 !important;
+        overflow: hidden !important;
+        border-radius: 50% !important; 
+        margin: 0 auto 25px auto !important;
+        padding: 0 !important;
+        display: block !important;
+        background: #111;
     }
-    
-    .hero-rolling-text {
-        font-size: 10vw !important;
-        padding: 6px 12px !important;  /* Mobil üçün geniş padding */
+
+    .team-member .chew-img-box img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
     }
-    
-    .big-statement {
-        font-size: 25px !important;
-        line-height: 1.4 !important;
-        letter-spacing: 0.5px !important; /* ✅ Hərfləri bir-birindən 4px araladıq */
+
+    /* Ad */
+    .team-member .member-name {
+        font-size: 20px !important;
+        font-weight: 700 !important;
+        color: #fff !important;
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto 5px auto !important;
+        padding: 0 !important;
     }
-    
-    /* --- 4. SOSİAL BÖLMƏ (KİÇİLDİLMİŞ) --- */
-    body.lang-az .menu-socials a {
+
+    /* Vəzifə */
+    .team-member .member-position,
+    .team-member .member-role {
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        color: #e6b32e !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto 20px auto !important;
+        padding: 0 !important;
+    }
+
+    /* ✅ BİO MƏTN - TAM MƏRKƏZLƏŞDIRMƏ */
+    .team-member p,
+    .team-member .member-bio,
+    .team-member span:not(.member-name):not(.member-role),
+    .team-member div:not(.chew-img-box) {
         font-family: 'Montserrat', sans-serif !important;
-        font-size: 13px !important;        /* 14px-dən kiçildildi */
-        font-weight: 700 !important;       
-        letter-spacing: 1px !important;    
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        color: #cccccc !important;
+        text-align: center !important;
+        text-align-last: center !important; /* ✅ Son sətir də mərkəzdə */
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
     }
-/* ===============================
-   MEET US / KOMANDA - MOBILE (TAM DÜZƏLDİLMİŞ)
-   =============================== */
-.chew-team-grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 50px !important; /* Kartlar arası məsafə */
-    width: 100% !important;
-    margin: 60px auto 0 !important;
-    padding: 0 !important;
-}
 
-.team-member {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important; /* Konteynerin içindəkiləri mərkəzə çəkir */
-    justify-content: flex-start !important;
-    text-align: center !important; /* Mətnləri mərkəzləyir */
-    width: 100% !important;
-    padding: 0 15px !important; /* Ekran kənarlarına yapışmasın deyə bir az boşluq */
-    box-sizing: border-box !important;
-    margin: 0 auto !important;
-}
+    /* ===== GÖRÜNÜRLÜK ===== */
+    .reveal-item, 
+    .chew-card, 
+    .chew-team-grid .reveal-item,
+    .chew-team-grid .chew-card,
+    .mobile-ready,
+    .mobile-instant {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+        animation: none !important;
+        display: block !important;
+    }
 
-/* Şəkil hissəsi */
-.team-member .chew-img-box {
-    width: 80% !important;
-    max-width: 250px !important;
-    aspect-ratio: 1 / 1 !important;
-    overflow: hidden !important;
-    border-radius: 50% !important; 
-    margin: 0 auto 25px auto !important; /* Şəklin altında boşluq */
-    display: block !important;
-    background: #111; /* Şəkil yüklənməyibsə fon */
-}
+    .reveal-item.active,
+    .chew-card.active,
+    .mobile-ready.active,
+    .mobile-instant,
+    .force-visible {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+    }
 
-.team-member .chew-img-box img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    display: block !important;
-}
-
-/* Ad hissəsi */
-.team-member .member-name {
-    font-size: 20px !important; /* Adı biraz böyütdüm */
-    font-weight: 700 !important;
-    color: #fff !important;
-    text-align: center !important;
-    width: 100% !important;
-    margin: 0 0 5px 0 !important;
-}
-
-/* Vəzifə hissəsi */
-.team-member .member-position {
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    color: #e6b32e !important; /* Narıncı rəng (şəkildəki kimi) */
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    text-align: center !important;
-    width: 100% !important;
-    margin: 0 0 20px 0 !important; /* Mətnlə arası */
-}
-
-/* ✅ ƏSAS HƏLL: Uzun mətn (Paraqraf) */
-.team-member p,
-.team-member span,
-.team-member div:not(.chew-img-box) {
-    font-family: 'Montserrat', sans-serif !important;
-    font-size: 14px !important;
-    line-height: 1.6 !important; /* Sətirlər arası məsafə rahat oxunsun */
-    color: #cccccc !important;
+    .chew-img-box {
+        opacity: 1 !important;
+        visibility: visible !important;
+        background: #111;
+        display: block !important;
+    }
     
-    /* Mərkəzləmə kodları */
-    text-align: center !important;
-    text-align-last: center !important; /* Son sətri də mərkəzləyir */
+    .chew-img-box img {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
     
-    width: 100% !important;
-    max-width: 100% !important;
+    .chew-team-grid {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: grid !important;
+    }
     
-    /* Boşluqları sıfırlayırıq ki, sola çəkməsin */
-    margin: 0 auto !important;
-    padding: 0 !important;
-}
+    .member-name,
+    .member-role {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
+    
+    #team-grid {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: grid !important;
+    }
 }
 
 /* =========================================
-   DESKTOP PROTECTION
+   18. DESKTOP PROTECTION
    ========================================= */
 @media (min-width: 769px) {
-    /* Yalnız Azərbaycan dili üçün boşluq */
     body.lang-az .mobile-menu .nav-btn,
     body.lang-az .nav-btn,
     .lang-az .nav-btn {
@@ -1613,92 +1655,8 @@ body.lang-az .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 900 !important;
     }
-} 
 
-/* =========================================
-   MOBILE FIX - ABSOLUTE VISIBILITY
-   Bu hissəni about.css faylınızın SONUNA əlavə edin
-   ========================================= */
-
-/* Mobil üçün BÜTÜNLƏYİCİ qaydalar */
-@media (max-width: 768px) {
-    
-    /* ✅ HƏR ŞEY GÖRÜNƏN OLSUN */
-    .reveal-item, 
-    .chew-card, 
-    .chew-team-grid .reveal-item,
-    .chew-team-grid .chew-card,
-    .mobile-ready,
-    .mobile-instant {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        filter: none !important;
-        transition: none !important;
-        animation: none !important;
-        display: block !important;
-    }
-
-    /* Aktiv və məcburi görünən */
-    .reveal-item.active,
-    .chew-card.active,
-    .mobile-ready.active,
-    .mobile-instant,
-    .force-visible {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        filter: none !important;
-    }
-
-    /* Şəkil konteynerləri */
-    .chew-img-box {
-        opacity: 1 !important;
-        visibility: visible !important;
-        background: #111;
-        display: block !important;
-    }
-    
-    .chew-img-box img {
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: block !important;
-    }
-    
-    /* Team grid və content */
-    .chew-team-grid {
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: grid !important;
-    }
-    
-    /* Member info */
-    .member-name,
-    .member-role {
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: block !important;
-    }
-    
-    /* Grid container özü */
-    #team-grid {
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: grid !important;
-    }
-    
-    /* Loading state üçün minimum hündürlük */
-    .chew-team-grid:empty::before {
-        content: 'Loading team members...';
-        display: block;
-        text-align: center;
-        padding: 40px;
-        color: rgba(255, 255, 255, 0.5);
-    }
-}
-
-/* Desktop üçün normal reveal animation */
-@media (min-width: 769px) {
+    /* Desktop üçün normal reveal animation */
     .reveal-item {
         opacity: 1;
         transform: translateY(60px);
@@ -1712,7 +1670,6 @@ body.lang-az .nav-btn {
         filter: blur(0);
     }
     
-    /* Desktop-da instant class effekt verməməlidir */
     .mobile-instant {
         opacity: 0;
         transform: translateY(60px);
@@ -1727,79 +1684,142 @@ body.lang-az .nav-btn {
 }
 
 /* =========================================
-   UNIVERSAL SAFEGUARD (Həm mobil, həm desktop)
+   19. UNIVERSAL SAFEGUARD
    ========================================= */
-
-/* Əgər JavaScript işləməsə belə, minimum vizibilite */
 .chew-card {
-    min-height: 200px; /* Boş görünməsin */
+    min-height: 200px;
 }
 
 .chew-img-box {
-    background-color: #111; /* Loading state-də boş olmasın */
+    background-color: #111;
 }
 
-/* Grid strukturu həmişə saxlanılsın */
 .chew-team-grid {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
     gap: 100px 40px;
 }
 
-@media (max-width: 768px) {
-    .chew-team-grid {
-        grid-template-columns: 1fr !important;
-        gap: 30px !important;
-    }
-}
 /* ============================================================
-   THE "NÖQTƏ" FIX - MEET US TEXT ALIGNMENT
+   FOOTER MOBILE FIX - ABOUT PAGE
+   Yazılar ekranın kənarına yaxın olsun
    ============================================================ */
-@media (max-width: 768px) {
-    /* 1. Əsas seksiyanın yaratdığı asimmetrik boşluğu ləğv edirik */
-    .content-section {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
 
-    /* 2. Grid-in kənarlara yapışmamasını təmin edirik */
-    .chew-team-grid {
-        width: 100% !important;
-        padding: 0 20px !important; /* Hər iki tərəfdən riyazi olaraq bərabər boşluq */
-        margin: 0 auto !important;
-        box-sizing: border-box !important;
+/* Tablet və aşağı */
+@media (max-width: 1024px) {
+    .main-footer {
+        padding: 60px 30px 30px;
     }
-
-    /* 3. Team Member konteynerini tam mərkəzləyirik */
-    .team-member {
-        width: 100% !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        padding: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
+    
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        max-width: 100%;
     }
-
-    /* 4. VƏ ƏN VACİBİ: Mətn blokunu mərkəzləyirik */
-    .team-member p, 
-    .team-member .member-bio {
-        width: 100% !important;
-        max-width: 100% !important;
-        text-align: center !important;
-        text-align-last: center !important; /* Son sətir sola qaçmasın */
-        margin: 0 auto !important;
-        padding: 0 !important;
-        display: block !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 5. Şəklin sürüşməməsi üçün */
-    .team-member .chew-img-box {
-        margin-left: auto !important;
-        margin-right: auto !important;
+    
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
     }
 }
 
+/* Mobile - Yazılar kenara yaxın */
+@media (max-width: 768px) {
+    .main-footer {
+        padding: 60px 15px 30px !important;
+        overflow-x: hidden;
+    }
+    
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-label {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+    }
+    
+    .footer-content {
+        gap: 8px;
+    }
+    
+    .footer-text {
+        font-size: 14px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .mask-link {
+        max-width: 100%;
+        word-break: break-word;
+    }
+    
+    .mask-link span {
+        font-size: 14px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .social-icons {
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+    
+    .mask-icon i {
+        font-size: 20px;
+    }
+    
+    .footer-bottom {
+        margin-top: 50px;
+        padding-top: 20px;
+    }
+    
+    .copyright {
+        font-size: 10px;
+        text-align: center;
+    }
+}
 
-
+/* Çox kiçik ekranlar */
+@media (max-width: 480px) {
+    .main-footer {
+        padding: 50px 10px 25px !important;
+    }
+    
+    .footer-wrapper {
+        gap: 35px;
+    }
+    
+    .footer-label {
+        font-size: 10px;
+        letter-spacing: 1px;
+    }
+    
+    .footer-text,
+    .mask-link span {
+        font-size: 13px;
+    }
+    
+    .social-icons {
+        gap: 20px;
+    }
+    
+    .mask-icon i {
+        font-size: 18px;
+    }
+    
+    .copyright {
+        font-size: 9px;
+    }
+}
