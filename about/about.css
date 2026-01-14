@@ -1,6 +1,6 @@
 /* =========================================
    CineChord - About Page Stylesheet
-   Version: 6.1 - MOBILE FOOTER PADDING FIXED
+   Version: 6.2 - MOBILE FOOTER LARGER TEXT
    ========================================= */
 
 /* =========================================
@@ -1323,6 +1323,33 @@ body.lang-az .menu-contact-info a {
         color: #fff !important;
     }
     
+    .hamburger-icon {
+        width: 28px;
+        height: 18px;
+        gap: 6px;
+    }
+    
+    .hamburger-line:nth-child(1) {
+        width: 28px;
+    }
+    
+    .hamburger-line:nth-child(2) {
+        width: 20px;
+    }
+    
+    .hamburger:hover .hamburger-line,
+    .hamburger.active .hamburger-line {
+        width: 28px;
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(2) {
+        transform: translateY(-4px) rotate(-45deg);
+    }
+    
     .hamburger-icon .hamburger-line {
         background-color: #fff !important;
     }
@@ -1384,7 +1411,7 @@ body.lang-az .menu-contact-info a {
 
     /* ✅ YALNIZ BU KONTEYNER PADDİNG VERİR - HƏR TƏRƏFDƏN EYNİ */
     .content-section {
-        padding: 120px 25px 60px 25px !important; /* ✅ SOL VƏ SAĞ TAM EYNİ */
+        padding: 120px 25px 60px 25px !important;
         width: 100% !important;
         margin: 0 !important;
         box-sizing: border-box !important;
@@ -1398,8 +1425,8 @@ body.lang-az .menu-contact-info a {
         display: grid !important;
         grid-template-columns: 1fr !important;
         width: 100% !important;
-        margin: 0 !important;           /* ✅ Əlavə margin YOX */
-        padding: 0 !important;          /* ✅ Content-section artıq padding verdi */
+        margin: 0 !important;
+        padding: 0 !important;
         gap: 40px !important;
         box-sizing: border-box !important;
     }
@@ -1408,7 +1435,7 @@ body.lang-az .menu-contact-info a {
         width: 100% !important;
         height: auto !important;
         aspect-ratio: 16 / 9 !important;
-        margin: 0 0 40px 0 !important;  /* ✅ Yalnız altdan boşluq */
+        margin: 0 0 40px 0 !important;
         padding: 0 !important;
     }
     
@@ -1419,10 +1446,17 @@ body.lang-az .menu-contact-info a {
         padding: 0 !important;
     }
 
+    /* ===== ✅ MƏTN BLOKLARI TAM MƏRKƏZ ===== */
+    .text-footer-block {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
     /* ===== MƏTN ELEMENTLƏR ===== */
     .hero-rolling-text {
         font-size: 10vw !important;
-        padding: 6px 0 !important;      /* ✅ Horizontal padding silindi */
+        padding: 6px 0 !important;
         margin: 0 auto 80px auto !important;
         text-align: center !important;
         width: 100% !important;
@@ -1432,13 +1466,33 @@ body.lang-az .menu-contact-info a {
         font-size: 25px !important;
         line-height: 1.4 !important;
         letter-spacing: 0.5px !important;
-        margin: 0 auto !important;      /* ✅ Mərkəzdə */
+        margin: 0 auto 30px auto !important;
         padding: 0 !important;
         text-align: center !important;
+        max-width: 100% !important;
         width: 100% !important;
     }
 
-    .desc-text,
+    .description-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .desc-text {
+        font-size: 14px !important;
+        line-height: 1.7 !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     .subtitle {
         text-align: center !important;
         width: 100% !important;
@@ -1493,12 +1547,13 @@ body.lang-az .menu-contact-info a {
         grid-template-columns: 1fr !important;
         gap: 50px !important;
         width: 100% !important;
-        margin: 100px 0 0 0 !important; /* ✅ Sol/sağ margin yoxdur */
-        padding: 0 !important;          /* ✅ ƏLAVƏ padding yoxdur */
+        margin: 100px 0 0 0 !important;
+        padding: 0 !important;
         box-sizing: border-box !important;
     }
 
-    /* ✅ Team member - ƏLAVƏ PADDİNG YOX */
+    /* ✅ Team member - TAM MƏRKƏZ */
+    .chew-card,
     .team-member {
         display: flex !important;
         flex-direction: column !important;
@@ -1506,24 +1561,26 @@ body.lang-az .menu-contact-info a {
         justify-content: flex-start !important;
         text-align: center !important;
         width: 100% !important;
-        padding: 0 !important;          /* ✅ 15px silindi */
+        padding: 0 !important;
         margin: 0 auto !important;
         box-sizing: border-box !important;
     }
 
     /* Şəkil */
-    .team-member .chew-img-box {
-        width: 80% !important;
-        max-width: 250px !important;
-        aspect-ratio: 1 / 1 !important;
-        overflow: hidden !important;
-        border-radius: 50% !important; 
-        margin: 0 auto 25px auto !important;
-        padding: 0 !important;
-        display: block !important;
-        background: #111;
-    }
+.chew-card .chew-img-box,
+.team-member .chew-img-box {
+    width: 100% !important;           /* ✅ 80%-dən 100%-ə */
+    max-width: 350px !important;      /* ✅ 250px-dən 350px-ə */
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
+    border-radius: 0 !important;  /* ✅ 50% əvəzinə 0 - kvadrat */
+    margin: 0 auto 25px auto !important;
+    padding: 0 !important;
+    display: block !important;
+    background: #111;
+}
 
+    .chew-card .chew-img-box img,
     .team-member .chew-img-box img {
         width: 100% !important;
         height: 100% !important;
@@ -1532,6 +1589,7 @@ body.lang-az .menu-contact-info a {
     }
 
     /* Ad */
+    .chew-card .member-name,
     .team-member .member-name {
         font-size: 20px !important;
         font-weight: 700 !important;
@@ -1543,6 +1601,8 @@ body.lang-az .menu-contact-info a {
     }
 
     /* Vəzifə */
+    .chew-card .member-position,
+    .chew-card .member-role,
     .team-member .member-position,
     .team-member .member-role {
         font-size: 13px !important;
@@ -1557,21 +1617,39 @@ body.lang-az .menu-contact-info a {
     }
 
     /* ✅ BİO MƏTN - TAM MƏRKƏZLƏŞDIRMƏ */
-    .team-member p,
+    .chew-card .member-bio,
+    .chew-card p,
     .team-member .member-bio,
-    .team-member span:not(.member-name):not(.member-role),
-    .team-member div:not(.chew-img-box) {
+    .team-member p {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 14px !important;
-        line-height: 1.6 !important;
+        line-height: 1.7 !important;
         color: #cccccc !important;
         text-align: center !important;
-        text-align-last: center !important; /* ✅ Son sətir də mərkəzdə */
+        text-align-last: center !important;
         width: 100% !important;
         max-width: 100% !important;
         margin: 0 auto !important;
         padding: 0 !important;
         box-sizing: border-box !important;
+        display: block !important;
+    }
+
+    /* ✅ Əgər bio <div> içindədirsə */
+    .chew-card div:not(.chew-img-box),
+    .team-member div:not(.chew-img-box) {
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    /* ✅ Bütün team card elementləri */
+    .chew-team-grid .chew-card,
+    .chew-team-grid .team-member {
+        text-align: center !important;
+        width: 100% !important;
+        padding: 0 !important;
     }
 
     /* ===== GÖRÜNÜRLÜK ===== */
@@ -1631,6 +1709,72 @@ body.lang-az .menu-contact-info a {
         opacity: 1 !important;
         visibility: visible !important;
         display: grid !important;
+    }
+
+    /* ===== FOOTER MOBİL ===== */
+    .main-footer {
+        padding: 60px 15px 30px !important;
+        overflow-x: hidden;
+    }
+    
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-label {
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+    }
+    
+    .footer-content {
+        gap: 8px;
+    }
+    
+    .footer-text {
+        font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .mask-link {
+        max-width: 100%;
+        word-break: break-word;
+    }
+    
+    .mask-link span {
+        font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .social-icons {
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+    
+    .mask-icon i {
+        font-size: 24px;
+    }
+    
+    .footer-bottom {
+        margin-top: 50px;
+        padding-top: 20px;
+    }
+    
+    .copyright {
+        font-size: 11px;
+        text-align: center;
     }
 }
 
@@ -1744,7 +1888,7 @@ body.lang-az .menu-contact-info a {
     }
     
     .footer-label {
-        font-size: 11px;
+        font-size: 13px;
         letter-spacing: 1.5px;
         margin-bottom: 10px;
     }
@@ -1754,7 +1898,7 @@ body.lang-az .menu-contact-info a {
     }
     
     .footer-text {
-        font-size: 14px;
+        font-size: 16px;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
@@ -1765,7 +1909,7 @@ body.lang-az .menu-contact-info a {
     }
     
     .mask-link span {
-        font-size: 14px;
+        font-size: 16px;
         word-wrap: break-word;
         overflow-wrap: break-word;
         white-space: normal;
@@ -1777,7 +1921,7 @@ body.lang-az .menu-contact-info a {
     }
     
     .mask-icon i {
-        font-size: 20px;
+        font-size: 24px;
     }
     
     .footer-bottom {
@@ -1786,7 +1930,7 @@ body.lang-az .menu-contact-info a {
     }
     
     .copyright {
-        font-size: 10px;
+        font-size: 11px;
         text-align: center;
     }
 }
@@ -1802,13 +1946,13 @@ body.lang-az .menu-contact-info a {
     }
     
     .footer-label {
-        font-size: 10px;
+        font-size: 12px;
         letter-spacing: 1px;
     }
     
     .footer-text,
     .mask-link span {
-        font-size: 13px;
+        font-size: 15px;
     }
     
     .social-icons {
@@ -1816,10 +1960,10 @@ body.lang-az .menu-contact-info a {
     }
     
     .mask-icon i {
-        font-size: 18px;
+        font-size: 22px;
     }
     
     .copyright {
-        font-size: 9px;
+        font-size: 10px;
     }
 }

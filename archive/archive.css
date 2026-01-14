@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Stylesheet
-   Version: 6.4 - INCREASED TITLE SPACING (COMMERCIAL & ARCHIVE)
+   Version: 6.3 - AZ LANGUAGE MENU SAME AS INDEX + SOCIAL STABLE
    ============================================================ */
 
 /* ============================================================
@@ -744,7 +744,6 @@ body.lang-az .menu-contact-info a {
     overflow: visible;
 }
 
-/* ✅ COMMERCIAL VƏ ARCHIVE ARASINDA DAHA ÇOX BOŞ YER */
 .split-titles {
     display: flex;
     justify-content: space-between;
@@ -754,7 +753,6 @@ body.lang-az .menu-contact-info a {
     max-width: 100%;
     box-sizing: border-box;
     overflow: visible;
-    gap: 100px; /* ✅ Hərflər arasında daha çox boşluq */
 }
 
 .video-title {
@@ -765,6 +763,7 @@ body.lang-az .menu-contact-info a {
     height: auto;
     min-height: clamp(40px, 6vw, 70px);
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
     overflow: visible;
 }
@@ -775,14 +774,14 @@ body.lang-az .menu-contact-info a {
     font-weight: 900;
     letter-spacing: -2px;
     line-height: 1.15;
-    -webkit-text-stroke: 0;
-    color: #FFA500;
+    -webkit-text-stroke: 0;  /* ✅ 1.2px #FFA500 əvəzinə 0 */
+    color: #FFA500;  /* ✅ transparent əvəzinə #FFA500 */
     text-transform: uppercase;
     position: absolute;
     opacity: 0;
     transform: translateY(100px);
     animation: cycleWords 9s infinite;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .video-word:nth-child(1) { animation: cycleWords 9s infinite 0s; }
@@ -802,6 +801,7 @@ body.lang-az .menu-contact-info a {
     opacity: 0;
     animation: fadeInUp 0.8s ease forwards;
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
     padding: 0;
     margin: 0;
@@ -820,14 +820,14 @@ body.lang-az .menu-contact-info a {
     letter-spacing: -2px;
     line-height: 1.15;
     margin-bottom: 15px;
-    -webkit-text-stroke: 0;
-    color: #FFA500;
+    -webkit-text-stroke: 0;  /* ✅ 1.2px #FFA500 əvəzinə 0 */
+    color: #FFA500;  /* ✅ transparent əvəzinə #FFA500 */
     text-transform: uppercase;
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
     box-sizing: border-box;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .archive-subtitle {
@@ -1045,15 +1045,15 @@ body.lang-az .menu-contact-info a {
 .preview-title {
     font-family: 'Gabarito', sans-serif;
     font-weight: 900;
-    color: #fff;
-    -webkit-text-stroke: 0;
+    color: #fff;  /* ✅ transparent əvəzinə #fff */
+    -webkit-text-stroke: 0;  /* ✅ 1px #fff əvəzinə 0 */
     font-size: clamp(24px, 4vw, 50px);
     margin: 0;
     text-transform: uppercase;
     transform: translateY(105%);
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);  /* ✅ Kölgə əlavə */
 }
 
 .preview-title::after {
@@ -1387,11 +1387,6 @@ body.lang-az .menu-contact-info a {
     .video-wrapper {
         width: 95%;
     }
-
-    /* Tablet üçün də gap bir az azalır */
-    .split-titles {
-        gap: 60px;
-    }
 }
 
 /* ============================================================
@@ -1491,6 +1486,12 @@ body.lang-az .menu-contact-info a {
         left: auto !important;
         z-index: 30001;
     }
+    
+    @media (max-width: 768px) {
+    body.lang-en .nav-btn {
+        letter-spacing: 0.08em !important;
+    }
+}
     
     .lang-globe-btn {
         padding: 8px 6px;
@@ -1607,7 +1608,7 @@ body.lang-az .nav-btn {
         transform: translateX(5px) !important; 
     }
 
-      /* ✅ SOSİAL BÖLMƏ (INDEX İLƏ EYNİ - SABİTLƏŞDİRİLMİŞ) */
+      /* ✅ SOSİAL BÖLMƏ (INDEX İLƏ EYNİ - SABİTLƏNMİŞ) */
     body.lang-az .menu-socials a {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 12px !important;
@@ -1644,11 +1645,6 @@ body.lang-az .nav-btn {
     .logo-img {
         width: 80px;
         height: 80px;
-    }
-
-    /* ✅ MOBİLDƏ DƏ YAN-YANA QALIR, SADƏCƏ GAP AZ OLUR */
-    .split-titles {
-        gap: 40px !important; /* Mobil üçün 40px kifayətdir */
     }
 
     body.lang-az .video-title {
@@ -1759,6 +1755,40 @@ body.lang-az .nav-btn {
     .right-controls-group {
         gap: 8px;
     }
+    /* ✅ BAŞLIQLAR - Tam Paralel */
+.split-titles {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end !important;  /* Hər ikisi alt tərəfdən hizalansın */
+    gap: 20px;
+}
+
+.video-title {
+    position: relative;
+    height: clamp(24px, 6.5vw, 45px);  /* Yüksəklik təyin et */
+}
+
+.video-word {
+    font-size: clamp(24px, 6.5vw, 45px) !important;
+    letter-spacing: 0.5px !important;
+    line-height: 0.3 !important;
+    white-space: nowrap !important;
+    top: 0 !important;  /* Yuxarıdan başlasın */
+}
+
+.archive-title-container {
+    text-align: right !important;
+}
+
+.archive-title {
+    font-size: clamp(24px, 6.5vw, 45px) !important;
+    letter-spacing: 0.5px !important;
+    line-height: 0.5 !important;
+    white-space: nowrap !important;
+    margin-bottom: 15px;
+    position: relative;
+    right: -25px;  /* Sağa - istədiyin qədər */
+}
 }
 
 /* ============================================================
@@ -1777,10 +1807,6 @@ body.lang-az .nav-btn {
 
     .archive-section {
         padding: 130px 10px 60px;
-    }
-
-    .split-titles {
-        gap: 30px !important; /* Kiçik mobil üçün 30px */
     }
 
     body.lang-az .video-title {
