@@ -3,9 +3,8 @@
    Version: 5.3 - MOBILE AUTOPLAY OVERLAY FIX
    ============================================================ */
 
-const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/CineChord_Showreel_1_1_y9lq3g.mp4";
+const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dwybvusv6/video/upload/f_auto,q_auto,vc_auto/CineChord__Showreel_b7noe2";
 
-// Global video configuration
 window.CONFIG = {
     videos: [
         SHOWREEL_VIDEO_URL,

@@ -445,45 +445,68 @@
     }
 }
 
-    function processApiData(data, lang = 'en') {
-        console.log('🔧 processApiData called');
-        console.log('📦 API data received:', data);
-        
-        function formatText(text) {
-            if (!text) return '';
-            return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
-        }
-
-        const ensureHttps = (url) => {
-            if (!url) return null;
-            return url.replace('http://', 'https://');
-        };
-        
-        const content = {
-            mainTitle: data.mainTitle || (lang === 'az' ? "HAQQIMIZDA" : "ABOUT US"),
-            subTitle: data.subTitle || "",
-            whoWeAreText: formatText(data.whoWeAreText || ''),
-            ourMissionText: formatText(data.ourMissionText || ''),
-            ourApproachText: formatText(data.ourApproachText || ''),
-            email: data.email || "hello@cinechord.com",
-            phone: data.phone || "+994 50 123 45 67",
-            address: data.address || (lang === 'az' ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"),
-            videoUrl: ensureHttps(data.videoUrl),
-            
-            // Why CineChord
-            whyTitle: data.whyTitle || (lang === 'az' ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES"),
-            whyDescription: data.whyDescription || "",
-            whyMediaUrl: ensureHttps(data.whyMediaUrl),
-            whyMediaType: data.whyMediaType || 'video',
-            
-            // Team
-            teamMembers: data.teamMembers || []
-        };
-        
-        console.log('👥 Team members in content:', content.teamMembers.length);
-        
-        populateContent(content);
+ function processApiData(data, lang = 'en') {
+    console.log('🔧 processApiData called');
+    console.log('📦 API data received:', data);
+    
+    function formatText(text) {
+        if (!text) return '';
+        return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
     }
+
+    // ⭐ YENİ: Cloudinary optimizasiyalı HTTPS çevirici
+// ⭐ YENİ: Cloudinary optimizasiyalı HTTPS çevirici (FIXED)
+const ensureHttps = (url) => {
+    if (!url) return null;
+    
+    // HTTP -> HTTPS
+    url = url.replace('http://', 'https://');
+    
+    // Cloudinary video optimizasiyası
+    if (
+        url.includes('cloudinary.com') &&
+        url.includes('/video/upload/') &&
+        !url.includes('/f_auto,q_auto,vc_auto/') &&
+        !url.includes('/f_auto,q_auto/')
+    ) {
+        const uploadIndex = url.indexOf('/video/upload/');
+        const before = url.substring(0, uploadIndex + '/video/upload/'.length);
+        const after = url.substring(uploadIndex + '/video/upload/'.length);
+        
+        return `${before}f_auto,q_auto,vc_auto/${after}`;
+    }
+    
+    return url;
+};
+
+    
+    const content = {
+        mainTitle: data.mainTitle || (lang === 'az' ? "HAQQIMIZDA" : "ABOUT US"),
+        subTitle: data.subTitle || "",
+        whoWeAreText: formatText(data.whoWeAreText || ''),
+        ourMissionText: formatText(data.ourMissionText || ''),
+        ourApproachText: formatText(data.ourApproachText || ''),
+        email: data.email || "hello@cinechord.com",
+        phone: data.phone || "+994 50 123 45 67",
+        address: data.address || (lang === 'az' ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"),
+        
+        // ✅ Avtomatik optimize olunur
+        videoUrl: ensureHttps(data.videoUrl),
+        
+        // Why CineChord
+        whyTitle: data.whyTitle || (lang === 'az' ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES"),
+        whyDescription: data.whyDescription || "",
+        whyMediaUrl: ensureHttps(data.whyMediaUrl), // ✅ Bu da optimize olunur
+        whyMediaType: data.whyMediaType || 'video',
+        
+        // Team
+        teamMembers: data.teamMembers || []
+    };
+    
+    console.log('👥 Team members in content:', content.teamMembers.length);
+    
+    populateContent(content);
+}
 
     function populateContent(content) {
         console.log('🎨 populateContent called');

@@ -7,7 +7,7 @@
     const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
     const API_WORKS = `${BACKEND_URL}/api/works`;
     const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
-    const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dinncr6hs/video/upload/Works_Showreel_epbwt0.mp4";    
+    const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dwybvusv6/video/upload/f_mp4,q_auto,vc_auto/Works_Showreel_f6dwys.mp4";
     
     // Əsas elementlər
     const container = document.getElementById('dynamic-projects-grid');
@@ -481,9 +481,59 @@
 // ============================================================
 
 // URL təmizləyən və birləşdirən köməkçi funksiya
+// ============================================================
+// 6. WORKS API & GRID - (Qara ekran problemi həll olunmuş versiya)
+// ============================================================
+
+// ⭐ YENİ FUNKSIYA: Cloudinary URL Optimizasiyası (FIXED)
+function optimizeCloudinaryUrl(url) {
+    if (!url) return '';
+    
+    // HTTP -> HTTPS
+    url = url.replace('http://', 'https://');
+    
+    // Yalnız Cloudinary URL-lərini optimize et
+    if (!url.includes('cloudinary.com')) {
+        return url;
+    }
+    
+    // Əgər artıq optimize edilmiş parametrlər varsa, geri qaytar
+    if (
+        url.includes('/f_auto,q_auto,vc_auto/') ||
+        url.includes('/f_auto,q_auto/')
+    ) {
+        return url;
+    }
+    
+    // Video optimizasiyası
+    const uploadIndex = url.indexOf('/video/upload/');
+    
+    if (uploadIndex === -1) {
+        // Video deyil, image ola bilər
+        const imageUploadIndex = url.indexOf('/image/upload/');
+        if (imageUploadIndex !== -1) {
+            const before = url.substring(0, imageUploadIndex + '/image/upload/'.length);
+            const after = url.substring(imageUploadIndex + '/image/upload/'.length);
+            return `${before}f_auto,q_auto/${after}`;
+        }
+        return url;
+    }
+    
+    // ✅ VIDEO üçün: format + quality + codec auto
+    const before = url.substring(0, uploadIndex + '/video/upload/'.length);
+    const after = url.substring(uploadIndex + '/video/upload/'.length);
+    
+    return `${before}f_auto,q_auto,vc_auto/${after}`;
+}
+
+// URL təmizləyən və birləşdirən köməkçi funksiya
 function getFullMediaUrl(path) {
     if (!path) return '';
-    if (path.startsWith('http')) return path;
+    
+    // ⭐ YENİ: Əgər artıq tam URL-dirsə, optimize et və qaytar
+    if (path.startsWith('http')) {
+        return optimizeCloudinaryUrl(path);
+    }
 
     let cleanPath = path;
     while (cleanPath.startsWith('/')) {
@@ -492,7 +542,9 @@ function getFullMediaUrl(path) {
     if (cleanPath.startsWith('uploads/')) {
         cleanPath = cleanPath.substring(8);
     }
-    return UPLOADS_URL + cleanPath;
+    
+    const fullUrl = UPLOADS_URL + cleanPath;
+    return optimizeCloudinaryUrl(fullUrl); // ⭐ YENİ: Optimize et
 }
 
 async function loadDynamicWorks() {
@@ -513,12 +565,11 @@ async function loadDynamicWorks() {
 
         works.forEach((work, index) => {
             const rawVideoPath = work.previewVideoUrl || work.videoUrl;
-            const videoSrc = getFullMediaUrl(rawVideoPath);
+            const videoSrc = getFullMediaUrl(rawVideoPath); // ✅ Artıq avtomatik optimize olunur
             const categoryClass = categoryMap[work.category] || 'other';
 
             if (!videoSrc) return;
 
-            // DƏYİŞİKLİK BURADADIR: src dərhal təyin olunur və #t=0.1 əlavə edilir
             const workHTML = `
                 <div class="project-card reveal-item" 
                     data-category="${categoryClass}" 
@@ -545,7 +596,6 @@ async function loadDynamicWorks() {
         const newCards = container.querySelectorAll('.project-card');
         newCards.forEach(card => observer.observe(card));
 
-        // Hover effektlərini aktivləşdiririk
         attachHoverEffects();
 
     } catch (error) {
@@ -559,14 +609,12 @@ function attachHoverEffects() {
         const video = card.querySelector('video');
         if (!video) return;
 
-        // Hover edəndə video başlasın
         card.addEventListener('mouseenter', () => {
             video.play().catch(error => {
                 console.log("Play error:", error);
             });
         });
 
-        // Hover-dən çıxanda video dayansın və yenidən ilk rəngli kadrda (0.1s) qalsın
         card.addEventListener('mouseleave', () => {
             video.pause();
             video.currentTime = 0.1; 
@@ -574,23 +622,23 @@ function attachHoverEffects() {
     });
 }
 
-    window.filterWorks = function(category, btn) {
-        if(btn) {
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+window.filterWorks = function(category, btn) {
+    if(btn) {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    const cards = document.querySelectorAll('.project-card');
+    cards.forEach(card => {
+        const cardCat = card.getAttribute('data-category');
+        if (category === 'all' || cardCat === category) {
+            card.style.display = 'block';
+            setTimeout(() => card.classList.add('active'), 50); 
+        } else {
+            card.style.display = 'none';
+            card.classList.remove('active');
         }
-        const cards = document.querySelectorAll('.project-card');
-        cards.forEach(card => {
-            const cardCat = card.getAttribute('data-category');
-            if (category === 'all' || cardCat === category) {
-                card.style.display = 'block';
-                setTimeout(() => card.classList.add('active'), 50); 
-            } else {
-                card.style.display = 'none';
-                card.classList.remove('active');
-            }
-        });
-    };
+    });
+};
 
     // ============================================================
     // 7. SCROLL REVEAL

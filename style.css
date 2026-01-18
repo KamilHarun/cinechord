@@ -1233,9 +1233,8 @@ body.lang-az .play-text {
 }
 
 /* ============================================================
-   15. VIDEO MODAL
+   12. VIDEO MODAL PLAYER
    ============================================================ */
-
 .preview-container {
     position: fixed;
     top: 0;
@@ -1251,6 +1250,7 @@ body.lang-az .play-text {
     visibility: hidden;
     pointer-events: none;
     transition: opacity 0.5s ease, visibility 0.5s ease;
+    will-change: opacity;
 }
 
 .preview-container.active {
@@ -1274,6 +1274,7 @@ body.lang-az .play-text {
     transform: translateY(100%);
     opacity: 0;
     transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+    will-change: transform, opacity;
 }
 
 .preview-container.active .video-wrapper {
@@ -1299,60 +1300,193 @@ body.lang-az .play-text {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    transition: all 0.5s ease;
+    will-change: opacity, transform;
 }
 
-.text-mask {
-    overflow: hidden;
-    position: relative;
+.preview-container.user-inactive .preview-info {
+    opacity: 0;
+    transform: translateY(-40px);
 }
 
+/* 1. ÜMUMİ VƏ DESKTOP (WEB) ÜÇÜN KOD */
 .preview-title {
     font-family: 'Gabarito', sans-serif;
     font-weight: 900;
+    font-size: clamp(40px, 8vw, 100px);
     color: #fff;
     -webkit-text-stroke: 0;
-    font-size: clamp(24px, 4vw, 50px);
     margin: 0;
     text-transform: uppercase;
     transform: translateY(105%);
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    
+    /* Masaüstü üçün böyük ölçü (Web üçün bunu istifadə edin) */
+    font-size: 100px; 
+}
+
+.preview-title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #fff;
+    -webkit-text-stroke: 0;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
 
 .preview-container.active .preview-title {
     transform: translateY(0);
 }
 
-.preview-container.user-inactive .preview-title {
-    transform: translateY(105%);
+.preview-container.active .preview-title::after {
+    clip-path: inset(0 0% 0 0);
+}
+
+.close-preview {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2001;
+    pointer-events: auto;
+    will-change: transform, opacity;
+}
+
+.preview-container.user-inactive .close-preview {
+    opacity: 0;
+    transform: scale(0.8) rotate(90deg);
+}
+
+.close-preview:hover {
+    border-color: #FFA500;
+    color: #FFA500;
+    transform: rotate(90deg);
 }
 
 .modal-play-btn {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+    opacity: 0;
+    pointer-events: auto !important;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-container.is-paused .modal-play-btn,
+.preview-container:not(.is-paused):not(.user-inactive) .modal-play-btn {
+    opacity: 1;
+}
+
+.preview-container:not(.is-paused).user-inactive .modal-play-btn {
+    opacity: 0;
+}
+
+.play-button-container {
+    width: 250px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.play-button {
+    position: relative;
+    width: 90px;
+    height: 34px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s ease;
+    pointer-events: none;
+}
+
+.play-button::before {
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    z-index: 1002;
     transform: translate(-50%, -50%);
-    visibility: hidden;
-    opacity: 0;
-    clip-path: inset(100% 0 0 0);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: auto !important;
+    width: 135px;
+    height: 46px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 100px;
+    transition: all 0.4s ease;
+    pointer-events: none;
 }
 
-.preview-container.active .modal-play-btn,
-.preview-container.user-active .modal-play-btn,
-.preview-container.is-paused .modal-play-btn {
-    visibility: visible;
-    opacity: 1;
-    clip-path: inset(0 0 0 0);
+.play-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
+    width: 180px;
+    height: 58px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 100px;
+    transition: all 0.4s ease;
+    pointer-events: none;
 }
 
-.preview-container.user-inactive .modal-play-btn {
-    visibility: hidden;
-    opacity: 0;
-    clip-path: inset(100% 0 0 0);
-    transform: translate(-50%, -50%);
+.play-button i {
+    display: none !important;
+}
+
+.play-text {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #fff;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: color 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.play-button-container:hover .play-button {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    width: 98px;
+}
+
+.play-button-container:hover .play-text {
+    color: #ffffff;
+    letter-spacing: 3px;
+}
+
+.play-button-container:hover .play-button::before {
+    border-color: rgba(255, 255, 255, 0.8);
+    width: 145px;
+    height: 50px;
+}
+
+.play-button-container:hover .play-button::after {
+    border-color: rgba(255, 255, 255, 0.5);
+    width: 200px;
+    height: 66px;
 }
 
 .custom-controls {
@@ -1369,6 +1503,7 @@ body.lang-az .play-text {
     opacity: 1;
     transform: translateY(0);
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
 }
 
 .preview-container.user-inactive .custom-controls {
@@ -1412,6 +1547,8 @@ body.lang-az .play-text {
     height: 100%;
     opacity: 0;
     cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .controls-buttons {
@@ -1425,15 +1562,13 @@ body.lang-az .play-text {
     background: transparent;
     border: none;
     color: #fff;
-    padding: 8px;
+    padding: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.2s ease, color 0.2s ease;
     opacity: 0.8;
-    min-width: 40px;
-    min-height: 40px;
 }
 
 .ctrl-btn:hover {
@@ -1442,29 +1577,16 @@ body.lang-az .play-text {
     opacity: 1;
 }
 
-/* Font Awesome ikonları üçün xüsusi stil */
-.ctrl-btn i,
-.ctrl-btn .fa-solid,
-.ctrl-btn .fa-brands,
-.ctrl-btn [class^="fa-"],
-.ctrl-btn [class*=" fa-"] {
-    font-family: "Font Awesome 6 Free" !important;
-    font-weight: 900;
+.ctrl-btn i {
     font-size: 20px;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 .main-play-btn i {
-    font-size: 32px !important;
+    font-size: 24px;
 }
 
 .skip-btn i {
-    font-size: 18px !important;
+    font-size: 18px;
 }
 
 .time-display {
@@ -1500,30 +1622,10 @@ body.lang-az .play-text {
     cursor: pointer;
 }
 
-.close-preview {
-    position: absolute;
-    top: 40px;
-    right: 40px;
-    width: 50px;
-    height: 50px;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 2001;
-    pointer-events: auto;
-}
-
-.close-preview:hover {
-    border-color: #FFA500;
-    color: #FFA500;
-    transform: rotate(90deg);
+.speed-btn {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .video-loading {
@@ -1763,32 +1865,30 @@ body.lang-az .nav-btn {
     object-position: center;
   }
 }
+/* ============================================================
+   ONLY MOBILE & TABLET (Max-width: 991px)
+   ============================================================ */
+@media (max-width: 991px) {
 
-  /* Modal & Player Controls hissəsini tapın və bunu tətbiq edin */
-.modal-play-btn {
-    /* Ölçüləri bir az kiçildirik (məsələn: 120x60-dan 100x45-ə) */
-    width: 100px !important; 
-    height: 45px !important; 
-    
-     /* Mərkəzləmə kodları olduğu kimi qalır */
-    top: 70% !important;  /* 50%-dən 70%-ə qaldırdıq ki, düymə aşağı düşsün */
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    /* Modal Play Düyməsi Tənzimləmələri */
+    .modal-play-btn {
+        width: 100px !important; 
+        height: 45px !important; 
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        font-size: 12px !important;
+        line-height: 1 !important;
+        border: 1px solid #fff !important;
+        border-radius: 50px !important;
+    }
 
-    /* Kəsilmənin qarşısını alan əsas hissə */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important; /* Daxili boşluğu sıfırlayırıq ki, ölçü sabit qalsın */
-    overflow: visible !important; /* Kənara çıxan element varsa görünsün */
-    
-    /* Yazı tənzimləməsi */
-    font-size: 12px !important; /* Yazını bir az kiçildirik ki, düyməyə sığsın */
-    line-height: 1 !important;
-    border: 1px solid #fff !important; /* Əgər border kəsilirsə bura diqqət */
-    border-radius: 50px !important; /* Oval görünüş üçün */
-}
-
+    /* Ümumi Məlumat və Başlıq */
     .preview-info {
         top: 70px;
         left: 20px;
@@ -1805,6 +1905,7 @@ body.lang-az .nav-btn {
         height: 40px;
     }
 
+    /* Kontrol Paneli və Düymələr */
     .custom-controls {
         padding: 0 10px 20px 10px;
     }
@@ -1821,17 +1922,18 @@ body.lang-az .nav-btn {
         font-size: 9px;
     }
 
-    
-    /* ✅ AZƏRBAYCAN DİLİ - MODAL */
+    /* Azərbaycan dili - Modal tənzimləməsi */
     body.lang-az .modal-play-btn .play-text {
         font-size: 7px !important;
         letter-spacing: 0.3px !important;
     }
-    
-    /* ✅ HOVER EFFEKTLƏRİNİ BLOKLA */
+
+    /* HOVER EFFEKTLƏRİNİ BLOKLA (Mobil üçün sabit görünüş) */
     .preview-container .modal-play-btn:hover .play-button,
     .preview-container .modal-play-btn:active .play-button,
-    .preview-container.active .modal-play-btn:hover .play-button {
+    .preview-container.active .modal-play-btn:hover .play-button,
+    .preview-container .play-button-container:hover .play-button,
+    .preview-container .play-button-container:active .play-button {
         width: 60px !important;
         height: 24px !important;
         border-color: rgba(255, 255, 255, 0.9) !important;
@@ -1839,86 +1941,38 @@ body.lang-az .nav-btn {
         transform: none !important;
         scale: 1 !important;
     }
-    
+
+    /* Halqaların (Rings) Mobil Ölçüləri */
     .preview-container .modal-play-btn:hover .play-button::before,
-    .preview-container .modal-play-btn:active .play-button::before {
+    .preview-container .modal-play-btn:active .play-button::before,
+    .preview-container .play-button-container:hover .play-button::before {
         width: 90px !important;
         height: 32px !important;
         border-color: rgba(255, 255, 255, 0.5) !important;
-        transform: translate(calc(-50% + var(--ring-x)), calc(-50% + var(--ring-y))) !important;
     }
-    
+
     .preview-container .modal-play-btn:hover .play-button::after,
-    .preview-container .modal-play-btn:active .play-button::after {
+    .preview-container .modal-play-btn:active .play-button::after,
+    .preview-container .play-button-container:hover .play-button::after {
         width: 120px !important;
         height: 40px !important;
         border-color: rgba(255, 255, 255, 0.3) !important;
-        transform: translate(calc(-50% + var(--ring-x) * 1.5), calc(-50% + var(--ring-y) * 1.5)) !important;
     }
-    
+
+    /* Mobil Yazı və Səs Tənzimləməsi */
     .preview-container .modal-play-btn:hover .play-text,
-    .preview-container .modal-play-btn:active .play-text {
+    .preview-container .modal-play-btn:active .play-text,
+    .preview-container .play-button-container:hover .play-text,
+    .preview-container .play-button-container:active .play-text {
         color: #fff !important;
         letter-spacing: 0.5px !important;
         transform: none !important;
     }
-    
-    body.lang-az .preview-container .modal-play-btn:hover .play-text,
-    body.lang-az .preview-container .modal-play-btn:active .play-text {
-        letter-spacing: 0.3px !important;
-    }
-    
-    .preview-container .play-button-container:hover .play-button,
-    .preview-container .play-button-container:active .play-button {
-        width: 60px !important;
-        height: 24px !important;
-        transform: none !important;
-    }
-    
-    .preview-container .play-button-container:hover .play-button::before,
-    .preview-container .play-button-container:active .play-button::before {
-        width: 90px !important;
-        height: 32px !important;
-    }
-    
-    .preview-container .play-button-container:hover .play-button::after,
-    .preview-container .play-button-container:active .play-button::after {
-        width: 120px !important;
-        height: 40px !important;
-    }
-    
-    .preview-container .play-button-container:hover .play-text,
-    .preview-container .play-button-container:active .play-text {
-        letter-spacing: 0.5px !important;
-    }
-    
-    body.lang-az .preview-container .play-button-container:hover .play-text,
-    body.lang-az .preview-container .play-button-container:active .play-text {
-        letter-spacing: 0.3px !important;
-    }
-    
-    .custom-controls {
-        padding: 0 20px 40px;
-    }
-    
-    .ctrl-btn {
-        min-width: 36px;
-        min-height: 36px;
-        padding: 6px;
-    }
-    
-    .ctrl-btn i {
-        font-size: 16px !important;
-    }
-    
-    .main-play-btn i {
-        font-size: 24px !important;
-    }
-    
-    .volume-wrapper {
-        display: none;
-    }
 
+    .volume-wrapper {
+        display: none; /* Mobildə səs barını gizlədir */
+    }
+}
 
 /* ============================================================
    18. RESPONSIVE - SMALL MOBILE (480px)
