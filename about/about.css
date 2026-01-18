@@ -1493,11 +1493,18 @@ body.lang-az .menu-contact-info a {
         max-width: 100% !important;
     }
 
-    .subtitle {
+   .subtitle {
         text-align: center !important;
         width: 100% !important;
-        margin: 0 auto !important;
+        
+        /* 🔥 ƏSAS HİSSƏ: -20px yazırıq ki, aşağıdakı mətni özünə çəksin */
+        margin: 0 auto 60px auto !important; 
+        
         padding: 0 !important;
+        display: block !important;
+        line-height: 1 !important; 
+        z-index: 5; /* Yazının digər elementlərin altında qalmaması üçün */
+        position: relative;
     }
 
     /* ===== SOSİAL VƏ KONTAKT ===== */
@@ -1528,13 +1535,14 @@ body.lang-az .menu-contact-info a {
     }
 
     /* ===== ✅ KOMANDA SEKSİYASI - TAM DÜZƏLDİLMİŞ ===== */
-    .sidebar-label {
+ .sidebar-label {
         position: relative !important;
         top: 0 !important;
         display: block !important;
         text-align: center !important;
         width: 100% !important;
-        margin: 40px auto 80px auto !important;
+        /* margin: Yuxarı | Sağ | Aşağı | Sol */
+        margin: 40px auto 30px auto !important; /* <--- DƏYİŞİKLİK: Sonda 80px idi, 30px etdik */
         padding: 0 !important;
         font-size: 14px !important;
         letter-spacing: 3px !important;

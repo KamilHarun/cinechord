@@ -1313,7 +1313,10 @@ body.lang-az .play-text {
 .preview-title {
     font-family: 'Gabarito', sans-serif;
     font-weight: 900;
-    font-size: clamp(40px, 8vw, 100px);
+    
+    /* 1-ci hissə:
+    font-size: clamp(30px, 5vw, 60px); /* Əvvəl: clamp(40px, 8vw, 100px) */
+    
     color: #fff;
     -webkit-text-stroke: 0;
     margin: 0;
@@ -1323,8 +1326,8 @@ body.lang-az .play-text {
     position: relative;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
     
-    /* Masaüstü üçün böyük ölçü (Web üçün bunu istifadə edin) */
-    font-size: 100px; 
+    /* 2-ci hissə: Ən vacibi buradır (Sondakı override) */
+    font-size: 60px; /* Əvvəl: 100px idi. Bunu istədiyin qədər azalt (məs: 50px, 40px) */
 }
 
 .preview-title::after {

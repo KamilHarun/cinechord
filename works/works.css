@@ -2107,6 +2107,33 @@ body.lang-az .nav-btn {
         font-size: 9px;
     }
 }
+/* ===== MOBİL DÜYMƏLƏR ÜÇÜN "RESET" KODU (STICKER PROBLEMİNİ HƏLL EDİR) ===== */
+    button, 
+    .ctrl-btn, 
+    .works-play-btn, 
+    #fullscreenBtn,
+    .play-button {
+        /* iPhone və Android-in öz standart dizaynını ləğv edir */
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        
+        /* Arxa fon və çərçivəni təmizləyir */
+        background-color: transparent; /* Əgər vacibdirsə !important əlavə et */
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* Əgər o şəkildəki düymənin xüsusi class-ı varsa, ona da tətbiq et */
+    /* Məsələn, layihə kartlarındakı o ox işarəsi üçün: */
+    .project-link-btn, /* (Bu adı təxmini yazdım, öz JS kodundakı adı yoxla) */
+    .card-icon-btn {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        background: rgba(0, 0, 0, 0.5) !important; /* Öz rəngini bura yaz */
+        border: none !important;
+    }
 
 /* ============================================================
    LOGO POSİTİON DÜZƏLİŞİ - VACİB!
