@@ -1807,7 +1807,6 @@ body.lang-az .category-btn {
         right: 155px;
     }
 }
-
 /* =========================================
    18. RESPONSIVE - MOBILE (768px)
    ========================================= */
@@ -1910,20 +1909,19 @@ body.lang-az .category-btn {
         color: #fff !important;
     }
     
-    /* ✅ AZƏRBAYCAN DİLİ - İ HƏRFİ PROBLEMSIZ + SIX MARGIN */
-body.lang-az .nav-btn {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 900 !important;
-    text-shadow: 1px 0 0 #fff !important;
-    font-size: 10.5vw !important;
-    line-height: 1.2 !important;              /* 1.3-dən 1.2-yə endirdim */
-    margin: -0.3vh 0 !important;              /* Daha sıx (0.01vh-dən sıx) */
-    letter-spacing: -2px !important;
-    width: 100% !important;
-    display: block !important;
-    overflow: visible !important;             /* İ hərfi üçün */
-    /* padding-lər silindi */
-}
+    /* ✅ AZƏRBAYCAN DİLİ */
+    body.lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+        text-shadow: 1px 0 0 #fff !important;
+        font-size: 10.5vw !important;
+        line-height: 1.2 !important;
+        margin: -0.3vh 0 !important;
+        letter-spacing: -2px !important;
+        width: 100% !important;
+        display: block !important;
+        overflow: visible !important;
+    }
 
     body.lang-az .menu-socials a {
         font-family: 'Montserrat', sans-serif !important;
@@ -1939,13 +1937,13 @@ body.lang-az .nav-btn {
         font-weight: 700 !important;
     }
 
-     /* ✅ EMAIL VƏ TELEFON - XƏTT SİLİNDİ */
+     /* ✅ EMAIL VƏ TELEFON */
     .menu-contact-info p,
     .menu-contact-info p a,
     .menu-contact-info a {
         color: rgba(255,255,255,0.4) !important;
         text-decoration: none !important;
-        border-bottom: none !important;           /* Alt xətt yox */
+        border-bottom: none !important;
         -webkit-tap-highlight-color: transparent;
     }
     /* ---------------------------------------------- */
@@ -2050,30 +2048,109 @@ body.lang-az .nav-btn {
         text-align: left;
     }
 
-  /* Modal & Player Controls hissəsini tapın və bunu tətbiq edin */
-.modal-play-btn {
-    /* Ölçüləri bir az kiçildirik (məsələn: 120x60-dan 100x45-ə) */
-    width: 100px !important; 
-    height: 45px !important; 
-    
-    /* Mərkəzləmə kodları olduğu kimi qalır */
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    /* =========================================
+       MODAL PLAYER BUTTON (FIX - GÖRÜNƏN VƏ STATİK)
+       ========================================= */
+    .modal-play-btn {
+        width: 120px !important;
+        height: 60px !important;
+        
+        /* Mərkəzləmə */
+        position: absolute !important; /* Əgər fixed deyilsə, absolute olmalıdır */
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        
+        /* GÖRÜNMƏSİ ÜÇÜN ƏSAS KODLAR */
+        z-index: 99999 !important; /* Ən üstdə durması üçün */
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
 
-    /* Kəsilmənin qarşısını alan əsas hissə */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important; /* Daxili boşluğu sıfırlayırıq ki, ölçü sabit qalsın */
-    overflow: visible !important; /* Kənara çıxan element varsa görünsün */
-    
-    /* Yazı tənzimləməsi */
-    font-size: 12px !important; /* Yazını bir az kiçildirik ki, düyməyə sığsın */
-    line-height: 1 !important;
-    border: 1px solid #fff !important; /* Əgər border kəsilirsə bura diqqət */
-    border-radius: 50px !important; /* Oval görünüş üçün */
-}
+        /* Reset */
+        animation: none !important;
+        transition: none !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    /* ORTA DÜYMƏ (Əsas) */
+    .play-button {
+        width: 55px !important;
+        height: 22px !important;
+        position: absolute !important; /* Absolute vacibdir */
+        
+        /* Dizayn - Mütləq görünməlidir */
+        border: 1px solid #fff !important; 
+        border-radius: 50px !important;
+        background-color: rgba(255, 255, 255, 0.2) !important; /* Bir az rəng verdim ki görünsün */
+        
+        /* Mərkəzləmə */
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+
+        /* Hərəkəti dayandırır */
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+    }
+
+    /* BİRİNCİ HALQA (Orta) */
+    .play-button::before {
+        content: '' !important; /* Bu olmazsa görünməz */
+        position: absolute !important;
+        display: block !important;
+        
+        width: 85px !important;
+        height: 30px !important;
+        
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        
+        border: 1px solid rgba(255, 255, 255, 0.6) !important; /* Rəngi artırdım */
+        border-radius: 50px !important;
+        
+        animation: none !important;
+        transition: none !important;
+    }
+
+    /* İKİNCİ HALQA (Kənar) */
+    .play-button::after {
+        content: '' !important;
+        position: absolute !important;
+        display: block !important;
+        
+        width: 110px !important;
+        height: 38px !important;
+        
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        
+        border: 1px solid rgba(255, 255, 255, 0.4) !important; /* Rəngi artırdım */
+        border-radius: 50px !important;
+        
+        animation: none !important;
+        transition: none !important;
+    }
+
+    /* YAZI (PLAY) */
+    .play-text {
+        font-size: 8px !important;
+        color: #fff !important; /* Rəngi məcbur ağ edirik */
+        letter-spacing: 1px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        position: relative !important;
+        z-index: 100000 !important; /* Yazı düymənin üstündə olsun */
+        pointer-events: none;
+        display: block !important;
+    }
+    /* ========================================= */
 
     .preview-info {
         top: 70px;
@@ -2107,31 +2184,27 @@ body.lang-az .nav-btn {
         font-size: 9px;
     }
 }
-/* ===== MOBİL DÜYMƏLƏR ÜÇÜN "RESET" KODU (STICKER PROBLEMİNİ HƏLL EDİR) ===== */
+
+/* ===== MOBİL DÜYMƏLƏR ÜÇÜN "RESET" KODU ===== */
     button, 
     .ctrl-btn, 
     .works-play-btn, 
     #fullscreenBtn,
     .play-button {
-        /* iPhone və Android-in öz standart dizaynını ləğv edir */
         -webkit-appearance: none !important;
         -moz-appearance: none !important;
         appearance: none !important;
-        
-        /* Arxa fon və çərçivəni təmizləyir */
-        background-color: transparent; /* Əgər vacibdirsə !important əlavə et */
+        background-color: transparent; 
         border: none;
         border-radius: 0;
         box-shadow: none;
     }
 
-    /* Əgər o şəkildəki düymənin xüsusi class-ı varsa, ona da tətbiq et */
-    /* Məsələn, layihə kartlarındakı o ox işarəsi üçün: */
-    .project-link-btn, /* (Bu adı təxmini yazdım, öz JS kodundakı adı yoxla) */
+    .project-link-btn, 
     .card-icon-btn {
         -webkit-appearance: none !important;
         appearance: none !important;
-        background: rgba(0, 0, 0, 0.5) !important; /* Öz rəngini bura yaz */
+        background: rgba(0, 0, 0, 0.5) !important; 
         border: none !important;
     }
 

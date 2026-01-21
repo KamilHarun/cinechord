@@ -1701,31 +1701,59 @@ body.lang-az .nav-btn {
         height: 40px;
     }
 
-    .modal-play-btn {
-        width: 120px !important;
-        height: 60px !important;
-    }
+.modal-play-btn {
+       width: 120px !important;
+       height: 60px !important;
+       /* Bütün animasiyaları dayandırır */
+       animation: none !important;
+       transition: none !important;
+   }
 
-    .play-button-container {
-        width: 120px !important;
-        height: 60px !important;
-    }
+   .play-button-container {
+       width: 120px !important;
+       height: 60px !important;
+       animation: none !important;
+   }
 
-    .play-button {
-        width: 55px;
-        height: 22px;
-    }
+   .play-button {
+       width: 55px;
+       height: 22px;
+       /* Klikləyəndə tərpənməsin */
+       transform: translate(-50%, -50%) !important;
+       animation: none !important;
+       transition: none !important;
+   }
 
-    .play-button::before {
-        width: 85px;
-        height: 30px;
-    }
+   /* Birinci halqa (Statik) */
+   .play-button::before {
+       width: 85px !important;
+       height: 30px !important;
+       /* Böyümə effektini ləğv edir */
+       animation: none !important;
+       transition: none !important;
+       transform: translate(-50%, -50%) !important;
+       opacity: 1 !important; /* İtməsin deyə */
+   }
 
-    .play-button::after {
-        width: 110px;
-        height: 38px;
-    }
-
+   /* İkinci halqa (Statik) */
+   .play-button::after {
+       width: 110px !important;
+       height: 38px !important;
+       /* Böyümə effektini ləğv edir */
+       animation: none !important;
+       transition: none !important;
+       transform: translate(-50%, -50%) !important;
+       opacity: 1 !important;
+   }
+   
+   /* Klikləyəndə (Active) heç nə dəyişməsin */
+   .play-button:active, 
+   .play-button:active::before, 
+   .play-button:active::after {
+       transform: translate(-50%, -50%) !important;
+       width: inherit !important; /* Ölçüləri qoruyur */
+       height: inherit !important;
+   }
     .play-text {
         font-size: 8px;
         letter-spacing: 0.5px;
@@ -1789,7 +1817,10 @@ body.lang-az .nav-btn {
     position: relative;
     right: -25px;  /* Sağa - istədiyin qədər */
 }
+
 }
+
+
 
 /* ============================================================
    15. RESPONSIVE - SMALL MOBILE (480px)
