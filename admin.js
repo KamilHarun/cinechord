@@ -223,10 +223,11 @@ function initCharts(works) {
 }
 
 // ============================================
-// WORKS - TAM VƏ EKSİKSİZ VERSİYA (FIXED)
+// WORKS - R2 DƏSTƏKLİ TAM VERSİYA (OPTIMIZED)
 // ============================================
 
-// Dəyişənlərin adını dəyişdim ki, başqa fayllarla toqquşmasın
+// Sabitlər
+const R2_PUBLIC_URL = "https://pub-0ed548450bc549689ffc7fc01f88afae.r2.dev";
 let wDataCache = [];
 let wCurrentPage = 0;
 const wPageSize = 10;
@@ -238,12 +239,10 @@ async function loadWorks(page = 0) {
     const grid = document.getElementById('worksGrid');
     if (!grid) return;
     
-    // Grid-i təmizləyirik
     grid.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Yüklənir...</p></div>';
 
     try {
         const res = await authFetch(`${API.WORKS}/getAllWorks?page=${page}&size=${wPageSize}&sort=id,desc&t=${Date.now()}`);
-        
         if(!res || !res.ok) throw new Error("Yüklənmə xətası");
         
         const data = await res.json();
@@ -259,9 +258,6 @@ async function loadWorks(page = 0) {
         
         grid.innerHTML = '';
         works.forEach(w => {
-            // DÜZƏLİŞ BURADADIR:
-            // Əgər thumbnailUrl yoxdursa, internetdən hazır boz şəkil götürürük.
-            // Layihəndə şəkil faylı axtarmırıq.
             const imageSrc = w.thumbnailUrl && w.thumbnailUrl !== 'null' 
                 ? w.thumbnailUrl 
                 : 'https://placehold.co/600x400/1a1a1a/FFF?text=Video+Yoxdur';
@@ -273,8 +269,7 @@ async function loadWorks(page = 0) {
                     </div>
                     <div class="work-image-wrapper">
                         <img src="${imageSrc}" class="work-image" alt="" style="object-fit: cover;">
-                        
-                        ${w.previewVideoUrl ? `<video src="${w.previewVideoUrl}" class="work-preview-video" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` : ''}
+                        ${w.videoUrl ? `<video src="${w.videoUrl}" class="work-preview-video" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` : ''}
                     </div>
                     <div class="work-body">
                         <h3 class="work-title">${w.title}</h3>
@@ -322,7 +317,7 @@ function openWorkModal() {
     if (modalEl) new bootstrap.Modal(modalEl).show();
 }
 
-// 3. MƏLUMATLARIN BACKEND-Ə GÖNDƏRİLMƏSİ
+// 3. MƏLUMATLARIN BACKEND-Ə GÖNDƏRİLMƏSİ (R2 İNTEGRASİYALI)
 async function submitWork() {
     const getValue = (ids, def = '') => {
         const idList = Array.isArray(ids) ? ids : [ids];
@@ -339,8 +334,6 @@ async function submitWork() {
     };
 
     const id = getValue('workId');
-    const fd = new FormData();
-    
     const title = getValue('wTitle');
     const category = getValue('wCategory');
 
@@ -349,66 +342,98 @@ async function submitWork() {
         return;
     }
 
-    // DTO adları ilə tam eyni
-    fd.append('title', title);
-    fd.append('category', category);
-    fd.append('clientName', getValue('wClient'));
-    fd.append('description', getValue('wDescription'));
-    fd.append('location', getValue('wLocation'));
-    fd.append('agency', getValue('wAgency'));
-    fd.append('productionYear', getValue(['wProductionYear', 'wYear']));
-    fd.append('sortOrder', getValue('wSortOrder', '0'));
-    fd.append('featured', getChecked('wFeatured'));
-    fd.append('active', getChecked('wActive'));
-    fd.append('showInGallery', getChecked('wShowInGallery'));
-
-    // Video Faylı
     const videoFileInput = document.getElementById('wVideoFile');
-    if (videoFileInput && videoFileInput.files[0]) {
-        fd.append('videoFile', videoFileInput.files[0]);
-    }
-    
-    // Video URL
-    fd.append('videoUrl', getValue('wVideoUrl'));
+    const hasVideoFile = videoFileInput && videoFileInput.files[0];
 
+    // Yükləmə bildirişini açırıq
     Swal.fire({
-        title: 'Yüklənir...',
-        html: '<div class="progress" style="height: 20px;"><div id="upProgress" class="progress-bar" style="width: 0%">0%</div></div>',
+        title: 'Hazırlanır...',
+        html: '<div id="uploadStatus" style="font-weight:bold; margin-bottom:10px;">Proses başlayır...</div>' +
+              '<div class="progress" style="height: 25px;">' +
+              '<div id="upProgress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">0%</div>' +
+              '</div>',
         allowOutsideClick: false,
         showConfirmButton: false
     });
-    
+
     try {
-        const url = id ? `${API.WORKS}/updateWork/${id}` : `${API.WORKS}/createWork`;
-        const method = id ? 'PUT' : 'POST';
+        let finalVideoUrl = getValue('wVideoUrl');
 
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, url);
+        // A) ƏGƏR YENİ VİDEO FAYLI VARSA - BİRBAŞA R2-YƏ YÜKLƏYİRİK
+        if (hasVideoFile) {
+            const file = videoFileInput.files[0];
+            document.getElementById('uploadStatus').innerText = 'Cloudflare R2-yə yüklənir...';
+
+            // 1. Backend-dən bilet (Presigned URL) alırıq
+            const urlParams = new URLSearchParams({ fileName: file.name, contentType: file.type });
+            const authRes = await fetch(`${BASE_URL}/api/r2/get-upload-url?${urlParams}`, {                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+            });
+            
+            if (!authRes.ok) throw new Error("Yükləmə icazəsi alınmadı");
+            const { uploadUrl, fileKey } = await authRes.json();
+
+            // 2. XMLHttpRequest ilə R2-yə yükləyirik
+            await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', uploadUrl);
+                xhr.setRequestHeader('Content-Type', file.type);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        const bar = document.getElementById('upProgress');
+                        if(bar) { bar.style.width = percent + '%'; bar.textContent = percent + '%'; }
+                    }
+                };
+
+                xhr.onload = () => (xhr.status === 200 ? resolve() : reject(new Error("R2-yə yüklənə bilmədi")));
+                xhr.onerror = () => reject(new Error("Şəbəkə xətası"));
+                xhr.send(file);
+            });
+            
+            finalVideoUrl = `${R2_PUBLIC_URL}/videos/${fileKey}`;
+        }
+
+        // B) MƏLUMATLARIN BAZAYA YAZILMASI
+        document.getElementById('uploadStatus').innerText = 'Bazaya qeyd edilir...';
         
-        const token = localStorage.getItem('jwt_token');
-        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        const fd = new FormData();
+        fd.append('title', title);
+        fd.append('category', category);
+        fd.append('clientName', getValue('wClient'));
+        fd.append('description', getValue('wDescription'));
+        fd.append('location', getValue('wLocation'));
+        fd.append('agency', getValue('wAgency'));
+        fd.append('productionYear', getValue(['wProductionYear', 'wYear']));
+        fd.append('sortOrder', getValue('wSortOrder', '0'));
+        fd.append('featured', getChecked('wFeatured'));
+        fd.append('active', getChecked('wActive'));
+        fd.append('showInGallery', getChecked('wShowInGallery'));
+        fd.append('videoUrl', finalVideoUrl);
 
-        xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) {
-                const percent = Math.round((e.loaded / e.total) * 100);
-                const bar = document.getElementById('upProgress');
-                if(bar) { bar.style.width = percent + '%'; bar.textContent = percent + '%'; }
-            }
-        };
+        const url = id ? `${API.WORKS}/updateWork/${id}` : `${API.WORKS}/createWork`;
+        const method = id ? (id ? 'PUT' : 'POST') : 'POST';
 
-        xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                Swal.fire('Uğurlu!', 'İş yadda saxlanıldı.', 'success');
-                const modal = bootstrap.Modal.getInstance(document.getElementById('workModal'));
-                if (modal) modal.hide();
-                loadWorks(wCurrentPage);
-            } else {
-                Swal.fire('Xəta!', 'Server xətası: ' + xhr.status, 'error');
-            }
-        };
-        xhr.send(fd);
+        // Fetch API ilə bazaya göndəririk
+        const res = await fetch(url, {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` },
+            body: fd
+        });
+
+        if (res.ok) {
+            Swal.fire('Uğurlu!', 'İş yadda saxlanıldı.', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('workModal'));
+            if (modal) modal.hide();
+            loadWorks(wCurrentPage);
+        } else {
+            throw new Error("Server məlumatı qəbul etmədi");
+        }
+
     } catch(e) { 
-        Swal.fire('Xəta!', 'Bağlantı xətası.', 'error');
+        console.error(e);
+        Swal.fire('Xəta!', e.message || 'Xəta baş verdi', 'error');
     }
 }
 
@@ -445,13 +470,15 @@ function editWorkById(id) {
     if (modalEl) new bootstrap.Modal(modalEl).show();
 }
 
-// 5. SİLMƏK, AXTARIŞ VƏ FİLTRLƏR
+// 5. SİLMƏK
 async function deleteWork(id) {
     const r = await Swal.fire({
         title: 'Silinsin?',
+        text: "Bu iş və ona bağlı video bazadan silinəcək.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Sil'
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Bəli, sil!'
     });
     if(r.isConfirmed) {
         const res = await authFetch(`${API.WORKS}/deleteWork/${id}`, { method: 'DELETE' });
@@ -459,6 +486,7 @@ async function deleteWork(id) {
     }
 }
 
+// 6. PAGINATION VƏ DİGƏR KÖMƏKÇİLƏR
 function renderPagination(totalPages, current) {
     let html = '';
     for (let i = 0; i < totalPages; i++) {

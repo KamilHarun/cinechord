@@ -476,11 +476,7 @@
         });
     });
 
-// ============================================================
-// 6. WORKS API & GRID - (Qara ekran problemi həll olunmuş versiya)
-// ============================================================
 
-// URL təmizləyən və birləşdirən köməkçi funksiya
 // ============================================================
 // 6. WORKS API & GRID - (Qara ekran problemi həll olunmuş versiya)
 // ============================================================
@@ -530,21 +526,49 @@ function optimizeCloudinaryUrl(url) {
 function getFullMediaUrl(path) {
     if (!path) return '';
     
-    // ⭐ YENİ: Əgər artıq tam URL-dirsə, optimize et və qaytar
+    // 1. Əgər link Cloudflare R2 linkidirsə (pub-...r2.dev ehtiva edirsə)
+    // Heç bir dəyişiklik etmədən birbaşa qaytarırıq.
+    if (path.includes('r2.dev')) {
+        return path.replace('http://', 'https://');
+    }
+
+    // 2. Əgər link tam URL-dirsə (çox gümanki Cloudinary-dir)
     if (path.startsWith('http')) {
         return optimizeCloudinaryUrl(path);
     }
 
+    // 3. Əgər nisbi yoldursa (uploads/...), UPLOADS_URL əlavə edirik
     let cleanPath = path;
-    while (cleanPath.startsWith('/')) {
-        cleanPath = cleanPath.substring(1);
-    }
-    if (cleanPath.startsWith('uploads/')) {
-        cleanPath = cleanPath.substring(8);
-    }
+    while (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+    if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.substring(8);
     
     const fullUrl = UPLOADS_URL + cleanPath;
-    return optimizeCloudinaryUrl(fullUrl); // ⭐ YENİ: Optimize et
+    return optimizeCloudinaryUrl(fullUrl);
+}
+
+// Cloudinary üçün spesifik optimizasiya (R2-yə toxunmur)
+function optimizeCloudinaryUrl(url) {
+    if (!url || !url.includes('cloudinary.com')) return url;
+    
+    url = url.replace('http://', 'https://');
+    
+    if (url.includes('/f_auto,q_auto')) return url;
+
+    const videoIndex = url.indexOf('/video/upload/');
+    if (videoIndex !== -1) {
+        const before = url.substring(0, videoIndex + '/video/upload/'.length);
+        const after = url.substring(videoIndex + '/video/upload/'.length);
+        return `${before}f_auto,q_auto,vc_auto/${after}`;
+    }
+
+    const imageIndex = url.indexOf('/image/upload/');
+    if (imageIndex !== -1) {
+        const before = url.substring(0, imageIndex + '/image/upload/'.length);
+        const after = url.substring(imageIndex + '/image/upload/'.length);
+        return `${before}f_auto,q_auto/${after}`;
+    }
+    
+    return url;
 }
 
 async function loadDynamicWorks() {
@@ -563,9 +587,14 @@ async function loadDynamicWorks() {
             return;
         }
 
+        // --- DƏYİŞİKLİK BURADADIR ---
         works.forEach((work, index) => {
-            const rawVideoPath = work.previewVideoUrl || work.videoUrl;
-            const videoSrc = getFullMediaUrl(rawVideoPath); // ✅ Artıq avtomatik optimize olunur
+            // R2-yə yüklədiyimiz video linki
+            const videoSrc = getFullMediaUrl(work.videoUrl); 
+            
+            // Şəkil (Thumbnail) linki - Poster olaraq istifadə edirik
+            const posterSrc = getFullMediaUrl(work.thumbnailUrl); 
+            
             const categoryClass = categoryMap[work.category] || 'other';
 
             if (!videoSrc) return;
@@ -579,6 +608,7 @@ async function loadDynamicWorks() {
                     <div class="project-image-container">
                         <video muted loop playsinline class="project-video" 
                             preload="metadata" 
+                            poster="${posterSrc}"
                             src="${videoSrc}#t=0.1"> 
                         </video>
                         <div class="card-overlay"></div>
@@ -592,6 +622,7 @@ async function loadDynamicWorks() {
             `;
             container.innerHTML += workHTML;
         });
+        // --- DƏYİŞİKLİK BİTDİ ---
 
         const newCards = container.querySelectorAll('.project-card');
         newCards.forEach(card => observer.observe(card));
@@ -679,21 +710,19 @@ window.filterWorks = function(category, btn) {
         }
     }
 
-    function openModal(videoSrc, title) {
-        if (!videoSrc) return;
-        if(previewTitleEl) previewTitleEl.textContent = title;
-        
-        previewContainer.style.display = 'flex';
-        setTimeout(() => {
-            previewContainer.classList.add('active');
-        }, 10);
-        
-        previewContainer.classList.add('is-paused');
-        document.body.style.overflow = 'hidden';
-
-        previewVideo.src = videoSrc;
-        previewVideo.load();
-    }
+   function openModal(videoSrc, title) {
+    if (!videoSrc) return;
+    if(previewTitleEl) previewTitleEl.textContent = title;
+    
+    previewContainer.style.display = 'flex';
+    setTimeout(() => {
+        previewContainer.classList.add('active');
+    }, 10);
+    
+    previewVideo.src = videoSrc;
+    previewVideo.preload = "auto"; // Böyük video üçün preload-u aktiv edirik
+    previewVideo.load();
+}
 
     function closeVideoPreview() {
         if(!previewContainer) return;
