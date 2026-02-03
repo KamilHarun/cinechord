@@ -858,11 +858,29 @@ async function deleteMessage(id) {
 }
 
 /* ============================================================
-   CINECHORD ADMIN - ABOUT SECTION (FULL & FIXED)
+   CINECHORD ADMIN - ABOUT SECTION (FULL & R2 INTEGRATED)
    ============================================================ */
 
+// 1. SABİTLƏR VƏ GLOBAL DƏYİŞƏNLƏR
+if (typeof R2_PUBLIC_URL === 'undefined') {
+    window.R2_PUBLIC_URL = "https://pub-0ed548450bc549689ffc7fc01f88afae.r2.dev";
+}
+
+if (typeof teamMembersCache === 'undefined') {
+    window.teamMembersCache = [];
+}
 /**
- * 1. MƏLUMATLARIN YÜKLƏNMƏSİ
+ * URL-ləri emal edən köməkçi funksiya.
+ * Həm R2 linklərini, həm də köhnə lokal bazadakı faylları tanıyır.
+ */
+function getImageUrl(url) {
+    if (!url || url === 'null') return 'https://via.placeholder.com/600x400/1a1a1a/FFF?text=Media+Yoxdur';
+    if (url.startsWith('http')) return url; 
+    return `${CONFIG.BACKEND_URL}/uploads/${url}`; 
+}
+
+/**
+ * 2. MƏLUMATLARIN YÜKLƏNMƏSİ
  */
 async function loadAbout() {
     try {
@@ -870,13 +888,13 @@ async function loadAbout() {
         const res = await authFetch(`${API.ABOUT}/getAbout?lang=en&t=${Date.now()}`);
         
         if(!res || !res.ok) {
-            console.error("Backend-dən About datası gəlmədi");
+            console.error("Backend-dən data gəlmədi");
             return;
         }
         
         const data = await res.json();
         
-        // HTML ID-ləri ilə Backend Response DTO sahələrini eşləşdiririk
+        // Form elementlərini DTO sahələrinə görə doldururuq
         const fields = {
             'aMainTitle': data.mainTitle,
             'aMainTitleAz': data.mainTitleAz,
@@ -902,10 +920,7 @@ async function loadAbout() {
             }
         }
 
-        // İTMİŞ FUNKSİYA 1: Media Preview
         loadWhyMediaPreview(data); 
-        
-        // İTMİŞ FUNKSİYA 2: Komanda Üzvləri
         loadTeamMembers();
 
     } catch(error) {
@@ -914,76 +929,108 @@ async function loadAbout() {
 }
 
 /**
- * 2. MƏLUMATLARI YADDA SAXLA (Text)
+ * 3. ƏSAS MƏLUMATLARI YADDA SAXLA (R2 VİDEO YÜKLƏMƏ İLƏ)
  */
 async function submitAbout() {
-    const fd = new FormData();
-    
-    const aboutData = {
-        mainTitle: document.getElementById('aMainTitle')?.value || '',
-        mainTitleAz: document.getElementById('aMainTitleAz')?.value || '',
-        subTitle: document.getElementById('aSubTitle')?.value || '',
-        subTitleAz: document.getElementById('aSubTitleAz')?.value || '',
-        whyTitle: document.getElementById('aWhyTitle')?.value || '',
-        whyTitleAz: document.getElementById('aWhyTitleAz')?.value || '',
-        whyDescription: document.getElementById('aWhyDesc')?.value || '',
-        whyDescriptionAz: document.getElementById('aWhyDescAz')?.value || '',
-        
-        // Hidden fields defaults
-        whoWeAreText: document.getElementById('who-we-are')?.value || '',
-        whoWeAreTextAz: '',
-        ourMissionText: document.getElementById('our-mission')?.value || '',
-        ourMissionTextAz: '',
-        ourApproachText: document.getElementById('our-approach')?.value || '',
-        ourApproachTextAz: '',
-        address: 'Baku, Azerbaijan',
-        addressAz: 'Bakı, Azərbaycan',
-        email: 'info@cinechord.az',
-        phone: '+994 50 233 04 54'
-    };
+    const mediaFileInput = document.getElementById('aWhyMediaFile');
+    const hasMediaFile = mediaFileInput && mediaFileInput.files[0];
 
-    Object.keys(aboutData).forEach(key => {
-        fd.append(key, aboutData[key]);
-    });
-
-    // Media faylını yoxla (əgər seçilibsə)
-    const mediaFile = document.getElementById('aWhyMediaFile')?.files[0];
-    if (mediaFile) {
-        fd.append('whyMediaFile', mediaFile);
-        
-        // Media tipini təyin et
-        const ext = mediaFile.name.split('.').pop().toLowerCase();
-        const type = ['mp4', 'mov', 'webm'].includes(ext) ? 'video' : 'image';
-        fd.append('whyMediaType', type);
-    }
-
-    Swal.fire({ 
-        title: 'Məlumatlar yadda saxlanılır...', 
+    Swal.fire({
+        title: 'Məlumatlar hazırlanır...',
+        html: '<div id="uploadStatus" style="font-weight:bold; margin-bottom:10px;">Proses başlayır...</div>' +
+              '<div class="progress" style="height: 25px;">' +
+              '<div id="upProgress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">0%</div>' +
+              '</div>',
         allowOutsideClick: false,
-        didOpen: () => Swal.showLoading() 
+        showConfirmButton: false
     });
 
     try {
-        const res = await authFetch(`${API.ABOUT}/updateAbout`, { 
-            method: 'PUT', 
-            body: fd 
-        });
+        let finalMediaUrl = ""; 
+        let mediaType = "image";
+
+        // A) R2-YƏ YÜKLƏMƏ (Əgər yeni fayl seçilibsə)
+        if (hasMediaFile) {
+            const file = mediaFileInput.files[0];
+            document.getElementById('uploadStatus').innerText = 'Media R2-yə yüklənir...';
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            mediaType = ['mp4', 'mov', 'webm'].includes(ext) ? 'video' : 'image';
+
+            // 1. Presigned URL almaq
+            const urlParams = new URLSearchParams({ 
+                fileName: `about/${Date.now()}_${file.name}`, 
+                contentType: file.type 
+            });
+            
+            const authRes = await fetch(`${BASE_URL}/api/r2/get-upload-url?${urlParams}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+            });
+            
+            if (!authRes.ok) throw new Error("R2 icazəsi alınmadı");
+            const { uploadUrl, fileKey } = await authRes.json();
+
+            // 2. Birbaşa Cloudflare-ə yükləmə
+            await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', uploadUrl);
+                xhr.setRequestHeader('Content-Type', file.type);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        const bar = document.getElementById('upProgress');
+                        if(bar) { bar.style.width = percent + '%'; bar.textContent = percent + '%'; }
+                    }
+                };
+
+                xhr.onload = () => (xhr.status === 200 ? resolve() : reject(new Error("R2-yə yükləmə xətası")));
+                xhr.onerror = () => reject(new Error("Şəbəkə xətası"));
+                xhr.send(file);
+            });
+            
+            finalMediaUrl = `${R2_PUBLIC_URL}/${fileKey}`;
+        }
+
+        // B) MƏLUMATLARI BAZADA YENİLƏ
+        document.getElementById('uploadStatus').innerText = 'Bazaya qeyd edilir...';
+        
+        const fd = new FormData();
+        const aboutData = {
+            mainTitle: document.getElementById('aMainTitle')?.value || '',
+            mainTitleAz: document.getElementById('aMainTitleAz')?.value || '',
+            subTitle: document.getElementById('aSubTitle')?.value || '',
+            subTitleAz: document.getElementById('aSubTitleAz')?.value || '',
+            whyTitle: document.getElementById('aWhyTitle')?.value || '',
+            whyTitleAz: document.getElementById('aWhyTitleAz')?.value || '',
+            whyDescription: document.getElementById('aWhyDesc')?.value || '',
+            whyDescriptionAz: document.getElementById('aWhyDescAz')?.value || '',
+            whoWeAreText: document.getElementById('who-we-are')?.value || '',
+            ourMissionText: document.getElementById('our-mission')?.value || '',
+            ourApproachText: document.getElementById('our-approach')?.value || '',
+            whyMediaUrl: finalMediaUrl, 
+            whyMediaType: mediaType
+        };
+
+        Object.keys(aboutData).forEach(key => fd.append(key, aboutData[key]));
+
+        const res = await authFetch(`${API.ABOUT}/updateAbout`, { method: 'PUT', body: fd });
         
         if (res && res.ok) {
             Swal.fire('Uğurlu!', 'Məlumatlar yeniləndi', 'success');
-            setTimeout(loadAbout, 500);
+            loadAbout();
         } else {
-            const errData = await res.json().catch(() => ({}));
-            Swal.fire('Xəta', errData.message || 'Xəta baş verdi', 'error');
+            throw new Error("Backend xətası");
         }
     } catch(e) {
-        console.error('Submit About Error:', e);
-        Swal.fire('Xəta', 'Bağlantı xətası', 'error');
+        console.error('Submit Error:', e);
+        Swal.fire('Xəta', e.message, 'error');
     }
 }
 
 /**
- * 3. MEDIA PREVIEW (İTMİŞ KOD)
+ * 4. MEDIA PREVIEW (Frontend görüntüsü üçün)
  */
 function loadWhyMediaPreview(data) {
     const previewDiv = document.getElementById('whyMediaPreview');
@@ -992,65 +1039,62 @@ function loadWhyMediaPreview(data) {
     const mediaUrl = data.whyMediaUrl;
     const mediaType = data.whyMediaType;
 
-    if (!mediaUrl) {
-        previewDiv.innerHTML = '<span class="text-muted">Media yoxdur</span>';
+    if (!mediaUrl || mediaUrl === 'null') {
+        previewDiv.innerHTML = '<span class="text-muted italic">Media yoxdur</span>';
         return;
     }
 
     const fullUrl = getImageUrl(mediaUrl);
     
-    if (mediaType === 'video' || fullUrl.endsWith('.mp4')) {
+    if (mediaType === 'video' || fullUrl.toLowerCase().match(/\.(mp4|webm|mov)$/)) {
         previewDiv.innerHTML = `
-            <video width="100%" height="200" controls style="border-radius:8px; background:black;">
+            <video width="100%" height="220" controls style="border-radius:8px; background:#000; object-fit:cover;">
                 <source src="${fullUrl}">
             </video>
         `;
     } else {
-        previewDiv.innerHTML = `
-            <img src="${fullUrl}" style="max-height:200px; border-radius:8px; width:auto;" alt="Media">
-        `;
+        previewDiv.innerHTML = `<img src="${fullUrl}" style="max-height:220px; border-radius:8px; width:auto; border:1px solid #333;" alt="Media">`;
     }
 }
 
 /**
- * 4. KOMANDA ÜZVLƏRİ SİYAHISI (İTMİŞ KOD)
+ * 5. KOMANDA ÜZVLƏRİNİN İDARƏ OLUNMASI (CRUD)
  */
 async function loadTeamMembers() {
     const list = document.getElementById('teamMembersGrid');
     if (!list) return;
 
-    list.innerHTML = '<div class="col-12 text-center"><i class="fas fa-spinner fa-spin"></i> Yüklənir...</div>';
+    list.innerHTML = '<div class="col-12 text-center py-4"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
 
     try {
         const res = await authFetch(`${API.ABOUT}/team?lang=en&t=${Date.now()}`);
         if (!res || !res.ok) {
-            list.innerHTML = '<div class="col-12 text-center text-muted">Komanda üzvü yoxdur</div>';
+            list.innerHTML = '<div class="col-12 text-center text-muted">Məlumat tapılmadı.</div>';
             return;
         }
         
         const members = await res.json();
-        teamMembersCache = members; // Cache üçün qlobal dəyişən
+        teamMembersCache = members; 
         
-        if (!Array.isArray(members) || members.length === 0) {
-            list.innerHTML = '<div class="col-12 text-center text-muted">Komanda üzvü yoxdur</div>';
+        if (members.length === 0) {
+            list.innerHTML = '<div class="col-12 text-center text-muted">Komanda üzvü yoxdur.</div>';
             return;
         }
         
         list.innerHTML = members.map(m => `
             <div class="col-md-4 mb-3">
-                <div class="card bg-dark border-secondary h-100">
+                <div class="card bg-dark border-secondary h-100 shadow-sm">
                     <img src="${getImageUrl(m.imageUrl)}" 
                          class="card-img-top" 
-                         style="height:150px; object-fit:cover; object-position:top;" 
+                         style="height:200px; object-fit:cover; object-position:top;" 
                          alt="${m.name}"
-                         onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                         onerror="this.src='https://via.placeholder.com/300x400?text=No+Photo'">
                     <div class="card-body p-3 text-center">
                         <h6 class="text-white mb-1">${m.name}</h6>
                         <p class="text-info mb-2 small">${m.role}</p>
-                        
-                        <div class="btn-group w-100 mt-2" role="group">
+                        <div class="btn-group w-100 mt-2">
                             <button class="btn btn-sm btn-outline-warning" onclick="editTeamMember(${m.id})">
-                                <i class="fas fa-edit"></i>
+                                <i class="fas fa-edit"></i> Redaktə
                             </button>
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteTeamMember(${m.id})">
                                 <i class="fas fa-trash"></i>
@@ -1063,32 +1107,23 @@ async function loadTeamMembers() {
         
     } catch (e) { 
         console.error("Team loading error:", e);
-        list.innerHTML = '<div class="col-12 text-center text-danger">Xəta</div>';
+        list.innerHTML = '<div class="col-12 text-center text-danger">Məlumat yüklənərkən xəta baş verdi.</div>';
     }
 }
 
-/**
- * 5. MODAL AÇ (YENİ ÜZV) - (İTMİŞ KOD)
- */
 function openTeamModal() {
     const form = document.getElementById('teamForm');
     if(form) form.reset();
-    
     document.getElementById('teamId').value = '';
-    document.querySelector('#teamModal .modal-header h5').textContent = 'Yeni Komanda Üzvü';
-    
+    document.querySelector('#teamModal .modal-title').textContent = 'Yeni Komanda Üzvü';
     new bootstrap.Modal(document.getElementById('teamModal')).show();
 }
 
-/**
- * 6. MODAL AÇ (REDAKTƏ) - (İTMİŞ KOD)
- */
 function editTeamMember(id) {
     const member = teamMembersCache.find(m => m.id === id);
     if (!member) return;
 
-    document.querySelector('#teamModal .modal-header h5').textContent = 'Üzvü Redaktə Et';
-
+    document.querySelector('#teamModal .modal-title').textContent = 'Üzvü Redaktə Et';
     document.getElementById('teamId').value = member.id;
     document.getElementById('tName').value = member.name || '';
     document.getElementById('tNameAz').value = member.nameAz || '';
@@ -1101,9 +1136,6 @@ function editTeamMember(id) {
     new bootstrap.Modal(document.getElementById('teamModal')).show();
 }
 
-/**
- * 7. KOMANDA SAVE (YENİ VƏ YA UPDATE) - (İTMİŞ KOD)
- */
 async function submitTeamMember() {
     const teamId = document.getElementById('teamId')?.value;
     const fd = new FormData();
@@ -1112,7 +1144,7 @@ async function submitTeamMember() {
     const role = document.getElementById('tRole')?.value;
 
     if (!name || !role) { 
-        Swal.fire('Xəbərdarlıq', 'Ad və Vəzifə mütləqdir', 'warning'); 
+        Swal.fire('Xəbərdarlıq', 'Ad və Vəzifə sahələri boş qala bilməz', 'warning'); 
         return; 
     }
 
@@ -1125,68 +1157,48 @@ async function submitTeamMember() {
     fd.append('displayOrder', document.getElementById('tOrder')?.value || 0);
     
     const img = document.getElementById('tImage')?.files[0];
-    if (img) {
-        fd.append('imageFile', img);
-    }
+    if (img) fd.append('imageFile', img);
 
-    Swal.fire({ 
-        title: 'Yadda saxlanılır...', 
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading() 
-    });
+    Swal.fire({ title: 'Yadda saxlanılır...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
     try {
-        const url = teamId 
-            ? `${API.ABOUT}/team/${teamId}` 
-            : `${API.ABOUT}/team`;
-        
+        const url = teamId ? `${API.ABOUT}/team/${teamId}` : `${API.ABOUT}/team`;
         const method = teamId ? 'PUT' : 'POST';
 
-        const res = await authFetch(url, { 
-            method: method, 
-            body: fd 
-        });
+        const res = await authFetch(url, { method: method, body: fd });
         
         if (res && res.ok) {
             Swal.fire('Uğurlu!', 'Əməliyyat tamamlandı', 'success');
-            
-            // Modalı bağla
             const modalEl = document.getElementById('teamModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalEl);
-            if (modalInstance) modalInstance.hide();
-            
+            bootstrap.Modal.getInstance(modalEl).hide();
             loadTeamMembers();
         } else {
-            Swal.fire('Xəta', 'Əməliyyat uğursuz oldu', 'error');
+            Swal.fire('Xəta', 'Məlumat yadda saxlanılmadı', 'error');
         }
     } catch (e) { 
-        console.error("Submit team error:", e);
-        Swal.fire('Xəta', 'Sistem xətası', 'error'); 
+        Swal.fire('Xəta', 'Bağlantı xətası baş verdi', 'error'); 
     }
 }
 
-/**
- * 8. KOMANDA SİL - (İTMİŞ KOD)
- */
 async function deleteTeamMember(id) {
-    const confirmation = await Swal.fire({
+    const conf = await Swal.fire({
         title: 'Əminsiniz?',
-        text: "Bu üzv silinəcək!",
+        text: "Bu komanda üzvü sistemdən silinəcək.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
-        confirmButtonText: 'Sil'
+        confirmButtonText: 'Bəli, sil!'
     });
 
-    if (confirmation.isConfirmed) {
+    if (conf.isConfirmed) {
         try {
             const res = await authFetch(`${API.ABOUT}/team/${id}`, { method: 'DELETE' });
             if (res && res.ok) { 
                 loadTeamMembers(); 
-                Swal.fire('Silindi!', '', 'success');
+                Swal.fire('Silindi!', 'Komanda üzvü silindi.', 'success');
             }
         } catch (e) {
-            Swal.fire('Xəta', 'Sistem xətası', 'error');
+            Swal.fire('Xəta', 'Silinmə zamanı xəta baş verdi', 'error');
         }
     }
 }
