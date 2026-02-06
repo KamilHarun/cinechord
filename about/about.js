@@ -638,26 +638,72 @@ const ensureHttps = (url) => {
         }
         
         // 3. Media (Video/Image)
-     if (elements.whyMediaContainer && content.whyMediaUrl) {
+  // 3. Media (Video/Image) - populateWhySection() içində
+if (elements.whyMediaContainer && content.whyMediaUrl) {
+    console.log('🎬 Loading why media:', content.whyMediaUrl, 'Type:', content.whyMediaType);
+    
     if (content.whyMediaType === 'video') {
-        elements.whyMediaContainer.innerHTML = `
-            <video autoplay muted loop playsinline class="side-video">
-                <source src="${content.whyMediaUrl}" type="video/mp4">
-            </video>
-        `;
-        const video = elements.whyMediaContainer.querySelector('video');
-        if (video) {
-            video.load(); // 👈 BU ÇOX VACİBDİR: Videonu məcburi yükləyir
-            video.play().catch(e => console.error("Video oynadıla bilmədi:", e));
+        // ✅ Köhnə video varsa, əvvəlcə onu təmizlə
+        elements.whyMediaContainer.innerHTML = '';
+        
+        // ✅ Yeni video elementi yarat
+        const video = document.createElement('video');
+        video.className = 'side-video';
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        
+        // ✅ Source elementi yarat
+        const source = document.createElement('source');
+        source.src = content.whyMediaUrl;
+        source.type = 'video/mp4';
+        
+        // ✅ Source-u video-ya əlavə et
+        video.appendChild(source);
+        
+        // ✅ Video yükləmə hadisələri
+        video.addEventListener('loadeddata', () => {
+            console.log('✅ Why video loaded successfully!');
+        });
+        
+        video.addEventListener('error', (e) => {
+            console.error('❌ Video load error:', e);
+            console.error('Failed URL:', content.whyMediaUrl);
+            console.error('Error code:', video.error?.code);
+            console.error('Error message:', video.error?.message);
+        });
+        
+        // ✅ Video-nu konteynerə əlavə et
+        elements.whyMediaContainer.appendChild(video);
+        
+        // ✅ Video yüklənməsini başlat
+        video.load();
+        
+        // ✅ Play etməyə çalış
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn('⚠️ Autoplay blocked, waiting for user interaction');
+                // User interaction gözlə
+                document.addEventListener('click', () => {
+                    video.play().catch(() => {});
+                }, { once: true });
+            });
         }
-    } else {
+        
+    } else if (content.whyMediaType === 'image') {
         elements.whyMediaContainer.innerHTML = `
-            <img src="${content.whyMediaUrl}" alt="Why CineChord" class="side-video" style="object-fit: cover;">
+            <img src="${content.whyMediaUrl}" 
+                 alt="Why CineChord" 
+                 class="side-video" 
+                 style="object-fit: cover;">
         `;
     }
-}else if (elements.whyMediaContainer) {
-            elements.whyMediaContainer.innerHTML = `<div class="placeholder-video-bg"></div>`;
-        }
+} else if (elements.whyMediaContainer) {
+    console.warn('⚠️ No why media URL found');
+    elements.whyMediaContainer.innerHTML = `<div class="placeholder-video-bg"></div>`;
+}
     }
 
 function populateTeamMembers(teamMembers) {
