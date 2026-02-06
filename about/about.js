@@ -459,20 +459,17 @@
 const ensureHttps = (url) => {
     if (!url) return null;
     
-    // HTTP -> HTTPS
-    url = url.replace('http://', 'https://');
+    // Əgər R2 linkidirsə, heç bir dəyişiklik etmədən qaytar
+    if (url.includes('r2.dev')) {
+        return url.replace('http://', 'https://');
+    }
     
-    // Cloudinary video optimizasiyası
-    if (
-        url.includes('cloudinary.com') &&
-        url.includes('/video/upload/') &&
-        !url.includes('/f_auto,q_auto,vc_auto/') &&
-        !url.includes('/f_auto,q_auto/')
-    ) {
+    // Köhnə Cloudinary məntiqini saxla (ehtiyat üçün)
+    url = url.replace('http://', 'https://');
+    if (url.includes('cloudinary.com') && url.includes('/video/upload/')) {
         const uploadIndex = url.indexOf('/video/upload/');
         const before = url.substring(0, uploadIndex + '/video/upload/'.length);
         const after = url.substring(uploadIndex + '/video/upload/'.length);
-        
         return `${before}f_auto,q_auto,vc_auto/${after}`;
     }
     
@@ -575,94 +572,77 @@ const ensureHttps = (url) => {
         populateTeamMembers(content.teamMembers || []);
     }
 
-    function populateWhySection(content) {
-        // 1. Başlıq
-        if (elements.whyTitle) {
-            elements.whyTitle.textContent = content.whyTitle;
-        }
+function populateWhySection(content) {
+    // 1. Başlıq
+    if (elements.whyTitle) {
+        elements.whyTitle.textContent = content.whyTitle;
+    }
+    
+    // 2. Description split (Sənin orijinal məntiqin - toxunmuruq)
+    if (content.whyDescription && elements.whyDescription1 && elements.whyDescription2) {
+        const cleanText = content.whyDescription.trim();
+        let parts = cleanText.split(/\n\n+|\r\n\r\n+|<br\s*\/?>\s*<br\s*\/?>/gi);
         
-        // 2. Description split
-        if (content.whyDescription && elements.whyDescription1 && elements.whyDescription2) {
-            
-            const cleanText = content.whyDescription.trim();
-            
-            // Method 1: Double line break
-            let parts = cleanText.split(/\n\n+|\r\n\r\n+|<br\s*\/?>\s*<br\s*\/?>/gi);
-            
-            if (parts.length >= 2 && parts[0].length > 10 && parts[1].length > 10) {
-                elements.whyDescription1.innerHTML = parts[0].trim().replace(/\n/g, '<br>');
-                elements.whyDescription2.innerHTML = parts[1].trim().replace(/\n/g, '<br>');
+        if (parts.length >= 2 && parts[0].length > 10 && parts[1].length > 10) {
+            elements.whyDescription1.innerHTML = parts[0].trim().replace(/\n/g, '<br>');
+            elements.whyDescription2.innerHTML = parts[1].trim().replace(/\n/g, '<br>');
+        } else {
+            parts = cleanText.split(/\n+|\r\n+/);
+            if (parts.length >= 2) {
+                const midIndex = Math.ceil(parts.length / 2);
+                elements.whyDescription1.innerHTML = parts.slice(0, midIndex).join('<br>').trim();
+                elements.whyDescription2.innerHTML = parts.slice(midIndex).join('<br>').trim();
             } else {
-                // Method 2: Single line break
-                parts = cleanText.split(/\n+|\r\n+/);
-                
-                if (parts.length >= 2) {
-                    const midIndex = Math.ceil(parts.length / 2);
-                    const firstHalf = parts.slice(0, midIndex).join('<br>').trim();
-                    const secondHalf = parts.slice(midIndex).join('<br>').trim();
-                    
-                    elements.whyDescription1.innerHTML = firstHalf;
-                    elements.whyDescription2.innerHTML = secondHalf;
+                const totalLength = cleanText.length;
+                if (totalLength < 100) {
+                    elements.whyDescription1.innerHTML = cleanText;
+                    elements.whyDescription2.innerHTML = '';
                 } else {
-                    // Method 3: Character-based split
-                    const totalLength = cleanText.length;
-                    
-                    if (totalLength < 100) {
-                        elements.whyDescription1.innerHTML = cleanText;
-                        elements.whyDescription2.innerHTML = '';
-                    } else {
-                        const midPoint = Math.floor(totalLength / 2);
-                        const breakChars = ['. ', '! ', '? ', ', ', '; ', ' '];
-                        let splitIndex = midPoint;
-                        
-                        for (const breakChar of breakChars) {
-                            const nearestBreak = cleanText.indexOf(breakChar, midPoint - 100);
-                            if (nearestBreak > midPoint - 100 && nearestBreak < midPoint + 100) {
-                                splitIndex = nearestBreak + breakChar.length;
-                                break;
-                            }
+                    const midPoint = Math.floor(totalLength / 2);
+                    const breakChars = ['. ', '! ', '? ', ', ', '; ', ' '];
+                    let splitIndex = midPoint;
+                    for (const breakChar of breakChars) {
+                        const nearestBreak = cleanText.indexOf(breakChar, midPoint - 100);
+                        if (nearestBreak > midPoint - 100 && nearestBreak < midPoint + 100) {
+                            splitIndex = nearestBreak + breakChar.length;
+                            break;
                         }
-                        
-                        if (splitIndex === midPoint) {
-                            splitIndex = cleanText.lastIndexOf(' ', midPoint);
-                            if (splitIndex === -1 || splitIndex < midPoint - 100) {
-                                splitIndex = cleanText.indexOf(' ', midPoint);
-                            }
-                        }
-                        
-                        const firstHalf = cleanText.substring(0, splitIndex).trim();
-                        const secondHalf = cleanText.substring(splitIndex).trim();
-                        
-                        elements.whyDescription1.innerHTML = firstHalf.replace(/\n/g, '<br>');
-                        elements.whyDescription2.innerHTML = secondHalf.replace(/\n/g, '<br>');
                     }
+                    if (splitIndex === midPoint) {
+                        splitIndex = cleanText.lastIndexOf(' ', midPoint);
+                        if (splitIndex === -1 || splitIndex < midPoint - 100) {
+                            splitIndex = cleanText.indexOf(' ', midPoint);
+                        }
+                    }
+                    elements.whyDescription1.innerHTML = cleanText.substring(0, splitIndex).trim().replace(/\n/g, '<br>');
+                    elements.whyDescription2.innerHTML = cleanText.substring(splitIndex).trim().replace(/\n/g, '<br>');
                 }
             }
-        }
-        
-        // 3. Media (Video/Image)
-        if (elements.whyMediaContainer && content.whyMediaUrl) {
-            if (content.whyMediaType === 'video') {
-                elements.whyMediaContainer.innerHTML = `
-                    <video autoplay muted loop playsinline class="side-video">
-                        <source src="${content.whyMediaUrl}" type="video/mp4">
-                    </video>
-                `;
-                const video = elements.whyMediaContainer.querySelector('video');
-                if (video) {
-                    video.play().catch(() => {
-                        setTimeout(() => video.play().catch(() => {}), 500);
-                    });
-                }
-            } else {
-                elements.whyMediaContainer.innerHTML = `
-                    <img src="${content.whyMediaUrl}" alt="Why CineChord" class="side-video" style="object-fit: cover;">
-                `;
-            }
-        } else if (elements.whyMediaContainer) {
-            elements.whyMediaContainer.innerHTML = `<div class="placeholder-video-bg"></div>`;
         }
     }
+    
+    // 3. Media (Video/Image) - BURA DİQQƏT
+    if (elements.whyMediaContainer && content.whyMediaUrl) {
+        if (content.whyMediaType === 'video') {
+            elements.whyMediaContainer.innerHTML = `
+                <video autoplay muted loop playsinline class="side-video">
+                    <source src="${content.whyMediaUrl}" type="video/mp4">
+                </video>
+            `;
+            const video = elements.whyMediaContainer.querySelector('video');
+            if (video) {
+                video.load(); // 👈 BU SƏTİR: Brauzerə videonu yenidən yükləməyi əmr edir
+                video.play().catch(err => console.error("Video play error:", err));
+            }
+        } else {
+            elements.whyMediaContainer.innerHTML = `
+                <img src="${content.whyMediaUrl}" alt="Why CineChord" class="side-video" style="object-fit: cover;">
+            `;
+        }
+    } else if (elements.whyMediaContainer) {
+        elements.whyMediaContainer.innerHTML = `<div class="placeholder-video-bg"></div>`;
+    }
+}
 
 function populateTeamMembers(teamMembers) {
     console.log('🔍 populateTeamMembers called');
