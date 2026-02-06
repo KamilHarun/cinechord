@@ -990,8 +990,7 @@ async function submitAbout() {
                 xhr.send(file);
             });
             
-            finalMediaUrl = `${R2_PUBLIC_URL}/${fileKey}`;
-        }
+            finalMediaUrl = `${R2_PUBLIC_URL}/videos/${fileKey}`;        }
 
         // B) MƏLUMATLARI BAZADA YENİLƏ
         document.getElementById('uploadStatus').innerText = 'Bazaya qeyd edilir...';
