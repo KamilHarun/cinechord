@@ -906,7 +906,11 @@ async function loadAbout() {
             'aWhyDescAz': data.whyDescriptionAz,
             'who-we-are': data.whoWeAreText,
             'our-mission': data.ourMissionText,
-            'our-approach': data.ourApproachText
+            'our-approach': data.ourApproachText,
+            'aEmail': data.email,
+            'aPhone': data.phone,
+            'aAddress': data.address,
+            'aAddressAz': data.addressAz
         };
 
         for (const [id, value] of Object.entries(fields)) {
@@ -1009,7 +1013,11 @@ async function submitAbout() {
             ourMissionText: document.getElementById('our-mission')?.value || '',
             ourApproachText: document.getElementById('our-approach')?.value || '',
             whyMediaUrl: finalMediaUrl, 
-            whyMediaType: mediaType
+            whyMediaType: mediaType,
+             email: document.getElementById('aEmail')?.value || '',
+    phone: document.getElementById('aPhone')?.value || '',
+    address: document.getElementById('aAddress')?.value || '',
+    addressAz: document.getElementById('aAddressAz')?.value || ''
         };
 
         Object.keys(aboutData).forEach(key => fd.append(key, aboutData[key]));

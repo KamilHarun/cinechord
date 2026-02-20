@@ -238,7 +238,9 @@
                 "about": "ABOUT", 
                 "contact": "CONTACT",
                 "who_we_are": "WHY CINECHORD", 
-                "meet_us": "MEET US"
+                "meet_us": "MEET US",
+                "contact_headline": "WANT TO START A PROJECT?"
+
             },
             "az": {
                 "menu": "MENYU", 
@@ -250,51 +252,58 @@
                 "about": "HAQQIMIZDA", 
                 "contact": "ƏLAQƏ",
                 "who_we_are": "NİYƏ CINECHORD", 
-                "meet_us": "KOMANDA"
+                "meet_us": "KOMANDA",
+                "contact_headline": "LAYİHƏYƏ BAŞLAMAQ İSTƏYİRSİNİZ?"
+
             }
         };
         return window.translations;
     }
 
-    function applyTranslations(lang) {
-        if (!window.translations || !window.translations[lang]) return;
+   function applyTranslations(lang) {
+    if (!window.translations || !window.translations[lang]) return;
 
-        const t = window.translations[lang];
-        window.currentLang = lang;
+    const t = window.translations[lang];
+    window.currentLang = lang;
 
-        const hamburgerTextEl = document.querySelector('.hamburger-text');
-        if (hamburgerTextEl) {
-            const isMenuOpen = elements.hamburger && elements.hamburger.classList.contains('active');
-            hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
-        }
-
-        const navButtons = document.querySelectorAll('.nav-btn');
-        navButtons.forEach(btn => {
-            const navText = btn.querySelector('.nav-text');
-            const key = btn.getAttribute('data-key');
-            if (key && t[key]) {
-                if (navText) navText.textContent = t[key];
-                btn.setAttribute('data-text', t[key]);
-            }
-        });
-
-        const blockTitles = document.querySelectorAll('.sidebar-label');
-        blockTitles.forEach(title => {
-            const key = title.getAttribute('data-key');
-            if (key && t[key]) {
-                title.textContent = t[key];
-            }
-        });
-
-        if (lang === 'az') {
-            document.body.classList.add('lang-az');
-            document.documentElement.setAttribute('lang', 'az');
-        } else {
-            document.body.classList.remove('lang-az');
-            document.documentElement.setAttribute('lang', 'en');
-        }
+    const hamburgerTextEl = document.querySelector('.hamburger-text');
+    if (hamburgerTextEl) {
+        const isMenuOpen = elements.hamburger && elements.hamburger.classList.contains('active');
+        hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
     }
 
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => {
+        const navText = btn.querySelector('.nav-text');
+        const key = btn.getAttribute('data-key');
+        if (key && t[key]) {
+            if (navText) navText.textContent = t[key];
+            btn.setAttribute('data-text', t[key]);
+        }
+    });
+
+    const blockTitles = document.querySelectorAll('.sidebar-label');
+    blockTitles.forEach(title => {
+        const key = title.getAttribute('data-key');
+        if (key && t[key]) {
+            title.textContent = t[key];
+        }
+    });
+
+    // contact_headline tərcüməsi
+    const contactHeadline = document.querySelector('[data-key="contact_headline"]');
+    if (contactHeadline && t.contact_headline) {
+        contactHeadline.textContent = t.contact_headline;
+    }
+
+    if (lang === 'az') {
+        document.body.classList.add('lang-az');
+        document.documentElement.setAttribute('lang', 'az');
+    } else {
+        document.body.classList.remove('lang-az');
+        document.documentElement.setAttribute('lang', 'en');
+    }
+}
     /* ============================================================
        8. GLOBE LANGUAGE SELECTOR
        ============================================================ */
@@ -508,72 +517,99 @@ const ensureHttps = (url) => {
     populateContent(content);
 }
 
-    function populateContent(content) {
-        console.log('🎨 populateContent called');
-        console.log('👥 Team members to populate:', content.teamMembers?.length || 0);
-        
-        const safeUpdate = (el, val, isHTML = false) => {
-            if (el) {
-                if (isHTML) el.innerHTML = val;
-                else el.textContent = val;
-            }
-        };
+function populateContent(content) {
+    console.log('🎨 populateContent called');
+    console.log('👥 Team members to populate:', content.teamMembers?.length || 0);
+    
+    const safeUpdate = (el, val, isHTML = false) => {
+        if (el) {
+            if (isHTML) el.innerHTML = val;
+            else el.textContent = val;
+        }
+    };
 
-        // 1. Main Title
-        if (elements.mainTitle) {
-            const span = elements.mainTitle.querySelector('span');
-            if (span) {
-                span.textContent = content.mainTitle;
-            } else {
-                elements.mainTitle.innerHTML = `<span>${content.mainTitle}</span>`;
-            }
-            elements.mainTitle.setAttribute('data-text', content.mainTitle);
+    // 1. Main Title
+    if (elements.mainTitle) {
+        const span = elements.mainTitle.querySelector('span');
+        if (span) {
+            span.textContent = content.mainTitle;
+        } else {
+            elements.mainTitle.innerHTML = `<span>${content.mainTitle}</span>`;
         }
-        
-        // 2. Text Content
-        safeUpdate(elements.subtitle, content.subTitle);
-        safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
-        safeUpdate(elements.ourMission, content.ourMissionText, true);
-        safeUpdate(elements.ourApproach, content.ourApproachText, true);
-        safeUpdate(elements.address, content.address);
-
-        // 3. Email & Phone
-        if (elements.emailLink) {
-            elements.emailLink.href = `mailto:${content.email}`;
-            const eSpan = elements.emailLink.querySelector('span');
-            if(eSpan) {
-                eSpan.textContent = content.email;
-                eSpan.setAttribute('data-text', content.email);
-            }
-        }
-
-        if (elements.phoneLink) {
-            elements.phoneLink.href = `tel:${content.phone.replace(/\s/g, '')}`;
-            const pSpan = elements.phoneLink.querySelector('span');
-            if(pSpan) {
-                pSpan.textContent = content.phone;
-                pSpan.setAttribute('data-text', content.phone);
-            }
-        }
-        
-        // 4. Hero Video Handling (Secure)
-        if (content.videoUrl && elements.aboutVideo) {
-            elements.aboutVideo.src = content.videoUrl;
-            elements.aboutVideo.load();
-            elements.aboutVideo.addEventListener('loadeddata', function() {
-                if (typeof forceVideoPlay === 'function') forceVideoPlay();
-            }, { once: true });
-        } else if (elements.aboutVideo) {
-            if (typeof loadStaticVideo === 'function') loadStaticVideo();
-        }
-        
-        // 5. Why Section & Team
-        populateWhySection(content);
-        
-        // CRITICAL: Ensure team members are populated
-        console.log('🚀 Calling populateTeamMembers with', content.teamMembers?.length || 0, 'members');
-        populateTeamMembers(content.teamMembers || []);
+        elements.mainTitle.setAttribute('data-text', content.mainTitle);
     }
+    
+    // 2. Text Content
+    safeUpdate(elements.subtitle, content.subTitle);
+    safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
+    safeUpdate(elements.ourMission, content.ourMissionText, true);
+    safeUpdate(elements.ourApproach, content.ourApproachText, true);
+    safeUpdate(elements.address, content.address);
+
+    // 3. Email & Phone (footer elements)
+    if (elements.emailLink) {
+        elements.emailLink.href = `mailto:${content.email}`;
+        const eSpan = elements.emailLink.querySelector('span');
+        if(eSpan) {
+            eSpan.textContent = content.email;
+            eSpan.setAttribute('data-text', content.email);
+        }
+    }
+
+    if (elements.phoneLink) {
+        elements.phoneLink.href = `tel:${content.phone.replace(/\s/g, '')}`;
+        const pSpan = elements.phoneLink.querySelector('span');
+        if(pSpan) {
+            pSpan.textContent = content.phone;
+            pSpan.setAttribute('data-text', content.phone);
+        }
+    }
+    
+    // ✅ 3.5 Contact Section (ayrıca bölmə - YENİ!)
+    const contactEmail = document.getElementById('contact-email');
+    const contactPhone = document.getElementById('contact-phone');
+    const contactAddress = document.getElementById('contact-address');
+
+    if (contactEmail) {
+        const span = contactEmail.querySelector('span');
+        if (span) {
+            span.textContent = content.email;
+            contactEmail.setAttribute('data-text', content.email);
+        }
+        contactEmail.href = `mailto:${content.email}`;
+    }
+
+    if (contactPhone) {
+        const span = contactPhone.querySelector('span');
+        if (span) {
+            span.textContent = content.phone;
+            contactPhone.setAttribute('data-text', content.phone);
+        }
+        contactPhone.href = `tel:${content.phone.replace(/\s/g, '')}`;
+    }
+
+    if (contactAddress) {
+        contactAddress.textContent = content.address;
+    }
+    
+    // 4. Hero Video Handling (Secure)
+    if (content.videoUrl && elements.aboutVideo) {
+        elements.aboutVideo.src = content.videoUrl;
+        elements.aboutVideo.load();
+        elements.aboutVideo.addEventListener('loadeddata', function() {
+            if (typeof forceVideoPlay === 'function') forceVideoPlay();
+        }, { once: true });
+    } else if (elements.aboutVideo) {
+        if (typeof loadStaticVideo === 'function') loadStaticVideo();
+    }
+    
+    // 5. Why Section & Team
+    populateWhySection(content);
+    
+    // CRITICAL: Ensure team members are populated
+    console.log('🚀 Calling populateTeamMembers with', content.teamMembers?.length || 0, 'members');
+    populateTeamMembers(content.teamMembers || []);
+}
 
     function populateWhySection(content) {
         // 1. Başlıq

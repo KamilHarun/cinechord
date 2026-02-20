@@ -542,38 +542,35 @@
         });
     }
 
-    /* ============================================================
-        8. DİNAMİK SERVİS YÜKLƏMƏSİ
-        ============================================================ */
+/* ============================================================
+    8. DİNAMİK SERVİS YÜKLƏMƏSİ
+    ============================================================ */
 
-    function cleanUrlPath(url) {
-        if (url && typeof url === 'string') {
-            if (url.startsWith('http')) return url;
-            if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
-        }
-        return url;
+function cleanUrlPath(url) {
+    if (url && typeof url === 'string') {
+        if (url.startsWith('http')) return url;
+        if (url.startsWith('/uploads/')) return url.substring('/uploads/'.length);
     }
+    return url;
+}
 
-    // API verilerini sakla
-    let cachedServicesData = null;
+// API verilerini sakla
+let cachedServicesData = null;
 
 async function fetchAndRenderServices(lang = 'en') {
     const container = elements.servicesContainer;
     if (!container) return;
 
     try {
-        // 1. API'ye dil parametresi gönder (BU KISIM KALMALI)
         const langParam = lang === 'az' ? 'az' : 'en';
         const url = `${API_SERVICES}?lang=${langParam}`;
         
-        // 2. Asıl veriyi çeken istek (BU KISIM KALMALI)
         const response = await fetch(url);
         
         if (!response.ok) {
             throw new Error(`API error! Status: ${response.status}`);
         }
         
-        // 3. Veriyi JSON formatına çevir (BU KISIM KALMALI)
         const data = await response.json();
         
         const services = data.content ? data.content : data;
@@ -585,7 +582,6 @@ async function fetchAndRenderServices(lang = 'en') {
             return;
         }
 
-        // 4. Veriyi ekrana bas (BU KISIM KALMALI)
         renderServices(services, lang);
         
     } catch (error) {
@@ -606,11 +602,10 @@ async function fetchAndRenderServices(lang = 'en') {
     }
 }
 
-   function renderServices(services, lang = 'en') {
+function renderServices(services, lang = 'en') {
     const container = elements.servicesContainer;
     if (!container) return;
     
-    // HATAYI DÜZELTEN KRİTİK TANIMLAMA
     const isAz = lang === 'az'; 
 
     let htmlContent = '';
@@ -619,6 +614,12 @@ async function fetchAndRenderServices(lang = 'en') {
         let videoSrc = service.videoUrl || '';
         if (videoSrc) {
             videoSrc = cleanUrlPath(videoSrc);
+            
+            // Köhnə Cloudinary cloud-ı yeni ilə əvəz et
+            if (videoSrc.includes('res.cloudinary.com/dinncr6hs')) {
+                videoSrc = videoSrc.replace('res.cloudinary.com/dinncr6hs', 'res.cloudinary.com/dwybvusv6');
+            }
+            
             if (!videoSrc.startsWith('http')) {
                 videoSrc = UPLOADS_URL + videoSrc;
             }

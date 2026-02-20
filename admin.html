@@ -184,7 +184,7 @@
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Haqqımızda Redaktəsi</h1>
-                        <p class="page-subtitle">Hero, Why CineChord və Komanda Üzvləri</p>
+                        <p class="page-subtitle">Hero, Əlaqə, Why CineChord və Komanda Üzvləri</p>
                     </div>
                     <button type="button" id="saveAboutBtn" class="btn-primary" onclick="submitAbout()">
                         <i class="fas fa-save"></i> Ümumi Yadda Saxla
@@ -192,6 +192,7 @@
                 </div>
 
                 <form id="aboutForm" onsubmit="return false;">
+                    <!-- 1. HERO BÖLMƏSİ -->
                     <div class="content-card mb-4">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-video"></i> 1. Hero Bölməsi</h3>
@@ -216,6 +217,32 @@
                         </div>
                     </div>
 
+                    <!-- ✅ 1.5. ƏLAQƏ MƏLUMAT LARI (YENİ) -->
+                    <div class="content-card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-address-book"></i> 1.5. Əlaqə Məlumatları (Contact Info)</h3>
+                        </div>
+                        <div class="p-3 row g-3">
+                            <div class="col-md-6">
+                                <label>Email</label>
+                                <input type="email" id="aEmail" class="form-control" placeholder="info@cinechord.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Telefon</label>
+                                <input type="text" id="aPhone" class="form-control" placeholder="+994 50 233 04 54">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Ünvan (EN)</label>
+                                <input type="text" id="aAddress" class="form-control" placeholder="Baku, Azerbaijan">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Ünvan (AZ)</label>
+                                <input type="text" id="aAddressAz" class="form-control" placeholder="Bakı, Azərbaycan">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. WHY CINECHORD MEDIA -->
                     <div class="content-card mb-4">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-star"></i> 2. Why CineChord Media</h3>
@@ -247,6 +274,7 @@
                         </div>
                     </div>
 
+                    <!-- 3. KOMANDA ÜZVLƏRİ -->
                     <div class="content-card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title"><i class="fas fa-users"></i> 3. Komanda Üzvləri (Meet Us)</h3>

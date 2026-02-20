@@ -876,7 +876,7 @@ body.lang-az .hero-rolling-text {
     grid-template-columns: repeat(3, 1fr);
     gap: 40px;
     margin-top: 60px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none !important;
     padding-top: 30px;
 }
 
@@ -942,6 +942,239 @@ body.lang-az .hero-rolling-text {
 .rolling-link-item::after {
     content: var(--link-text, attr(data-text));
 }
+/* =========================================
+   CONTACT SECTION – SLIM BORDERS
+   ========================================= */
+
+/* Contact Section Yenilənməsi */
+.contact-section {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 100px 0; /* Boşluğu idarə olunan səviyyəyə saldıq */
+    margin: 0;
+    position: relative;
+}
+
+/* Kreativ "Let's Connect" fon yazısı və ya başlığı üçün */
+.contact-header-text {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: clamp(40px, 8vw, 120px);
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: -3px;
+    margin-bottom: 60px;
+    color: #fff;
+    text-align: left;
+    opacity: 1;
+}
+
+/* Azerbaijan dili üçün font tənzimləməsi */
+body.lang-az .contact-header-text {
+    font-family: 'Montserrat', sans-serif !important;
+    letter-spacing: -2px;
+}
+
+
+/* =========================================
+   CONTACT INFO GRID
+   ========================================= */
+
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px; /* Gap-i azaltdıq ki, dağınıq görünməsin */
+    max-width: 1200px;
+}
+
+.contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Kateqoriya və dəyər arasındakı məsafəni azaltdıq */
+}
+
+.contact-value {
+    font-size: 18px; /* Daha premium və minimal görünüş üçün bir az kiçiltdik */
+    font-weight: 500;
+}
+
+
+/* =========================================
+   CONTACT BLOCK
+   ========================================= */
+
+.contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+}
+
+
+/* =========================================
+   CONTACT CATEGORY
+   ========================================= */
+
+.contact-category {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #FFA500;
+    opacity: 0.8;
+    margin: 0;
+}
+
+
+/* =========================================
+   CONTACT VALUE
+   ========================================= */
+
+.contact-value {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    line-height: 1.5;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.contact-value:not(p):hover {
+    color: #FFA500;
+}
+
+
+/* =========================================
+   ROLLING LINK CLEANUP
+   ========================================= */
+
+.contact-value.rolling-link-item {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+    height: auto;
+}
+
+.contact-value.rolling-link-item span {
+    display: inline;
+    transition: color 0.3s ease;
+}
+
+.contact-value.rolling-link-item::after {
+    display: none !important;
+    content: none !important;
+}
+
+.contact-value.rolling-link-item:hover span {
+    color: #FFA500;
+    transform: none !important;
+}
+
+/* Kontakt bölməsinin ümumi hündürlüyünü tənzimləyək */
+.contact-section-adjustment {
+    padding: 80px 0 !important; /* Çox böyük boşluğu 80px-ə endirdik */
+}
+
+/* Kreativ böyük yazı */
+/* Başlıq və aşağıdakı məlumatlar arasındakı məsafəni açırıq */
+.contact-big-title {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: clamp(30px, 4vw, 60px);
+    line-height: 1.1;
+    letter-spacing: -2px;
+    color: #FFA500; /* Turuncu rəng */
+    text-transform: uppercase;
+    
+    /* Məsafəni buradan tənzimləyirik */
+    margin-bottom: 120px; /* 80px-dən 120px-ə qaldırdıq */
+}
+
+/* Məlumatların olduğu hissəni bir az da aşağı itələyirik */
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    padding-top: 30px; /* Əlavə daxili boşluq */
+    border-top: 1px solid rgba(255, 255, 255, 0.05); /* Zəif bir xətt əlavə edərək ayırmaq olar (istəyə bağlı) */
+}
+
+/* Kateqoriya (EMAIL, PHONE) və dəyər arasındakı məsafəni də bir az artırıq */
+.contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* EMAIL yazısı ilə info@... arasındakı məsafə */
+}
+
+/* Mobil tənzimləmə */
+@media (max-width: 768px) {
+    .contact-big-title {
+        margin-bottom: 80px; /* Mobildə ekran balaca olduğu üçün bir az azaltdıq */
+    }
+    
+    .contact-info-grid {
+        padding-top: 20px;
+        gap: 50px; /* Mobildə alt-alta düşdükləri üçün aralarındakı məsafə */
+    }
+}
+
+/* Mobil görünüşdə başlıq və məlumat arası məsafəni qoruyaq */
+@media (max-width: 768px) {
+    .contact-big-title {
+        margin-bottom: 60px;
+        font-size: 30px;
+    }
+}
+    
+    .contact-section-adjustment {
+        padding: 50px 20px !important;
+    }
+
+
+
+/* =========================================
+   LANGUAGE OVERRIDES
+   ========================================= */
+
+body.lang-az .contact-category,
+body.lang-az .contact-value {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .contact-section {
+        padding: 8px 0; /* ⬅️ mobile-da da slim */
+    }
+
+    .contact-info-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .contact-block {
+        text-align: center;
+        gap: 15px;
+    }
+
+    .contact-category {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .contact-value {
+        font-size: 16px;
+    }
+}
 
 /* =========================================
    12. DESKTOP/WEB SOSIAL HİSSƏ (AZ DİLİ)
@@ -977,6 +1210,7 @@ body.lang-az .menu-contact-info a {
     filter: blur(0) !important;
 }
 
+
 /* =========================================
    14. SCROLL HIDE/SHOW ANIMATION
    ========================================= */
@@ -1009,7 +1243,7 @@ body.lang-az .menu-contact-info a {
     padding: 80px 60px 40px;
     position: relative;
     z-index: 10;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none; /* Xətti ləğv etdik */
     overflow: hidden;
 }
 
