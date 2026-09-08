@@ -1127,86 +1127,205 @@ function openTeamModal() {
 }
 
 function editTeamMember(id) {
-    const member = teamMembersCache.find(m => m.id === id);
+    const member = teamMembersCache.find(m => Number(m.id) === Number(id));
     if (!member) return;
 
-    document.querySelector('#teamModal .modal-title').textContent = 'Üzvü Redaktə Et';
-    document.getElementById('teamId').value = member.id;
-    document.getElementById('tName').value = member.name || '';
-    document.getElementById('tNameAz').value = member.nameAz || '';
-    document.getElementById('tRole').value = member.role || '';
-    document.getElementById('tRoleAz').value = member.roleAz || '';
-    document.getElementById('tBio').value = member.bio || '';
-    document.getElementById('tBioAz').value = member.bioAz || '';
-    document.getElementById('tOrder').value = member.displayOrder || 0;
+    const modalEl = document.getElementById('teamModal');
+    if (!modalEl) return;
 
-    new bootstrap.Modal(document.getElementById('teamModal')).show();
+    const titleEl = modalEl.querySelector('.modal-title');
+
+    if (titleEl) {
+        titleEl.textContent = 'Üzvü Redaktə Et';
+    }
+
+    const teamId = document.getElementById('teamId');
+    const name = document.getElementById('tName');
+    const nameAz = document.getElementById('tNameAz');
+    const role = document.getElementById('tRole');
+    const roleAz = document.getElementById('tRoleAz');
+    const bio = document.getElementById('tBio');
+    const bioAz = document.getElementById('tBioAz');
+    const order = document.getElementById('tOrder');
+
+    if (teamId) teamId.value = member.id;
+    if (name) name.value = member.name || '';
+    if (nameAz) nameAz.value = member.nameAz || '';
+    if (role) role.value = member.role || '';
+    if (roleAz) roleAz.value = member.roleAz || '';
+    if (bio) bio.value = member.bio || '';
+    if (bioAz) bioAz.value = member.bioAz || '';
+    if (order) order.value = member.displayOrder ?? 0;
+
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 async function submitTeamMember() {
-    const teamId = document.getElementById('teamId')?.value;
+    const teamId = document.getElementById('teamId')?.value || '';
     const fd = new FormData();
-    
-    const name = document.getElementById('tName')?.value;
-    const role = document.getElementById('tRole')?.value;
 
-    if (!name || !role) { 
-        Swal.fire('Xəbərdarlıq', 'Ad və Vəzifə sahələri boş qala bilməz', 'warning'); 
-        return; 
+    const name = document.getElementById('tName')?.value?.trim() || '';
+    const role = document.getElementById('tRole')?.value?.trim() || '';
+
+    if (!name || !role) {
+        Swal.fire(
+            'Xəbərdarlıq',
+            'Ad və Vəzifə sahələri boş qala bilməz',
+            'warning'
+        );
+        return;
     }
 
     fd.append('name', name);
-    fd.append('nameAz', document.getElementById('tNameAz')?.value || name);
+    fd.append(
+        'nameAz',
+        document.getElementById('tNameAz')?.value?.trim() || name
+    );
     fd.append('role', role);
-    fd.append('roleAz', document.getElementById('tRoleAz')?.value || role);
-    fd.append('bio', document.getElementById('tBio')?.value || '');
-    fd.append('bioAz', document.getElementById('tBioAz')?.value || '');
-    fd.append('displayOrder', document.getElementById('tOrder')?.value || 0);
-    
-    const img = document.getElementById('tImage')?.files[0];
-    if (img) fd.append('imageFile', img);
+    fd.append(
+        'roleAz',
+        document.getElementById('tRoleAz')?.value?.trim() || role
+    );
+    fd.append(
+        'bio',
+        document.getElementById('tBio')?.value?.trim() || ''
+    );
+    fd.append(
+        'bioAz',
+        document.getElementById('tBioAz')?.value?.trim() || ''
+    );
+    fd.append(
+        'displayOrder',
+        document.getElementById('tOrder')?.value || '0'
+    );
 
-    Swal.fire({ title: 'Yadda saxlanılır...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    const img = document.getElementById('tImage')?.files[0];
+
+    if (img) {
+        fd.append('imageFile', img);
+    }
+
+    Swal.fire({
+        title: 'Yadda saxlanılır...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
 
     try {
-        const url = teamId ? `${API.ABOUT}/team/${teamId}` : `${API.ABOUT}/team`;
+        const url = teamId
+            ? `${API.ABOUT}/team/${teamId}`
+            : `${API.ABOUT}/team`;
+
         const method = teamId ? 'PUT' : 'POST';
 
-        const res = await authFetch(url, { method: method, body: fd });
-        
+        const res = await authFetch(url, {
+            method: method,
+            body: fd
+        });
+
         if (res && res.ok) {
-            Swal.fire('Uğurlu!', 'Əməliyyat tamamlandı', 'success');
+            Swal.fire(
+                'Uğurlu!',
+                teamId
+                    ? 'Komanda üzvü uğurla yeniləndi.'
+                    : 'Komanda üzvü uğurla əlavə edildi.',
+                'success'
+            );
+
             const modalEl = document.getElementById('teamModal');
-            bootstrap.Modal.getInstance(modalEl).hide();
-            loadTeamMembers();
+
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+
+                if (modal) {
+                    modal.hide();
+                }
+            }
+
+            await loadTeamMembers();
         } else {
-            Swal.fire('Xəta', 'Məlumat yadda saxlanılmadı', 'error');
+            let message = 'Məlumat yadda saxlanılmadı.';
+
+            try {
+                const data = await res.json();
+
+                if (data?.message) {
+                    message = data.message;
+                }
+            } catch (e) {
+            }
+
+            Swal.fire('Xəta', message, 'error');
         }
-    } catch (e) { 
-        Swal.fire('Xəta', 'Bağlantı xətası baş verdi', 'error'); 
+    } catch (e) {
+        console.error(e);
+
+        Swal.fire(
+            'Xəta',
+            'Bağlantı xətası baş verdi.',
+            'error'
+        );
     }
 }
 
 async function deleteTeamMember(id) {
     const conf = await Swal.fire({
         title: 'Əminsiniz?',
-        text: "Bu komanda üzvü sistemdən silinəcək.",
+        text: 'Bu komanda üzvü sistemdən silinəcək.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
-        confirmButtonText: 'Bəli, sil!'
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Bəli, sil!',
+        cancelButtonText: 'Ləğv et'
     });
 
-    if (conf.isConfirmed) {
-        try {
-            const res = await authFetch(`${API.ABOUT}/team/${id}`, { method: 'DELETE' });
-            if (res && res.ok) { 
-                loadTeamMembers(); 
-                Swal.fire('Silindi!', 'Komanda üzvü silindi.', 'success');
+    if (!conf.isConfirmed) return;
+
+    try {
+        Swal.fire({
+            title: 'Silinir...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        const res = await authFetch(
+            `${API.ABOUT}/team/${id}`,
+            {
+                method: 'DELETE'
             }
-        } catch (e) {
-            Swal.fire('Xəta', 'Silinmə zamanı xəta baş verdi', 'error');
+        );
+
+        if (res && res.ok) {
+            await loadTeamMembers();
+
+            Swal.fire(
+                'Silindi!',
+                'Komanda üzvü uğurla silindi.',
+                'success'
+            );
+        } else {
+            let message = 'Komanda üzvü silinmədi.';
+
+            try {
+                const data = await res.json();
+
+                if (data?.message) {
+                    message = data.message;
+                }
+            } catch (e) {
+            }
+
+            Swal.fire('Xəta', message, 'error');
         }
+    } catch (e) {
+        console.error(e);
+
+        Swal.fire(
+            'Xəta',
+            'Silinmə zamanı bağlantı xətası baş verdi.',
+            'error'
+        );
     }
 }
 // ============================================

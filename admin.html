@@ -451,52 +451,122 @@
     </div>
 
     <div class="modal fade" id="teamModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content bg-dark text-white border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5>Komanda Üzvü Məlumatları</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="teamForm">
-                        <input type="hidden" id="teamId">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label>Ad Soyad (EN/AZ)</label>
-                                <input type="text" id="tName" class="form-control bg-secondary text-white border-0 mb-2" placeholder="Full Name">
-                                <input type="text" id="tNameAz" class="form-control bg-secondary text-white border-0" placeholder="Ad Soyad">
-                            </div>
-                            <div class="col-md-6">
-                                <label>Vəzifə (EN/AZ)</label>
-                                <input type="text" id="tRole" class="form-control bg-secondary text-white border-0 mb-2" placeholder="e.g. Director">
-                                <input type="text" id="tRoleAz" class="form-control bg-secondary text-white border-0" placeholder="məs. Rejissor">
-                            </div>
-                            <div class="col-12">
-                                <label class="text-info">Bioqrafiya (EN)</label>
-                                <textarea id="tBio" class="form-control bg-secondary text-white border-0" rows="3" placeholder="Member's short story..."></textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="text-info">Bioqrafiya (AZ)</label>
-                                <textarea id="tBioAz" class="form-control bg-secondary text-white border-0" rows="3" placeholder="Üzv haqqında qısa məlumat..."></textarea>
-                            </div>
-                            <div class="col-md-8">
-                                <label>Profil Şəkli</label>
-                                <input type="file" id="tImage" class="form-control bg-secondary text-white border-0">
-                            </div>
-                            <div class="col-md-4">
-                                <label>Sıralama</label>
-                                <input type="number" id="tOrder" class="form-control bg-secondary text-white border-0" value="0">
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-secondary">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Ləğv et</button>
-                    <button type="button" class="btn btn-primary" onclick="submitTeamMember()">Yadda Saxla</button>
-                </div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white border-secondary">
+
+            <div class="modal-header border-secondary">
+<h5 class="modal-title">Komanda Üzvü Məlumatları</h5>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal">
+                </button>
             </div>
+
+            <div class="modal-body">
+                <form id="teamForm">
+
+                    <input type="hidden" id="teamId">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label>Ad Soyad (EN/AZ)</label>
+
+                            <input
+                                type="text"
+                                id="tName"
+                                class="form-control bg-secondary text-white border-0 mb-2"
+                                placeholder="Full Name">
+
+                            <input
+                                type="text"
+                                id="tNameAz"
+                                class="form-control bg-secondary text-white border-0"
+                                placeholder="Ad Soyad">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Vəzifə (EN/AZ)</label>
+
+                            <input
+                                type="text"
+                                id="tRole"
+                                class="form-control bg-secondary text-white border-0 mb-2"
+                                placeholder="e.g. Director">
+
+                            <input
+                                type="text"
+                                id="tRoleAz"
+                                class="form-control bg-secondary text-white border-0"
+                                placeholder="məs. Rejissor">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="text-info">Bioqrafiya (EN)</label>
+
+                            <textarea
+                                id="tBio"
+                                class="form-control bg-secondary text-white border-0"
+                                rows="3"
+                                placeholder="Member's short story..."></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="text-info">Bioqrafiya (AZ)</label>
+
+                            <textarea
+                                id="tBioAz"
+                                class="form-control bg-secondary text-white border-0"
+                                rows="3"
+                                placeholder="Üzv haqqında qısa məlumat..."></textarea>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label>Profil Şəkli</label>
+
+                            <input
+                                type="file"
+                                id="tImage"
+                                class="form-control bg-secondary text-white border-0">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Sıralama</label>
+
+                            <input
+                                type="number"
+                                id="tOrder"
+                                class="form-control bg-secondary text-white border-0"
+                                value="0">
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer border-secondary">
+
+                <button
+                    type="button"
+                    class="btn btn-outline-light"
+                    data-bs-dismiss="modal">
+                    Ləğv et
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="submitTeamMember()">
+                    Yadda Saxla
+                </button>
+
+            </div>
+
         </div>
     </div>
+</div>
 
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
