@@ -884,7 +884,7 @@ body.lang-az .menu-socials a {
 
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
@@ -904,7 +904,7 @@ body.lang-az .menu-contact-info a {
 
 .center-logo {
     position: absolute;
-    top: 5px;
+    top: 2px;
     left: 40px;
     z-index: 100;
     pointer-events: auto;
@@ -912,8 +912,8 @@ body.lang-az .menu-contact-info a {
 }
 
 .logo-img {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
     object-fit: contain;
     filter: brightness(0) invert(1);
     image-rendering: -webkit-optimize-contrast;
@@ -926,108 +926,332 @@ body.lang-az .menu-contact-info a {
 }
 
 /* ============================================================
-   11. PLAY BUTTON
+   11. PLAY BUTTON - WORKS SƏHİFƏSİ EFFEKTLƏRİ İLƏ
    ============================================================ */
 
-.play-button-container {
+/* ============================================================
+   ANA EKRAN PLAY BUTTON - BÖYÜDÜLMÜŞ
+   ============================================================ */
+
+#mainPlayBtnContainer {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10000 !important;
+    width: 220px;              /* 300 → 420 */
+    height: 220px;             /* 300 → 420 */
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    width: 250px;
-    height: 120px;
     pointer-events: auto !important;
-    --ring-x: 0px;
-    --ring-y: 0px;
 }
 
-.play-button {
+#mainPlayBtnContainer .play-button-wrapper {
     position: relative;
-    width: 90px;
-    height: 34px;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    border-radius: 100px;
+    width: 180px;              /* 150 → 280 ⬅️ BURANI DA BÖYÜD! */
+    height: 180px;             /* 150 → 280 */
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.4s ease;
+}
+
+/* İkonlar - eyni yerdə */
+#mainPlayBtnContainer .play-icon-img,
+#mainPlayBtnContainer .pause-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Play ikonu - default görünür */
+#mainPlayBtnContainer .play-icon-img {
+    display: block;
+}
+
+/* Pause ikonu - default gizli */
+#mainPlayBtnContainer .pause-icon {
+    display: none;
+}
+
+/* Hover - ikonlar böyüyür */
+#mainPlayBtnContainer:hover .play-icon-img,
+#mainPlayBtnContainer:hover .pause-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.8));
+}
+
+/* ===== ANA EKRAN - PLAY/PAUSE DƏYİŞMƏSİ ===== */
+#mainPlayBtnContainer.is-playing .play-icon-img {
+    display: none !important;
+}
+#mainPlayBtnContainer.is-playing .pause-icon {
+    display: block !important;
+}
+
+#mainPlayBtnContainer.is-paused .play-icon-img {
+    display: block !important;
+}
+#mainPlayBtnContainer.is-paused .pause-icon {
+    display: none !important;
+}
+
+/* ===== ANA EKRAN - AUTO-HIDE MASK EFFEKTİ (Works-dakı kimi) ===== */
+#mainPlayBtnContainer.auto-hidden .play-button-wrapper {
+    opacity: 0;
+    visibility: hidden;
+    clip-path: inset(0 0 100% 0);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
 }
 
-.play-button::before {
-    content: '';
+#mainPlayBtnContainer:not(.auto-hidden) .play-button-wrapper {
+    opacity: 1;
+    visibility: visible;
+    clip-path: inset(0 0 0 0);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto;
+}
+
+/* İkonlar da maskalanır */
+#mainPlayBtnContainer.auto-hidden .play-icon-img,
+#mainPlayBtnContainer.auto-hidden .pause-icon {
+    transform: scale(0.5);
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+#mainPlayBtnContainer:not(.auto-hidden) .play-icon-img,
+#mainPlayBtnContainer:not(.auto-hidden) .pause-icon {
+    transform: scale(1);
+    opacity: 1;
+    transition: all 0.5s ease;
+}
+
+/* ============================================================
+   MODAL PLAY BUTTON - BÖYÜDÜLMÜŞ
+   ============================================================ */
+
+.modal-play-btn-wrapper {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(calc(-50% + var(--ring-x)), calc(-50% + var(--ring-y)));
-    width: 135px;
-    height: 46px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 100px;
-    transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
-    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+    width: 250px;              /* 250 → 300 */
+    height: 250px;             /* 250 → 300 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    overflow: visible;
 }
 
-.play-button::after {
-    content: '';
+.modal-play-btn-inner {
+    position: relative;
+    width: 170px;              /* 120 → 200 ⬅️ BURANI DA BÖYÜD! */
+    height: 170px;             /* 120 → 200 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* ✅ Default - tam görünür */
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.5s ease;
+    opacity: 1;
+}
+
+/* Modal ikonlar - avtomatik böyüyəcək (width: 100%) */
+.modal-play-btn-inner .modal-play-icon,
+.modal-play-btn-inner .pause-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(calc(-50% + var(--ring-x) * 1.5), calc(-50% + var(--ring-y) * 1.5));
-    width: 180px;
-    height: 58px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 100px;
-    transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
-    pointer-events: none;
+    top: 0;
+    left: 0;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+/* Modal hover */
+.modal-play-btn-wrapper:hover .modal-play-icon,
+.modal-play-btn-wrapper:hover .pause-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.8));
 }
 
-.play-button span,
-.play-text {
-    font-family: 'Gabarito', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #fff;
-    text-transform: uppercase;
-    pointer-events: none;
-    transition: color 0.3s ease;
+/* ===== MODAL - PLAY/PAUSE DƏYİŞMƏSİ ===== */
+.modal-play-btn-wrapper.is-playing .modal-play-icon {
+    display: none !important;
+}
+.modal-play-btn-wrapper.is-playing .pause-icon {
+    display: block !important;
 }
 
-.play-button-container:hover .play-button {
-    border-color: #ffffff;
-    background: rgba(255, 255, 255, 0.15);
-    width: 98px;
+.modal-play-btn-wrapper.is-paused .modal-play-icon {
+    display: block !important;
+}
+.modal-play-btn-wrapper.is-paused .pause-icon {
+    display: none !important;
 }
 
-.play-button-container:hover .play-text {
-    color: #ffffff;
-    letter-spacing: 3px;
+/* ============================================================
+   MODAL - USER INACTIVE (Mouse hərəkətsiz 3 saniyə)
+   ============================================================ */
+
+/* ✅ User inactive - YUXARIDAN AŞAĞIYA MASK İLƏ GİZLƏNİR */
+.preview-container.user-inactive .modal-play-btn-inner {
+    clip-path: inset(0 0 100% 0) !important;  /* Yuxarıdan aşağıya bağlanır */
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.5s ease;
 }
 
-.play-button-container:hover .play-button::before {
-    border-color: rgba(255, 255, 255, 0.8);
-    width: 145px;
-    height: 50px;
+/* ============================================================
+   MODAL - USER ACTIVE (Mouse hərəkəti var)
+   ============================================================ */
+
+/* ✅ User active - TAM AÇILIR (mask sıfırlanır) */
+.preview-container:not(.user-inactive) .modal-play-btn-inner {
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.5s ease;
 }
 
-.play-button-container:hover .play-button::after {
-    border-color: rgba(255, 255, 255, 0.5);
-    width: 200px;
-    height: 66px;
+/* ============================================================
+   PLAY/PAUSE - HƏMİŞƏ GÖRÜNƏN (əlavə təminat)
+   ============================================================ */
+
+.preview-container.is-paused .modal-play-btn-inner {
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
+.preview-container:not(.is-paused) .modal-play-btn-inner {
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* User inactive olduqda is-paused/play override olunur */
+.preview-container.user-inactive.is-paused .modal-play-btn-inner {
+    clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.preview-container.user-inactive:not(.is-paused) .modal-play-btn-inner {
+    clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+
+/* ============================================================
+   MOBİL ÜÇÜN ÖLÇÜLƏR
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .modal-play-btn-wrapper {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .modal-play-btn-inner {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-play-btn-wrapper {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .modal-play-btn-inner {
+        width: 65px;
+        height: 65px;
+    }
+}
+/* ============================================================
+   MOBİL ÜÇÜN ÖLÇÜLƏR
+   ============================================================ */
+
+@media (max-width: 768px) {
+    #mainPlayBtnContainer {
+        width: 160px;
+        height: 160px;
+    }
+    
+    #mainPlayBtnContainer .play-button-wrapper {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .modal-play-btn-wrapper {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .modal-play-btn-inner {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    #mainPlayBtnContainer {
+        width: 120px;
+        height: 120px;
+    }
+    
+    #mainPlayBtnContainer .play-button-wrapper {
+        width: 75px;
+        height: 75px;
+    }
+    
+    .modal-play-btn-wrapper {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .modal-play-btn-inner {
+        width: 65px;
+        height: 65px;
+    }
+}
+
+
+/* ============================================================
+   AZƏRBAYCAN DİLİ ÜÇÜN KİÇİK FONT
+   ============================================================ */
+
+body.lang-az .play-text {
+    font-size: 11px !important;
+    letter-spacing: 0.8px !important;
+}
 /* ✅ AZƏRBAYCAN DİLİ ÜÇÜN KİÇİK FONT */
 body.lang-az .play-text {
     font-size: 11px !important;
     letter-spacing: 0.8px !important;
 }
+#mainPlayBtnContainer.auto-hidden {
+    pointer-events: none;
+}
+
 
 /* ============================================================
    12. SOL ALT - EXPLORE WORKS
@@ -1673,14 +1897,36 @@ body.lang-az .play-text {
         letter-spacing: 2px;
         margin: -0.3vh 0;
     }
+
+    /* ✅ TABLET - ANA EKRAN PLAY BUTTON */
+    #mainPlayBtnContainer {
+        width: 220px;
+        height: 220px;
+    }
+    
+    #mainPlayBtnContainer .play-button-wrapper {
+        width: 150px;
+        height: 150px;
+    }
+
+    /* ✅ TABLET - MODAL PLAY BUTTON */
+    .modal-play-btn-wrapper {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .modal-play-btn-inner {
+        width: 110px;
+        height: 110px;
+    }
 }
 
 /* ============================================================
-   17. RESPONSIVE - MOBILE (768px) - FINAL HOME FIX
+   17. RESPONSIVE - MOBILE (768px)
    ============================================================ */
 
 @media (max-width: 768px) {
-    /* --- 1. HEADER DÜYMƏLƏRİ (SƏNİN KODUNDAKI KOORDİNATLAR - TOXUNULMADI) --- */
+    /* --- 1. HEADER DÜYMƏLƏRİ --- */
     .lang-selector {
         top: 20px !important;
         right: 125px !important;
@@ -1726,13 +1972,12 @@ body.lang-az .play-text {
         height: 80px;
     }
 
-    /* --- 2. MENU YAZILARI (BOLD, SIX VƏ EFFEKTLİ) --- */
+    /* --- 2. MENU YAZILARI --- */
     .mobile-menu {
         width: 100%;
         background-color: #000 !important;
     }
     
-  /* İNGİLİS DİLİ (Standart) */
     .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 13vw !important;
@@ -1743,22 +1988,20 @@ body.lang-az .play-text {
         color: #fff !important;
     }
     
-    /* ✅ AZƏRBAYCAN DİLİ - İ HƏRFİ PROBLEMSIZ + SIX MARGIN */
-body.lang-az .nav-btn {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 900 !important;
-    text-shadow: 1px 0 0 #fff !important;
-    font-size: 10.5vw !important;
-    line-height: 1.2 !important;              /* 1.3-dən 1.2-yə endirdim */
-    margin: -0.3vh 0 !important;              /* Daha sıx (0.01vh-dən sıx) */
-    letter-spacing: -2px !important;
-    width: 100% !important;
-    display: block !important;
-    overflow: visible !important;             /* İ hərfi üçün */
-    /* padding-lər silindi */
-}
-    
-    /* Menyu açılarkən sürüşmə effekti (İngilis dili ilə eyni) */
+    /* AZƏRBAYCAN DİLİ */
+    body.lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+        text-shadow: 1px 0 0 #fff !important;
+        font-size: 10.5vw !important;
+        line-height: 1.2 !important;
+        margin: -0.3vh 0 !important;
+        letter-spacing: -2px !important;
+        width: 100% !important;
+        display: block !important;
+        overflow: visible !important;
+    }
+
     body.lang-az .mobile-menu.active .nav-btn:nth-child(odd) { 
         transform: translateX(-5px) !important; 
     }
@@ -1766,13 +2009,13 @@ body.lang-az .nav-btn {
         transform: translateX(5px) !important; 
     }
 
-    /* --- 3. SOSİAL BÖLMƏ (OYNAYAN YAZILARIN SABİTLƏNMƏSİ) --- */
+    /* --- 3. SOSİAL BÖLMƏ --- */
     body.lang-az .menu-socials a {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 12px !important;
         font-weight: 800 !important;      
         letter-spacing: 0.5px !important; 
-        transform: none !important; /* Scale silindi, yerində sabit duracaq */
+        transform: none !important;
     }
 
     body.lang-az .menu-contact-info p, 
@@ -1781,32 +2024,34 @@ body.lang-az .nav-btn {
         font-size: 12px !important;
         font-weight: 700 !important;      
         letter-spacing: 0.5px !important; 
-        transform: none !important; /* Scale silindi, yerində sabit duracaq */
+        transform: none !important;
     }
 
-    /* --- 4. HOME SCREEN ELEMENTLƏRİ (OYUN VƏ NAVİQASİYA) --- */
-    .play-button-container {
-        width: 140px;
-        height: 90px;
-        top: 45%;
+    /* --- 4. HOME SCREEN - ANA EKRAN PLAY BUTTON (MOBİL) --- */
+    #mainPlayBtnContainer {
+        width: 180px !important;
+        height: 180px !important;
+        top: 45% !important;
         z-index: 10000 !important;
     }
     
-    .play-button {
-        width: 60px;
-        height: 24px;
+    #mainPlayBtnContainer .play-button-wrapper {
+        width: 120px !important;
+        height: 120px !important;
     }
 
-    .play-text {
-        font-size: 9px;
-        letter-spacing: 0.5px;
+    /* --- 5. MODAL PLAY BUTTON (MOBİL) --- */
+    .modal-play-btn-wrapper {
+        width: 140px !important;
+        height: 140px !important;
     }
     
-    body.lang-az .play-text {
-        font-size: 7px !important;
-        letter-spacing: 0.3px !important;
+    .modal-play-btn-inner {
+        width: 95px !important;
+        height: 95px !important;
     }
     
+    /* --- 6. DIGƏR ELEMENTLƏR --- */
     .bottom-left-explore {
         bottom: 100px;
         left: 20px;
@@ -1843,6 +2088,7 @@ body.lang-az .nav-btn {
         font-size: 22px;
     }
     
+    /* --- 7. MODAL INFO --- */
     .preview-info {
         top: 70px;
         left: 20px;
@@ -1860,19 +2106,24 @@ body.lang-az .nav-btn {
     }
 }
 
+/* ============================================================
+   VIDEO - MOBİL DÜZƏLİŞ
+   ============================================================ */
+
 @media (max-width: 768px) {
-  video {
-    width: 100vw;
-    height: 100dvh;
-    object-fit: cover;
-    object-position: center;
-  }
+    video {
+        width: 100vw;
+        height: 100dvh;
+        object-fit: cover;
+        object-position: center;
+    }
 }
+
 /* ============================================================
    ONLY MOBILE & TABLET (Max-width: 991px)
    ============================================================ */
-@media (max-width: 991px) {
 
+@media (max-width: 991px) {
     /* Modal Play Düyməsi Tənzimləmələri */
     .modal-play-btn {
         width: 100px !important; 
@@ -1973,7 +2224,18 @@ body.lang-az .nav-btn {
     }
 
     .volume-wrapper {
-        display: none; /* Mobildə səs barını gizlədir */
+        display: none;
+    }
+
+    /* ✅ MOBİL - MODAL PLAY BUTTON ÖLÇÜLƏRİ (991px-dək) */
+    .modal-play-btn-wrapper {
+        width: 140px !important;
+        height: 140px !important;
+    }
+    
+    .modal-play-btn-inner {
+        width: 95px !important;
+        height: 95px !important;
     }
 }
 
@@ -1987,7 +2249,6 @@ body.lang-az .nav-btn {
         left: 82px;
         z-index: 30001;
     }
-    
     
     .lang-globe-btn {
         padding: 8px 5px;
@@ -2039,40 +2300,27 @@ body.lang-az .nav-btn {
         padding: 6px;
     }
 
-    .play-button-container {
-        width: 120px;
-        height: 60px;
+    /* ✅ SMALL MOBİL - ANA EKRAN PLAY BUTTON */
+    #mainPlayBtnContainer {
+        width: 150px !important;
+        height: 150px !important;
         top: 40% !important;
     }
-
-    .play-button {
-        width: 55px;
-        height: 22px;
-    }
-
-    .play-button::before {
-        width: 75px;
-        height: 28px;
+    
+    #mainPlayBtnContainer .play-button-wrapper {
+        width: 100px !important;
+        height: 100px !important;
     }
 
-    .play-button::after {
-        width: 95px;
-        height: 35px;
+    /* ✅ SMALL MOBİL - MODAL PLAY BUTTON */
+    .modal-play-btn-wrapper {
+        width: 110px !important;
+        height: 110px !important;
     }
     
-    .play-text {
-        font-size: 7px !important;
-    }
-    
-    /* ✅ AZƏRBAYCAN DİLİ - SMALL MOBILE */
-    body.lang-az .play-text {
-        font-size: 6px !important;
-        letter-spacing: 0.2px !important;
-    }
-    
-    body.lang-az .modal-play-btn .play-text {
-        font-size: 6px !important;
-        letter-spacing: 0.2px !important;
+    .modal-play-btn-inner {
+        width: 75px !important;
+        height: 75px !important;
     }
     
     .bottom-left-explore {

@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Index - Main JavaScript
-   Version: 5.3 - MOBILE AUTOPLAY OVERLAY FIX
+   Version: 5.4 - PLAY BUTTON AUTO-HIDE FIX + LOQO FIX + PLAY/PAUSE ICON + RESPONSIVE
    ============================================================ */
 
 const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dwybvusv6/video/upload/f_auto,q_auto,vc_auto/CineChord_Showreel_1_1_o3bvnx";
@@ -61,7 +61,7 @@ window.openMainVideo = function() {
         NAVIGATION_DELAY: 600,
         FALLBACK_DELAY: 1600,
         RESIZE_DEBOUNCE: 250,
-        INACTIVITY_DELAY: 2000
+        INACTIVITY_DELAY: 3000 // 3 saniyə
     };
 
     /* ============================================================
@@ -107,8 +107,9 @@ window.openMainVideo = function() {
     const navBtns = document.querySelectorAll('.nav-btn');
     const centerLogo = document.querySelector('.center-logo');
 
+    // UI_ELEMENTS - LOQO DA DAXİL
     const UI_ELEMENTS = [
-        ".center-logo", 
+        ".center-logo",
         ".play-button-container", 
         ".right-floating-nav", 
         ".bottom-right-socials", 
@@ -439,7 +440,7 @@ window.openMainVideo = function() {
         });
     }
 
-   /* ============================================================
+    /* ============================================================
        9. GSAP ANIMATIONS
        ============================================================ */
     
@@ -447,7 +448,11 @@ window.openMainVideo = function() {
         if (typeof gsap === 'undefined') return;
         
         gsap.set(".hero-section", { autoAlpha: 1 });
-        gsap.set(UI_ELEMENTS, { y: 50, autoAlpha: 0 });
+        
+        gsap.set(UI_ELEMENTS, { 
+            y: 50, 
+            autoAlpha: 0 
+        });
     }
 
     function runLoadingAnimation() {
@@ -482,7 +487,7 @@ window.openMainVideo = function() {
         });
     }
 
-   function revealSite(isPageTransition = false) {
+    function revealSite(isPageTransition = false) {
         if (typeof gsap === 'undefined') return;
         
         const mainTl = gsap.timeline({
@@ -511,7 +516,7 @@ window.openMainVideo = function() {
         mainTl.to(".bottom-left-explore", { y: 0, autoAlpha: 1, duration: 0.85, ease: "power2.out" }, startDelay + 0.25);
     }
 
-  /* ============================================================
+    /* ============================================================
        10. VIDEO AUTOPLAY - MOBİL OVERLAY FİX
        ============================================================ */
     
@@ -520,22 +525,20 @@ window.openMainVideo = function() {
         
         const video = currentVideoEl;
         
-        // Məcburi atributlar
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
         video.autoplay = true;
-        video.preload = 'auto'; // ƏLAVƏ
+        video.preload = 'auto';
         video.setAttribute('muted', '');
         video.setAttribute('playsinline', 'true');
         video.setAttribute('webkit-playsinline', 'true');
-        video.setAttribute('preload', 'auto'); // ƏLAVƏ
+        video.setAttribute('preload', 'auto');
         
         video.removeAttribute('controls');
         video.controls = false;
         
-        // Pointer events söndür - MOBİL OVERLAY BLOKLU
-        video.style.pointerEvents = 'none'; // ƏLAVƏ
+        video.style.pointerEvents = 'none';
         
         function attemptPlay() {
             if (!videoShouldPlay) return;
@@ -636,7 +639,7 @@ window.openMainVideo = function() {
         setupNavButtons();
     }
 
-  /* ============================================================
+    /* ============================================================
        13. VIDEO SLIDER - MOBİL AUTOPLAY FİX
        ============================================================ */
     
@@ -649,19 +652,17 @@ window.openMainVideo = function() {
         firstVideo.id = 'heroBgVideo';
         firstVideo.className = 'hero-bg';
         
-        // MƏCBUR atributlar - mobil üçün kritik
         firstVideo.muted = true;
         firstVideo.loop = true;
         firstVideo.playsInline = true;
         firstVideo.autoplay = true;
-        firstVideo.preload = 'auto'; // ƏLAVƏ
+        firstVideo.preload = 'auto';
         firstVideo.setAttribute('muted', '');
         firstVideo.setAttribute('playsinline', 'true');
         firstVideo.setAttribute('webkit-playsinline', 'true');
-        firstVideo.setAttribute('preload', 'auto'); // ƏLAVƏ
+        firstVideo.setAttribute('preload', 'auto');
         
-        // Pointer events söndür - MOBİL OVERLAY İNTERACTİON BLOKLU
-        firstVideo.style.pointerEvents = 'none'; // ƏLAVƏ
+        firstVideo.style.pointerEvents = 'none';
         
         firstVideo.src = window.CONFIG.videos[window.currentIndex];
         
@@ -674,7 +675,6 @@ window.openMainVideo = function() {
         
         currentVideoEl = firstVideo;
 
-        // AGGRESSİV AUTOPLAY MEXANİZMİ - YAXŞILAŞDIRILMIŞ
         const forcePlay = () => {
             const playPromise = firstVideo.play();
             
@@ -696,19 +696,14 @@ window.openMainVideo = function() {
             }
         };
 
-        // ƏLAVƏ EVENT LİSTENERLƏR - ÇOXLU TETRİK POINT
         firstVideo.addEventListener('loadedmetadata', forcePlay);
         firstVideo.addEventListener('loadeddata', forcePlay);
         firstVideo.addEventListener('canplay', forcePlay);
         firstVideo.addEventListener('canplaythrough', forcePlay);
         
-        // 1 saniyə sonra yenidən cəhd
         setTimeout(forcePlay, 1000);
-        
-        // 2 saniyə sonra son cəhd
         setTimeout(forcePlay, 2000);
 
-        // UI Yeniləmə
         function updateInfoUI(index = window.currentIndex) {
             const total = String(window.CONFIG.videos.length).padStart(2, '0');
             const current = String(index + 1).padStart(2, '0');
@@ -739,8 +734,7 @@ window.openMainVideo = function() {
     }
 
     function updatePlayButtonUI() {
-        const modalPlayText = document.querySelector('#modalPlayBtnContainer .play-text');
-        const t = window.translations ? window.translations[window.currentLang] : { play: 'PLAY' };
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
         
         if (elements.previewVideo.paused) {
             if (elements.playIcon) elements.playIcon.style.display = 'block';
@@ -748,18 +742,20 @@ window.openMainVideo = function() {
             elements.previewContainer.classList.add('is-paused');
             elements.previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
-            if (modalPlayText) {
-                modalPlayText.textContent = t.play;
-                modalPlayText.setAttribute('data-text', t.play);
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
             }
         } else {
             if (elements.playIcon) elements.playIcon.style.display = 'none';
             if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
             elements.previewContainer.classList.remove('is-paused');
             handleUserActivity();
-            if (modalPlayText) {
-                modalPlayText.textContent = 'PAUSE';
-                modalPlayText.setAttribute('data-text', 'PAUSE');
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
             }
         }
     }
@@ -775,6 +771,7 @@ window.openMainVideo = function() {
         
         elements.previewContainer.classList.remove('active');
         elements.previewContainer.classList.add('is-paused');
+        elements.previewContainer.classList.remove('user-inactive');
         
         if (!document.getElementById('mobileMenu')?.classList.contains('active')) {
             document.body.classList.remove('menu-open');
@@ -790,6 +787,68 @@ window.openMainVideo = function() {
         }, 500);
     }
 
+    // ===== PLAY/PAUSE İKON DƏYİŞMƏSİ =====
+    function toggleModalPlay() {
+        const previewVideo = document.getElementById('previewVideo');
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
+        
+        if (!previewVideo) return;
+        
+        // Klik edəndə user-inactive silinir (button görünür)
+        if (elements.previewContainer) {
+            elements.previewContainer.classList.remove('user-inactive');
+            clearTimeout(activityTimeout);
+        }
+        
+        if (previewVideo.paused) {
+            previewVideo.play();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        } else {
+            previewVideo.pause();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        }
+    }
+
+    // Video eventləri - avtomatik ikon dəyişməsi
+    function initPlayPauseIcons() {
+        const previewVideo = document.getElementById('previewVideo');
+        if (!previewVideo) return;
+        
+        previewVideo.addEventListener('play', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+            
+            const mainBtn = document.getElementById('mainPlayBtnContainer');
+            if (mainBtn) {
+                mainBtn.classList.remove('is-paused');
+                mainBtn.classList.add('is-playing');
+            }
+        });
+        
+        previewVideo.addEventListener('pause', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+            
+            const mainBtn = document.getElementById('mainPlayBtnContainer');
+            if (mainBtn) {
+                mainBtn.classList.remove('is-playing');
+                mainBtn.classList.add('is-paused');
+            }
+        });
+    }
+
     function initVideoModal() {
         if (!elements.previewContainer || !elements.previewVideo) return;
 
@@ -799,15 +858,34 @@ window.openMainVideo = function() {
         if (elements.playPauseBtn) elements.playPauseBtn.onclick = togglePlay;
         elements.previewVideo.onclick = togglePlay;
 
-        if (elements.modalPlayContainer) {
-            elements.modalPlayContainer.addEventListener('click', (e) => {
+        initPlayPauseIcons();
+
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
+        if (modalBtn) {
+            modalBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                togglePlay();
+                toggleModalPlay();
             });
         }
 
-        elements.previewVideo.addEventListener('play', updatePlayButtonUI);
-        elements.previewVideo.addEventListener('pause', updatePlayButtonUI);
+        const mainBtn = document.getElementById('mainPlayBtnContainer');
+        if (mainBtn) {
+            mainBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.openMainVideo();
+            });
+        }
+
+        elements.previewVideo.addEventListener('play', function() {
+            elements.previewContainer.classList.remove('is-paused');
+            elements.previewContainer.classList.remove('user-inactive');
+            updatePlayButtonUI();
+        });
+        
+        elements.previewVideo.addEventListener('pause', function() {
+            elements.previewContainer.classList.add('is-paused');
+            updatePlayButtonUI();
+        });
 
         elements.previewVideo.addEventListener('timeupdate', () => {
             const percent = (elements.previewVideo.currentTime / elements.previewVideo.duration) * 100;
@@ -857,63 +935,84 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       15. PLAY BUTTON MOUSE FOLLOW EFFECT
+       15. MAIN PLAY BUTTON AUTO-HIDE - MOBİL + DESKTOP DÜZƏLİŞ
        ============================================================ */
 
-    function initPlayButtonFollow() {
-        const playBtn = document.getElementById('mainPlayBtnContainer');
+    function initPlayButtonAutoHide() {
+        const mainPlayBtn = document.getElementById('mainPlayBtnContainer');
         const heroSection = document.querySelector('.hero-section');
-        
-        if (!playBtn || !heroSection) return;
-        
-        let currentX = 0;
-        let currentY = 0;
-        let targetX = 0;
-        let targetY = 0;
-        
-        const maxMove = 15;
-        const ease = 0.08;
-        const activationRadius = 250;
-        
-        heroSection.addEventListener('mousemove', (e) => {
-            const btnRect = playBtn.getBoundingClientRect();
-            const btnCenterX = btnRect.left + btnRect.width / 2;
-            const btnCenterY = btnRect.top + btnRect.height / 2;
-            
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
-            
-            const distance = Math.sqrt(
-                Math.pow(mouseX - btnCenterX, 2) + 
-                Math.pow(mouseY - btnCenterY, 2)
-            );
-            
-            if (distance < activationRadius) {
-                const strength = 1 - (distance / activationRadius);
-                targetX = ((mouseX - btnCenterX) / activationRadius) * maxMove * strength;
-                targetY = ((mouseY - btnCenterY) / activationRadius) * maxMove * strength;
-            } else {
-                targetX = 0;
-                targetY = 0;
-            }
-        });
-        
-        heroSection.addEventListener('mouseleave', () => {
-            targetX = 0;
-            targetY = 0;
-        });
-        
-        function animate() {
-            currentX += (targetX - currentX) * ease;
-            currentY += (targetY - currentY) * ease;
-            
-            playBtn.style.setProperty('--ring-x', `${currentX}px`);
-            playBtn.style.setProperty('--ring-y', `${currentY}px`);
-            
-            requestAnimationFrame(animate);
+
+        if (!mainPlayBtn || !heroSection) {
+            console.warn('Play button or hero section not found.');
+            return;
         }
-        
-        animate();
+
+        let hideTimeout = null;
+        const HIDE_DELAY = 3000; // 3 saniyə
+
+        // Mobil və ya desktop olduğunu yoxla
+        const isMobile = window.innerWidth <= 768;
+
+        function hidePlayBtn() {
+            mainPlayBtn.classList.add('auto-hidden');
+        }
+
+        function showPlayBtn() {
+            mainPlayBtn.classList.remove('auto-hidden');
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(hidePlayBtn, HIDE_DELAY);
+        }
+
+        // İlk vəziyyət: səhifə açılandan HIDE_DELAY sonra gizlət
+        showPlayBtn();
+
+        // ===== DESKTOP: Mouse hərəkətində göstər =====
+        if (!isMobile) {
+            heroSection.addEventListener('mousemove', showPlayBtn);
+            heroSection.addEventListener('mouseleave', function() {
+                clearTimeout(hideTimeout);
+                hidePlayBtn();
+            });
+        }
+
+        // ===== MOBİL: Touch hərəkətində göstər =====
+        heroSection.addEventListener('touchstart', function(e) {
+            showPlayBtn();
+        }, { passive: true });
+
+        // ===== Buttona klik edəndə göstər və yenidən say =====
+        mainPlayBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showPlayBtn();
+        });
+
+        // ===== Əgər video açılıbsa, button gizlənsin =====
+        const previewContainer = document.getElementById('previewContainer');
+        if (previewContainer) {
+            const observer = new MutationObserver(function() {
+                if (previewContainer.classList.contains('active')) {
+                    clearTimeout(hideTimeout);
+                    hidePlayBtn();
+                } else {
+                    showPlayBtn();
+                }
+            });
+            observer.observe(previewContainer, { attributes: true, attributeFilter: ['class'] });
+        }
+
+        // ===== Pəncərə ölçüsü dəyişəndə =====
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                const newIsMobile = window.innerWidth <= 768;
+                if (isMobile !== newIsMobile) {
+                    location.reload();
+                }
+            }, 500);
+        });
+
+        console.log('Play button auto-hide initialized (mobile + desktop).');
     }
 
     /* ============================================================
@@ -932,7 +1031,7 @@ window.openMainVideo = function() {
         initNavigation();
         initVideoSlider();
         initVideoModal();
-        initPlayButtonFollow();
+        initPlayButtonAutoHide();
     }
 
     if (document.readyState === 'loading') {

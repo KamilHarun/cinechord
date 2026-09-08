@@ -38,26 +38,26 @@
     <div class="progress-bar-top"></div>
 
     <!-- LANGUAGE SELECTOR WITH GLOBE -->
-<div class="lang-selector" id="langSelector">
-    <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
-        <span class="globe-icon">
-            <span class="globe-ellipse"></span>
-        </span>
-        <span class="current-lang" id="currentLangText">EN</span>
-    </button>
-    <div class="lang-dropdown" id="langDropdown">
-        <button class="lang-option active" data-lang="en">
-            <span class="lang-code">EN</span>
-            <span class="lang-name">English</span>
-            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+    <div class="lang-selector" id="langSelector">
+        <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+            <span class="globe-icon">
+                <span class="globe-ellipse"></span>
+            </span>
+            <span class="current-lang" id="currentLangText">EN</span>
         </button>
-        <button class="lang-option" data-lang="az">
-            <span class="lang-code">AZ</span>
-            <span class="lang-name">Azərbaycan</span>
-            <span class="lang-check"><i class="fa-solid fa-check"></i></span>
-        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <button class="lang-option active" data-lang="en">
+                <span class="lang-code">EN</span>
+                <span class="lang-name">English</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+            <button class="lang-option" data-lang="az">
+                <span class="lang-code">AZ</span>
+                <span class="lang-name">Azərbaycan</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+        </div>
     </div>
-</div>
 
     <!-- HAMBURGER BUTTON -->
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
@@ -72,32 +72,35 @@
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
     <!-- MOBILE MENU -->
-  <nav class="mobile-menu" id="mobileMenu">
-    <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
-    <a href="#" class="nav-btn active" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
-    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
-    <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
-    <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
-    <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
+    <nav class="mobile-menu" id="mobileMenu">
+        <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+        <a href="#" class="nav-btn active" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+        <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+        <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+        <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+        <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
 
-    <div class="menu-footer">
-        <div class="menu-socials">
-            <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
-             <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a> 
-            <a href="#">VIMEO</a>
+        <div class="menu-footer">
+            <div class="menu-socials">
+                <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+                <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a> 
+                <a href="#">VIMEO</a>
+            </div>
+            <div class="menu-contact-info">
+                <p>info@cinechord.com</p>
+                <p>+994 50 233 04 54</p>
+            </div>
         </div>
-         <div class="menu-contact-info">
-                    <p>info@cinechord.com</p>
-                    <p>+994 50 233 04 54</p>
-                </div>
-    </div>
-</nav>
+    </nav>
 
     <!-- LOGO -->
     <a href="../" class="center-logo">
         <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
     </a>
 
+    <!-- ============================================================
+         VIDEO PREVIEW MODAL - YENİ PLAY BUTTON İLƏ
+         ============================================================ -->
     <div class="preview-container is-paused" id="previewContainer">
         <button class="close-preview" id="closePreview">×</button>
         <div class="preview-info" id="previewInfo">
@@ -107,12 +110,18 @@
         </div>
         <div class="video-wrapper" id="videoWrapper">
             <div class="video-loading"></div>
-            <div class="play-button-container modal-play-btn" id="modalPlayBtnContainer">
-                <button class="play-button">
-                    <span class="play-text" data-text="PLAY">PLAY</span>
-                </button>
+            
+            <!-- ✅ YENİ MODAL PLAY BUTTON - Play + Pause ikonları -->
+            <div class="modal-play-btn-wrapper" id="modalPlayBtnContainer">
+                <div class="modal-play-btn-inner">
+                    <img src="../play-btn.png" alt="Play Video" class="modal-play-icon" id="modalPlayIcon">
+                    <img src="../pause-btn.png" alt="Pause Video" class="modal-play-icon pause-icon" id="modalPauseIcon" style="display:none;">
+                </div>
             </div>
+            
             <video id="previewVideo" class="preview-video" playsinline preload="metadata"></video>
+            
+            <!-- Custom Controls - TOXUNULMADAN QALIR -->
             <div class="custom-controls" id="customControls">
                 <div class="progress-bar-container" id="progressBarContainer">
                     <div class="progress-played" id="progressPlayed"></div>
@@ -141,14 +150,13 @@
 
     <section class="hero-section">
         <div class="hero-bg">
-
             <div class="hero-overlay"></div>
         </div>
-      <div class="hero-left-title">
-    <h1 class="title-main" data-text="WORKS" data-key="works">
-        <span>WORKS</span>
-    </h1>
-</div>
+        <div class="hero-left-title">
+            <h1 class="title-main" data-text="WORKS" data-key="works">
+                <span>WORKS</span>
+            </h1>
+        </div>
         <div class="hero-right-content">
         </div>
         <a href="#works" class="scroll-down-arrow">
@@ -185,13 +193,12 @@
             <div class="footer-col">
                 <span class="footer-label" data-key="address">ADDRESS</span>
                 <div class="footer-content">
-                    <p class="footer-text">Filmmaker LLC</p>
-                    <p class="footer-text">5th Floor, Suite 580</p>
+                    <p class="footer-text">CineChord </p>
                     <p class="footer-text">Baku, Azerbaijan</p>
                 </div>
             </div>
 
-               <div class="footer-col">
+            <div class="footer-col">
                 <span class="footer-label" data-key="get_in_touch">GET IN TOUCH</span>
                 <div class="footer-content">
                     <a href="mailto:info@cinechord.com" class="mask-link">
@@ -212,24 +219,19 @@
                             <i class="fa-brands fa-instagram hover-icon"></i>
                         </span>
                     </a>
-                   <a href="https://www.youtube.com/@cinechordpro" class="mask-icon" target="_blank">
-    <span class="icon-wrap">
-        <i class="fa-brands fa-youtube main-icon"></i>
-        <i class="fa-brands fa-youtube hover-icon"></i>
-    </span>
-</a>
+                    <a href="https://www.youtube.com/@cinechordpro" class="mask-icon" target="_blank">
+                        <span class="icon-wrap">
+                            <i class="fa-brands fa-youtube main-icon"></i>
+                            <i class="fa-brands fa-youtube hover-icon"></i>
+                        </span>
+                    </a>
                     <a href="#" class="mask-icon">
                         <span class="icon-wrap">
                             <i class="fa-brands fa-vimeo-v main-icon"></i>
                             <i class="fa-brands fa-vimeo-v hover-icon"></i>
                         </span>
                     </a>
-                    <a href="#" class="mask-icon">
-                        <span class="icon-wrap">
-                            <i class="fa-brands fa-linkedin-in main-icon"></i>
-                            <i class="fa-brands fa-linkedin-in hover-icon"></i>
-                        </span>
-                    </a>
+                    
                 </div>
             </div>
         </div>

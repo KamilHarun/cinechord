@@ -676,7 +676,7 @@ body.lang-az .menu-socials a {
 
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
@@ -710,7 +710,7 @@ body.lang-az .menu-contact-info a {
 
 .center-logo {
     position: fixed;
-    top: 5px;
+    top: 3px;
     left: 40px;
     z-index: 100;
     pointer-events: auto;
@@ -718,8 +718,8 @@ body.lang-az .menu-contact-info a {
 }
 
 .logo-img {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
     object-fit: contain;
     filter: brightness(0) invert(1);
     image-rendering: -webkit-optimize-contrast;

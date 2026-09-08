@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Archive - Main JavaScript
-   Version: 6.7 - DYNAMIC CATEGORY TRANSLATION
+   Version: 6.8 - NEW PLAY/PAUSE ICONS WITH MASK EFFECT
    ============================================================ */
 
 (function() {
@@ -16,7 +16,7 @@
         PAGE_LOAD_DELAY: 100,
         NAVIGATION_DELAY: 600,
         FALLBACK_DELAY: 1600,
-        INACTIVITY_DELAY: 2000
+        INACTIVITY_DELAY: 3000 // 3 saniyə
     };
 
     const API_URLS = {
@@ -31,7 +31,6 @@
         
         if (!window.translations || !window.translations[window.currentLang]) {
             console.log('⚠️ Using fallback - translations not loaded');
-            // Fallback if translations not loaded
             const fallbackMap = {
                 'FILM': 'FILM',
                 'COMMERCIAL': 'COMMERCIAL',
@@ -85,7 +84,7 @@
        ============================================================ */
     
     let activityTimeout = null;
-    let archiveData = []; // Store archive data globally for re-rendering
+    let archiveData = [];
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
     // Global translations object
@@ -128,7 +127,7 @@
     }
 
     /* ============================================================
-       5. LOGO CLICK - AYRICA HANDLE
+       5. LOGO CLICK
        ============================================================ */
 
     function initLogoClick() {
@@ -171,71 +170,56 @@
             if (!response.ok) throw new Error('Translation file not found');
             window.translations = await response.json();
             console.log('✅ Translations loaded successfully:', window.translations);
-            
-            // Check if category translations exist
-            if (window.translations.en && window.translations.en.category_film) {
-                console.log('✅ Category translations found in EN');
-            } else {
-                console.log('⚠️ Category translations NOT found in EN');
-            }
-            
-            if (window.translations.az && window.translations.az.category_film) {
-                console.log('✅ Category translations found in AZ');
-            } else {
-                console.log('⚠️ Category translations NOT found in AZ');
-            }
-            
             return window.translations;
         } catch (error) {
             console.error('❌ Error loading translations:', error);
             console.log('⚠️ Using fallback translations');
-            // Fallback translations
             window.translations = {
                 "en": {
-        "menu": "MENU",
-        "close": "CLOSE",
-        "home": "HOME",
-        "work": "WORK",
-        "service": "SERVICE",
-        "archive": "ARCHIVE",
-        "about": "ABOUT",
-        "contact": "CONTACT",
-        "archive_title": "ARCHIVE",
-        "play": "PLAY",
-        "address": "ADDRESS",
-        "get_in_touch": "GET IN TOUCH",
-        "follow_us": "FOLLOW US",
-        "category_film": "FILM",
-        "category_commercial": "COMMERCIAL",
-        "category_clip": "CLIP",
-        "category_music_video": "MUSIC VIDEO",
-        "category_documentary": "DOCUMENTARY",
-        "category_social": "SOCIAL",
-        "archive_subtitle_1": "EXPLORE MORE",
-        "archive_subtitle_2": "CONTACT"
-    },
-    "az": {
-        "menu": "MENYU",
-        "close": "BAĞLA",
-        "home": "ANA SƏHİFƏ",
-        "work": "İŞLƏR",
-        "service": "XİDMƏTLƏR",
-        "archive": "ARXİV",
-        "about": "HAQQIMIZDA",
-        "contact": "ƏLAQƏ",
-        "archive_title": "ARXİV",
-        "play": "BAŞLAT",
-        "address": "ÜNVAN",
-        "get_in_touch": "ƏLAQƏ SAXLAYIN",
-        "follow_us": "BİZİ İZLƏYİN",
-        "category_film": "FİLM",
-        "category_commercial": "REKLAM",
-        "category_clip": "KLİP",
-        "category_music_video": "MUSİQİ VİDEOSU",
-        "category_documentary": "SƏNƏDLI",
-        "category_social": "SOSIAL",
-        "archive_subtitle_1": "DAHA ÇOXUNU KƏŞF ET",
-        "archive_subtitle_2": "ƏLAQƏ"
+                    "menu": "MENU",
+                    "close": "CLOSE",
+                    "home": "HOME",
+                    "work": "WORK",
+                    "service": "SERVICE",
+                    "archive": "ARCHIVE",
+                    "about": "ABOUT",
+                    "contact": "CONTACT",
+                    "archive_title": "ARCHIVE",
+                    "play": "PLAY",
+                    "address": "ADDRESS",
+                    "get_in_touch": "GET IN TOUCH",
+                    "follow_us": "FOLLOW US",
+                    "category_film": "FILM",
+                    "category_commercial": "COMMERCIAL",
+                    "category_clip": "CLIP",
+                    "category_music_video": "MUSIC VIDEO",
+                    "category_documentary": "DOCUMENTARY",
+                    "category_social": "SOCIAL",
+                    "archive_subtitle_1": "EXPLORE MORE",
+                    "archive_subtitle_2": "CONTACT"
+                },
+                "az": {
+                    "menu": "MENYU",
+                    "close": "BAĞLA",
+                    "home": "ANA SƏHİFƏ",
+                    "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR",
+                    "archive": "ARXİV",
+                    "about": "HAQQIMIZDA",
+                    "contact": "ƏLAQƏ",
+                    "archive_title": "ARXİV",
+                    "play": "BAŞLAT",
+                    "address": "ÜNVAN",
+                    "get_in_touch": "ƏLAQƏ SAXLAYIN",
+                    "follow_us": "BİZİ İZLƏYİN",
+                    "category_film": "FİLM",
+                    "category_commercial": "REKLAM",
+                    "category_clip": "KLİP",
+                    "category_music_video": "MUSİQİ VİDEOSU",
+                    "category_documentary": "SƏNƏDLİ",
+                    "category_social": "SOSIAL",
+                    "archive_subtitle_1": "DAHA ÇOXUNU KƏŞF ET",
+                    "archive_subtitle_2": "ƏLAQƏ"
                 }
             };
             return window.translations;
@@ -307,7 +291,7 @@
             }
         });
 
-        // ========== YENİ KOD - Animasiyalı Video Sözləri ==========
+        // Video Words
         const videoWords = document.querySelectorAll('.video-word[data-key]');
         videoWords.forEach(word => {
             const key = word.getAttribute('data-key');
@@ -316,22 +300,21 @@
                 console.log(`🎬 Video word translated: ${key} → ${t[key]}`);
             }
         });
-        // ========== YENİ KOD BİTİR ==========
 
         // Archive Subtitle
-const archiveSubtitle = document.querySelector('.archive-subtitle');
-if (archiveSubtitle) {
-    const fullFilmSpan = archiveSubtitle.querySelector('span[data-key="archive_subtitle_1"]');
-    const shootMessageLink = archiveSubtitle.querySelector('a[data-key="archive_subtitle_2"]');
-    
-    if (fullFilmSpan && t.archive_subtitle_1) {
-        fullFilmSpan.textContent = t.archive_subtitle_1;
-    }
-    
-    if (shootMessageLink && t.archive_subtitle_2) {
-        shootMessageLink.textContent = t.archive_subtitle_2;
-    }
-}
+        const archiveSubtitle = document.querySelector('.archive-subtitle');
+        if (archiveSubtitle) {
+            const fullFilmSpan = archiveSubtitle.querySelector('span[data-key="archive_subtitle_1"]');
+            const shootMessageLink = archiveSubtitle.querySelector('a[data-key="archive_subtitle_2"]');
+            
+            if (fullFilmSpan && t.archive_subtitle_1) {
+                fullFilmSpan.textContent = t.archive_subtitle_1;
+            }
+            
+            if (shootMessageLink && t.archive_subtitle_2) {
+                shootMessageLink.textContent = t.archive_subtitle_2;
+            }
+        }
 
         // Re-render table with translated categories
         console.log('🔄 Calling reloadTableWithTranslations from applyTranslations');
@@ -362,11 +345,9 @@ if (archiveSubtitle) {
         
         if (!langSelector || !langGlobeBtn) return;
         
-        // LocalStorage-dən dil seçimini yüklə
         const savedLang = localStorage.getItem('selectedLang') || 'en';
         window.currentLang = savedLang;
         
-        // Seçilmiş dili tətbiq et (translations zaten yüklenmiş olmalı)
         applyTranslations(savedLang);
         
         langOptions.forEach(option => {
@@ -380,14 +361,12 @@ if (archiveSubtitle) {
             }
         });
         
-        // Globe düyməsinə klik - dropdown aç/bağla
         langGlobeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             langSelector.classList.toggle('active');
         });
         
-        // Dil seçimlərinə klik
         langOptions.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -395,33 +374,25 @@ if (archiveSubtitle) {
                 
                 const lang = option.dataset.lang;
                 
-                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
                 if (option.classList.contains('active')) {
                     langSelector.classList.remove('active');
                     return;
                 }
                 
-                // Aktiv classını dəyiş
                 langOptions.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
                 
-                // Current lang text-i yenilə
                 if (currentLangText) {
                     currentLangText.textContent = lang.toUpperCase();
                 }
                 
-                // LocalStorage-ə yadda saxla
                 localStorage.setItem('selectedLang', lang);
-                
-                // Tərcümələri tətbiq et
                 applyTranslations(lang);
                 
-                // Dropdown-u bağla
                 setTimeout(() => {
                     langSelector.classList.remove('active');
                 }, 200);
                 
-                // Event göndər
                 document.dispatchEvent(new CustomEvent('languageChanged', { 
                     detail: { language: lang } 
                 }));
@@ -430,14 +401,12 @@ if (archiveSubtitle) {
             });
         });
         
-        // Xaricdə klik - dropdown-u bağla
         document.addEventListener('click', (e) => {
             if (!langSelector.contains(e.target)) {
                 langSelector.classList.remove('active');
             }
         });
         
-        // ESC düyməsi - dropdown-u bağla
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && langSelector.classList.contains('active')) {
                 langSelector.classList.remove('active');
@@ -556,7 +525,7 @@ if (archiveSubtitle) {
     }
 
     /* ============================================================
-       9. SCROLL REVEAL (INTERSECTION OBSERVER)
+       9. SCROLL REVEAL
        ============================================================ */
     
     const observerOptions = {
@@ -628,10 +597,8 @@ if (archiveSubtitle) {
             const data = await response.json();
             const works = data.content ? data.content : data;
             
-            // Store data globally for language switching
             archiveData = works;
             
-            // Render table
             renderArchiveTable(works);
 
         } catch (error) {
@@ -664,7 +631,6 @@ if (archiveSubtitle) {
                 }
             }
 
-            // Use dynamic category translation
             const categoryDisplay = getCategoryDisplay(work.category);
 
             const row = document.createElement('tr');
@@ -707,13 +673,12 @@ if (archiveSubtitle) {
     }
 
     /* ============================================================
-       12. TABLE ROW EFFECTS - SCRAMBLE BUG FIXED
+       12. TABLE ROW EFFECTS
        ============================================================ */
 
     function attachTableRowEffects() {
         document.querySelectorAll('.archive-table tbody tr').forEach(row => {
             
-            // Row click - video modal aç
             row.addEventListener('click', function() {
                 const videoSrc = this.getAttribute('data-video-src');
                 const title = this.getAttribute('data-title');
@@ -723,19 +688,15 @@ if (archiveSubtitle) {
                 openModal(videoSrc, `${client} - ${title}`);
             });
 
-            // ===== SCRAMBLE EFFECT - DÜZƏLDİLMİŞ VERSİYA =====
             row.addEventListener('mouseenter', function() {
                 const cells = this.querySelectorAll('td:not(.number-col)');
                 
                 cells.forEach(cell => {
-                    // Əvvəlki interval varsa, onu clear et
                     if (cell._scrambleInterval) {
                         clearInterval(cell._scrambleInterval);
                         cell._scrambleInterval = null;
                     }
                     
-                    // Orijinal mətni YALNIZ ilk dəfə saxla
-                    // Əgər artıq saxlanılıbsa, onu istifadə et
                     if (!cell.dataset.originalText) {
                         cell.dataset.originalText = cell.textContent;
                     }
@@ -758,7 +719,7 @@ if (archiveSubtitle) {
                         if (iteration >= originalText.length) {
                             clearInterval(cell._scrambleInterval);
                             cell._scrambleInterval = null;
-                            cell.textContent = originalText; // Mütləq orijinalı qoy
+                            cell.textContent = originalText;
                         }
                     }, 30);
                 });
@@ -768,13 +729,11 @@ if (archiveSubtitle) {
                 const cells = this.querySelectorAll('td:not(.number-col)');
                 
                 cells.forEach(cell => {
-                    // İntervalı dayandır
                     if (cell._scrambleInterval) {
                         clearInterval(cell._scrambleInterval);
                         cell._scrambleInterval = null;
                     }
                     
-                    // VACİB: Orijinal mətni bərpa et!
                     if (cell.dataset.originalText) {
                         cell.textContent = cell.dataset.originalText;
                     }
@@ -784,7 +743,7 @@ if (archiveSubtitle) {
     }
 
     /* ============================================================
-       13. VIDEO MODAL LOGIC
+       13. VIDEO MODAL LOGIC - YENİ PLAY/PAUSE İKONLARI
        ============================================================ */
 
     function handleUserActivity() {
@@ -817,11 +776,6 @@ if (archiveSubtitle) {
         
         elements.previewVideo.onloadedmetadata = function() {
             if (elements.durationTimeEl) elements.durationTimeEl.textContent = formatTime(elements.previewVideo.duration);
-            const modalPlayText = elements.modalPlayContainer ? elements.modalPlayContainer.querySelector('.play-text') : null;
-            if (modalPlayText) {
-                modalPlayText.setAttribute('data-text', 'PLAY');
-                modalPlayText.innerText = 'PLAY';
-            }
         };
     }
 
@@ -842,23 +796,74 @@ if (archiveSubtitle) {
         }, 500);
     }
 
-    function updatePlayButtonUI() {
-        const modalPlayText = elements.modalPlayContainer ? elements.modalPlayContainer.querySelector('.play-text') : null;
-
+    // ✅ YENİ - Modal play/pause toggle (ikon dəyişməsi üçün)
+    function toggleModalPlay() {
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
+        
         if (elements.previewVideo.paused) {
-            if (elements.playIcon) elements.playIcon.style.display = 'block';
-            if (elements.pauseIcon) elements.pauseIcon.style.display = 'none';
-            if (modalPlayText) applyScrambleEffect(elements.modalPlayContainer, modalPlayText, "PLAY");
+            elements.previewVideo.play();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        } else {
+            elements.previewVideo.pause();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        }
+    }
+
+    // ✅ YENİ - Play/Pause ikonlarını idarə et
+    function updatePlayButtonUI() {
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        
+        if (elements.previewVideo.paused) {
+            if (playIcon) playIcon.style.display = 'block';
+            if (pauseIcon) pauseIcon.style.display = 'none';
             elements.previewContainer.classList.add('is-paused');
             elements.previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
         } else {
-            if (elements.playIcon) elements.playIcon.style.display = 'none';
-            if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
-            if (modalPlayText) applyScrambleEffect(elements.modalPlayContainer, modalPlayText, "PAUSE");
+            if (playIcon) playIcon.style.display = 'none';
+            if (pauseIcon) pauseIcon.style.display = 'block';
             elements.previewContainer.classList.remove('is-paused');
             handleUserActivity();
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
         }
+    }
+
+    // ✅ YENİ - Video eventləri
+    function initPlayPauseIcons() {
+        if (!elements.previewVideo) return;
+        
+        elements.previewVideo.addEventListener('play', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        });
+        
+        elements.previewVideo.addEventListener('pause', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        });
     }
 
     function togglePlay(e) {
@@ -869,8 +874,16 @@ if (archiveSubtitle) {
     function initVideoModal() {
         if (!elements.previewContainer || !elements.previewVideo) return;
 
+        // ✅ MODAL PLAY BUTTON KLİK
         document.addEventListener('click', (e) => {
-            if (e.target.closest('#playPauseBtn') || e.target.closest('#modalPlayBtnContainer')) {
+            // ✅ Yeni modal play button
+            if (e.target.closest('#modalPlayBtnContainer')) {
+                e.stopPropagation();
+                toggleModalPlay();
+            }
+            
+            // Köhnə play/pause button (custom controls)
+            if (e.target.closest('#playPauseBtn')) {
                 e.stopPropagation();
                 togglePlay();
             }
@@ -881,12 +894,21 @@ if (archiveSubtitle) {
         });
 
         elements.previewVideo.addEventListener('click', togglePlay);
-        elements.previewVideo.addEventListener('play', updatePlayButtonUI);
-        elements.previewVideo.addEventListener('pause', updatePlayButtonUI);
+        elements.previewVideo.addEventListener('play', function() {
+            updatePlayButtonUI();
+            // İkonlar avtomatik dəyişəcək
+        });
+        elements.previewVideo.addEventListener('pause', function() {
+            updatePlayButtonUI();
+            // İkonlar avtomatik dəyişəcək
+        });
         elements.previewVideo.addEventListener('ended', () => {
             elements.previewVideo.pause();
             elements.previewVideo.currentTime = 0;
         });
+
+        // ✅ Play/Pause ikonlarını init et
+        initPlayPauseIcons();
 
         elements.previewVideo.addEventListener('timeupdate', () => {
             const percent = (elements.previewVideo.currentTime / elements.previewVideo.duration) * 100;
@@ -928,6 +950,18 @@ if (archiveSubtitle) {
             };
         }
 
+        if (elements.speedBtn) {
+            let speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+            let speedIndex = 2;
+            elements.speedBtn.onclick = function(e) {
+                e.stopPropagation();
+                speedIndex = (speedIndex + 1) % speeds.length;
+                elements.previewVideo.playbackRate = speeds[speedIndex];
+                this.textContent = speeds[speedIndex] + 'x';
+                handleUserActivity();
+            };
+        }
+
         if (elements.fullscreenBtn) {
             elements.fullscreenBtn.onclick = () => {
                 if (elements.previewVideo.requestFullscreen) {
@@ -948,7 +982,7 @@ if (archiveSubtitle) {
     }
 
     /* ============================================================
-       14. DİGƏR LİNKLƏR (Logo xaric)
+       14. DİGƏR LİNKLƏR
        ============================================================ */
     
     function setupOtherLinks() {
@@ -971,55 +1005,50 @@ if (archiveSubtitle) {
         });
     }
 
-          /* ============================================================
-   WORKS PAGE - SCROLL HIDE/SHOW ADDON
-   ============================================================ */
+    /* ============================================================
+       15. SCROLL HIDE/SHOW
+       ============================================================ */
 
-// Scroll Hide/Show Funksionallığı
-(function() {
-    let lastScrollY = 0;
-    let ticking = false;
-    
-    function handleScroll() {
-        const currentScrollY = window.scrollY;
+    (function() {
+        let lastScrollY = 0;
+        let ticking = false;
         
-        const logo = document.querySelector('.center-logo');
-        const hamburger = document.querySelector('.hamburger');
-        const langSelector = document.querySelector('.lang-selector');
+        function handleScroll() {
+            const currentScrollY = window.scrollY;
+            
+            const logo = document.querySelector('.center-logo');
+            const hamburger = document.querySelector('.hamburger');
+            const langSelector = document.querySelector('.lang-selector');
+            
+            if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+                if (logo) logo.classList.add('hide-on-scroll');
+                if (hamburger) hamburger.classList.add('hide-on-scroll');
+                if (langSelector) langSelector.classList.add('hide-on-scroll');
+            }
+            else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+                if (logo) logo.classList.remove('hide-on-scroll');
+                if (hamburger) hamburger.classList.remove('hide-on-scroll');
+                if (langSelector) langSelector.classList.remove('hide-on-scroll');
+            }
+            
+            lastScrollY = currentScrollY;
+            ticking = false;
+        }
         
-        // Scroll aşağı (100px-dən çox) - gizlə
-        if (currentScrollY > 100 && currentScrollY > lastScrollY) {
-            if (logo) logo.classList.add('hide-on-scroll');
-            if (hamburger) hamburger.classList.add('hide-on-scroll');
-            if (langSelector) langSelector.classList.add('hide-on-scroll');
-        }
-        // Scroll yuxarı və ya 100px-dən az - göstər
-        else if (currentScrollY < lastScrollY || currentScrollY < 100) {
-            if (logo) logo.classList.remove('hide-on-scroll');
-            if (hamburger) hamburger.classList.remove('hide-on-scroll');
-            if (langSelector) langSelector.classList.remove('hide-on-scroll');
+        function requestScrollTick() {
+            if (!ticking) {
+                window.requestAnimationFrame(handleScroll);
+                ticking = true;
+            }
         }
         
-        lastScrollY = currentScrollY;
-        ticking = false;
-    }
-    
-    function requestScrollTick() {
-        if (!ticking) {
-            window.requestAnimationFrame(handleScroll);
-            ticking = true;
-        }
-    }
-    
-    // Scroll event listener (performanslı)
-    window.addEventListener('scroll', requestScrollTick, { passive: true });
-    
-    console.log('✅ Scroll hide/show initialized!');
-})();
-
+        window.addEventListener('scroll', requestScrollTick, { passive: true });
+        
+        console.log('✅ Scroll hide/show initialized!');
+    })();
 
     /* ============================================================
-       15. INITIALIZATION
+       16. INITIALIZATION
        ============================================================ */
 
     async function init() {
@@ -1040,4 +1069,4 @@ if (archiveSubtitle) {
         init();
     }
 
-})(); // ← İIFE bağlanır
+})();

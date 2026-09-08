@@ -44,7 +44,7 @@
     const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     let activityTimeout = null;
-    const INACTIVITY_DELAY = 2000;
+    const INACTIVITY_DELAY = 3000; // 3 saniyə
 
     // Global translations object
     window.translations = null;
@@ -70,7 +70,7 @@
     }
 
     // ============================================================
-    // 2. HERO VIDEO INIT (Arxa fon videosu üçün)
+    // 2. HERO VIDEO INIT
     // ============================================================
     function initHeroVideo() {
         const heroBg = document.querySelector('.hero-bg');
@@ -119,7 +119,6 @@
             return window.translations;
         } catch (error) {
             console.error('Error loading translations:', error);
-            // Fallback translations
             window.translations = {
                 "en": {
                     "menu": "MENU",
@@ -179,13 +178,11 @@
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        // Hamburger Menu Text
         if (hamburgerText) {
             const isMenuOpen = hamburger && hamburger.classList.contains('active');
             hamburgerText.textContent = isMenuOpen ? t.close : t.menu;
         }
 
-        // Navigation Buttons
         navBtns.forEach(btn => {
             const navText = btn.querySelector('.nav-text');
             const key = btn.getAttribute('data-key');
@@ -196,7 +193,6 @@
             }
         });
 
-        // Works Title
         const worksTitle = document.querySelector('.title-main');
         if (worksTitle) {
             const key = worksTitle.getAttribute('data-key');
@@ -207,7 +203,6 @@
             }
         }
 
-        // Scroll Text
         const scrollText = document.querySelector('.arrow-text');
         if (scrollText) {
             const key = scrollText.getAttribute('data-key');
@@ -216,7 +211,6 @@
             }
         }
 
-        // Category Buttons
         const categoryButtons = document.querySelectorAll('.category-btn');
         categoryButtons.forEach(btn => {
             const key = btn.getAttribute('data-key');
@@ -225,7 +219,6 @@
             }
         });
 
-        // Play Button
         const playTexts = document.querySelectorAll('.play-text');
         playTexts.forEach(el => {
             if (t.play) {
@@ -234,7 +227,6 @@
             }
         });
 
-        // Footer CTA Text
         const ctaText = document.querySelector('.cta-text');
         if (ctaText) {
             const key = ctaText.getAttribute('data-key');
@@ -245,7 +237,6 @@
             }
         }
 
-        // Footer CTA Button
         const ctaButton = document.querySelector('.cta-button');
         if (ctaButton) {
             const key = ctaButton.getAttribute('data-key');
@@ -254,7 +245,6 @@
             }
         }
 
-        // Footer Labels
         const footerLabels = document.querySelectorAll('.footer-label');
         footerLabels.forEach(label => {
             const key = label.getAttribute('data-key');
@@ -263,7 +253,6 @@
             }
         });
 
-        // Apply font class
         if (lang === 'az') {
             document.body.classList.add('lang-az');
             document.documentElement.setAttribute('lang', 'az');
@@ -272,9 +261,7 @@
             document.documentElement.setAttribute('lang', 'en');
         }
 
-        // Contact info yenilə
         updateGlobalContactInfo();
-
         console.log('Translations applied for:', lang);
     }
 
@@ -289,20 +276,14 @@
         const langOptions = document.querySelectorAll('.lang-option');
         const currentLangText = document.getElementById('currentLangText');
         
-        console.log('initLanguageSelector called');
-        console.log('langSelector:', langSelector);
-        console.log('langGlobeBtn:', langGlobeBtn);
-        
         if (!langSelector || !langGlobeBtn) {
             console.log('Language selector elements not found!');
             return;
         }
         
-        // LocalStorage-dən dil seçimini yüklə
         const savedLang = localStorage.getItem('selectedLang') || 'en';
         window.currentLang = savedLang;
         
-        // Seçilmiş dili tətbiq et
         applyTranslations(savedLang);
         
         langOptions.forEach(option => {
@@ -316,51 +297,38 @@
             }
         });
         
-        // Globe düyməsinə klik - dropdown aç/bağla
         langGlobeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Globe button clicked!');
             langSelector.classList.toggle('active');
-            console.log('langSelector.classList:', langSelector.classList.toString());
         });
         
-        // Dil seçimlərinə klik
         langOptions.forEach(option => {
             option.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
                 const lang = this.dataset.lang;
-                console.log('Language option clicked:', lang);
                 
-                // Əgər artıq aktivdirsə, sadəcə dropdown-u bağla
                 if (this.classList.contains('active')) {
                     langSelector.classList.remove('active');
                     return;
                 }
                 
-                // Aktiv classını dəyiş
                 langOptions.forEach(opt => opt.classList.remove('active'));
                 this.classList.add('active');
                 
-                // Current lang text-i yenilə
                 if (currentLangText) {
                     currentLangText.textContent = lang.toUpperCase();
                 }
                 
-                // LocalStorage-ə yadda saxla
                 localStorage.setItem('selectedLang', lang);
-                
-                // Tərcümələri tətbiq et
                 applyTranslations(lang);
                 
-                // Dropdown-u bağla
                 setTimeout(() => {
                     langSelector.classList.remove('active');
                 }, 200);
                 
-                // Event göndər
                 document.dispatchEvent(new CustomEvent('languageChanged', { 
                     detail: { language: lang } 
                 }));
@@ -369,14 +337,12 @@
             });
         });
         
-        // Xaricdə klik - dropdown-u bağla
         document.addEventListener('click', function(e) {
             if (langSelector && !langSelector.contains(e.target)) {
                 langSelector.classList.remove('active');
             }
         });
         
-        // ESC düyməsi - dropdown-u bağla
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && langSelector.classList.contains('active')) {
                 langSelector.classList.remove('active');
@@ -387,15 +353,13 @@
     }
 
     // ============================================================
-    // 5. MENU SİSTEMİ (Mobil Menyu)
+    // 5. MENU SİSTEMİ
     // ============================================================
 
     function toggleMenu() {
         if (!hamburger || !mobileMenu) return;
 
         const isActive = hamburger.classList.contains('active');
-        
-        // Scrollbar genişliyini hesabla (Jump probleminin həlli)
         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
         
         hamburger.classList.toggle('active');
@@ -411,7 +375,6 @@
             }
         }
         
-        // Scrollbar compensation 
         if (!isActive) {
             document.body.style.overflow = 'hidden';
             document.body.style.paddingRight = scrollbarWidth + 'px';
@@ -439,7 +402,6 @@
         });
     }
 
-    // ESC düyməsi
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (previewContainer && previewContainer.classList.contains('active')) {
@@ -452,7 +414,6 @@
         }
     });
 
-    // Menu linkləri
     navBtns.forEach(link => {
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
@@ -476,200 +437,138 @@
         });
     });
 
+    // ============================================================
+    // 6. WORKS API & GRID
+    // ============================================================
 
-// ============================================================
-// 6. WORKS API & GRID - (Qara ekran problemi həll olunmuş versiya)
-// ============================================================
-
-// ⭐ YENİ FUNKSIYA: Cloudinary URL Optimizasiyası (FIXED)
-function optimizeCloudinaryUrl(url) {
-    if (!url) return '';
-    
-    // HTTP -> HTTPS
-    url = url.replace('http://', 'https://');
-    
-    // Yalnız Cloudinary URL-lərini optimize et
-    if (!url.includes('cloudinary.com')) {
-        return url;
-    }
-    
-    // Əgər artıq optimize edilmiş parametrlər varsa, geri qaytar
-    if (
-        url.includes('/f_auto,q_auto,vc_auto/') ||
-        url.includes('/f_auto,q_auto/')
-    ) {
-        return url;
-    }
-    
-    // Video optimizasiyası
-    const uploadIndex = url.indexOf('/video/upload/');
-    
-    if (uploadIndex === -1) {
-        // Video deyil, image ola bilər
-        const imageUploadIndex = url.indexOf('/image/upload/');
-        if (imageUploadIndex !== -1) {
-            const before = url.substring(0, imageUploadIndex + '/image/upload/'.length);
-            const after = url.substring(imageUploadIndex + '/image/upload/'.length);
-            return `${before}f_auto,q_auto/${after}`;
+    function optimizeCloudinaryUrl(url) {
+        if (!url) return '';
+        url = url.replace('http://', 'https://');
+        if (!url.includes('cloudinary.com')) return url;
+        if (url.includes('/f_auto,q_auto,vc_auto/') || url.includes('/f_auto,q_auto/')) return url;
+        
+        const uploadIndex = url.indexOf('/video/upload/');
+        if (uploadIndex === -1) {
+            const imageUploadIndex = url.indexOf('/image/upload/');
+            if (imageUploadIndex !== -1) {
+                const before = url.substring(0, imageUploadIndex + '/image/upload/'.length);
+                const after = url.substring(imageUploadIndex + '/image/upload/'.length);
+                return `${before}f_auto,q_auto/${after}`;
+            }
+            return url;
         }
-        return url;
-    }
-    
-    // ✅ VIDEO üçün: format + quality + codec auto
-    const before = url.substring(0, uploadIndex + '/video/upload/'.length);
-    const after = url.substring(uploadIndex + '/video/upload/'.length);
-    
-    return `${before}f_auto,q_auto,vc_auto/${after}`;
-}
-
-// URL təmizləyən və birləşdirən köməkçi funksiya
-function getFullMediaUrl(path) {
-    if (!path) return '';
-    
-    // 1. Əgər link Cloudflare R2 linkidirsə (pub-...r2.dev ehtiva edirsə)
-    // Heç bir dəyişiklik etmədən birbaşa qaytarırıq.
-    if (path.includes('r2.dev')) {
-        return path.replace('http://', 'https://');
-    }
-
-    // 2. Əgər link tam URL-dirsə (çox gümanki Cloudinary-dir)
-    if (path.startsWith('http')) {
-        return optimizeCloudinaryUrl(path);
-    }
-
-    // 3. Əgər nisbi yoldursa (uploads/...), UPLOADS_URL əlavə edirik
-    let cleanPath = path;
-    while (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
-    if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.substring(8);
-    
-    const fullUrl = UPLOADS_URL + cleanPath;
-    return optimizeCloudinaryUrl(fullUrl);
-}
-
-// Cloudinary üçün spesifik optimizasiya (R2-yə toxunmur)
-function optimizeCloudinaryUrl(url) {
-    if (!url || !url.includes('cloudinary.com')) return url;
-    
-    url = url.replace('http://', 'https://');
-    
-    if (url.includes('/f_auto,q_auto')) return url;
-
-    const videoIndex = url.indexOf('/video/upload/');
-    if (videoIndex !== -1) {
-        const before = url.substring(0, videoIndex + '/video/upload/'.length);
-        const after = url.substring(videoIndex + '/video/upload/'.length);
+        
+        const before = url.substring(0, uploadIndex + '/video/upload/'.length);
+        const after = url.substring(uploadIndex + '/video/upload/'.length);
         return `${before}f_auto,q_auto,vc_auto/${after}`;
     }
 
-    const imageIndex = url.indexOf('/image/upload/');
-    if (imageIndex !== -1) {
-        const before = url.substring(0, imageIndex + '/image/upload/'.length);
-        const after = url.substring(imageIndex + '/image/upload/'.length);
-        return `${before}f_auto,q_auto/${after}`;
+    function getFullMediaUrl(path) {
+        if (!path) return '';
+        if (path.includes('r2.dev')) return path.replace('http://', 'https://');
+        if (path.startsWith('http')) return optimizeCloudinaryUrl(path);
+        
+        let cleanPath = path;
+        while (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+        if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.substring(8);
+        
+        const fullUrl = UPLOADS_URL + cleanPath;
+        return optimizeCloudinaryUrl(fullUrl);
     }
-    
-    return url;
-}
 
-async function loadDynamicWorks() {
-    if (!container) return;
+    async function loadDynamicWorks() {
+        if (!container) return;
 
-    try {
-        const response = await fetch(API_WORKS);
-        if (!response.ok) throw new Error('API Error');
+        try {
+            const response = await fetch(API_WORKS);
+            if (!response.ok) throw new Error('API Error');
 
-        const data = await response.json();
-        const works = data.content ? data.content : data;
-        container.innerHTML = '';
+            const data = await response.json();
+            const works = data.content ? data.content : data;
+            container.innerHTML = '';
 
-        if (works.length === 0) {
-            container.innerHTML = '<p style="color:white; text-align:center;">No works found.</p>';
-            return;
-        }
+            if (works.length === 0) {
+                container.innerHTML = '<p style="color:white; text-align:center;">No works found.</p>';
+                return;
+            }
 
-        // --- DƏYİŞİKLİK BURADADIR ---
-        works.forEach((work, index) => {
-            // R2-yə yüklədiyimiz video linki
-            const videoSrc = getFullMediaUrl(work.videoUrl); 
-            
-            // Şəkil (Thumbnail) linki - Poster olaraq istifadə edirik
-            const posterSrc = getFullMediaUrl(work.thumbnailUrl); 
-            
-            const categoryClass = categoryMap[work.category] || 'other';
+            works.forEach((work, index) => {
+                const videoSrc = getFullMediaUrl(work.videoUrl);
+                const posterSrc = getFullMediaUrl(work.thumbnailUrl);
+                const categoryClass = categoryMap[work.category] || 'other';
 
-            if (!videoSrc) return;
+                if (!videoSrc) return;
 
-            const workHTML = `
-                <div class="project-card reveal-item" 
-                    data-category="${categoryClass}" 
-                    data-video-src="${videoSrc}" 
-                    data-title="${work.title}"
-                    style="transition-delay: ${index * 0.05}s;">
-                    <div class="project-image-container">
-                        <video muted loop playsinline class="project-video" 
-                            preload="metadata" 
-                            poster="${posterSrc}"
-                            src="${videoSrc}#t=0.1"> 
-                        </video>
-                        <div class="card-overlay"></div>
-                        <div class="card-info">
-                            <h3 class="card-title">${work.title}</h3>
-                            <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
+                const workHTML = `
+                    <div class="project-card reveal-item" 
+                        data-category="${categoryClass}" 
+                        data-video-src="${videoSrc}" 
+                        data-title="${work.title}"
+                        style="transition-delay: ${index * 0.05}s;">
+                        <div class="project-image-container">
+                            <video muted loop playsinline class="project-video" 
+                                preload="metadata" 
+                                poster="${posterSrc}"
+                                src="${videoSrc}#t=0.1"> 
+                            </video>
+                            <div class="card-overlay"></div>
+                            <div class="card-info">
+                                <h3 class="card-title">${work.title}</h3>
+                                <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
+                            </div>
                         </div>
+                        <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
                     </div>
-                    <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
-                </div>
-            `;
-            container.innerHTML += workHTML;
-        });
-        // --- DƏYİŞİKLİK BİTDİ ---
+                `;
+                container.innerHTML += workHTML;
+            });
 
-        const newCards = container.querySelectorAll('.project-card');
-        newCards.forEach(card => observer.observe(card));
+            const newCards = container.querySelectorAll('.project-card');
+            newCards.forEach(card => observer.observe(card));
 
-        attachHoverEffects();
+            attachHoverEffects();
 
-    } catch (error) {
-        console.error("API Error:", error);
-        container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
+        } catch (error) {
+            console.error("API Error:", error);
+            container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
+        }
     }
-}
 
-function attachHoverEffects() {
-    document.querySelectorAll('.project-card').forEach(card => {
-        const video = card.querySelector('video');
-        if (!video) return;
+    function attachHoverEffects() {
+        document.querySelectorAll('.project-card').forEach(card => {
+            const video = card.querySelector('video');
+            if (!video) return;
 
-        card.addEventListener('mouseenter', () => {
-            video.play().catch(error => {
-                console.log("Play error:", error);
+            card.addEventListener('mouseenter', () => {
+                video.play().catch(error => {
+                    console.log("Play error:", error);
+                });
+            });
+
+            card.addEventListener('mouseleave', () => {
+                video.pause();
+                video.currentTime = 0.1; 
             });
         });
-
-        card.addEventListener('mouseleave', () => {
-            video.pause();
-            video.currentTime = 0.1; 
-        });
-    });
-}
-
-window.filterWorks = function(category, btn) {
-    if(btn) {
-        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
     }
-    const cards = document.querySelectorAll('.project-card');
-    cards.forEach(card => {
-        const cardCat = card.getAttribute('data-category');
-        if (category === 'all' || cardCat === category) {
-            card.style.display = 'block';
-            setTimeout(() => card.classList.add('active'), 50); 
-        } else {
-            card.style.display = 'none';
-            card.classList.remove('active');
+
+    window.filterWorks = function(category, btn) {
+        if(btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
-    });
-};
+        const cards = document.querySelectorAll('.project-card');
+        cards.forEach(card => {
+            const cardCat = card.getAttribute('data-category');
+            if (category === 'all' || cardCat === category) {
+                card.style.display = 'block';
+                setTimeout(() => card.classList.add('active'), 50); 
+            } else {
+                card.style.display = 'none';
+                card.classList.remove('active');
+            }
+        });
+    };
 
     // ============================================================
     // 7. SCROLL REVEAL
@@ -689,7 +588,7 @@ window.filterWorks = function(category, btn) {
     });
 
     // ============================================================
-    // 8. VIDEO MODAL
+    // 8. VIDEO MODAL - YENİ PLAY/PAUSE İKONLARI İLƏ
     // ============================================================
     
     function formatTime(seconds) {
@@ -710,19 +609,19 @@ window.filterWorks = function(category, btn) {
         }
     }
 
-   function openModal(videoSrc, title) {
-    if (!videoSrc) return;
-    if(previewTitleEl) previewTitleEl.textContent = title;
-    
-    previewContainer.style.display = 'flex';
-    setTimeout(() => {
-        previewContainer.classList.add('active');
-    }, 10);
-    
-    previewVideo.src = videoSrc;
-    previewVideo.preload = "auto"; // Böyük video üçün preload-u aktiv edirik
-    previewVideo.load();
-}
+    function openModal(videoSrc, title) {
+        if (!videoSrc) return;
+        if(previewTitleEl) previewTitleEl.textContent = title;
+        
+        previewContainer.style.display = 'flex';
+        setTimeout(() => {
+            previewContainer.classList.add('active');
+        }, 10);
+        
+        previewVideo.src = videoSrc;
+        previewVideo.preload = "auto";
+        previewVideo.load();
+    }
 
     function closeVideoPreview() {
         if(!previewContainer) return;
@@ -744,35 +643,93 @@ window.filterWorks = function(category, btn) {
         previewVideo.paused ? previewVideo.play() : previewVideo.pause();
     }
 
+    // ✅ YENİ - Modal play/pause toggle (ikon dəyişməsi üçün)
+    function toggleModalPlay() {
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
+        
+        if (previewVideo.paused) {
+            previewVideo.play();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        } else {
+            previewVideo.pause();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        }
+    }
+
+    // ✅ YENİ - Play/Pause ikonlarını idarə et
     function updatePlayButtonUI() {
-        const modalPlayText = modalPlayContainer ? modalPlayContainer.querySelector('.play-text') : null;
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
         const playIcon = document.getElementById('playIcon');
         const pauseIcon = document.getElementById('pauseIcon');
         
         if (previewVideo.paused) {
             if (playIcon) playIcon.style.display = 'block';
             if (pauseIcon) pauseIcon.style.display = 'none';
-            if(modalPlayText) modalPlayText.textContent = 'PLAY';
             previewContainer.classList.add('is-paused');
             previewContainer.classList.remove('user-inactive');
+            clearTimeout(activityTimeout);
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
         } else {
             if (playIcon) playIcon.style.display = 'none';
             if (pauseIcon) pauseIcon.style.display = 'block';
-            if(modalPlayText) modalPlayText.textContent = 'PAUSE';
             previewContainer.classList.remove('is-paused');
             handleUserActivity();
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
         }
     }
 
+    // ✅ YENİ - Video eventləri
+    function initPlayPauseIcons() {
+        if (!previewVideo) return;
+        
+        previewVideo.addEventListener('play', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        });
+        
+        previewVideo.addEventListener('pause', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        });
+    }
+
+    // ✅ YENİ - Event listener əlavəsi
     document.addEventListener('click', (e) => {
         if (e.target.closest('.fullscreen-btn')) {
             e.preventDefault();
             const btn = e.target.closest('.fullscreen-btn');
             openModal(btn.getAttribute('data-video-src'), btn.getAttribute('data-title'));
         }
-        if (e.target.closest('#playPauseBtn') || e.target.closest('#modalPlayBtnContainer')) {
-             e.stopPropagation();
-             togglePlay();
+        
+        // ✅ Modal play button klik
+        if (e.target.closest('#modalPlayBtnContainer')) {
+            e.stopPropagation();
+            toggleModalPlay();
+        }
+        
+        if (e.target.closest('#playPauseBtn')) {
+            e.stopPropagation();
+            togglePlay();
         }
     });
 
@@ -790,6 +747,9 @@ window.filterWorks = function(category, btn) {
         previewVideo.addEventListener('loadedmetadata', () => {
              if(durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
         });
+        
+        // ✅ Play/Pause ikonlarını init et
+        initPlayPauseIcons();
     }
 
     if(closePreview) closePreview.onclick = closeVideoPreview;
@@ -806,7 +766,6 @@ window.filterWorks = function(category, btn) {
         ['mousemove', 'click'].forEach(evt => previewContainer.addEventListener(evt, handleUserActivity));
     }
 
-    // REWIND / FORWARD BUTTONS
     if (rewindBtn) {
         rewindBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -825,7 +784,6 @@ window.filterWorks = function(category, btn) {
         });
     }
 
-    // VOLUME SLIDER
     if (volumeSlider) {
         volumeSlider.addEventListener('input', (e) => {
             if (previewVideo) {
@@ -838,7 +796,6 @@ window.filterWorks = function(category, btn) {
         }
     }
 
-    // FULLSCREEN BUTTON
     if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -895,7 +852,6 @@ window.filterWorks = function(category, btn) {
 
             const data = await response.json();
 
-            // Email yenilə
             if (data.email) {
                 const emailElements = document.querySelectorAll('.global-email');
                 emailElements.forEach(el => {
@@ -910,7 +866,6 @@ window.filterWorks = function(category, btn) {
                 });
             }
 
-            // Telefon yenilə
             if (data.phone) {
                 const phoneElements = document.querySelectorAll('.global-phone');
                 phoneElements.forEach(el => {
@@ -926,7 +881,6 @@ window.filterWorks = function(category, btn) {
                 });
             }
 
-            // Ünvan yenilə
             if (data.address) {
                 const addressElements = document.querySelectorAll('.global-address');
                 addressElements.forEach(el => {
@@ -939,73 +893,58 @@ window.filterWorks = function(category, btn) {
         }
     }
 
-    /* ============================================================
-   WORKS PAGE - SCROLL HIDE/SHOW ADDON
-   ============================================================ */
+    // ============================================================
+    // 11. SCROLL HIDE/SHOW
+    // ============================================================
 
-// Scroll Hide/Show Funksionallığı
-(function() {
-    let lastScrollY = 0;
-    let ticking = false;
-    
-    function handleScroll() {
-        const currentScrollY = window.scrollY;
+    (function() {
+        let lastScrollY = 0;
+        let ticking = false;
         
-        const logo = document.querySelector('.center-logo');
-        const hamburger = document.querySelector('.hamburger');
-        const langSelector = document.querySelector('.lang-selector');
+        function handleScroll() {
+            const currentScrollY = window.scrollY;
+            
+            const logo = document.querySelector('.center-logo');
+            const hamburger = document.querySelector('.hamburger');
+            const langSelector = document.querySelector('.lang-selector');
+            
+            if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+                if (logo) logo.classList.add('hide-on-scroll');
+                if (hamburger) hamburger.classList.add('hide-on-scroll');
+                if (langSelector) langSelector.classList.add('hide-on-scroll');
+            }
+            else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+                if (logo) logo.classList.remove('hide-on-scroll');
+                if (hamburger) hamburger.classList.remove('hide-on-scroll');
+                if (langSelector) langSelector.classList.remove('hide-on-scroll');
+            }
+            
+            lastScrollY = currentScrollY;
+            ticking = false;
+        }
         
-        // Scroll aşağı (100px-dən çox) - gizlə
-        if (currentScrollY > 100 && currentScrollY > lastScrollY) {
-            if (logo) logo.classList.add('hide-on-scroll');
-            if (hamburger) hamburger.classList.add('hide-on-scroll');
-            if (langSelector) langSelector.classList.add('hide-on-scroll');
-        }
-        // Scroll yuxarı və ya 100px-dən az - göstər
-        else if (currentScrollY < lastScrollY || currentScrollY < 100) {
-            if (logo) logo.classList.remove('hide-on-scroll');
-            if (hamburger) hamburger.classList.remove('hide-on-scroll');
-            if (langSelector) langSelector.classList.remove('hide-on-scroll');
+        function requestScrollTick() {
+            if (!ticking) {
+                window.requestAnimationFrame(handleScroll);
+                ticking = true;
+            }
         }
         
-        lastScrollY = currentScrollY;
-        ticking = false;
-    }
-    
-    function requestScrollTick() {
-        if (!ticking) {
-            window.requestAnimationFrame(handleScroll);
-            ticking = true;
-        }
-    }
-    
-    // Scroll event listener (performanslı)
-    window.addEventListener('scroll', requestScrollTick, { passive: true });
-    
-    console.log('✅ Scroll hide/show initialized!');
-})();
+        window.addEventListener('scroll', requestScrollTick, { passive: true });
+        
+        console.log('✅ Scroll hide/show initialized!');
+    })();
 
     // ============================================================
-    // 11. INIT - ✅ BİRLƏŞDİRİLMİŞ VƏ DÜZƏLDİLMİŞ
+    // 12. INIT
     // ============================================================
     
     async function init() {
-        // Translations yüklə
         await loadTranslations();
-        
-        // Language selector başlat
         initLanguageSelector();
-        
-        // Hero video başlat (Cloudinary)
         initHeroVideo();
-        
-        // Works məlumatlarını yüklə
         loadDynamicWorks();
-        
-        // Naviqasiya linklərini qur
         setupNavLinks();
-        
-        // Contact məlumatlarını yüklə
         updateGlobalContactInfo();
     }
 

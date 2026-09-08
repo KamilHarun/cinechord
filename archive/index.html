@@ -26,31 +26,31 @@
     <div class="page-transition"></div>
     <div class="grain-overlay"></div>
 
-
-     <!-- LANGUAGE SELECTOR WITH GLOBE -->
-        <div class="lang-selector" id="langSelector">
-            <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
-                <span class="globe-icon">
-                    <span class="globe-ellipse"></span>
-                </span>
-                <span class="current-lang" id="currentLangText">EN</span>
+    <!-- LANGUAGE SELECTOR WITH GLOBE -->
+    <div class="lang-selector" id="langSelector">
+        <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+            <span class="globe-icon">
+                <span class="globe-ellipse"></span>
+            </span>
+            <span class="current-lang" id="currentLangText">EN</span>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <button class="lang-option active" data-lang="en">
+                <span class="lang-code">EN</span>
+                <span class="lang-name">English</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
             </button>
-            <div class="lang-dropdown" id="langDropdown">
-                <button class="lang-option active" data-lang="en">
-                    <span class="lang-code">EN</span>
-                    <span class="lang-name">English</span>
-                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
-                </button>
-                <button class="lang-option" data-lang="az">
-                    <span class="lang-code">AZ</span>
-                    <span class="lang-name">Azərbaycan</span>
-                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
-                </button>
-            </div>
+            <button class="lang-option" data-lang="az">
+                <span class="lang-code">AZ</span>
+                <span class="lang-name">Azərbaycan</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
         </div>
+    </div>
 
-
-    <!-- VIDEO MODAL (WORKS STYLE) -->
+    <!-- ============================================================
+         VIDEO MODAL - YENİ PLAY BUTTON İLƏ
+         ============================================================ -->
     <div class="preview-container is-paused" id="previewContainer">
         <button class="close-preview" id="closePreview">×</button>
         
@@ -63,14 +63,17 @@
         <div class="video-wrapper" id="videoWrapper">
             <div class="video-loading"></div>
             
-            <div class="play-button-container modal-play-btn" id="modalPlayBtnContainer">
-                <button class="play-button">
-                    <span class="play-text" data-text="PLAY">PLAY</span>
-                </button>
+            <!-- ✅ YENİ MODAL PLAY BUTTON - Play + Pause ikonları -->
+            <div class="modal-play-btn-wrapper" id="modalPlayBtnContainer">
+                <div class="modal-play-btn-inner">
+                    <img src="../play-btn.png" alt="Play Video" class="modal-play-icon" id="modalPlayIcon">
+                    <img src="../pause-btn.png" alt="Pause Video" class="modal-play-icon pause-icon" id="modalPauseIcon" style="display:none;">
+                </div>
             </div>
             
             <video id="previewVideo" class="preview-video" playsinline preload="auto"></video>
             
+            <!-- Custom Controls - TOXUNULMADAN QALIR -->
             <div class="custom-controls" id="customControls">
                 <div class="progress-bar-container" id="progressBarContainer">
                     <div class="progress-played" id="progressPlayed"></div>
@@ -122,49 +125,47 @@
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
     <!-- MOBILE MENU -->
-   <nav class="mobile-menu" id="mobileMenu">
-    <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
-    <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
-    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
-    
-    <a href="#" class="nav-btn active" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
-    
-    <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
-    <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
+    <nav class="mobile-menu" id="mobileMenu">
+        <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+        <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+        <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+        <a href="#" class="nav-btn active" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+        <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+        <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
 
-    <div class="menu-footer">
-        <div class="menu-socials">
-            <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
-            <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a> 
-            <a href="#">VIMEO</a>
+        <div class="menu-footer">
+            <div class="menu-socials">
+                <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+                <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a> 
+                <a href="#">VIMEO</a>
+            </div>
+            <div class="menu-contact-info">
+                <p>hello@cinechord.com</p>
+                <p>+994 50 123 45 67</p>
+            </div>
         </div>
-        <div class="menu-contact-info">
-            <p>hello@cinechord.com</p>
-            <p>+994 50 123 45 67</p>
-        </div>
-    </div>
-</nav>
+    </nav>
 
     <!-- LOGO -->
-<a href="../" class="center-logo" title="Home">
-    <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
-</a>
+    <a href="../" class="center-logo" title="Home">
+        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    </a>
 
     <main>
         <section class="archive-section" id="archiveSection">
             <div class="split-titles">
-              <div class="video-title" aria-hidden="true">
-    <span class="video-word" data-key="category_film">FILM</span>
-    <span class="video-word" data-key="category_commercial">COMMERCIAL</span>
-    <span class="video-word" data-key="category_clip">CLIP</span>
-</div>
+                <div class="video-title" aria-hidden="true">
+                    <span class="video-word" data-key="category_film">FILM</span>
+                    <span class="video-word" data-key="category_commercial">COMMERCIAL</span>
+                    <span class="video-word" data-key="category_clip">CLIP</span>
+                </div>
                 
                 <div class="archive-title-container">
                     <h1 class="archive-title" data-key="archive_title">ARCHIVE</h1>
                     <p class="archive-subtitle">
-    <span data-key="archive_subtitle_1">FULL FILM AVAILABLE ON REQUEST</span> • 
-    <a href="../contact/" data-key="archive_subtitle_2">SHOOT A MESSAGE</a>
-</p>
+                        <span data-key="archive_subtitle_1">FULL FILM AVAILABLE ON REQUEST</span> • 
+                        <a href="../contact/" data-key="archive_subtitle_2">SHOOT A MESSAGE</a>
+                    </p>
                 </div>
             </div>
 

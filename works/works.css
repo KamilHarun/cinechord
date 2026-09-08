@@ -718,7 +718,7 @@ body.lang-az .menu-socials a {
 
 .menu-contact-info p {
     font-family: 'Gabarito', sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     color: rgba(255,255,255,0.4) !important;
     margin-bottom: 5px;
     letter-spacing: 1px;
@@ -745,8 +745,8 @@ body.lang-az .menu-contact-info a {
 }
 
 .logo-img {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
     object-fit: contain;
     filter: brightness(0) invert(1);
     image-rendering: -webkit-optimize-contrast;
@@ -2354,6 +2354,160 @@ body.lang-az .cta-text-link:hover .cta-text::after {
 
 body.lang-az .cta-text-link:not(:hover) .cta-text::after {
     clip-path: inset(100% 0 0 0) !important;
+}
+
+/* ============================================================
+   WORKS - MODAL PLAY BUTTON (YENİ İKONLAR)
+   ============================================================ */
+
+/* Modal play button - yeni ikonlu versiya */
+.modal-play-btn-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    overflow: visible;
+}
+
+.modal-play-btn-inner {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Default - tam görünür */
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.5s ease;
+    opacity: 1;
+}
+
+/* Modal ikonlar */
+.modal-play-btn-inner .modal-play-icon,
+.modal-play-btn-inner .pause-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Modal play ikonu - default */
+.modal-play-btn-inner .modal-play-icon {
+    display: block;
+}
+
+/* Modal pause ikonu - default gizli */
+.modal-play-btn-inner .pause-icon {
+    display: none;
+}
+
+/* Modal hover */
+.modal-play-btn-wrapper:hover .modal-play-icon,
+.modal-play-btn-wrapper:hover .pause-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.8));
+}
+
+/* ===== MODAL - PLAY/PAUSE DƏYİŞMƏSİ ===== */
+.modal-play-btn-wrapper.is-playing .modal-play-icon {
+    display: none !important;
+}
+.modal-play-btn-wrapper.is-playing .pause-icon {
+    display: block !important;
+}
+
+.modal-play-btn-wrapper.is-paused .modal-play-icon {
+    display: block !important;
+}
+.modal-play-btn-wrapper.is-paused .pause-icon {
+    display: none !important;
+}
+
+/* ===== MODAL - USER INACTIVE (Mouse hərəkətsiz) ===== */
+.preview-container.user-inactive .modal-play-btn-inner {
+    clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.5s ease;
+}
+
+/* ===== MODAL - USER ACTIVE (Mouse hərəkəti var) ===== */
+.preview-container:not(.user-inactive) .modal-play-btn-inner {
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.5s ease;
+}
+
+/* ===== PLAY/PAUSE - HƏMİŞƏ GÖRÜNƏN (əlavə təminat) ===== */
+.preview-container.is-paused .modal-play-btn-inner {
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.preview-container:not(.is-paused) .modal-play-btn-inner {
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* User inactive olduqda is-paused/play override olunur */
+.preview-container.user-inactive.is-paused .modal-play-btn-inner {
+    clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.preview-container.user-inactive:not(.is-paused) .modal-play-btn-inner {
+    clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+
+/* ============================================================
+   WORKS - MOBİL MODAL PLAY BUTTON ÖLÇÜLƏRİ
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .modal-play-btn-wrapper {
+        width: 170px !important;
+        height: 170px !important;
+    }
+    
+    .modal-play-btn-inner {
+        width: 115px !important;
+        height: 115px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-play-btn-wrapper {
+        width: 140px !important;
+        height: 140px !important;
+    }
+    
+    .modal-play-btn-inner {
+        width: 95px !important;
+        height: 95px !important;
+    }
 }
 
 
