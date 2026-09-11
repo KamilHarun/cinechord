@@ -675,15 +675,15 @@ window.openMainVideo = function() {
         
         currentVideoEl = firstVideo;
 
-        const forcePlay = () => {
-            const playPromise = firstVideo.play();
+        function forcePlayEl(el) {
+            const playPromise = el.play();
             
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
                     console.warn('Autoplay blocked, waiting for interaction:', err);
                     
                     const startOnTouch = () => {
-                        firstVideo.play();
+                        el.play();
                         ['click', 'touchstart', 'touchend'].forEach(ev => 
                             document.removeEventListener(ev, startOnTouch)
                         );
@@ -694,7 +694,9 @@ window.openMainVideo = function() {
                     );
                 });
             }
-        };
+        }
+
+        const forcePlay = () => forcePlayEl(firstVideo);
 
         firstVideo.addEventListener('loadedmetadata', forcePlay);
         firstVideo.addEventListener('loadeddata', forcePlay);
@@ -794,7 +796,6 @@ window.openMainVideo = function() {
         
         if (!previewVideo) return;
         
-        // Klik edəndə user-inactive silinir (button görünür)
         if (elements.previewContainer) {
             elements.previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
@@ -815,7 +816,6 @@ window.openMainVideo = function() {
         }
     }
 
-    // Video eventləri - avtomatik ikon dəyişməsi
     function initPlayPauseIcons() {
         const previewVideo = document.getElementById('previewVideo');
         if (!previewVideo) return;
@@ -950,7 +950,6 @@ window.openMainVideo = function() {
         let hideTimeout = null;
         const HIDE_DELAY = 3000; // 3 saniyə
 
-        // Mobil və ya desktop olduğunu yoxla
         const isMobile = window.innerWidth <= 768;
 
         function hidePlayBtn() {
@@ -963,10 +962,8 @@ window.openMainVideo = function() {
             hideTimeout = setTimeout(hidePlayBtn, HIDE_DELAY);
         }
 
-        // İlk vəziyyət: səhifə açılandan HIDE_DELAY sonra gizlət
         showPlayBtn();
 
-        // ===== DESKTOP: Mouse hərəkətində göstər =====
         if (!isMobile) {
             heroSection.addEventListener('mousemove', showPlayBtn);
             heroSection.addEventListener('mouseleave', function() {
@@ -975,18 +972,15 @@ window.openMainVideo = function() {
             });
         }
 
-        // ===== MOBİL: Touch hərəkətində göstər =====
         heroSection.addEventListener('touchstart', function(e) {
             showPlayBtn();
         }, { passive: true });
 
-        // ===== Buttona klik edəndə göstər və yenidən say =====
         mainPlayBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             showPlayBtn();
         });
 
-        // ===== Əgər video açılıbsa, button gizlənsin =====
         const previewContainer = document.getElementById('previewContainer');
         if (previewContainer) {
             const observer = new MutationObserver(function() {
@@ -1000,7 +994,6 @@ window.openMainVideo = function() {
             observer.observe(previewContainer, { attributes: true, attributeFilter: ['class'] });
         }
 
-        // ===== Pəncərə ölçüsü dəyişəndə =====
         let resizeTimeout;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimeout);
