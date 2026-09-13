@@ -1742,9 +1742,8 @@ body.lang-az .play-text {
     body.lang-az .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 900 !important;
-        text-shadow: 1px 0 0 #fff !important;
         font-size: 10.5vw !important;
-        line-height: 1.2 !important;
+        line-height: 1.0 !important;
         margin: -0.3vh 0 !important;
         letter-spacing: -2px !important;
         width: 100% !important;
@@ -1753,16 +1752,16 @@ body.lang-az .play-text {
     }
 
     body.lang-az .mobile-menu.active .nav-btn:nth-child(odd) { 
-        transform: translateX(-5px) !important; 
+        transform: translateX(-10px) !important; 
     }
     body.lang-az .mobile-menu.active .nav-btn:nth-child(even) { 
-        transform: translateX(5px) !important; 
+        transform: translateX(10px) !important; 
     }
 
     /* --- 3. SOSİAL BÖLMƏ --- */
     body.lang-az .menu-socials a {
         font-family: 'Montserrat', sans-serif !important;
-        font-size: 12px !important;
+        font-size: 13px !important;
         font-weight: 800 !important;      
         letter-spacing: 0.5px !important; 
         transform: none !important;
@@ -1771,7 +1770,7 @@ body.lang-az .play-text {
     body.lang-az .menu-contact-info p, 
     body.lang-az .menu-contact-info a {
         font-family: 'Montserrat', sans-serif !important;
-        font-size: 12px !important;
+        font-size: 13px !important;
         font-weight: 700 !important;      
         letter-spacing: 0.5px !important; 
         transform: none !important;
