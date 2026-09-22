@@ -479,66 +479,69 @@
         return optimizeCloudinaryUrl(fullUrl);
     }
 
-    async function loadDynamicWorks() {
-        if (!container) return;
+  async function loadDynamicWorks() {
+    if (!container) return;
 
-        try {
-            const response = await fetch(API_WORKS);
-            if (!response.ok) throw new Error('API Error');
+    try {
+        const response = await fetch(API_WORKS);
+        if (!response.ok) throw new Error('API Error');
 
-            const data = await response.json();
-            const works = data.content ? data.content : data;
-            container.innerHTML = '';
+        const data = await response.json();
+        const works = data.content ? data.content : data;
+        container.innerHTML = '';
 
-            if (works.length === 0) {
-                container.innerHTML = '<p style="color:white; text-align:center;">No works found.</p>';
-                return;
-            }
-
-                       works.forEach((work, index) => {
-                const videoSrc = getFullMediaUrl(work.videoUrl);
-                const posterSrc = getFullMediaUrl(work.thumbnailUrl);
-                // ✅ YENİ - hover şəklini əldə et
-                const hoverImageSrc = work.hoverImageUrl ? getFullMediaUrl(work.hoverImageUrl) : '';
-                const categoryClass = categoryMap[work.category] || 'other';
-
-                if (!videoSrc) return;
-const workHTML = `
-    <div class="project-card reveal-item ${hoverImageSrc ? 'has-hover-image' : ''}" 
-        data-category="${categoryClass}" 
-        data-video-src="${videoSrc}" 
-        data-title="${work.title}"
-        style="transition-delay: ${index * 0.05}s;">
-        <div class="project-image-container">
-            <video muted loop playsinline class="project-video" 
-                preload="metadata" 
-                poster="${posterSrc}"
-                data-src="${videoSrc}#t=0.1"> 
-            </video>
-            ${hoverImageSrc ? `<img class="project-hover-image" src="${hoverImageSrc}" alt="" loading="lazy">` : ''}
-            <div class="card-overlay"></div>
-            <div class="card-info">
-                <h3 class="card-title">${work.title}</h3>
-                <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
-            </div>
-        </div>
-        <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
-    </div>
-`;
-container.innerHTML += workHTML;
-            });
-
-            const newCards = container.querySelectorAll('.project-card');
-            newCards.forEach(card => observer.observe(card));
-
-            initLazyVideoLoading();
-            attachHoverEffects();
-
-        } catch (error) {
-            console.error("API Error:", error);
-            container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
+        if (works.length === 0) {
+            container.innerHTML = '<p style="color:white; text-align:center;">No works found.</p>';
+            return;
         }
+
+        works.forEach((work, index) => {
+            const videoSrc = getFullMediaUrl(work.videoUrl);
+            const posterSrc = getFullMediaUrl(work.thumbnailUrl);
+            const hoverImageSrc = work.hoverImageUrl ? getFullMediaUrl(work.hoverImageUrl) : '';
+            const categoryClass = categoryMap[work.category] || 'other';
+
+            if (!videoSrc) return;
+
+            const workHTML = `
+                <div class="project-card ${hoverImageSrc ? 'has-hover-image' : ''}" 
+                    data-category="${categoryClass}" 
+                    data-video-src="${videoSrc}" 
+                    data-title="${work.title}"
+                    style="transition-delay: ${index * 0.05}s;">
+                    <div class="project-image-container">
+                        <video muted loop playsinline class="project-video" 
+                            preload="metadata" 
+                            poster="${posterSrc}"
+                            data-src="${videoSrc}#t=0.1"> 
+                        </video>
+                        ${hoverImageSrc ? `<img class="project-hover-image" src="${hoverImageSrc}" alt="" loading="lazy">` : ''}
+                        <div class="card-overlay"></div>
+                        <div class="card-info">
+                            <h3 class="card-title">${work.title}</h3>
+                            <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
+                        </div>
+                    </div>
+                    <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
+                </div>
+            `;
+            container.innerHTML += workHTML;
+        });
+
+           // ✅ KARTLAR ÜÇÜN SCROLL REVEAL — observer ilə
+        const newCards = container.querySelectorAll('.project-card');
+        newCards.forEach((card) => {
+            observer.observe(card);
+        });
+
+        initLazyVideoLoading();
+        attachHoverEffects();
+
+    } catch (error) {
+        console.error("API Error:", error);
+        container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
     }
+}
 
     // ✅ YENİ - Videoları yalnız ekrana yaxınlaşanda yükləyir.
     // Poster şəkli hər zaman dərhal görünür (qara ekran olmur),
@@ -571,71 +574,42 @@ container.innerHTML += workHTML;
     // bufferləməyə ehtiyac duymur — istifadəçi kart üzərində nə qədər
     // uzun qalsa da, yüklənən data miqdarı sabit qalır.
     const HOVER_PREVIEW_SECONDS = 3;
-
+ 
     function attachHoverEffects() {
         document.querySelectorAll('.project-card').forEach(card => {
             const video = card.querySelector('video');
-            const hoverImage = card.querySelector('.project-hover-image');
             if (!video) return;
-
+ 
             let isHovering = false;
-
+ 
             // Hər video üçün YALNIZ BİR DƏFƏ əlavə olunur (hər hoverdə yox)
             video.addEventListener('timeupdate', () => {
                 if (isHovering && video.currentTime >= HOVER_PREVIEW_SECONDS) {
                     video.currentTime = 0;
                 }
             });
-
-        card.addEventListener('mouseenter', () => {
-    isHovering = true;
-    
-    // ✅ Əvvəlcə şəkli gizlət
-    if (hoverImage) {
-        hoverImage.style.opacity = '0';
-    }
-    
-    // ✅ Videonu göstər və oynat (3 saniyə)
-    video.style.opacity = '1';
-    
-    if (!video.src) {
-        const src = video.getAttribute('data-src');
-        if (src) video.src = src;
-    }
-    video.currentTime = 0;  // Başlanğıcdan başla
-    video.play().catch(error => console.log("Play error:", error));
-});
-
-card.addEventListener('mouseleave', () => {
-    isHovering = false;
-    
-    // ✅ Videonu gizlət və dayandır
-    video.pause();
-    video.currentTime = 0;
-    video.style.opacity = '0';
-    
-    // ✅ Şəkli geri göstər
-    if (hoverImage) {
-        hoverImage.style.opacity = '1';
-    }
-});
-
-       card.addEventListener('mouseleave', () => {
-    isHovering = false;
-    
-    // ✅ Videonu gizlət və dayandır
-    video.pause();
-    video.currentTime = 0;
-    video.style.opacity = '0';
-    
-    // ✅ Şəkli geri göstər
-    if (hoverImage) {
-        hoverImage.style.opacity = '1';
-    }
-});
+ 
+            card.addEventListener('mouseenter', () => {
+                isHovering = true;
+                // Əgər video hələ lazy-load olunmayıbsa (nadir hal),
+                // data-src-dən src-i dərhal təyin et ki, hover-də boş qalmasın.
+                if (!video.src) {
+                    const src = video.getAttribute('data-src');
+                    if (src) video.src = src;
+                }
+                video.play().catch(error => {
+                    console.log("Play error:", error);
+                });
+            });
+ 
+            card.addEventListener('mouseleave', () => {
+                isHovering = false;
+                video.pause();
+                video.currentTime = 0.1; 
+            });
         });
     }
-
+ 
     window.filterWorks = function(category, btn) {
         if(btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
@@ -653,7 +627,7 @@ card.addEventListener('mouseleave', () => {
             }
         });
     };
-
+ 
     // ============================================================
     // 7. SCROLL REVEAL
     // ============================================================
@@ -665,12 +639,12 @@ card.addEventListener('mouseleave', () => {
             }
         });
     }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-
+ 
     document.querySelectorAll('.hero-left-title, .hero-right-content, .scroll-down-arrow, .category-section, .main-footer').forEach(el => {
         el.classList.add('reveal-item');
         observer.observe(el);
     });
-
+ 
     // ============================================================
     // 8. VIDEO MODAL - YENİ PLAY/PAUSE İKONLARI İLƏ
     // ============================================================

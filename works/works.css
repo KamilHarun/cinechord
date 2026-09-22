@@ -1018,17 +1018,22 @@ body.lang-az .category-btn {
     cursor: pointer;
     overflow: hidden;
     opacity: 0;
-    transform: translateY(100px) scale(0.95);
+    transform: translateY(60px) scale(0.95);
     filter: blur(10px);
     transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity, filter;
 }
-
 .project-card.active {
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
 }
+.project-card.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
 
 .project-image-container {
     position: relative;
@@ -2507,7 +2512,6 @@ body.lang-az .cta-text-link:not(:hover) .cta-text::after {
         height: 95px !important;
     }
 }
-
 /* ============================================================
    HOVER ŞƏKLİ ÜÇÜN STİLLƏR
    ============================================================ */
@@ -2534,7 +2538,7 @@ body.lang-az .cta-text-link:not(:hover) .cta-text::after {
     opacity: 0;
 }
 
-/* ✅ DEFAULT: Şəkil gizli (yalnız hover şəkli olan kartlarda görünəcək) */
+/* ✅ DEFAULT: Şəkil gizli */
 .project-hover-image {
     opacity: 0;
     pointer-events: none;

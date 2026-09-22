@@ -364,8 +364,10 @@ async function submitWork() {
             document.getElementById('uploadStatus').innerText = 'Cloudflare R2-yə yüklənir...';
 
             // 1. Backend-dən bilet (Presigned URL) alırıq
-            const urlParams = new URLSearchParams({ fileName: file.name, contentType: file.type });
-            const authRes = await fetch(`${BASE_URL}/api/r2/get-upload-url?${urlParams}`, {
+const urlParams = new URLSearchParams({ 
+    fileName: `videos/${file.name}`, 
+    contentType: file.type 
+});            const authRes = await fetch(`${BASE_URL}/api/r2/get-upload-url?${urlParams}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
             });
@@ -392,7 +394,7 @@ async function submitWork() {
                 xhr.send(file);
             });
             
-            finalVideoUrl = `${R2_PUBLIC_URL}/videos/${fileKey}`;
+finalVideoUrl = `${R2_PUBLIC_URL}/${fileKey}`;
         }
 
         // ✅ B) HOVER ŞƏKLİNİ R2-YƏ YÜKLƏ
@@ -1057,7 +1059,7 @@ async function submitAbout() {
                 xhr.send(file);
             });
             
-            finalMediaUrl = `${R2_PUBLIC_URL}/videos/${fileKey}`;        }
+            finalMediaUrl = `${R2_PUBLIC_URL}/${fileKey}`;       }
 
         // B) MƏLUMATLARI BAZADA YENİLƏ
         document.getElementById('uploadStatus').innerText = 'Bazaya qeyd edilir...';
