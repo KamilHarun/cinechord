@@ -503,30 +503,29 @@
                 const categoryClass = categoryMap[work.category] || 'other';
 
                 if (!videoSrc) return;
-
-                const workHTML = `
-                    <div class="project-card reveal-item" 
-                        data-category="${categoryClass}" 
-                        data-video-src="${videoSrc}" 
-                        data-title="${work.title}"
-                        style="transition-delay: ${index * 0.05}s;">
-                        <div class="project-image-container">
-                            <video muted loop playsinline class="project-video" 
-                                preload="metadata" 
-                                poster="${posterSrc}"
-                                data-src="${videoSrc}#t=0.1"> 
-                            </video>
-                            ${hoverImageSrc ? `<img class="project-hover-image" src="${hoverImageSrc}" alt="" loading="lazy">` : ''}
-                            <div class="card-overlay"></div>
-                            <div class="card-info">
-                                <h3 class="card-title">${work.title}</h3>
-                                <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
-                            </div>
-                        </div>
-                        <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
-                    </div>
-                `;
-                container.innerHTML += workHTML;
+const workHTML = `
+    <div class="project-card reveal-item ${hoverImageSrc ? 'has-hover-image' : ''}" 
+        data-category="${categoryClass}" 
+        data-video-src="${videoSrc}" 
+        data-title="${work.title}"
+        style="transition-delay: ${index * 0.05}s;">
+        <div class="project-image-container">
+            <video muted loop playsinline class="project-video" 
+                preload="metadata" 
+                poster="${posterSrc}"
+                data-src="${videoSrc}#t=0.1"> 
+            </video>
+            ${hoverImageSrc ? `<img class="project-hover-image" src="${hoverImageSrc}" alt="" loading="lazy">` : ''}
+            <div class="card-overlay"></div>
+            <div class="card-info">
+                <h3 class="card-title">${work.title}</h3>
+                <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
+            </div>
+        </div>
+        <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
+    </div>
+`;
+container.innerHTML += workHTML;
             });
 
             const newCards = container.querySelectorAll('.project-card');
@@ -588,38 +587,52 @@
                 }
             });
 
-            card.addEventListener('mouseenter', () => {
-                isHovering = true;
-                
-                // ✅ YENİ - Əgər hover şəkli varsa, videonu oynatma, şəkli göstər
-                if (hoverImage) {
-                    hoverImage.style.opacity = '1';
-                    video.style.opacity = '0';
-                    return;
-                }
-                
-                // Əks halda köhnə qaydada videonu oynat
-                if (!video.src) {
-                    const src = video.getAttribute('data-src');
-                    if (src) video.src = src;
-                }
-                video.play().catch(error => {
-                    console.log("Play error:", error);
-                });
-            });
+        card.addEventListener('mouseenter', () => {
+    isHovering = true;
+    
+    // ✅ Əvvəlcə şəkli gizlət
+    if (hoverImage) {
+        hoverImage.style.opacity = '0';
+    }
+    
+    // ✅ Videonu göstər və oynat (3 saniyə)
+    video.style.opacity = '1';
+    
+    if (!video.src) {
+        const src = video.getAttribute('data-src');
+        if (src) video.src = src;
+    }
+    video.currentTime = 0;  // Başlanğıcdan başla
+    video.play().catch(error => console.log("Play error:", error));
+});
 
-            card.addEventListener('mouseleave', () => {
-                isHovering = false;
-                
-                // ✅ YENİ - Şəkli gizlət, videonu geri göstər
-                if (hoverImage) {
-                    hoverImage.style.opacity = '0';
-                    video.style.opacity = '1';
-                }
-                
-                video.pause();
-                video.currentTime = 0.1; 
-            });
+card.addEventListener('mouseleave', () => {
+    isHovering = false;
+    
+    // ✅ Videonu gizlət və dayandır
+    video.pause();
+    video.currentTime = 0;
+    video.style.opacity = '0';
+    
+    // ✅ Şəkli geri göstər
+    if (hoverImage) {
+        hoverImage.style.opacity = '1';
+    }
+});
+
+       card.addEventListener('mouseleave', () => {
+    isHovering = false;
+    
+    // ✅ Videonu gizlət və dayandır
+    video.pause();
+    video.currentTime = 0;
+    video.style.opacity = '0';
+    
+    // ✅ Şəkli geri göstər
+    if (hoverImage) {
+        hoverImage.style.opacity = '1';
+    }
+});
         });
     }
 

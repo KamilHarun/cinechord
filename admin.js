@@ -434,7 +434,7 @@ async function submitWork() {
                 xhr.send(file);
             });
 
-            finalHoverImageUrl = `${R2_PUBLIC_URL}/images/${fileKey}`;
+finalHoverImageUrl = `${R2_PUBLIC_URL}/${fileKey}`;
         }
 
         // C) MƏLUMATLARIN BAZAYA YAZILMASI

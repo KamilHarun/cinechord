@@ -2528,12 +2528,25 @@ body.lang-az .cta-text-link:not(:hover) .cta-text::after {
     transition: opacity 0.4s ease;
 }
 
+/* ✅ DEFAULT: Video gizli */
 .project-video {
     z-index: 1;
+    opacity: 0;
 }
 
+/* ✅ DEFAULT: Şəkil gizli (yalnız hover şəkli olan kartlarda görünəcək) */
 .project-hover-image {
     opacity: 0;
     pointer-events: none;
     z-index: 2;
+}
+
+/* ✅ Əgər hover şəkli VARSA → şəkil default görünsün */
+.project-card.has-hover-image .project-hover-image {
+    opacity: 1;
+}
+
+/* ✅ Əgər hover şəkli YOXDURSA → video default görünsün */
+.project-card:not(.has-hover-image) .project-video {
+    opacity: 1;
 }
