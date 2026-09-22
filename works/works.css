@@ -2554,3 +2554,194 @@ body.lang-az .cta-text-link:not(:hover) .cta-text::after {
 .project-card:not(.has-hover-image) .project-video {
     opacity: 1;
 }
+/* ============================================================
+   CINEMATIC MINIMAL PAGINATION
+   ============================================================ */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 75px;
+    padding-bottom: 90px;
+}
+
+.pagination-btn {
+    position: relative;
+
+    min-width: 54px;
+    height: 54px;
+
+    padding: 0 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+
+    color: rgba(255, 255, 255, 0.45);
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+
+    cursor: pointer;
+
+    transition:
+        color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* ============================================================
+   HOVER
+   ============================================================ */
+
+.pagination-btn:hover {
+    color: #FFA500;
+
+    background: rgba(255, 165, 0, 0.07);
+
+    transform: translateY(-3px);
+}
+
+
+/* ============================================================
+   ACTIVE
+   ============================================================ */
+
+.pagination-btn.active {
+    color: #000;
+
+    background: #FFA500;
+
+    transform: scale(0.92);
+
+    box-shadow:
+        0 6px 22px rgba(255, 165, 0, 0.18);
+}
+
+.pagination-btn.active:hover {
+    background: #FFB52E;
+
+    transform: scale(1.08) translateY(-3px);
+}
+
+
+/* ============================================================
+   ACTIVE ALTIN NÖQTƏ
+   ============================================================ */
+
+.pagination-btn.active::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: -10px;
+    left: 50%;
+
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: #FFA500;
+
+    transform: translateX(-50%);
+
+    opacity: 0.9;
+}
+
+
+/* ============================================================
+   PREVIOUS / NEXT
+   ============================================================ */
+
+.pagination-prev,
+.pagination-next {
+    min-width: 58px;
+
+    color: rgba(255, 255, 255, 0.55);
+
+    font-size: 21px;
+
+    letter-spacing: 0;
+
+    border-radius: 50%;
+}
+
+.pagination-prev:hover {
+    color: #FFA500;
+
+    transform: translateX(-5px);
+}
+
+.pagination-next:hover {
+    color: #FFA500;
+
+    transform: translateX(5px);
+}
+
+
+/* ============================================================
+   DISABLED
+   ============================================================ */
+
+.pagination-btn:disabled {
+    opacity: 0.15;
+
+    color: rgba(255, 255, 255, 0.5);
+
+    background: transparent;
+
+    cursor: default;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+.pagination-btn:disabled:hover {
+    color: rgba(255, 255, 255, 0.5);
+
+    background: transparent;
+
+    transform: none;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .pagination {
+        gap: 4px;
+
+        margin-top: 55px;
+        padding-bottom: 60px;
+    }
+
+    .pagination-btn {
+        min-width: 46px;
+        height: 46px;
+
+        padding: 0 12px;
+
+        font-size: 14px;
+    }
+
+    .pagination-prev,
+    .pagination-next {
+        min-width: 48px;
+
+        font-size: 18px;
+    }
+}

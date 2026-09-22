@@ -700,72 +700,311 @@ function editServiceById(id) {
 
 async function submitService() {
     const id = document.getElementById('serviceId')?.value;
-    const fd = new FormData();
-    
+
     const title = document.getElementById('sTitle')?.value;
     const titleAz = document.getElementById('sTitleAz')?.value || title;
     const desc = document.getElementById('sDesc')?.value;
     const descAz = document.getElementById('sDescAz')?.value || desc;
-    
-    if(!title) {
+
+    if (!title) {
         Swal.fire('Diqqət', 'Başlıq mütləqdir', 'warning');
         return;
     }
 
-    fd.append('title', title);
-    fd.append('titleAz', titleAz);
-    fd.append('description', desc);
-    fd.append('descriptionAz', descAz);
-    
-    const bulletInput = document.getElementById('sBulletPoints')?.value || '';
-    const bulletPoints = bulletInput.split('\n').filter(line => line.trim() !== '');
-    bulletPoints.forEach(point => fd.append('bulletPoints', point.trim()));
-    
-    const bulletInputAz = document.getElementById('sBulletPointsAz')?.value || '';
-    const bulletPointsAz = bulletInputAz.split('\n').filter(line => line.trim() !== '');
-    bulletPointsAz.forEach(point => fd.append('bulletPointsAz', point.trim()));
-    
-    const videoFile = document.getElementById('sVideoFile');
-    if(videoFile?.files?.[0]) {
-        fd.append('videoFile', videoFile.files[0]);
-    }
-
-    if(id) fd.append('removeVideo', 'false'); 
-
     Swal.fire({
         title: 'Yadda saxlanılır...',
+        html: `
+            <div id="serviceUploadStatus"
+                 style="font-weight:bold; margin-bottom:10px;">
+                Proses başlayır...
+            </div>
+            <div class="progress" style="height:25px;">
+                <div id="serviceUpProgress"
+                     class="progress-bar progress-bar-striped progress-bar-animated"
+                     style="width:0%">
+                    0%
+                </div>
+            </div>
+        `,
         allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
+        showConfirmButton: false
     });
-    
-    try {
-        const url = id ? `${API.SERVICES}/${id}` : `${API.SERVICES}`;
-        const method = id ? 'PUT' : 'POST';
 
-        const res = await authFetch(url, { 
-            method: method, 
-            body: fd 
+    try {
+
+        // ============================================================
+        // 1. FORM MƏLUMATLARI
+        // ============================================================
+
+        const fd = new FormData();
+
+        fd.append('title', title);
+        fd.append('titleAz', titleAz);
+        fd.append('description', desc || '');
+        fd.append('descriptionAz', descAz || '');
+
+        const bulletInput =
+            document.getElementById('sBulletPoints')?.value || '';
+
+        const bulletPoints = bulletInput
+            .split('\n')
+            .filter(line => line.trim() !== '');
+
+        bulletPoints.forEach(point => {
+            fd.append('bulletPoints', point.trim());
         });
-        
-        if(res && res.ok) {
-            Swal.fire('Uğurlu!', id ? 'Xidmət yeniləndi.' : 'Xidmət yaradıldı.', 'success');
-            
-            const modalEl = document.getElementById('serviceModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalEl);
-            if(modalInstance) modalInstance.hide();
-            
+
+        const bulletInputAz =
+            document.getElementById('sBulletPointsAz')?.value || '';
+
+        const bulletPointsAz = bulletInputAz
+            .split('\n')
+            .filter(line => line.trim() !== '');
+
+        bulletPointsAz.forEach(point => {
+            fd.append('bulletPointsAz', point.trim());
+        });
+
+
+        // ============================================================
+        // 2. MÖVCUD VIDEO URL
+        // ============================================================
+
+        let finalVideoUrl = '';
+
+        if (id) {
+
+            const existingService = servicesDataCache.find(
+                s => String(s.id) === String(id)
+            );
+
+            finalVideoUrl = existingService?.videoUrl || '';
+        }
+
+
+        // ============================================================
+        // 3. YENİ VIDEO VARSA → BİRBAŞA R2
+        // ============================================================
+
+        const videoFile =
+            document.getElementById('sVideoFile');
+
+        if (videoFile?.files?.[0]) {
+
+            const file = videoFile.files[0];
+
+            document.getElementById('serviceUploadStatus').innerText =
+                'Cloudflare R2-yə yüklənir...';
+
+            const urlParams = new URLSearchParams({
+                fileName: `services/${Date.now()}_${file.name}`,
+                contentType: file.type
+            });
+
+            // R2 üçün presigned URL alırıq
+            const authRes = await fetch(
+                `${BASE_URL}/api/r2/get-upload-url?${urlParams}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization':
+                            `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                }
+            );
+
+            if (!authRes.ok) {
+                throw new Error(
+                    'R2 upload URL alına bilmədi'
+                );
+            }
+
+            const { uploadUrl, fileKey } =
+                await authRes.json();
+
+
+            // ========================================================
+            // 4. VIDEONU BİRBAŞA R2-YƏ YÜKLƏ
+            // ========================================================
+
+            await new Promise((resolve, reject) => {
+
+                const xhr = new XMLHttpRequest();
+
+                xhr.open('PUT', uploadUrl);
+
+                xhr.setRequestHeader(
+                    'Content-Type',
+                    file.type
+                );
+
+                xhr.upload.onprogress = function (e) {
+
+                    if (e.lengthComputable) {
+
+                        const percent =
+                            Math.round(
+                                (e.loaded / e.total) * 100
+                            );
+
+                        const statusElement =
+                            document.getElementById(
+                                'serviceUploadStatus'
+                            );
+
+                        const progressBar =
+                            document.getElementById(
+                                'serviceUpProgress'
+                            );
+
+                        if (statusElement) {
+                            statusElement.innerText =
+                                `R2-yə yüklənir... ${percent}%`;
+                        }
+
+                        if (progressBar) {
+                            progressBar.style.width =
+                                percent + '%';
+
+                            progressBar.textContent =
+                                percent + '%';
+                        }
+                    }
+                };
+
+                xhr.onload = function () {
+
+                    if (xhr.status === 200) {
+                        resolve();
+                    } else {
+                        reject(
+                            new Error(
+                                `R2 upload failed: ${xhr.status}`
+                            )
+                        );
+                    }
+                };
+
+                xhr.onerror = function () {
+
+                    reject(
+                        new Error(
+                            'R2 upload zamanı şəbəkə xətası'
+                        )
+                    );
+                };
+
+                xhr.send(file);
+            });
+
+
+            // ========================================================
+            // 5. R2 PUBLIC URL
+            // ========================================================
+
+            finalVideoUrl =
+                `${R2_PUBLIC_URL}/${fileKey}`;
+
+            console.log(
+                'Service video R2 URL:',
+                finalVideoUrl
+            );
+        }
+
+
+        // ============================================================
+        // 6. VIDEO URL-İ FORM-A ƏLAVƏ ET
+        // ============================================================
+
+        fd.append(
+            'videoUrl',
+            finalVideoUrl
+        );
+
+
+        // ============================================================
+        // 7. UPDATE ÜÇÜN
+        // ============================================================
+
+        if (id) {
+            fd.append('removeVideo', 'false');
+        }
+
+
+        // ============================================================
+        // 8. BACKEND-Ə YALNIZ URL GÖNDƏR
+        // ============================================================
+
+        document.getElementById(
+            'serviceUploadStatus'
+        ).innerText = 'Bazaya qeyd edilir...';
+
+        const url = id
+            ? `${API.SERVICES}/${id}`
+            : `${API.SERVICES}`;
+
+        const method = id
+            ? 'PUT'
+            : 'POST';
+
+        const res = await authFetch(url, {
+            method: method,
+            body: fd
+        });
+
+
+        // ============================================================
+        // 9. NƏTİCƏ
+        // ============================================================
+
+        if (res && res.ok) {
+
+            Swal.fire(
+                'Uğurlu!',
+                id
+                    ? 'Xidmət yeniləndi.'
+                    : 'Xidmət yaradıldı.',
+                'success'
+            );
+
+            const modalEl =
+                document.getElementById('serviceModal');
+
+            const modalInstance =
+                bootstrap.Modal.getInstance(modalEl);
+
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+
             loadServices();
             loadDashboard();
+
         } else {
-            const errData = await res.json().catch(() => ({}));
-            Swal.fire('Xəta', errData.message || 'Server xətası baş verdi', 'error');
+
+            const errData =
+                await res.json().catch(() => ({}));
+
+            throw new Error(
+                errData.message ||
+                'Server xətası baş verdi'
+            );
         }
+
     } catch (e) {
-        console.error("Submit error:", e);
-        Swal.fire('Xəta', 'Əlaqə kəsildi', 'error');
+
+        console.error(
+            'Service submit error:',
+            e
+        );
+
+        Swal.fire(
+            'Xəta',
+            e.message || 'Xəta baş verdi',
+            'error'
+        );
     }
 }
-
 async function deleteService(id) {
     const r = await Swal.fire({
         title: 'Xidmət silinsin?',

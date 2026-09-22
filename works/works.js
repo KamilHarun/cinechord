@@ -10,8 +10,13 @@
     const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dwybvusv6/video/upload/f_mp4,q_auto,vc_auto/Works_Showreel_f6dwys.mp4";
     
     // Əsas elementlər
-    const container = document.getElementById('dynamic-projects-grid');
-    const loadingScreen = document.querySelector('.loading-screen');
+const container = document.getElementById('dynamic-projects-grid');
+const paginationContainer = document.getElementById('works-pagination');
+
+const WORKS_PER_PAGE = 6;
+let currentPage = 0;
+let totalPages = 0;
+let currentCategory = 'all';    const loadingScreen = document.querySelector('.loading-screen');
     const pageTransition = document.querySelector('.page-transition');
     
     // Menu Elementlər
@@ -479,27 +484,50 @@
         return optimizeCloudinaryUrl(fullUrl);
     }
 
-  async function loadDynamicWorks() {
+ async function loadDynamicWorks(page = 0) {
     if (!container) return;
 
     try {
-        const response = await fetch(API_WORKS);
-        if (!response.ok) throw new Error('API Error');
-
-        const data = await response.json();
-        const works = data.content ? data.content : data;
         container.innerHTML = '';
 
+        // Pagination üçün page və size göndəririk
+        const url = `${API_WORKS}?page=${page}&size=${WORKS_PER_PAGE}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('API Error');
+        }
+
+        const data = await response.json();
+
+        // Backend Page response
+        const works = data.content || [];
+
+        currentPage = data.number || 0;
+        totalPages = data.totalPages || 0;
+
         if (works.length === 0) {
-            container.innerHTML = '<p style="color:white; text-align:center;">No works found.</p>';
+            container.innerHTML = `
+                <p style="color:white; text-align:center;">
+                    No works found.
+                </p>
+            `;
+
+            renderPagination();
             return;
         }
 
         works.forEach((work, index) => {
+
             const videoSrc = getFullMediaUrl(work.videoUrl);
             const posterSrc = getFullMediaUrl(work.thumbnailUrl);
-            const hoverImageSrc = work.hoverImageUrl ? getFullMediaUrl(work.hoverImageUrl) : '';
-            const categoryClass = categoryMap[work.category] || 'other';
+            const hoverImageSrc = work.hoverImageUrl
+                ? getFullMediaUrl(work.hoverImageUrl)
+                : '';
+
+            const categoryClass =
+                categoryMap[work.category] || 'other';
 
             if (!videoSrc) return;
 
@@ -509,38 +537,184 @@
                     data-video-src="${videoSrc}" 
                     data-title="${work.title}"
                     style="transition-delay: ${index * 0.05}s;">
+
                     <div class="project-image-container">
+
                         <video muted loop playsinline class="project-video" 
                             preload="metadata" 
                             poster="${posterSrc}"
-                            data-src="${videoSrc}#t=0.1"> 
+                            data-src="${videoSrc}#t=0.1">
                         </video>
-                        ${hoverImageSrc ? `<img class="project-hover-image" src="${hoverImageSrc}" alt="" loading="lazy">` : ''}
+
+                        ${
+                            hoverImageSrc
+                            ? `<img class="project-hover-image" 
+                                    src="${hoverImageSrc}" 
+                                    alt="" 
+                                    loading="lazy">`
+                            : ''
+                        }
+
                         <div class="card-overlay"></div>
+
                         <div class="card-info">
                             <h3 class="card-title">${work.title}</h3>
-                            <p style="font-size: 12px; opacity: 0.7;">${work.clientName || ''}</p>
+
+                            <p style="font-size: 12px; opacity: 0.7;">
+                                ${work.clientName || ''}
+                            </p>
                         </div>
+
                     </div>
-                    <button class="fullscreen-btn" data-video-src="${videoSrc}" data-title="${work.title}"></button>
+
+                    <button 
+                        class="fullscreen-btn" 
+                        data-video-src="${videoSrc}" 
+                        data-title="${work.title}">
+                    </button>
+
                 </div>
             `;
-            container.innerHTML += workHTML;
+
+            container.insertAdjacentHTML('beforeend', workHTML);
         });
 
-           // ✅ KARTLAR ÜÇÜN SCROLL REVEAL — observer ilə
+        // Scroll reveal
         const newCards = container.querySelectorAll('.project-card');
-        newCards.forEach((card) => {
+
+        newCards.forEach(card => {
             observer.observe(card);
         });
 
+        // Lazy video
         initLazyVideoLoading();
+
+        // Hover
         attachHoverEffects();
 
+        // Pagination
+        renderPagination();
+
+        // // Filter aktivdirsə, həmin səhifədə göstərilən
+        // // category-ləri tətbiq et
+        // applyCurrentCategory();
+
     } catch (error) {
+
         console.error("API Error:", error);
-        container.innerHTML = '<p style="color:white; text-align:center;">Error loading works.</p>';
+
+        container.innerHTML = `
+            <p style="color:white; text-align:center;">
+                Error loading works.
+            </p>
+        `;
+
+        if (paginationContainer) {
+            paginationContainer.innerHTML = '';
+        }
     }
+}
+function renderPagination() {
+
+    if (!paginationContainer) return;
+
+    paginationContainer.innerHTML = '';
+
+    // Yalnız 1 səhifə varsa pagination göstərmə
+    if (totalPages <= 1) {
+        return;
+    }
+
+    // Previous
+    const prevButton = document.createElement('button');
+
+    prevButton.className = 'pagination-btn pagination-prev';
+    prevButton.textContent = '←';
+    prevButton.disabled = currentPage === 0;
+
+    prevButton.addEventListener('click', () => {
+
+        if (currentPage > 0) {
+            loadDynamicWorks(currentPage - 1);
+
+            setTimeout(() => {
+                scrollToWorks();
+            }, 100);
+        }
+
+    });
+
+    paginationContainer.appendChild(prevButton);
+
+
+    // Page numbers
+    for (let i = 0; i < totalPages; i++) {
+
+        const pageButton = document.createElement('button');
+
+        pageButton.className = 'pagination-btn';
+
+        if (i === currentPage) {
+            pageButton.classList.add('active');
+        }
+
+        pageButton.textContent = i + 1;
+
+        pageButton.addEventListener('click', () => {
+
+            if (i === currentPage) return;
+
+            loadDynamicWorks(i);
+
+            setTimeout(() => {
+                scrollToWorks();
+            }, 100);
+
+        });
+
+        paginationContainer.appendChild(pageButton);
+    }
+
+
+    // Next
+    const nextButton = document.createElement('button');
+
+    nextButton.className = 'pagination-btn pagination-next';
+    nextButton.textContent = '→';
+    nextButton.disabled = currentPage === totalPages - 1;
+
+    nextButton.addEventListener('click', () => {
+
+        if (currentPage < totalPages - 1) {
+
+            loadDynamicWorks(currentPage + 1);
+
+            setTimeout(() => {
+                scrollToWorks();
+            }, 100);
+        }
+
+    });
+
+    paginationContainer.appendChild(nextButton);
+}
+function scrollToWorks() {
+
+    const worksSection = document.getElementById('works');
+
+    if (!worksSection) return;
+
+    const offset = 100;
+
+    const top =
+        worksSection.getBoundingClientRect().top +
+        window.scrollY -
+        offset;
+
+    window.scrollTo({
+        top: top,
+        behavior: 'smooth'
+    });
 }
 
     // ✅ YENİ - Videoları yalnız ekrana yaxınlaşanda yükləyir.
