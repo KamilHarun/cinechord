@@ -495,17 +495,15 @@
                 return;
             }
 
-            works.forEach((work, index) => {
+                       works.forEach((work, index) => {
                 const videoSrc = getFullMediaUrl(work.videoUrl);
                 const posterSrc = getFullMediaUrl(work.thumbnailUrl);
+                // ✅ YENİ - hover şəklini əldə et
+                const hoverImageSrc = work.hoverImageUrl ? getFullMediaUrl(work.hoverImageUrl) : '';
                 const categoryClass = categoryMap[work.category] || 'other';
 
                 if (!videoSrc) return;
 
-                // ✅ LAZY-LOAD: video üçün src yerinə data-src istifadə olunur,
-                // preload="none" olaraq dəyişilib. Poster şəkli dərhal görünür,
-                // əsl video faylı yalnız kart ekrana yaxınlaşanda yüklənir
-                // (bax: initLazyVideoLoading()).
                 const workHTML = `
                     <div class="project-card reveal-item" 
                         data-category="${categoryClass}" 
@@ -518,6 +516,7 @@
                                 poster="${posterSrc}"
                                 data-src="${videoSrc}#t=0.1"> 
                             </video>
+                            ${hoverImageSrc ? `<img class="project-hover-image" src="${hoverImageSrc}" alt="" loading="lazy">` : ''}
                             <div class="card-overlay"></div>
                             <div class="card-info">
                                 <h3 class="card-title">${work.title}</h3>
@@ -577,6 +576,7 @@
     function attachHoverEffects() {
         document.querySelectorAll('.project-card').forEach(card => {
             const video = card.querySelector('video');
+            const hoverImage = card.querySelector('.project-hover-image');
             if (!video) return;
 
             let isHovering = false;
@@ -590,8 +590,15 @@
 
             card.addEventListener('mouseenter', () => {
                 isHovering = true;
-                // Əgər video hələ lazy-load olunmayıbsa (nadir hal),
-                // data-src-dən src-i dərhal təyin et ki, hover-də boş qalmasın.
+                
+                // ✅ YENİ - Əgər hover şəkli varsa, videonu oynatma, şəkli göstər
+                if (hoverImage) {
+                    hoverImage.style.opacity = '1';
+                    video.style.opacity = '0';
+                    return;
+                }
+                
+                // Əks halda köhnə qaydada videonu oynat
                 if (!video.src) {
                     const src = video.getAttribute('data-src');
                     if (src) video.src = src;
@@ -603,6 +610,13 @@
 
             card.addEventListener('mouseleave', () => {
                 isHovering = false;
+                
+                // ✅ YENİ - Şəkli gizlət, videonu geri göstər
+                if (hoverImage) {
+                    hoverImage.style.opacity = '0';
+                    video.style.opacity = '1';
+                }
+                
                 video.pause();
                 video.currentTime = 0.1; 
             });

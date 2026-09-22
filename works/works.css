@@ -2480,7 +2480,6 @@ body.lang-az .cta-text-link:not(:hover) .cta-text::after {
     pointer-events: none !important;
 }
 
-
 /* ============================================================
    WORKS - MOBİL MODAL PLAY BUTTON ÖLÇÜLƏRİ
    ============================================================ */
@@ -2507,4 +2506,34 @@ body.lang-az .cta-text-link:not(:hover) .cta-text::after {
         width: 95px !important;
         height: 95px !important;
     }
+}
+
+/* ============================================================
+   HOVER ŞƏKLİ ÜÇÜN STİLLƏR
+   ============================================================ */
+
+.project-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.project-video,
+.project-hover-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.4s ease;
+}
+
+.project-video {
+    z-index: 1;
+}
+
+.project-hover-image {
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
 }

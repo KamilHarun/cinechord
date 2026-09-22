@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Chord — Behind The Scenes</title>
+    <meta name="description" content="Cine Chord — Behind the scenes footage, raw moments and the process behind the work of Director Rauf Gurbanaliyev.">
+    <link rel="canonical" href="https://cinechord.az/backstage/">
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="page-transition"></div>
+    <div class="grain-overlay"></div>
+
+    <!-- SCROLL / FOOTAGE GATE -->
+    <div class="reel-gate" aria-hidden="true">
+        <div class="reel-gate-fill" id="reelGateFill"></div>
+    </div>
+
+    <!-- FILM SPROCKET BORDERS -->
+    <div class="sprocket-strip sprocket-top"></div>
+    <div class="sprocket-strip sprocket-bottom"></div>
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cine-cursor" id="cineCursor">
+        <span class="cine-cursor-label" id="cineCursorLabel">VIEW</span>
+    </div>
+
+    <!-- COUNTDOWN INTRO -->
+    <div class="countdown-screen" id="countdownScreen">
+        <svg class="countdown-ring" viewBox="0 0 120 120">
+            <circle class="countdown-ring-bg" cx="60" cy="60" r="54"></circle>
+            <circle class="countdown-ring-fill" id="countdownRingFill" cx="60" cy="60" r="54"></circle>
+        </svg>
+        <div class="countdown-number" id="countdownNumber">5</div>
+        <div class="countdown-label">LOADING REEL</div>
+    </div>
+
+    <!-- HEADER (matches home) -->
+    <a href="/" class="center-logo">
+        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    </a>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span class="hamburger-text">MENU</span>
+        <span class="hamburger-icon">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </span>
+    </button>
+
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <nav class="mobile-menu" id="mobileMenu">
+        <a href="/" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
+        <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
+        <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
+        <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
+        <a href="./" class="nav-btn active" data-text="BACKSTAGE"><span class="nav-text">BACKSTAGE</span></a>
+        <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
+        <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="bts-hero">
+        <canvas class="hero-grain" id="heroGrain" aria-hidden="true"></canvas>
+        <div class="light-leak" aria-hidden="true"></div>
+        <div class="hero-stamp hero-stamp-left" aria-hidden="true">16MM</div>
+        <div class="hero-stamp hero-stamp-right" aria-hidden="true">24 FPS</div>
+
+        <div class="bts-hero-inner">
+            <div class="bts-eyebrow">
+                <span class="rec-dot"></span> RAW &amp; UNFILTERED
+            </div>
+            <h1 class="bts-title" id="btsTitle">
+                <span class="line" data-text="BEHIND"><span class="line-inner">BEHIND</span></span>
+                <span class="line accent" data-text="THE SCENES"><span class="line-inner">THE SCENES</span></span>
+            </h1>
+            <p class="bts-subtitle">Setdən kadr arxası anlar — hazırlıq, xaos, gülüş və prosesin özü.</p>
+        </div>
+        <div class="scroll-cue">
+            <span>SCROLL</span>
+            <div class="scroll-line"><i></i></div>
+        </div>
+    </section>
+
+    <!-- CREDITS MARQUEE -->
+    <div class="credits-marquee" aria-hidden="true">
+        <div class="marquee-track" id="marqueeTrack"></div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="bts-filters-row">
+        <div class="bts-eq" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="bts-filters" id="btsFilters">
+            <button class="filter-chip active" data-filter="all">ALL</button>
+            <button class="filter-chip" data-filter="abb">ABB</button>
+            <button class="filter-chip" data-filter="bakcell">BAKCELL</button>
+            <button class="filter-chip" data-filter="showreel">SHOWREEL</button>
+        </div>
+    </div>
+
+    <!-- REEL — horizontal scrubbing filmstrip -->
+    <section class="reel-section" id="reelSection">
+        <div class="reel-pin" id="reelPin">
+            <div class="reel-meta-row">
+                <span class="reel-counter" id="reelCounter">0000 FT</span>
+                <span class="reel-hint" id="reelHint">SCROLL TO ADVANCE THE REEL</span>
+                <span class="reel-count-label" id="reelCountLabel">CLIP 00 / 00</span>
+            </div>
+            <div class="reel-track-wrap">
+                <div class="reel-track" id="reelTrack">
+                    <!-- frame cards injected by JS from BTS_CLIPS -->
+                </div>
+                <div class="reel-playhead" id="reelPlayhead"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TAIL LEADER / OUTRO -->
+    <section class="tail-leader">
+        <div class="tail-stripes" aria-hidden="true"></div>
+        <p class="tail-text">REEL SONU <span class="tail-dot">●</span> DAHA ÇOX İŞ ÜÇÜN <a href="../works/">İŞLƏRİMİZƏ BAXIN</a></p>
+    </section>
+
+    <!-- VIDEO MODAL (same pattern as home, now with iris wipe) -->
+    <div class="preview-container is-paused" id="previewContainer">
+        <div class="iris-flash" id="irisFlash" aria-hidden="true"></div>
+        <button class="close-preview" id="closePreview">×</button>
+        <div class="preview-info">
+            <div class="preview-tag" id="previewTag">CLIP 00</div>
+            <div class="preview-title" id="previewTitle"></div>
+        </div>
+        <div class="video-wrapper" id="videoWrapper">
+            <div class="video-loading"></div>
+            <div class="modal-play-btn-wrapper" id="modalPlayBtnContainer">
+                <div class="modal-play-btn-inner">
+                    <i class="fa-solid fa-play modal-play-icon" id="modalPlayIcon"></i>
+                    <i class="fa-solid fa-pause modal-play-icon pause-icon" id="modalPauseIcon" style="display:none;"></i>
+                </div>
+            </div>
+            <video id="previewVideo" class="preview-video" playsinline preload="metadata"></video>
+            <div class="custom-controls" id="customControls">
+                <div class="progress-bar-container" id="progressBarContainer">
+                    <div class="progress-played" id="progressPlayed"></div>
+                    <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
+                </div>
+                <div class="controls-buttons">
+                    <button class="ctrl-btn" id="rewindBtn"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button class="ctrl-btn main-play-btn" id="playPauseBtn">
+                        <i class="fa-solid fa-play" id="playIcon"></i>
+                        <i class="fa-solid fa-pause" id="pauseIcon" style="display:none;"></i>
+                    </button>
+                    <button class="ctrl-btn" id="forwardBtn"><i class="fa-solid fa-rotate-right"></i></button>
+                    <div class="time-display"><span id="currentTime">0:00</span> / <span id="durationTime">0:00</span></div>
+                    <div class="right-controls-group">
+                        <div class="volume-wrapper"><input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100"></div>
+                        <button class="ctrl-btn" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

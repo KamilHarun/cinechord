@@ -317,7 +317,6 @@ function openWorkModal() {
     if (modalEl) new bootstrap.Modal(modalEl).show();
 }
 
-// 3. MƏLUMATLARIN BACKEND-Ə GÖNDƏRİLMƏSİ (R2 İNTEGRASİYALI)
 async function submitWork() {
     const getValue = (ids, def = '') => {
         const idList = Array.isArray(ids) ? ids : [ids];
@@ -366,7 +365,8 @@ async function submitWork() {
 
             // 1. Backend-dən bilet (Presigned URL) alırıq
             const urlParams = new URLSearchParams({ fileName: file.name, contentType: file.type });
-            const authRes = await fetch(`${BASE_URL}/api/r2/get-upload-url?${urlParams}`, {                method: 'POST',
+            const authRes = await fetch(`${BASE_URL}/api/r2/get-upload-url?${urlParams}`, {
+                method: 'POST',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
             });
             
@@ -395,7 +395,49 @@ async function submitWork() {
             finalVideoUrl = `${R2_PUBLIC_URL}/videos/${fileKey}`;
         }
 
-        // B) MƏLUMATLARIN BAZAYA YAZILMASI
+        // ✅ B) HOVER ŞƏKLİNİ R2-YƏ YÜKLƏ
+        const hoverImageInput = document.getElementById('wHoverImage');
+        let finalHoverImageUrl = getValue('wHoverImageUrl');
+
+        if (hoverImageInput && hoverImageInput.files[0]) {
+            const file = hoverImageInput.files[0];
+            document.getElementById('uploadStatus').innerText = 'Hover şəkli R2-yə yüklənir...';
+
+            const urlParams = new URLSearchParams({ 
+                fileName: `hover/${Date.now()}_${file.name}`, 
+                contentType: file.type 
+            });
+            
+            const authRes = await fetch(`${BASE_URL}/api/r2/get-upload-url?${urlParams}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+            });
+            
+            if (!authRes.ok) throw new Error("Hover şəkli üçün icazə alınmadı");
+            const { uploadUrl, fileKey } = await authRes.json();
+
+            await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', uploadUrl);
+                xhr.setRequestHeader('Content-Type', file.type);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        const bar = document.getElementById('upProgress');
+                        if(bar) { bar.style.width = percent + '%'; bar.textContent = percent + '%'; }
+                    }
+                };
+
+                xhr.onload = () => (xhr.status === 200 ? resolve() : reject(new Error("Hover şəkli R2-yə yüklənə bilmədi")));
+                xhr.onerror = () => reject(new Error("Şəbəkə xətası"));
+                xhr.send(file);
+            });
+
+            finalHoverImageUrl = `${R2_PUBLIC_URL}/images/${fileKey}`;
+        }
+
+        // C) MƏLUMATLARIN BAZAYA YAZILMASI
         document.getElementById('uploadStatus').innerText = 'Bazaya qeyd edilir...';
         
         const fd = new FormData();
@@ -411,11 +453,10 @@ async function submitWork() {
         fd.append('active', getChecked('wActive'));
         fd.append('showInGallery', getChecked('wShowInGallery'));
         fd.append('videoUrl', finalVideoUrl);
+        fd.append('hoverImageUrl', finalHoverImageUrl || '');   // ✅ YENİ
 
         const url = id ? `${API.WORKS}/updateWork/${id}` : `${API.WORKS}/createWork`;
-        const method = id ? (id ? 'PUT' : 'POST') : 'POST';
 
-        // Fetch API ilə bazaya göndəririk
         const res = await fetch(url, {
             method: id ? 'PUT' : 'POST',
             headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` },
@@ -442,19 +483,21 @@ function editWorkById(id) {
     const w = wDataCache.find(work => work.id === id);
     if (!w) return;
 
-    // ⚠️ VACİB: Fayl inputlarını təmizlə ki, əvvəlki redaktədə seçilmiş
-    // video/şəkil faylı brauzerdə "yapışıb qalıb" bu işə səhvən yüklənməsin
-    ['wVideoFile', 'wPreview', 'wImage'].forEach(fid => {
+    // ⚠️ VACİB: Fayl inputlarını təmizlə
+    ['wVideoFile', 'wPreview', 'wImage', 'wHoverImage'].forEach(fid => {
         const el = document.getElementById(fid);
         if (el) el.value = '';
     });
-    // Preview mətnlərini də təmizlə (əgər varsa)
+    
+    // Preview mətnlərini təmizlə
     const videoFilePrev = document.getElementById('videoFilePreview');
     if (videoFilePrev) videoFilePrev.textContent = '';
     const previewFilePrev = document.getElementById('previewFilePreview');
     if (previewFilePrev) previewFilePrev.textContent = '';
     const thumbPrev = document.getElementById('thumbnailPreview');
     if (thumbPrev) thumbPrev.innerHTML = '';
+    const hoverPrev = document.getElementById('hoverImagePreview');
+    if (hoverPrev) hoverPrev.innerHTML = '';
     
     const setValue = (ids, val) => {
         const idList = Array.isArray(ids) ? ids : [ids];
@@ -474,11 +517,17 @@ function editWorkById(id) {
     setValue('wAgency', w.agency);
     setValue(['wProductionYear', 'wYear'], w.productionYear);
     setValue('wSortOrder', w.sortOrder || 0);
+    setValue('wHoverImageUrl', w.hoverImageUrl);   // ✅ YENİ
 
     const setChecked = (id, val) => { if(document.getElementById(id)) document.getElementById(id).checked = val; };
     setChecked('wFeatured', w.featured);
     setChecked('wActive', w.active);
     setChecked('wShowInGallery', w.showInGallery);
+    
+    // ✅ Hover şəkli preview göstər
+    if (hoverPrev && w.hoverImageUrl) {
+        hoverPrev.innerHTML = `<img src="${w.hoverImageUrl}" style="max-height:100px; border-radius:6px; border:1px solid #444;" alt="Hover">`;
+    }
     
     const modalEl = document.getElementById('workModal');
     if (modalEl) new bootstrap.Modal(modalEl).show();
