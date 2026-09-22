@@ -454,93 +454,83 @@
         }
     }
 
-    /* ============================================================
-        7. VIDEO AUTOPLAY - Mobil uyumlu (Home sayfasındaki gibi)
-        ============================================================ */
-    
-    function initVideoAutoplay() {
-        const videos = document.querySelectorAll('video');
-        
-        videos.forEach(video => {
-            // Video ayarlarını garanti altına al
-            video.muted = true;
-            video.loop = true;
-            video.playsInline = true;
-            video.setAttribute('playsinline', 'true');
-            video.setAttribute('webkit-playsinline', 'true');
-            video.setAttribute('x-webkit-airplay', 'allow');
-            
-            // Controls'u kaldır (ekstra Play butonu görünmesin)
-            video.removeAttribute('controls');
-            video.controls = false;
-            
-            // Autoplay için birden fazla yöntem dene
-            function attemptPlay() {
-                const playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.warn("Autoplay failed:", error);
-                        // Kullanıcı etkileşimi sonrası tekrar dene
-                        const interactionEvents = ['click', 'touchstart', 'scroll', 'touchend'];
-                        const tryPlayOnce = () => {
-                            video.play().catch(() => {});
-                            interactionEvents.forEach(type => {
-                                document.removeEventListener(type, tryPlayOnce);
-                            });
-                        };
-                        interactionEvents.forEach(type => {
-                            document.addEventListener(type, tryPlayOnce, { once: true, passive: true });
+   /* ============================================================
+   7. VIDEO AUTOPLAY + LAZY LOAD
+   ============================================================ */
+
+function initVideoAutoplay() {
+    const videos = document.querySelectorAll('video');
+
+    videos.forEach(video => {
+
+        // Video ayarları
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+
+        video.setAttribute('muted', '');
+        video.setAttribute('loop', '');
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('x-webkit-airplay', 'allow');
+
+        // Controls-u deaktiv et
+        video.removeAttribute('controls');
+        video.controls = false;
+    });
+}
+
+
+function initVideoLazyLoad() {
+
+    const videoObserverOptions = {
+        threshold: CONFIG.VIDEO_OBSERVE_THRESHOLD,
+        rootMargin: CONFIG.VIDEO_ROOT_MARGIN
+    };
+
+    const videoObserver = new IntersectionObserver((entries) => {
+
+        entries.forEach(entry => {
+
+            const video = entry.target;
+
+            if (entry.isIntersecting) {
+
+                // Video ekrandadırsa oynat
+                if (video.paused) {
+
+                    const playPromise = video.play();
+
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+
+                            // AbortError play/pause toqquşmasından
+                            // yarana bilər, console-u doldurmasın
+                            if (error.name !== 'AbortError') {
+                                console.warn('Video play failed:', error);
+                            }
+
                         });
-                    });
+                    }
                 }
-            }
-            
-            // Video yüklendiğinde oynat
-            if (video.readyState >= 3) {
-                attemptPlay();
+
             } else {
-                video.addEventListener('loadeddata', attemptPlay, { once: true });
-                video.addEventListener('canplay', attemptPlay, { once: true });
-                video.addEventListener('loadedmetadata', attemptPlay, { once: true });
+
+                // Video ekrandan çıxıbsa dayandır
+                if (!video.paused) {
+                    video.pause();
+                }
             }
-            
-            // Sayfa görünür olduğunda oynat
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden && video.paused) {
-                    attemptPlay();
-                }
-            });
-            
-            // Video duraklarsa tekrar oynat
-            video.addEventListener('pause', () => {
-                if (!document.hidden && video.currentTime > 0) {
-                    setTimeout(() => attemptPlay(), 100);
-                }
-            });
         });
-    }
-    
-    function initVideoLazyLoad() {
-        const videoObserverOptions = {
-            threshold: CONFIG.VIDEO_OBSERVE_THRESHOLD,
-            rootMargin: CONFIG.VIDEO_ROOT_MARGIN
-        };
 
-        const videoObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const video = entry.target;
-                    video.play().catch(() => {});
-                } else {
-                    entry.target.pause();
-                }
-            });
-        }, videoObserverOptions);
+    }, videoObserverOptions);
 
-        document.querySelectorAll('video').forEach(video => {
-            videoObserver.observe(video);
-        });
-    }
+
+    // Bütün videoları observer-ə əlavə et
+    document.querySelectorAll('video').forEach(video => {
+        videoObserver.observe(video);
+    });
+}
 
 /* ============================================================
     8. DİNAMİK SERVİS YÜKLƏMƏSİ
@@ -686,7 +676,6 @@ function renderServices(services, lang = 'en') {
     
     initScrollReveal();
     initVideoLazyLoad();
-    initVideoAutoplay();
 }
 
   /* ============================================================
