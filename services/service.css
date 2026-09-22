@@ -687,7 +687,7 @@ body.lang-az .menu-contact-info p,
 body.lang-az .menu-contact-info a {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 700 !important;
-    font-size: 12px !important;
+    font-size: 13px !important;   /* 12px idi */
 }
 
 .menu-contact-info p,

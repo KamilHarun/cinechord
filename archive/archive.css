@@ -484,7 +484,6 @@ body.lang-az .hamburger-text {
     opacity: 1;
     pointer-events: all;
 }
-
 /* ============================================================
    8. MOBILE MENU
    ============================================================ */
@@ -569,12 +568,14 @@ body.lang-az .hamburger-text {
 .mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
 .mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
 
-/* ✅ AZƏRBAYCAN DİLİ - DESKTOP MENU (INDEX İLƏ EYNİ) */
-body.lang-az .nav-btn {
+/* ✅ AZƏRBAYCAN DİLİ - DESKTOP MENU */
+html[lang="az"] .nav-btn,
+body.lang-az .nav-btn,
+[data-lang="az"] .nav-btn {
     font-family: 'Montserrat', sans-serif !important;
-    font-weight: 900 !important;      /* Index ilə eyni */
-    font-size: 4.0vw !important;      /* Index ilə eyni */
-    letter-spacing: -2px !important;  /* Index ilə eyni */
+    font-weight: 900 !important;
+    font-size: 4.0vw !important;
+    letter-spacing: -2px !important;
     margin: -0.5vh 0 !important;
 }
 
@@ -664,11 +665,14 @@ body.lang-az .nav-btn {
     color: #FFA500;
 }
 
-/* ✅ AZ Dili Sosial & Kontakt Bold (INDEX İLƏ EYNİ) */
-body.lang-az .menu-socials a {
+/* ✅ AZ Dili Sosial & Kontakt Bold - BÜTÜN EHTİMALLAR ÜÇÜN */
+html[lang="az"] .menu-socials a,
+body.lang-az .menu-socials a,
+[data-lang="az"] .menu-socials a,
+.lang-az .menu-socials a {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 800 !important;
-    font-size: 13px !important;
+    font-size: 40px !important; 
 }
 
 .menu-contact-info p {
@@ -679,11 +683,18 @@ body.lang-az .menu-socials a {
     letter-spacing: 1px;
 }
 
+/* ✅ AZ Dili Əlaqə Məlumatları - BÜTÜN EHTİMALLAR ÜÇÜN */
+html[lang="az"] .menu-contact-info p,
+html[lang="az"] .menu-contact-info a,
 body.lang-az .menu-contact-info p,
-body.lang-az .menu-contact-info a {
+body.lang-az .menu-contact-info a,
+[data-lang="az"] .menu-contact-info p,
+[data-lang="az"] .menu-contact-info a,
+.lang-az .menu-contact-info p,
+.lang-az .menu-contact-info a {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 700 !important;
-    font-size: 12px !important;
+    font-size: 40px !important; 
 }
 
 .menu-contact-info p,
@@ -699,7 +710,6 @@ body.lang-az .menu-contact-info a {
 .menu-contact-info a:visited {
     color: rgba(255,255,255,0.4) !important;
 }
-
 /* ============================================================
    9. LOGO - Z-INDEX FIXED
    ============================================================ */
@@ -2099,4 +2109,6 @@ body.lang-az .nav-btn {
         width: 95px !important;
         height: 95px !important;
     }
+
+    
 }

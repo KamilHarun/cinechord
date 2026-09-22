@@ -441,6 +441,20 @@ async function submitWork() {
 function editWorkById(id) {
     const w = wDataCache.find(work => work.id === id);
     if (!w) return;
+
+    // ⚠️ VACİB: Fayl inputlarını təmizlə ki, əvvəlki redaktədə seçilmiş
+    // video/şəkil faylı brauzerdə "yapışıb qalıb" bu işə səhvən yüklənməsin
+    ['wVideoFile', 'wPreview', 'wImage'].forEach(fid => {
+        const el = document.getElementById(fid);
+        if (el) el.value = '';
+    });
+    // Preview mətnlərini də təmizlə (əgər varsa)
+    const videoFilePrev = document.getElementById('videoFilePreview');
+    if (videoFilePrev) videoFilePrev.textContent = '';
+    const previewFilePrev = document.getElementById('previewFilePreview');
+    if (previewFilePrev) previewFilePrev.textContent = '';
+    const thumbPrev = document.getElementById('thumbnailPreview');
+    if (thumbPrev) thumbPrev.innerHTML = '';
     
     const setValue = (ids, val) => {
         const idList = Array.isArray(ids) ? ids : [ids];

@@ -728,7 +728,7 @@ body.lang-az .menu-contact-info p,
 body.lang-az .menu-contact-info a {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 700 !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
 }
 
 /* ============================================================
@@ -1913,9 +1913,8 @@ body.lang-az .category-btn {
     body.lang-az .nav-btn {
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 900 !important;
-        text-shadow: 1px 0 0 #fff !important;
         font-size: 10.5vw !important;
-        line-height: 1.2 !important;
+        line-height: 1.0 !important;
         margin: -0.3vh 0 !important;
         letter-spacing: -2px !important;
         width: 100% !important;
@@ -1933,7 +1932,7 @@ body.lang-az .category-btn {
     body.lang-az .menu-contact-info p, 
     body.lang-az .menu-contact-info a {
         font-family: 'Montserrat', sans-serif !important;
-        font-size: 12px !important;
+        font-size: 13px !important;
         font-weight: 700 !important;
     }
 
@@ -2509,5 +2508,3 @@ body.lang-az .cta-text-link:not(:hover) .cta-text::after {
         height: 95px !important;
     }
 }
-
-
