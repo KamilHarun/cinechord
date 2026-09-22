@@ -53,20 +53,23 @@
     // ============================================================
     // 1. PAGE LOAD & TRANSITION
     // ============================================================
-    
-    if (loadingScreen) {
-        setTimeout(() => {
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 500);
-        }, 100);
-    }
+    // NOTE: Loading screen artıq burada sabit timeout ilə gizlənmir.
+    // Onun gizlədilməsi init() funksiyasında, works datası hazır
+    // olandan SONRA hideLoadingScreen() ilə edilir (bax: bölmə 12).
 
     if (pageTransition) {
         setTimeout(() => {
             pageTransition.classList.add('page-loaded'); 
         }, 100);
+    }
+
+    function hideLoadingScreen() {
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }
     }
 
     // ============================================================
@@ -499,6 +502,10 @@
 
                 if (!videoSrc) return;
 
+                // ✅ LAZY-LOAD: video üçün src yerinə data-src istifadə olunur,
+                // preload="none" olaraq dəyişilib. Poster şəkli dərhal görünür,
+                // əsl video faylı yalnız kart ekrana yaxınlaşanda yüklənir
+                // (bax: initLazyVideoLoading()).
                 const workHTML = `
                     <div class="project-card reveal-item" 
                         data-category="${categoryClass}" 
@@ -509,7 +516,7 @@
                             <video muted loop playsinline class="project-video" 
                                 preload="metadata" 
                                 poster="${posterSrc}"
-                                src="${videoSrc}#t=0.1"> 
+                                data-src="${videoSrc}#t=0.1"> 
                             </video>
                             <div class="card-overlay"></div>
                             <div class="card-info">
@@ -526,6 +533,7 @@
             const newCards = container.querySelectorAll('.project-card');
             newCards.forEach(card => observer.observe(card));
 
+            initLazyVideoLoading();
             attachHoverEffects();
 
         } catch (error) {
@@ -534,18 +542,67 @@
         }
     }
 
+    // ✅ YENİ - Videoları yalnız ekrana yaxınlaşanda yükləyir.
+    // Poster şəkli hər zaman dərhal görünür (qara ekran olmur),
+    // əsl video faylı isə yalnız lazım olanda (scroll ilə) çəkilir.
+    function initLazyVideoLoading() {
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const video = entry.target;
+                if (entry.isIntersecting) {
+                    const src = video.getAttribute('data-src');
+                    if (src && !video.src) {
+                        video.src = src;
+                        video.load(); // metadata/ilk kadr dərhal çəkilsin
+                    }
+                }
+            });
+        }, {
+            rootMargin: "200px 0px", // ekrana çatmazdan ~200px əvvəl yüklənməyə başlasın
+            threshold: 0.01
+        });
+
+        document.querySelectorAll('.project-video[data-src]').forEach(video => {
+            videoObserver.observe(video);
+        });
+    }
+
+    // ✅ Hover zamanı bütün video yüklənməsin deyə, playback yalnız
+    // ilk HOVER_PREVIEW_SECONDS saniyə ilə məhdudlaşdırılır. Brauzer
+    // playback bu həddi keçmədiyi üçün faylın qalan hissəsini
+    // bufferləməyə ehtiyac duymur — istifadəçi kart üzərində nə qədər
+    // uzun qalsa da, yüklənən data miqdarı sabit qalır.
+    const HOVER_PREVIEW_SECONDS = 3;
+
     function attachHoverEffects() {
         document.querySelectorAll('.project-card').forEach(card => {
             const video = card.querySelector('video');
             if (!video) return;
 
+            let isHovering = false;
+
+            // Hər video üçün YALNIZ BİR DƏFƏ əlavə olunur (hər hoverdə yox)
+            video.addEventListener('timeupdate', () => {
+                if (isHovering && video.currentTime >= HOVER_PREVIEW_SECONDS) {
+                    video.currentTime = 0;
+                }
+            });
+
             card.addEventListener('mouseenter', () => {
+                isHovering = true;
+                // Əgər video hələ lazy-load olunmayıbsa (nadir hal),
+                // data-src-dən src-i dərhal təyin et ki, hover-də boş qalmasın.
+                if (!video.src) {
+                    const src = video.getAttribute('data-src');
+                    if (src) video.src = src;
+                }
                 video.play().catch(error => {
                     console.log("Play error:", error);
                 });
             });
 
             card.addEventListener('mouseleave', () => {
+                isHovering = false;
                 video.pause();
                 video.currentTime = 0.1; 
             });
@@ -943,9 +1000,10 @@
         await loadTranslations();
         initLanguageSelector();
         initHeroVideo();
-        loadDynamicWorks();
+        await loadDynamicWorks();   // ✅ works datası tam yüklənənə qədər gözləyir
         setupNavLinks();
         updateGlobalContactInfo();
+        hideLoadingScreen();        // ✅ loading screen yalnız data hazır olandan sonra gizlənir
     }
 
     if (document.readyState === 'loading') {
