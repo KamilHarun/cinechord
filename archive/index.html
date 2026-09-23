@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CineChord Video Archive - Bütün filmləri, reklam videolarını və layihələri keçin.">
@@ -159,7 +160,7 @@
                     <span class="video-word" data-key="category_clip">CLIP</span>
                 </div>
                 
-                <div class="archive-title-container">
+            <div class="archive-title-container">
                     <h1 class="archive-title" data-key="archive_title">ARCHIVE</h1>
                     <p class="archive-subtitle">
                         <span data-key="archive_subtitle_1">FULL FILM AVAILABLE ON REQUEST</span> • 
@@ -168,23 +169,58 @@
                 </div>
             </div>
 
-            <table class="archive-table" role="table" aria-label="Video archive">
-                <thead>
-                    <tr>
-                        <th class="number-col" scope="col">#</th>
-                        <th class="client-col" scope="col" data-key="client">CLIENT</th>
-                        <th class="title-col" scope="col" data-key="title">TITLE</th>
-                        <th class="type-col" scope="col" data-key="type">TYPE</th>
-                        <th class="location-col" scope="col" data-key="location">LOCATION</th>
-                        <th class="agency-col" scope="col" data-key="agency">AGENCY</th>
-                        <th class="year-col" scope="col" data-key="year">YEAR</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <!-- ARCHIVE SORT (CUSTOM MINIMALIST DESIGN) BURA ƏLAVƏ OLUNUR -->
+            <div class="archive-sort-wrapper">
+                <label class="archive-sort-label">SORT BY</label>
+                
+                <div class="custom-select-wrapper" id="customSelectWrapper">
+                    <div class="custom-select-trigger" id="customSelectTrigger">
+                        <span>NEWEST ADDED</span>
+                        <div class="custom-arrow"></div>
+                    </div>
+                    
+                    <div class="custom-select-options" id="customSelectOptions">
+                        <div class="custom-option selected" data-value="newest-added">NEWEST ADDED</div>
+                        <div class="custom-option" data-value="oldest-added">OLDEST ADDED</div>
+                        <div class="custom-option" data-value="name-az">NAME A–Z</div>
+                        <div class="custom-option" data-value="name-za">NAME Z–A</div>
+                        <div class="custom-option" data-value="year-newest">YEAR: NEWEST</div>
+                        <div class="custom-option" data-value="year-oldest">YEAR: OLDEST</div>
+                    </div>
+                    
+                    <select id="archiveSort" style="display: none;">
+                        <option value="newest-added">NEWEST ADDED</option>
+                        <option value="oldest-added">OLDEST ADDED</option>
+                        <option value="name-az">NAME A–Z</option>
+                        <option value="name-za">NAME Z–A</option>
+                        <option value="year-newest">YEAR: NEWEST</option>
+                        <option value="year-oldest">YEAR: OLDEST</option>
+                    </select>
+                </div>
+            </div>
+            <!-- SORT BÖLMƏSİNİN SONU -->
+
+                      <div class="archive-table-scroll">
+                <table class="archive-table" role="table" aria-label="Video archive">
+                    <thead>
+                        <tr>
+                            <th class="number-col" scope="col">#</th>
+                            <th class="client-col" scope="col" data-key="client">CLIENT</th>
+                            <th class="title-col" scope="col" data-key="title">TITLE</th>
+                            <th class="type-col" scope="col" data-key="type">TYPE</th>
+                            <th class="location-col" scope="col" data-key="location">LOCATION</th>
+                            <th class="agency-col" scope="col" data-key="agency">AGENCY</th>
+                            <th class="year-col" scope="col" data-key="year">YEAR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </section>
     </main>
+
+    
 
     <script src="archive.js"></script>
 </body>

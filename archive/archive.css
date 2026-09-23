@@ -1948,7 +1948,6 @@ body.lang-az .nav-btn {
     transform: translateY(-30px);
     opacity: 0;
 }
-
 /* ============================================================
    16. TOUCH IMPROVEMENTS
    ============================================================ */
@@ -1957,11 +1956,10 @@ body.lang-az .nav-btn {
         background: rgba(255, 165, 0, 0.1);
     }
 }
+
 /* ============================================================
    ARCHIVE - MODAL PLAY BUTTON (YENİ İKONLAR)
    ============================================================ */
-
-/* Modal play button - yeni ikonlu versiya */
 .modal-play-btn-wrapper {
     position: absolute;
     top: 50%;
@@ -1985,15 +1983,11 @@ body.lang-az .nav-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Default - tam görünür */
     clip-path: inset(0 0 0 0);
-    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.5s ease;
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
     opacity: 1;
 }
 
-/* Modal ikonlar */
 .modal-play-btn-inner .modal-play-icon,
 .modal-play-btn-inner .pause-icon {
     width: 100%;
@@ -2006,57 +2000,34 @@ body.lang-az .nav-btn {
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Modal play ikonu - default */
-.modal-play-btn-inner .modal-play-icon {
-    display: block;
-}
+.modal-play-btn-inner .modal-play-icon { display: block; }
+.modal-play-btn-inner .pause-icon { display: none; }
 
-/* Modal pause ikonu - default gizli */
-.modal-play-btn-inner .pause-icon {
-    display: none;
-}
-
-/* Modal hover */
 .modal-play-btn-wrapper:hover .modal-play-icon,
 .modal-play-btn-wrapper:hover .pause-icon {
     transform: scale(1.1);
     filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.8));
 }
 
-/* ===== MODAL - PLAY/PAUSE DƏYİŞMƏSİ ===== */
-.modal-play-btn-wrapper.is-playing .modal-play-icon {
-    display: none !important;
-}
-.modal-play-btn-wrapper.is-playing .pause-icon {
-    display: block !important;
-}
+.modal-play-btn-wrapper.is-playing .modal-play-icon { display: none !important; }
+.modal-play-btn-wrapper.is-playing .pause-icon { display: block !important; }
+.modal-play-btn-wrapper.is-paused .modal-play-icon { display: block !important; }
+.modal-play-btn-wrapper.is-paused .pause-icon { display: none !important; }
 
-.modal-play-btn-wrapper.is-paused .modal-play-icon {
-    display: block !important;
-}
-.modal-play-btn-wrapper.is-paused .pause-icon {
-    display: none !important;
-}
-
-/* ===== MODAL - USER INACTIVE (Mouse hərəkətsiz) ===== */
 .preview-container.user-inactive .modal-play-btn-inner {
     clip-path: inset(0 0 100% 0) !important;
     opacity: 0 !important;
     pointer-events: none !important;
-    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.5s ease;
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
 }
 
-/* ===== MODAL - USER ACTIVE (Mouse hərəkəti var) ===== */
 .preview-container:not(.user-inactive) .modal-play-btn-inner {
     clip-path: inset(0 0 0 0) !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.5s ease;
+    transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
 }
 
-/* ===== PLAY/PAUSE - HƏMİŞƏ GÖRÜNƏN (əlavə təminat) ===== */
 .preview-container.is-paused .modal-play-btn-inner {
     clip-path: inset(0 0 0 0) !important;
     opacity: 1 !important;
@@ -2069,7 +2040,6 @@ body.lang-az .nav-btn {
     pointer-events: auto !important;
 }
 
-/* User inactive olduqda is-paused/play override olunur */
 .preview-container.user-inactive.is-paused .modal-play-btn-inner {
     clip-path: inset(0 0 100% 0) !important;
     opacity: 0 !important;
@@ -2082,33 +2052,186 @@ body.lang-az .nav-btn {
     pointer-events: none !important;
 }
 
-
 /* ============================================================
    ARCHIVE - MOBİL MODAL PLAY BUTTON ÖLÇÜLƏRİ
    ============================================================ */
-
 @media (max-width: 768px) {
-    .modal-play-btn-wrapper {
-        width: 170px !important;
-        height: 170px !important;
-    }
-    
-    .modal-play-btn-inner {
-        width: 115px !important;
-        height: 115px !important;
-    }
+    .modal-play-btn-wrapper { width: 170px !important; height: 170px !important; }
+    .modal-play-btn-inner { width: 115px !important; height: 115px !important; }
 }
 
 @media (max-width: 480px) {
-    .modal-play-btn-wrapper {
-        width: 140px !important;
-        height: 140px !important;
-    }
+    .modal-play-btn-wrapper { width: 140px !important; height: 140px !important; }
+    .modal-play-btn-inner { width: 95px !important; height: 95px !important; }
+} /* <--- DİQQƏT: ƏSKİK OLAN MÖTƏRİZƏ BURA ƏLAVƏ EDİLDİ! */
+
+/* ============================================================
+   ARCHIVE SORT — CUSTOM MINIMALIST STYLE
+   ============================================================ */
+.archive-sort-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 100;
+}
+
+.archive-sort-label {
+    margin-right: 16px;
+    font-family: 'Gabarito', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Əsas açılır (dropdown) konteyner */
+.custom-select-wrapper {
+    position: relative;
+    width: 200px;
+    user-select: none;
+}
+
+/* Düymənin özü (bağlı halda) */
+.custom-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 42px;
+    padding: 0 16px 0 20px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px; /* Minimalist dairəvi kənarlar */
+    cursor: pointer;
+    transition: all 0.3s ease;
     
-    .modal-play-btn-inner {
-        width: 95px !important;
-        height: 95px !important;
+    font-family: 'Gabarito', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.custom-select-trigger:hover, 
+.custom-select-wrapper.open .custom-select-trigger {
+    border-color: #FFA500;
+    color: #FFA500;
+    background: rgba(255, 165, 0, 0.03);
+}
+
+/* Xüsusi ox işarəsi */
+.custom-arrow {
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.3s ease;
+}
+
+.custom-select-wrapper.open .custom-arrow {
+    transform: translateY(2px) rotate(225deg);
+}
+
+/* Açılan pəncərənin (Menyunun) vizualı */
+.custom-select-options {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(15, 15, 15, 0.85);
+    backdrop-filter: blur(12px); /* Şüşə effekti */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px; /* Yumşaq kənarlar, dördbucaq deyil */
+    padding: 8px;
+    
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.custom-select-wrapper.open .custom-select-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Siyahıdakı hər bir seçim (Option) */
+.custom-option {
+    padding: 12px 16px;
+    font-family: 'Gabarito', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    border-radius: 8px; /* Seçimlərin daxili dairəviliyi */
+    transition: all 0.2s ease;
+}
+
+.custom-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    padding-left: 20px; /* Hover edəndə yüngül sağa sürüşmə effekti */
+}
+
+.custom-option.selected {
+    color: #FFA500;
+    background: rgba(255, 165, 0, 0.05);
+}
+
+/* AZ DİLİ ÜÇÜN */
+body.lang-az .archive-sort-label,
+body.lang-az .custom-select-trigger,
+body.lang-az .custom-option {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* MOBİL ÖLÇÜLƏR */
+@media (max-width: 768px) {
+    .custom-select-wrapper { width: 180px; }
+    .custom-select-trigger { height: 38px; font-size: 10px; }
+    .custom-option { font-size: 10px; padding: 10px 14px; }
+}
+@media (max-width: 480px) {
+    .custom-select-wrapper { width: 160px; }
+    .custom-select-trigger { height: 36px; padding: 0 14px 0 16px; }
+}
+
+.archive-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .archive-table {
+        table-layout: auto;
+        min-width: 680px; /* bütün sütunlar rahat sığsın deyə minimum en */
     }
 
-    
+    .archive-table th,
+    .archive-table td {
+        white-space: nowrap;      /* söz artıq qırılmasın */
+        word-break: keep-all;
+        overflow-wrap: normal;
+    }
+
+    /* sütunlara məcburi faiz enləri artıq lazım deyil - auto işləyəcək */
+    .archive-table thead .number-col,
+    .archive-table thead .client-col,
+    .archive-table thead .title-col,
+    .archive-table thead .type-col,
+    .archive-table thead .location-col,
+    .archive-table thead .agency-col,
+    .archive-table thead .year-col {
+        width: auto;
+    }
 }

@@ -87,6 +87,65 @@
     let archiveData = [];
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
+    let currentSort = 'newest-added';
+
+function sortArchiveData(sortType) {
+    currentSort = sortType;
+
+    const sortedData = [...archiveData];
+
+    switch (sortType) {
+
+        case 'newest-added':
+            sortedData.sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+            break;
+
+        case 'oldest-added':
+            sortedData.sort((a, b) => {
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            });
+            break;
+
+        case 'name-az':
+            sortedData.sort((a, b) => {
+                return (a.title || '').localeCompare(
+                    b.title || '',
+                    undefined,
+                    { sensitivity: 'base' }
+                );
+            });
+            break;
+
+        case 'name-za':
+            sortedData.sort((a, b) => {
+                return (b.title || '').localeCompare(
+                    a.title || '',
+                    undefined,
+                    { sensitivity: 'base' }
+                );
+            });
+            break;
+
+        case 'year-newest':
+            sortedData.sort((a, b) => {
+                return (Number(b.productionYear) || 0) -
+                       (Number(a.productionYear) || 0);
+            });
+            break;
+
+        case 'year-oldest':
+            sortedData.sort((a, b) => {
+                return (Number(a.productionYear) || 0) -
+                       (Number(b.productionYear) || 0);
+            });
+            break;
+    }
+
+    renderArchiveTable(sortedData);
+}
+
     // Global translations object
     window.translations = null;
     window.currentLang = 'en';
@@ -598,8 +657,8 @@
             const works = data.content ? data.content : data;
             
             archiveData = works;
-            
-            renderArchiveTable(works);
+
+sortArchiveData(currentSort);
 
         } catch (error) {
             console.error("Error loading archive:", error);
@@ -1061,6 +1120,7 @@
         initVideoModal();
         loadArchiveData();
         setupOtherLinks();
+        initArchiveSorting();
     }
 
     if (document.readyState === 'loading') {
@@ -1069,4 +1129,56 @@
         init();
     }
 
-})();
+function initArchiveSorting() {
+    const sortSelect = document.getElementById('archiveSort');
+    if (!sortSelect) return;
+
+    sortSelect.addEventListener('change', function () {
+        sortArchiveData(this.value);
+    });
+
+    // ✅ CUSTOM (görünən) DROPDOWN-un işə salınması
+    const wrapper = document.getElementById('customSelectWrapper');
+    const trigger = document.getElementById('customSelectTrigger');
+    const optionsBox = document.getElementById('customSelectOptions');
+    if (!wrapper || !trigger || !optionsBox) return;
+
+    const triggerLabel = trigger.querySelector('span');
+    const optionEls = optionsBox.querySelectorAll('.custom-option');
+
+    trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        wrapper.classList.toggle('open');
+    });
+
+    optionEls.forEach(function (opt) {
+        opt.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const value = opt.getAttribute('data-value');
+
+            if (triggerLabel) triggerLabel.textContent = opt.textContent;
+            optionEls.forEach(function (o) { o.classList.remove('selected'); });
+            opt.classList.add('selected');
+
+            sortSelect.value = value;
+            wrapper.classList.remove('open');
+            sortArchiveData(value);
+        });
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!wrapper.contains(e.target)) {
+            wrapper.classList.remove('open');
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            wrapper.classList.remove('open');
+        }
+    });
+}
+}
+
+
+)();
