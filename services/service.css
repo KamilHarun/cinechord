@@ -1297,9 +1297,18 @@ body.lang-az .mask-link span::after {
    ============================================================ */
 
 @media (max-width: 768px) {
-    /* ✅ MOBİL - MƏLUMAT ƏVVƏL, VİDEO SONRA */
+    /* ✅ MOBİL - VİDEO HƏMİŞƏ ÜSTDƏ, MƏTN HƏMİŞƏ ALTDA (sabit) */
     .page-wrapper {
-        flex-direction: column-reverse !important; /* ✅ Sıralama tərsinə çevrildi */
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .page-wrapper .media-column {
+        order: 1 !important;
+    }
+
+    .page-wrapper .content-column {
+        order: 2 !important;
     }
     
     /* ✅ SERVICES TITLE - MOBİLDƏ HOVER EFFEKT OLMASIN */
