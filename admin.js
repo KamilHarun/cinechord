@@ -1286,7 +1286,7 @@ async function deleteTeamMember(id) {
 // BACKSTAGE: siyahı, yükləmə (R2), dərc, sıralama, silmə
 // ============================================================
 
-const BS_MAX_VIDEO    = 500 * 1024 * 1024;   // backend limiti ilə eyni olsun
+const BS_MAX_VIDEO = 2000 * 1024 * 1024;   // backend limiti ilə eyni olsun
 const BS_MAX_POSTER   = 5 * 1024 * 1024;
 const BS_VIDEO_TYPES  = ['video/mp4'];
 const BS_POSTER_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
