@@ -1666,11 +1666,13 @@ function bsPutToR2(uploadUrl, file, onProgress) {
 
 // 1) backend-dən presigned link al  2) faylı birbaşa R2-yə yüklə  3) key-i qaytar
 async function bsUploadFile(kind, file, label) {
+    const safeFileName = bsSanitizeFileName(file.name);
+
     const res = await authFetch(`${API.BACKSTAGE}/upload-url`, {
         method: 'POST',
         body: JSON.stringify({
-            kind,                         // "VIDEO" | "POSTER"
-            fileName: file.name,
+            kind,
+            fileName: safeFileName,
             contentType: file.type,
             size: file.size
         })
@@ -1786,3 +1788,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const hash = location.hash.replace('#', '');
     navigateTo(VALID_PAGES.includes(hash) ? hash : 'dashboard');
 });
+
+function bsSanitizeFileName(name) {
+    const dotIndex = name.lastIndexOf('.');
+    const ext = dotIndex !== -1 ? name.slice(dotIndex) : '';
+    const base = dotIndex !== -1 ? name.slice(0, dotIndex) : name;
+
+    const cleanBase = base
+        .normalize('NFKD')
+        .replace(/[^A-Za-z0-9._-]+/g, '_');
+
+    const cleanExt = ext.replace(/[^A-Za-z0-9.]+/g, '');
+
+    return `${cleanBase || 'file'}${cleanExt}`;
+}
