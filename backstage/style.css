@@ -53,7 +53,7 @@ body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    cursor: none;
+    cursor: auto;
 }
 
 @media (hover: none), (max-width: 900px) {
