@@ -1,0 +1,1190 @@
+(function() {
+    'use strict';
+
+    // ============================================================
+    // 0. GLOBAL DƏYİŞƏNLƏR & ELEMENTLƏR
+    // ============================================================
+    const BACKEND_URL = "https://cinechord-admin-production.up.railway.app";
+    const API_WORKS = `${BACKEND_URL}/api/works`;
+    const UPLOADS_URL = `${BACKEND_URL}/uploads/`;
+    const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dwybvusv6/video/upload/f_mp4,q_auto,vc_auto/Works_Showreel_f6dwys.mp4";
+    
+    // Əsas elementlər
+const container = document.getElementById('dynamic-projects-grid');
+const paginationContainer = document.getElementById('works-pagination');
+
+const WORKS_PER_PAGE = 6;
+let currentPage = 0;
+let totalPages = 0;
+let currentCategory = 'all';    const loadingScreen = document.querySelector('.loading-screen');
+    const pageTransition = document.querySelector('.page-transition');
+    
+    // Menu Elementlər
+    const hamburger = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const overlay = document.getElementById('mobileMenuOverlay');
+    const hamburgerText = document.querySelector('.hamburger-text');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const centerLogo = document.querySelector('.center-logo');
+
+    // Kateqoriyalar
+    const categoryMap = { 
+        'FILM': 'films', 'COMMERCIAL': 'commercial', 'CLIP': 'clips',
+        'MUSIC_VIDEO': 'clips', 'DOCUMENTARY': 'films', 'SOCIAL': 'commercial'
+    };
+
+    // Video Modal Elementləri
+    const previewContainer = document.getElementById('previewContainer');
+    const previewVideo = document.getElementById('previewVideo');
+    const previewTitleEl = document.getElementById('previewTitle');
+    const closePreview = document.getElementById('closePreview'); 
+    const modalPlayContainer = document.getElementById('modalPlayBtnContainer');
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    const progressPlayed = document.getElementById('progressPlayed');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationTimeEl = document.getElementById('durationTime');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const rewindBtn = document.getElementById('rewindBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    let activityTimeout = null;
+    const INACTIVITY_DELAY = 3000; // 3 saniyə
+
+    // Global translations object
+    window.translations = null;
+    window.currentLang = 'en';
+
+    // ============================================================
+    // 1. PAGE LOAD & TRANSITION
+    // ============================================================
+    // NOTE: Loading screen artıq burada sabit timeout ilə gizlənmir.
+    // Onun gizlədilməsi init() funksiyasında, works datası hazır
+    // olandan SONRA hideLoadingScreen() ilə edilir (bax: bölmə 12).
+
+    if (pageTransition) {
+        setTimeout(() => {
+            pageTransition.classList.add('page-loaded'); 
+        }, 100);
+    }
+
+    function hideLoadingScreen() {
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }
+    }
+
+    // ============================================================
+    // 2. HERO VIDEO INIT
+    // ============================================================
+    function initHeroVideo() {
+        const heroBg = document.querySelector('.hero-bg');
+        if (!heroBg) {
+            console.warn('hero-bg element not found');
+            return;
+        }
+        
+        const video = document.createElement('video');
+        video.src = SHOWREEL_VIDEO_URL;
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.style.position = "absolute";
+        video.style.top = "0";
+        video.style.left = "0";
+        video.style.width = "100%";
+        video.style.height = "100%";
+        video.style.objectFit = "cover";
+        video.style.zIndex = "-1";
+        
+        video.addEventListener('error', (e) => {
+            console.error('Hero video loading error:', e, video.error);
+        });
+        
+        video.play().catch((error) => {
+            console.warn('Hero video autoplay failed:', error);
+        });
+        
+        heroBg.appendChild(video);
+    }
+
+    // ============================================================
+    // 3. TRANSLATION SYSTEM
+    // ============================================================
+
+    async function loadTranslations() {
+        try {
+            const response = await fetch('../lang/works.json');
+            if (!response.ok) throw new Error('Translation file not found');
+            window.translations = await response.json();
+            console.log('Translations loaded:', window.translations);
+            return window.translations;
+        } catch (error) {
+            console.error('Error loading translations:', error);
+            window.translations = {
+                "en": {
+                    "menu": "MENU",
+                    "close": "CLOSE",
+                    "home": "HOME",
+                    "work": "WORK",
+                    "service": "SERVICE",
+                    "archive": "ARCHIVE",
+                    "about": "ABOUT",
+                    "contact": "CONTACT",
+                    "works": "WORKS",
+                    "scroll": "Scroll",
+                    "all": "ALL",
+                    "films": "FILMS",
+                    "commercial": "COMMERCIAL",
+                    "clips": "CLIPS",
+                    "play": "PLAY",
+                    "view_all_works": "VIEW ALL WORKS",
+                    "open_archive": "OPEN ARCHIVE",
+                    "address": "ADDRESS",
+                    "get_in_touch": "GET IN TOUCH",
+                    "follow_us": "FOLLOW US"
+                },
+                "az": {
+                    "menu": "MENYU",
+                    "close": "BAĞLA",
+                    "home": "ANA SƏHİFƏ",
+                    "work": "İŞLƏR",
+                    "service": "XİDMƏTLƏR",
+                    "archive": "ARXİV",
+                    "about": "HAQQIMIZDA",
+                    "contact": "ƏLAQƏ",
+                    "works": "İŞLƏR",
+                    "scroll": "Sürüşdür",
+                    "all": "HAMISI",
+                    "films": "FİLMLƏR",
+                    "commercial": "REKLAM",
+                    "clips": "KLİPLƏR",
+                    "play": "BAŞLAT",
+                    "view_all_works": "BÜTÜN İŞLƏRƏ BAX",
+                    "open_archive": "ARXİVİ AÇ",
+                    "address": "ÜNVAN",
+                    "get_in_touch": "ƏLAQƏ SAXLAYIN",
+                    "follow_us": "BİZİ İZLƏYİN"
+                }
+            };
+            return window.translations;
+        }
+    }
+
+    function applyTranslations(lang) {
+        if (!window.translations || !window.translations[lang]) {
+            console.warn('Translations not available for:', lang);
+            return;
+        }
+
+        const t = window.translations[lang];
+        window.currentLang = lang;
+
+        if (hamburgerText) {
+            const isMenuOpen = hamburger && hamburger.classList.contains('active');
+            hamburgerText.textContent = isMenuOpen ? t.close : t.menu;
+        }
+
+        navBtns.forEach(btn => {
+            const navText = btn.querySelector('.nav-text');
+            const key = btn.getAttribute('data-key');
+            
+            if (key && t[key]) {
+                if (navText) navText.textContent = t[key];
+                btn.setAttribute('data-text', t[key]);
+            }
+        });
+
+        const worksTitle = document.querySelector('.title-main');
+        if (worksTitle) {
+            const key = worksTitle.getAttribute('data-key');
+            if (key && t[key]) {
+                const span = worksTitle.querySelector('span');
+                if (span) span.textContent = t[key];
+                worksTitle.setAttribute('data-text', t[key]);
+            }
+        }
+
+        const scrollText = document.querySelector('.arrow-text');
+        if (scrollText) {
+            const key = scrollText.getAttribute('data-key');
+            if (key && t[key]) {
+                scrollText.textContent = t[key];
+            }
+        }
+
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        categoryButtons.forEach(btn => {
+            const key = btn.getAttribute('data-key');
+            if (key && t[key]) {
+                btn.textContent = t[key];
+            }
+        });
+
+        const playTexts = document.querySelectorAll('.play-text');
+        playTexts.forEach(el => {
+            if (t.play) {
+                el.textContent = t.play;
+                el.setAttribute('data-text', t.play);
+            }
+        });
+
+        const ctaText = document.querySelector('.cta-text');
+        if (ctaText) {
+            const key = ctaText.getAttribute('data-key');
+            if (key && t[key]) {
+                const span = ctaText.querySelector('span');
+                if (span) span.textContent = t[key];
+                ctaText.setAttribute('data-text', t[key]);
+            }
+        }
+
+        const ctaButton = document.querySelector('.cta-button');
+        if (ctaButton) {
+            const key = ctaButton.getAttribute('data-key');
+            if (key && t[key]) {
+                ctaButton.textContent = t[key];
+            }
+        }
+
+        const footerLabels = document.querySelectorAll('.footer-label');
+        footerLabels.forEach(label => {
+            const key = label.getAttribute('data-key');
+            if (key && t[key]) {
+                label.textContent = t[key];
+            }
+        });
+
+        if (lang === 'az') {
+            document.body.classList.add('lang-az');
+            document.documentElement.setAttribute('lang', 'az');
+        } else {
+            document.body.classList.remove('lang-az');
+            document.documentElement.setAttribute('lang', 'en');
+        }
+
+        updateGlobalContactInfo();
+        console.log('Translations applied for:', lang);
+    }
+
+    // ============================================================
+    // 4. LANGUAGE SELECTOR
+    // ============================================================
+
+    function initLanguageSelector() {
+        const langSelector = document.getElementById('langSelector');
+        const langGlobeBtn = document.getElementById('langGlobeBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLangText = document.getElementById('currentLangText');
+        
+        if (!langSelector || !langGlobeBtn) {
+            console.log('Language selector elements not found!');
+            return;
+        }
+        
+        const savedLang = localStorage.getItem('selectedLang') || 'en';
+        window.currentLang = savedLang;
+        
+        applyTranslations(savedLang);
+        
+        langOptions.forEach(option => {
+            if (option.dataset.lang === savedLang) {
+                option.classList.add('active');
+                if (currentLangText) {
+                    currentLangText.textContent = savedLang.toUpperCase();
+                }
+            } else {
+                option.classList.remove('active');
+            }
+        });
+        
+        langGlobeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            langSelector.classList.toggle('active');
+        });
+        
+        langOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const lang = this.dataset.lang;
+                
+                if (this.classList.contains('active')) {
+                    langSelector.classList.remove('active');
+                    return;
+                }
+                
+                langOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (currentLangText) {
+                    currentLangText.textContent = lang.toUpperCase();
+                }
+                
+                localStorage.setItem('selectedLang', lang);
+                applyTranslations(lang);
+                
+                setTimeout(() => {
+                    langSelector.classList.remove('active');
+                }, 200);
+                
+                document.dispatchEvent(new CustomEvent('languageChanged', { 
+                    detail: { language: lang } 
+                }));
+                
+                console.log('Language changed to:', lang);
+            });
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (langSelector && !langSelector.contains(e.target)) {
+                langSelector.classList.remove('active');
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && langSelector.classList.contains('active')) {
+                langSelector.classList.remove('active');
+            }
+        });
+        
+        console.log('Language selector initialized successfully');
+    }
+
+    // ============================================================
+    // 5. MENU SİSTEMİ
+    // ============================================================
+
+    function toggleMenu() {
+        if (!hamburger || !mobileMenu) return;
+
+        const isActive = hamburger.classList.contains('active');
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        if (overlay) overlay.classList.toggle('active');
+        
+        if (hamburgerText) {
+            if (window.translations && window.translations[window.currentLang]) {
+                const t = window.translations[window.currentLang];
+                hamburgerText.textContent = isActive ? t.menu : t.close;
+            } else {
+                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
+            }
+        }
+        
+        if (!isActive) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.paddingRight = scrollbarWidth + 'px';
+            if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
+            if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
+        } else {
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            if (hamburger) hamburger.style.paddingRight = '';
+            if (centerLogo) centerLogo.style.paddingRight = '';
+        }
+    }
+
+    if (hamburger) {
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            toggleMenu();
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (previewContainer && previewContainer.classList.contains('active')) {
+                closeVideoPreview();
+                return;
+            }
+            if (hamburger && hamburger.classList.contains('active')) {
+                toggleMenu();
+            }
+        }
+    });
+
+    navBtns.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            if (!href || href === '#' || this.classList.contains('active')) {
+                e.preventDefault();
+                if (href !== '#') toggleMenu();
+                return;
+            }
+
+            e.preventDefault();
+            toggleMenu(); 
+
+            if (pageTransition) {
+                pageTransition.classList.remove('page-loaded');
+            }
+
+            setTimeout(() => {
+                window.location.href = href;
+            }, 600);
+        });
+    });
+
+    // ============================================================
+    // 6. WORKS API & GRID
+    // ============================================================
+
+    function optimizeCloudinaryUrl(url) {
+        if (!url) return '';
+        url = url.replace('http://', 'https://');
+        if (!url.includes('cloudinary.com')) return url;
+        if (url.includes('/f_auto,q_auto,vc_auto/') || url.includes('/f_auto,q_auto/')) return url;
+        
+        const uploadIndex = url.indexOf('/video/upload/');
+        if (uploadIndex === -1) {
+            const imageUploadIndex = url.indexOf('/image/upload/');
+            if (imageUploadIndex !== -1) {
+                const before = url.substring(0, imageUploadIndex + '/image/upload/'.length);
+                const after = url.substring(imageUploadIndex + '/image/upload/'.length);
+                return `${before}f_auto,q_auto/${after}`;
+            }
+            return url;
+        }
+        
+        const before = url.substring(0, uploadIndex + '/video/upload/'.length);
+        const after = url.substring(uploadIndex + '/video/upload/'.length);
+        return `${before}f_auto,q_auto,vc_auto/${after}`;
+    }
+
+    function getFullMediaUrl(path) {
+        if (!path) return '';
+        if (path.includes('r2.dev')) return path.replace('http://', 'https://');
+        if (path.startsWith('http')) return optimizeCloudinaryUrl(path);
+        
+        let cleanPath = path;
+        while (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+        if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.substring(8);
+        
+        const fullUrl = UPLOADS_URL + cleanPath;
+        return optimizeCloudinaryUrl(fullUrl);
+    }
+
+ async function loadDynamicWorks(page = 0) {
+    if (!container) return;
+
+    try {
+        container.innerHTML = '';
+
+        // Pagination üçün page və size göndəririk
+        const url = `${API_WORKS}?page=${page}&size=${WORKS_PER_PAGE}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('API Error');
+        }
+
+        const data = await response.json();
+
+        // Backend Page response
+        const works = data.content || [];
+
+        currentPage = data.number || 0;
+        totalPages = data.totalPages || 0;
+
+        if (works.length === 0) {
+            container.innerHTML = `
+                <p style="color:white; text-align:center;">
+                    No works found.
+                </p>
+            `;
+
+            renderPagination();
+            return;
+        }
+
+        works.forEach((work, index) => {
+
+            const videoSrc = getFullMediaUrl(work.videoUrl);
+            const posterSrc = getFullMediaUrl(work.thumbnailUrl);
+            const hoverImageSrc = work.hoverImageUrl
+                ? getFullMediaUrl(work.hoverImageUrl)
+                : '';
+
+            const categoryClass =
+                categoryMap[work.category] || 'other';
+
+            if (!videoSrc) return;
+
+            const workHTML = `
+                <div class="project-card ${hoverImageSrc ? 'has-hover-image' : ''}" 
+                    data-category="${categoryClass}" 
+                    data-video-src="${videoSrc}" 
+                    data-title="${work.title}"
+                    style="transition-delay: ${index * 0.05}s;">
+
+                    <div class="project-image-container">
+
+                        <video muted loop playsinline class="project-video" 
+                            preload="metadata" 
+                            poster="${posterSrc}"
+                            data-src="${videoSrc}#t=0.1">
+                        </video>
+
+                        ${
+                            hoverImageSrc
+                            ? `<img class="project-hover-image" 
+                                    src="${hoverImageSrc}" 
+                                    alt="" 
+                                    loading="lazy">`
+                            : ''
+                        }
+
+                        <div class="card-overlay"></div>
+
+                        <div class="card-info">
+                            <h3 class="card-title">${work.title}</h3>
+
+                            <p style="font-size: 12px; opacity: 0.7;">
+                                ${work.clientName || ''}
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <button 
+                        class="fullscreen-btn" 
+                        data-video-src="${videoSrc}" 
+                        data-title="${work.title}">
+                    </button>
+
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', workHTML);
+        });
+
+        // Scroll reveal
+        const newCards = container.querySelectorAll('.project-card');
+
+        newCards.forEach(card => {
+            observer.observe(card);
+        });
+
+        // Lazy video
+        initLazyVideoLoading();
+
+        // Hover
+        attachHoverEffects();
+
+        // Pagination
+        renderPagination();
+
+        // // Filter aktivdirsə, həmin səhifədə göstərilən
+        // // category-ləri tətbiq et
+        // applyCurrentCategory();
+
+    } catch (error) {
+
+        console.error("API Error:", error);
+
+        container.innerHTML = `
+            <p style="color:white; text-align:center;">
+                Error loading works.
+            </p>
+        `;
+
+        if (paginationContainer) {
+            paginationContainer.innerHTML = '';
+        }
+    }
+}
+function renderPagination() {
+
+    if (!paginationContainer) return;
+
+    paginationContainer.innerHTML = '';
+
+    // Yalnız 1 səhifə varsa pagination göstərmə
+    if (totalPages <= 1) {
+        return;
+    }
+
+    // Previous
+    const prevButton = document.createElement('button');
+
+    prevButton.className = 'pagination-btn pagination-prev';
+    prevButton.textContent = '←';
+    prevButton.disabled = currentPage === 0;
+
+    prevButton.addEventListener('click', () => {
+
+        if (currentPage > 0) {
+            loadDynamicWorks(currentPage - 1);
+
+            setTimeout(() => {
+                scrollToWorks();
+            }, 100);
+        }
+
+    });
+
+    paginationContainer.appendChild(prevButton);
+
+
+    // Page numbers
+    for (let i = 0; i < totalPages; i++) {
+
+        const pageButton = document.createElement('button');
+
+        pageButton.className = 'pagination-btn';
+
+        if (i === currentPage) {
+            pageButton.classList.add('active');
+        }
+
+        pageButton.textContent = i + 1;
+
+        pageButton.addEventListener('click', () => {
+
+            if (i === currentPage) return;
+
+            loadDynamicWorks(i);
+
+            setTimeout(() => {
+                scrollToWorks();
+            }, 100);
+
+        });
+
+        paginationContainer.appendChild(pageButton);
+    }
+
+
+    // Next
+    const nextButton = document.createElement('button');
+
+    nextButton.className = 'pagination-btn pagination-next';
+    nextButton.textContent = '→';
+    nextButton.disabled = currentPage === totalPages - 1;
+
+    nextButton.addEventListener('click', () => {
+
+        if (currentPage < totalPages - 1) {
+
+            loadDynamicWorks(currentPage + 1);
+
+            setTimeout(() => {
+                scrollToWorks();
+            }, 100);
+        }
+
+    });
+
+    paginationContainer.appendChild(nextButton);
+}
+function scrollToWorks() {
+
+    const worksSection = document.getElementById('works');
+
+    if (!worksSection) return;
+
+    const offset = 100;
+
+    const top =
+        worksSection.getBoundingClientRect().top +
+        window.scrollY -
+        offset;
+
+    window.scrollTo({
+        top: top,
+        behavior: 'smooth'
+    });
+}
+
+    // ✅ YENİ - Videoları yalnız ekrana yaxınlaşanda yükləyir.
+    // Poster şəkli hər zaman dərhal görünür (qara ekran olmur),
+    // əsl video faylı isə yalnız lazım olanda (scroll ilə) çəkilir.
+    function initLazyVideoLoading() {
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const video = entry.target;
+                if (entry.isIntersecting) {
+                    const src = video.getAttribute('data-src');
+                    if (src && !video.src) {
+                        video.src = src;
+                        video.load(); // metadata/ilk kadr dərhal çəkilsin
+                    }
+                }
+            });
+        }, {
+            rootMargin: "200px 0px", // ekrana çatmazdan ~200px əvvəl yüklənməyə başlasın
+            threshold: 0.01
+        });
+
+        document.querySelectorAll('.project-video[data-src]').forEach(video => {
+            videoObserver.observe(video);
+        });
+    }
+
+    // ✅ Hover zamanı bütün video yüklənməsin deyə, playback yalnız
+    // ilk HOVER_PREVIEW_SECONDS saniyə ilə məhdudlaşdırılır. Brauzer
+    // playback bu həddi keçmədiyi üçün faylın qalan hissəsini
+    // bufferləməyə ehtiyac duymur — istifadəçi kart üzərində nə qədər
+    // uzun qalsa da, yüklənən data miqdarı sabit qalır.
+    const HOVER_PREVIEW_SECONDS = 3;
+ 
+    function attachHoverEffects() {
+        document.querySelectorAll('.project-card').forEach(card => {
+            const video = card.querySelector('video');
+            if (!video) return;
+ 
+            let isHovering = false;
+ 
+            // Hər video üçün YALNIZ BİR DƏFƏ əlavə olunur (hər hoverdə yox)
+            video.addEventListener('timeupdate', () => {
+                if (isHovering && video.currentTime >= HOVER_PREVIEW_SECONDS) {
+                    video.currentTime = 0;
+                }
+            });
+ 
+            card.addEventListener('mouseenter', () => {
+                isHovering = true;
+                // Əgər video hələ lazy-load olunmayıbsa (nadir hal),
+                // data-src-dən src-i dərhal təyin et ki, hover-də boş qalmasın.
+                if (!video.src) {
+                    const src = video.getAttribute('data-src');
+                    if (src) video.src = src;
+                }
+                video.play().catch(error => {
+                    console.log("Play error:", error);
+                });
+            });
+ 
+            card.addEventListener('mouseleave', () => {
+                isHovering = false;
+                video.pause();
+                video.currentTime = 0.1; 
+            });
+        });
+    }
+ 
+    window.filterWorks = function(category, btn) {
+        if(btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        const cards = document.querySelectorAll('.project-card');
+        cards.forEach(card => {
+            const cardCat = card.getAttribute('data-category');
+            if (category === 'all' || cardCat === category) {
+                card.style.display = 'block';
+                setTimeout(() => card.classList.add('active'), 50); 
+            } else {
+                card.style.display = 'none';
+                card.classList.remove('active');
+            }
+        });
+    };
+ 
+    // ============================================================
+    // 7. SCROLL REVEAL
+    // ============================================================
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+ 
+    document.querySelectorAll('.hero-left-title, .hero-right-content, .scroll-down-arrow, .category-section, .main-footer').forEach(el => {
+        el.classList.add('reveal-item');
+        observer.observe(el);
+    });
+ 
+    // ============================================================
+    // 8. VIDEO MODAL - YENİ PLAY/PAUSE İKONLARI İLƏ
+    // ============================================================
+    
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function handleUserActivity() {
+        if(!previewContainer) return;
+        previewContainer.classList.remove('user-inactive');
+        clearTimeout(activityTimeout);
+        if (previewVideo && !previewVideo.paused) {
+            activityTimeout = setTimeout(() => {
+                previewContainer.classList.add('user-inactive');
+            }, INACTIVITY_DELAY);
+        }
+    }
+
+    function openModal(videoSrc, title) {
+        if (!videoSrc) return;
+        if(previewTitleEl) previewTitleEl.textContent = title;
+        
+        previewContainer.style.display = 'flex';
+        setTimeout(() => {
+            previewContainer.classList.add('active');
+        }, 10);
+        
+        previewVideo.src = videoSrc;
+        previewVideo.preload = "auto";
+        previewVideo.load();
+    }
+
+    function closeVideoPreview() {
+        if(!previewContainer) return;
+        previewContainer.classList.remove('active');
+        previewContainer.classList.add('is-paused');
+        previewContainer.classList.remove('user-inactive');
+        document.body.style.overflow = 'auto';
+
+        setTimeout(() => {
+            previewVideo.pause();
+            previewVideo.currentTime = 0;
+            previewVideo.removeAttribute('src');
+            previewContainer.style.display = 'none';
+        }, 500);
+    }
+
+    function togglePlay(e) {
+        if(e) e.stopPropagation();
+        previewVideo.paused ? previewVideo.play() : previewVideo.pause();
+    }
+
+    // ✅ YENİ - Modal play/pause toggle (ikon dəyişməsi üçün)
+    function toggleModalPlay() {
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
+        
+        if (previewVideo.paused) {
+            previewVideo.play();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        } else {
+            previewVideo.pause();
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        }
+    }
+
+    // ✅ YENİ - Play/Pause ikonlarını idarə et
+    function updatePlayButtonUI() {
+        const modalBtn = document.getElementById('modalPlayBtnContainer');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        
+        if (previewVideo.paused) {
+            if (playIcon) playIcon.style.display = 'block';
+            if (pauseIcon) pauseIcon.style.display = 'none';
+            previewContainer.classList.add('is-paused');
+            previewContainer.classList.remove('user-inactive');
+            clearTimeout(activityTimeout);
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        } else {
+            if (playIcon) playIcon.style.display = 'none';
+            if (pauseIcon) pauseIcon.style.display = 'block';
+            previewContainer.classList.remove('is-paused');
+            handleUserActivity();
+            
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        }
+    }
+
+    // ✅ YENİ - Video eventləri
+    function initPlayPauseIcons() {
+        if (!previewVideo) return;
+        
+        previewVideo.addEventListener('play', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-paused');
+                modalBtn.classList.add('is-playing');
+            }
+        });
+        
+        previewVideo.addEventListener('pause', function() {
+            const modalBtn = document.getElementById('modalPlayBtnContainer');
+            if (modalBtn) {
+                modalBtn.classList.remove('is-playing');
+                modalBtn.classList.add('is-paused');
+            }
+        });
+    }
+
+    // ✅ YENİ - Event listener əlavəsi
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.fullscreen-btn')) {
+            e.preventDefault();
+            const btn = e.target.closest('.fullscreen-btn');
+            openModal(btn.getAttribute('data-video-src'), btn.getAttribute('data-title'));
+        }
+        
+        // ✅ Modal play button klik
+        if (e.target.closest('#modalPlayBtnContainer')) {
+            e.stopPropagation();
+            toggleModalPlay();
+        }
+        
+        if (e.target.closest('#playPauseBtn')) {
+            e.stopPropagation();
+            togglePlay();
+        }
+    });
+
+    if (previewVideo) {
+        previewVideo.addEventListener('click', togglePlay);
+        previewVideo.addEventListener('play', updatePlayButtonUI);
+        previewVideo.addEventListener('pause', updatePlayButtonUI);
+        previewVideo.addEventListener('timeupdate', () => {
+             if (previewVideo.duration) {
+                const percent = (previewVideo.currentTime / previewVideo.duration) * 100;
+                if(progressPlayed) progressPlayed.style.width = percent + '%';
+                if(currentTimeEl) currentTimeEl.textContent = formatTime(previewVideo.currentTime);
+            }
+        });
+        previewVideo.addEventListener('loadedmetadata', () => {
+             if(durationTimeEl) durationTimeEl.textContent = formatTime(previewVideo.duration);
+        });
+        
+        // ✅ Play/Pause ikonlarını init et
+        initPlayPauseIcons();
+    }
+
+    if(closePreview) closePreview.onclick = closeVideoPreview;
+
+    if(progressBarContainer) progressBarContainer.addEventListener('click', (e) => {
+        const rect = progressBarContainer.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / progressBarContainer.clientWidth;
+         if (previewVideo.duration) {
+             previewVideo.currentTime = previewVideo.duration * percent;
+         }
+    });
+
+    if (previewContainer) {
+        ['mousemove', 'click'].forEach(evt => previewContainer.addEventListener(evt, handleUserActivity));
+    }
+
+    if (rewindBtn) {
+        rewindBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (previewVideo) {
+                previewVideo.currentTime = Math.max(0, previewVideo.currentTime - 5);
+            }
+        });
+    }
+
+    if (forwardBtn) {
+        forwardBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (previewVideo) {
+                previewVideo.currentTime = Math.min(previewVideo.duration || 0, previewVideo.currentTime + 5);
+            }
+        });
+    }
+
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+            if (previewVideo) {
+                previewVideo.volume = e.target.value / 100;
+            }
+        });
+        
+        if (previewVideo) {
+            volumeSlider.value = previewVideo.volume * 100;
+        }
+    }
+
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else if (previewContainer) {
+                previewContainer.requestFullscreen().catch(err => {
+                    console.log('Fullscreen error:', err);
+                });
+            }
+        });
+    }
+
+    // ============================================================
+    // 9. GLOBAL NAVİQASİYA
+    // ============================================================
+    
+    function setupNavLinks() {
+        const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
+        
+        internalLinks.forEach(link => {
+            if (link.closest('.mobile-menu')) return;
+
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (href.startsWith('mailto') || href.startsWith('tel')) return;
+                
+                e.preventDefault();
+                
+                if (pageTransition) {
+                    pageTransition.classList.remove('page-loaded');
+                }
+                
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 600);
+            });
+        });
+    }
+
+    // ============================================================
+    // 10. GLOBAL CONTACT INFO UPDATER
+    // ============================================================
+    
+    async function updateGlobalContactInfo() {
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/about?lang=${window.currentLang}`);
+
+            if (!response.ok) {
+                console.error("Məlumat tapılmadı");
+                return;
+            }
+
+            const data = await response.json();
+
+            if (data.email) {
+                const emailElements = document.querySelectorAll('.global-email');
+                emailElements.forEach(el => {
+                    const span = el.querySelector('span');
+                    if (span) {
+                        span.textContent = data.email;
+                        span.setAttribute('data-text', data.email);
+                    } else {
+                        el.textContent = data.email;
+                    }
+                    el.href = `mailto:${data.email}`;
+                });
+            }
+
+            if (data.phone) {
+                const phoneElements = document.querySelectorAll('.global-phone');
+                phoneElements.forEach(el => {
+                    const span = el.querySelector('span');
+                    if (span) {
+                        span.textContent = data.phone;
+                        span.setAttribute('data-text', data.phone);
+                    } else {
+                        el.textContent = data.phone;
+                    }
+                    const cleanPhone = data.phone.replace(/\s+/g, '');
+                    el.href = `tel:${cleanPhone}`;
+                });
+            }
+
+            if (data.address) {
+                const addressElements = document.querySelectorAll('.global-address');
+                addressElements.forEach(el => {
+                    el.textContent = data.address;
+                });
+            }
+
+        } catch (error) {
+            console.error("Əlaqə məlumatları yenilənərkən xəta:", error);
+        }
+    }
+
+    // ============================================================
+    // 11. SCROLL HIDE/SHOW
+    // ============================================================
+
+    (function() {
+        let lastScrollY = 0;
+        let ticking = false;
+        
+        function handleScroll() {
+            const currentScrollY = window.scrollY;
+            
+            const logo = document.querySelector('.center-logo');
+            const hamburger = document.querySelector('.hamburger');
+            const langSelector = document.querySelector('.lang-selector');
+            
+            if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+                if (logo) logo.classList.add('hide-on-scroll');
+                if (hamburger) hamburger.classList.add('hide-on-scroll');
+                if (langSelector) langSelector.classList.add('hide-on-scroll');
+            }
+            else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+                if (logo) logo.classList.remove('hide-on-scroll');
+                if (hamburger) hamburger.classList.remove('hide-on-scroll');
+                if (langSelector) langSelector.classList.remove('hide-on-scroll');
+            }
+            
+            lastScrollY = currentScrollY;
+            ticking = false;
+        }
+        
+        function requestScrollTick() {
+            if (!ticking) {
+                window.requestAnimationFrame(handleScroll);
+                ticking = true;
+            }
+        }
+        
+        window.addEventListener('scroll', requestScrollTick, { passive: true });
+        
+        console.log('✅ Scroll hide/show initialized!');
+    })();
+
+    // ============================================================
+    // 12. INIT
+    // ============================================================
+    
+    async function init() {
+        await loadTranslations();
+        initLanguageSelector();
+        initHeroVideo();
+        await loadDynamicWorks();   // ✅ works datası tam yüklənənə qədər gözləyir
+        setupNavLinks();
+        updateGlobalContactInfo();
+        hideLoadingScreen();        // ✅ loading screen yalnız data hazır olandan sonra gizlənir
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})();

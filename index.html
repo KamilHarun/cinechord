@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Chord - Home</title>
+    <meta name="description" content="Cine Chord - Portfolio of Director Rauf Gurbanaliyev. Explore works, services, and creative visual experiences.">
+    <link rel="canonical" href="https://cinechord.az/">
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/web-app-manifest-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="page-transition"></div>
+    
+    <div class="loading-screen">
+        <div class="loader-content">
+            <img src="photos/CineChord.png" alt="CineChord" class="loader-logo">
+            <div class="loader-bar-bg">
+                <div class="loader-bar-fill"></div>
+            </div>
+            <div class="loader-percentage">0%</div>
+        </div>
+        <div class="loader-author">
+            <img src="photos/Khlogo.png" alt="Kh" class="author-icon">
+            <span>Designed By Harunov</span>
+        </div>
+    </div>
+
+    <div class="grain-overlay"></div>
+    
+    <div class="hero-section">
+        
+        <div id="videoContainer">
+            <div class="hero-overlay"></div>
+        </div>
+
+        <!-- LANGUAGE SELECTOR WITH GLOBE -->
+        <div class="lang-selector" id="langSelector">
+            <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+                <span class="globe-icon">
+                    <span class="globe-ellipse"></span>
+                </span>
+                <span class="current-lang" id="currentLangText">EN</span>
+            </button>
+            <div class="lang-dropdown" id="langDropdown">
+                <button class="lang-option active" data-lang="en">
+                    <span class="lang-code">EN</span>
+                    <span class="lang-name">English</span>
+                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+                </button>
+                <button class="lang-option" data-lang="az">
+                    <span class="lang-code">AZ</span>
+                    <span class="lang-name">Azərbaycan</span>
+                    <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- HAMBURGER BUTTON -->
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+            <span class="hamburger-text" data-key="menu">MENU</span>
+            <span class="hamburger-icon">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </span>
+        </button>
+
+        <!-- OVERLAY -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+        <!-- MOBILE MENU -->
+        <nav class="mobile-menu" id="mobileMenu">
+ <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+    <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+    <a href="../backstage/" class="nav-btn" data-text="BACKSTAGE" data-key="backstage"><span class="nav-text">BACKSTAGE</span></a>
+    <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+    <a href="#" class="nav-btn active" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
+
+
+            <div class="menu-footer">
+                <div class="menu-socials">
+                    <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+                    <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a>
+                    <a href="#">VIMEO</a>
+                </div>
+                <div class="menu-contact-info">
+                    <p>info@cinechord.az</p>
+                    <p>+994 50 233 04 54</p>
+                </div>
+            </div>
+        </nav>
+
+        <!-- LOGO -->
+        <a href="/" class="center-logo">
+            <img src="photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+        </a>
+
+        <!-- ============================================================
+             PLAY BUTTON - ANA EKRAN (YENİ)
+             ============================================================ -->
+        <div class="play-button-container" id="mainPlayBtnContainer">
+            <div class="play-button-wrapper">
+                <!-- Play ikonu -->
+                <img src="play-btn.png" alt="Play Video" class="play-icon-img" id="mainPlayIcon">
+                <!-- Pause ikonu -->
+                <img src="pause-btn.png" alt="Pause Video" class="play-icon-img pause-icon" id="mainPauseIcon" style="display:none;">
+            </div>
+        </div>
+
+        <!-- BOTTOM LEFT - Explore Works -->
+        <div class="bottom-left-explore">
+            <a href="works/" class="explore-btn">
+                <span class="explore-line"></span>
+                <span class="explore-text" data-key="explore">EXPLORE OUR WORKS</span>
+                <span class="explore-arrow">→</span>
+            </a>
+        </div>
+
+        <!-- BOTTOM RIGHT SOCIALS -->
+        <div class="bottom-right-socials">
+            <div class="social-icons-home">
+                <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer" class="social-link-home">
+                    <span class="social-icon"><i class="fa-brands fa-instagram"></i></span>
+                    <span class="social-icon-hover"><i class="fa-brands fa-instagram"></i></span>
+                </a>
+                <a href="https://www.youtube.com/@cinechordpro" class="social-link-home" target="_blank">
+                    <span class="social-icon"><i class="fa-brands fa-youtube"></i></span>
+                    <span class="social-icon-hover"><i class="fa-brands fa-youtube"></i></span>
+                </a>
+                <a href="#" class="social-link-home">
+                    <span class="social-icon"><i class="fa-brands fa-vimeo-v"></i></span>
+                    <span class="social-icon-hover"><i class="fa-brands fa-vimeo-v"></i></span>
+                </a>
+               
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- ============================================================
+         VIDEO PREVIEW MODAL (YENİ)
+         ============================================================ -->
+    <div class="preview-container is-paused" id="previewContainer">
+        <button class="close-preview" id="closePreview">×</button>
+        <div class="preview-info" id="previewInfo">
+            <div class="text-mask">
+                <div class="preview-title" id="previewTitle"></div>
+            </div>
+        </div>
+        <div class="video-wrapper" id="videoWrapper">
+            <div class="video-loading"></div>
+            
+            <!-- MODAL PLAY BUTTON - YENİ (Play + Pause ikonları) -->
+            <div class="modal-play-btn-wrapper" id="modalPlayBtnContainer">
+                <div class="modal-play-btn-inner">
+                    <!-- Play ikonu -->
+                    <img src="play-btn.png" alt="Play Video" class="modal-play-icon" id="modalPlayIcon">
+                    <!-- Pause ikonu -->
+                    <img src="pause-btn.png" alt="Pause Video" class="modal-play-icon pause-icon" id="modalPauseIcon" style="display:none;">
+                </div>
+            </div>
+            
+            <video id="previewVideo" class="preview-video" playsinline preload="metadata"></video>
+            
+            <!-- Custom Controls - TOXUNULMADAN QALIR -->
+            <div class="custom-controls" id="customControls">
+                <div class="progress-bar-container" id="progressBarContainer">
+                    <div class="progress-played" id="progressPlayed"></div>
+                    <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
+                </div>
+                <div class="controls-buttons">
+                    <button class="ctrl-btn skip-btn" id="rewindBtn"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button class="ctrl-btn main-play-btn" id="playPauseBtn">
+                        <i class="fa-solid fa-play" id="playIcon"></i>
+                        <i class="fa-solid fa-pause" id="pauseIcon" style="display:none;"></i>
+                    </button>
+                    <button class="ctrl-btn skip-btn" id="forwardBtn"><i class="fa-solid fa-rotate-right"></i></button>
+                    <div class="time-display"><span id="currentTime">0:00</span> / <span id="durationTime">0:00</span></div>
+                    <div class="right-controls-group">
+                        <div class="volume-wrapper"><input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100"></div>
+                        <button class="ctrl-btn" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

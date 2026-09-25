@@ -1,0 +1,2212 @@
+/* =========================================
+   CineChord - About Page Stylesheet
+   Version: 6.2 - MOBILE FOOTER LARGER TEXT
+   ========================================= */
+
+/* =========================================
+   1. GLOBAL & RESET
+   ========================================= */
+.loading-content {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* Məlumat gələndə üzərinə çıxacaq klass */
+.content-ready {
+    opacity: 1 !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    scroll-behavior: smooth;
+    height: 100%;
+}
+
+body {
+    font-family: 'Gabarito', sans-serif;
+    background: #050505;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.5;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Azərbaycan dili üçün Montserrat */
+body.lang-az :not(i):not(.fa):not(.fas):not(.fab):not(.far) {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Font Awesome ikonlarını qoruyuruq */
+body.lang-az .fa-solid,
+body.lang-az .fa-brands,
+body.lang-az [class^="fa-"],
+body.lang-az [class*=" fa-"],
+body.lang-az .social-icon i,
+body.lang-az .social-icon-hover i,
+body.lang-az .ctrl-btn i,
+body.lang-az .lang-check i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+}
+
+/* =========================================
+   2. PAGE TRANSITION & GRAIN
+   ========================================= */
+.page-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 999999;
+    transform: translateY(0);
+    pointer-events: all;
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.page-transition.page-loaded {
+    transform: translateY(-100%);
+    pointer-events: none;
+    transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.grain-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
+    pointer-events: none;
+    z-index: 20002;
+    opacity: 0.08;
+    animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-1%, -1%); }
+}
+
+/* =========================================
+   3. HAMBURGER MENU
+   ========================================= */
+.hamburger {
+    position: fixed;
+    top: 38px;
+    right: 40px;
+    z-index: 30000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 15px;
+    width: auto;
+    height: auto;
+}
+
+.hamburger * {
+    pointer-events: none;
+}
+
+.hamburger-text {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    width: 32px;
+    height: 20px;
+}
+
+.hamburger-line {
+    display: block;
+    height: 2px;
+    background: #fff;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
+}
+
+.hamburger-line:nth-child(1) { width: 32px; }
+.hamburger-line:nth-child(2) { width: 24px; }
+
+.hamburger:hover .hamburger-text { color: #FFA500; }
+.hamburger:hover .hamburger-line { width: 32px; background: #FFA500; }
+
+.hamburger.active .hamburger-line:nth-child(1) {
+    width: 32px;
+    transform: translateY(5px) rotate(45deg);
+}
+
+.hamburger.active .hamburger-line:nth-child(2) {
+    width: 32px;
+    transform: translateY(-5px) rotate(-45deg);
+}
+
+.hamburger.active:hover .hamburger-text { color: #FFA500; }
+.hamburger.active:hover .hamburger-line { background: #FFA500; }
+
+/* =========================================
+   4. MOBILE MENU OVERLAY & CONTENT
+   ========================================= */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 29000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 35%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 29999;
+    transition: right 1.1s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    padding: 0 20px;
+    visibility: hidden;
+    opacity: 0;
+    box-shadow: -10px 0 50px rgba(0,0,0,0.5);
+}
+
+.mobile-menu.active {
+    right: 0;
+    visibility: visible;
+    opacity: 1;
+}
+
+.nav-btn {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    margin: -1vh 0;
+    line-height: 0.95;
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: 4.5vw;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    color: transparent;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(150px);
+    transition: opacity 0.8s ease, transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
+}
+
+.mobile-menu.active .nav-btn {
+    opacity: 1;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mobile-menu.active .nav-btn:nth-child(odd) { transform: translateX(-10px); }
+.mobile-menu.active .nav-btn:nth-child(even) { transform: translateX(10px); }
+
+.mobile-menu.active .nav-btn:nth-child(1) { transition-delay: 0.3s; }
+.mobile-menu.active .nav-btn:nth-child(2) { transition-delay: 0.4s; }
+.mobile-menu.active .nav-btn:nth-child(3) { transition-delay: 0.5s; }
+.mobile-menu.active .nav-btn:nth-child(4) { transition-delay: 0.6s; }
+.mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
+.mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
+.mobile-menu.active .nav-btn:nth-child(7) { transition-delay: 0.9s; }
+
+/* ✅ AZ DİLİNDƏ YALNIZ ÖLÇÜ VƏ FONT DƏYİŞİR */
+body.lang-az .nav-btn {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 4.0vw !important;
+    letter-spacing: -3px !important;
+}
+
+.nav-text {
+    display: block;
+    color: #fff;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    position: relative;
+    z-index: 2;
+}
+
+.nav-btn::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #FFA500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    z-index: 1;
+    pointer-events: none;
+    clip-path: inset(100% 0 0 0);
+}
+
+.nav-btn:hover .nav-text { transform: translateY(-100%) skewY(5deg) translateZ(0); }
+.nav-btn:hover::after { 
+    transform: translateY(-100%) skewY(0deg) translateZ(0);
+    clip-path: inset(0 0 0 0);
+}
+.nav-btn:not(:hover) .nav-text { transform: translateY(0) skewY(0deg) translateZ(0); }
+.nav-btn:not(:hover)::after { 
+    transform: translateY(0) translateZ(0);
+    clip-path: inset(100% 0 0 0);
+}
+
+.menu-footer {
+    margin-top: 60px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mobile-menu.active .menu-footer {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
+}
+
+.menu-socials {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.menu-socials a {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: color 0.3s;
+    letter-spacing: 1px;
+}
+
+.menu-socials a:hover { color: #FFA500; }
+
+.menu-contact-info p {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 16px;
+    color: rgba(255,255,255,0.4) !important;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.menu-contact-info p,
+.menu-contact-info p a,
+.menu-contact-info a {
+    color: rgba(255,255,255,0.4) !important;
+    text-decoration: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-contact-info p:visited,
+.menu-contact-info p a:visited,
+.menu-contact-info a:visited {
+    color: rgba(255,255,255,0.4) !important;
+}
+
+/* =========================================
+   5. CENTER LOGO
+   ========================================= */
+.center-logo {
+    position: fixed;
+    top: 15px;
+    left: 40px;
+    z-index: 100;
+    pointer-events: auto;
+    text-decoration: none;
+}
+
+.logo-img {
+    width: 160px;
+    height: 120px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: opacity 0.3s ease;
+}
+
+.center-logo:hover .logo-img { opacity: 0.8; }
+
+/* =========================================
+   6. GLOBE LANGUAGE SELECTOR
+   ========================================= */
+.lang-selector {
+    position: fixed;
+    top: 37px;
+    right: 175px;
+    z-index: 30001;
+    pointer-events: auto;
+}
+
+.lang-globe-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    padding: 15px 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+    position: relative;
+    z-index: 30002;
+}
+
+.globe-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.globe-icon::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.globe-icon::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.6);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.globe-icon i {
+    display: none;
+}
+
+.globe-icon .globe-ellipse {
+    position: absolute;
+    width: 10px;
+    height: 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-globe-btn:hover .globe-icon {
+    transform: rotate(20deg);
+}
+
+.lang-globe-btn:hover .globe-icon::before,
+.lang-globe-btn:hover .globe-ellipse {
+    border-color: #FFA500;
+}
+
+.lang-globe-btn:hover .globe-icon::after {
+    background: #FFA500;
+}
+
+.lang-selector.active .globe-icon {
+    transform: rotate(0deg);
+    animation: globePulse 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-selector.active .globe-icon::before {
+    border-color: #FFA500;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+}
+
+.lang-selector.active .globe-icon::after {
+    background: #FFA500;
+    box-shadow: 0 0 8px rgba(255, 165, 0, 0.4);
+}
+
+.lang-selector.active .globe-ellipse {
+    border-color: #FFA500;
+    animation: ellipseRotate 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes globePulse {
+    0% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.15) rotate(-10deg); }
+    60% { transform: scale(0.95) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes ellipseRotate {
+    0% { transform: rotateY(0deg); width: 10px; }
+    50% { transform: rotateY(90deg); width: 2px; }
+    100% { transform: rotateY(180deg); width: 10px; }
+}
+
+.current-lang {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-globe-btn:hover .current-lang {
+    color: #FFA500;
+    letter-spacing: 2px;
+}
+
+.lang-selector.active .current-lang {
+    color: #FFA500;
+}
+
+.lang-dropdown {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    min-width: 160px;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transform-origin: top right;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 30003;
+    pointer-events: none;
+}
+
+.lang-selector.active .lang-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.lang-option:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.lang-option.active {
+    background: rgba(255, 165, 0, 0.1);
+}
+
+.lang-code {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 1px;
+    min-width: 24px;
+}
+
+.lang-option.active .lang-code {
+    color: #FFA500;
+}
+
+.lang-name {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    flex: 1;
+    text-align: left;
+}
+
+.lang-option:hover .lang-name {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.lang-option.active .lang-name {
+    color: rgba(255, 165, 0, 0.7);
+}
+
+.lang-check {
+    font-size: 10px;
+    color: #FFA500;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-option.active .lang-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* =========================================
+   7. LAYOUT & MAIN CONTENT
+   ========================================= */
+.container {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background: #050505;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.video-section {
+    display: block !important;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-section video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.content-section {
+    width: 100%;
+    height: auto;
+    padding: 160px 30px 100px;
+    background: transparent;
+    text-align: center;
+}
+
+.main-content {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 700px;
+    margin: 0 auto 80px auto;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   8. ROW (ULTRA-WIDE CINEMATIC GRID)
+   ============================================================ */
+.chew-row {
+    display: grid;
+    grid-template-columns: 120px 1fr; 
+    gap: 60px;
+    margin: 0 20px; 
+    padding: 100px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #FFA500;
+    position: sticky;
+    top: 100px;
+    opacity: 0.8;
+}
+
+.video-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 750px !important;
+    background: #000;
+    margin-bottom: 60px;
+    overflow: hidden;
+    margin-right: 0;
+}
+
+.side-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.03);
+    transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.video-container:hover .side-video {
+    transform: scale(1.05);
+}
+
+.text-footer-block {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    padding-right: 40px; 
+}
+
+.big-statement {
+    font-size: clamp(28px, 4vw, 52px); 
+    line-height: 1.0;
+    font-weight: 900; 
+    letter-spacing: -2px; 
+    max-width: 950px;
+    text-transform: uppercase;
+    margin: 0 auto 45px auto;
+    color: #ffffff;
+    text-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.description-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.desc-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 400;
+}
+
+/* =========================================
+   9. MEET US (TEAM GRID)
+   ========================================= */
+.chew-team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 100px 40px; 
+    width: 100%;
+}
+
+.chew-card {
+    width: 100%;
+}
+
+.chew-img-box {
+    width: 100%;
+    aspect-ratio: 1 / 1.1; 
+    overflow: hidden;
+    margin-bottom: 30px;
+    background: #111;
+}
+
+.chew-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chew-card:hover .chew-img-box img {
+    filter: grayscale(0%);
+    transform: scale(1.04);
+}
+
+.member-name {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.member-role {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FFA500;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
+
+.member-bio {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #bbb;
+    max-width: 90%;
+}
+
+/* =========================================
+   10. CONTENT STYLING & BRANDING
+   ========================================= */
+.title-wrapper { 
+    margin-bottom: 50px; 
+    overflow: hidden; 
+    position: relative;
+    width: 100%;
+}
+
+.hero-rolling-text {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    line-height: 1.1; 
+    margin: 0;
+    text-transform: uppercase;
+    cursor: default; 
+    font-size: clamp(3rem, 7vw, 5rem);
+    letter-spacing: -1px;
+    position: relative;
+    display: inline-block;
+    color: #fff;
+    -webkit-text-stroke: 0;
+    overflow: hidden; 
+    padding: 0px 5px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    transition: none !important;
+}
+
+body.lang-az .hero-rolling-text {
+    font-family: 'Montserrat', sans-serif !important;
+    line-height: 1.1;
+}
+
+.hero-rolling-text span {
+    display: block;
+    transform: none !important;
+    transition: none !important;
+}
+
+.hero-rolling-text:hover,
+.hero-rolling-text:hover span {
+    color: #fff !important;
+    transform: none !important;
+}
+
+.hero-rolling-text::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* =========================================
+   11. OTHER BLOCKS (CONTACT & LINKS)
+   ========================================= */
+.block-title {
+    font-size: 14px;
+    color: #FFA500;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.block-text {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+}
+
+.contact-info-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 60px;
+    border-top: none !important;
+    padding-top: 30px;
+}
+
+.contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contact-category {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+}
+
+.contact-value {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.rolling-link-item {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+    height: 1.2em;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.rolling-link-item span {
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.rolling-link-item::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    color: #FFA500;
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.rolling-link-item:hover span { 
+    transform: translateY(-100%); 
+}
+
+.rolling-link-item:hover::after { 
+    transform: translateY(-100%); 
+}
+
+.rolling-link-item {
+    --link-text: "";
+}
+
+.rolling-link-item::after {
+    content: var(--link-text, attr(data-text));
+}
+/* =========================================
+   CONTACT SECTION – SLIM BORDERS
+   ========================================= */
+
+/* Contact Section Yenilənməsi */
+.contact-section {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 100px 0; /* Boşluğu idarə olunan səviyyəyə saldıq */
+    margin: 0;
+    position: relative;
+}
+
+/* Kreativ "Let's Connect" fon yazısı və ya başlığı üçün */
+.contact-header-text {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: clamp(40px, 8vw, 120px);
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: -3px;
+    margin-bottom: 60px;
+    color: #fff;
+    text-align: left;
+    opacity: 1;
+}
+
+/* Azerbaijan dili üçün font tənzimləməsi */
+body.lang-az .contact-header-text {
+    font-family: 'Montserrat', sans-serif !important;
+    letter-spacing: -2px;
+}
+
+
+/* =========================================
+   CONTACT INFO GRID
+   ========================================= */
+
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px; /* Gap-i azaltdıq ki, dağınıq görünməsin */
+    max-width: 1200px;
+}
+
+.contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Kateqoriya və dəyər arasındakı məsafəni azaltdıq */
+}
+
+.contact-value {
+    font-size: 18px; /* Daha premium və minimal görünüş üçün bir az kiçiltdik */
+    font-weight: 500;
+}
+
+
+/* =========================================
+   CONTACT BLOCK
+   ========================================= */
+
+.contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+}
+
+
+/* =========================================
+   CONTACT CATEGORY
+   ========================================= */
+
+.contact-category {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #FFA500;
+    opacity: 0.8;
+    margin: 0;
+}
+
+
+/* =========================================
+   CONTACT VALUE
+   ========================================= */
+
+.contact-value {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    line-height: 1.5;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.contact-value:not(p):hover {
+    color: #FFA500;
+}
+
+
+/* =========================================
+   ROLLING LINK CLEANUP
+   ========================================= */
+
+.contact-value.rolling-link-item {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+    height: auto;
+}
+
+.contact-value.rolling-link-item span {
+    display: inline;
+    transition: color 0.3s ease;
+}
+
+.contact-value.rolling-link-item::after {
+    display: none !important;
+    content: none !important;
+}
+
+.contact-value.rolling-link-item:hover span {
+    color: #FFA500;
+    transform: none !important;
+}
+
+/* Kontakt bölməsinin ümumi hündürlüyünü tənzimləyək */
+.contact-section-adjustment {
+    padding: 80px 0 !important; /* Çox böyük boşluğu 80px-ə endirdik */
+}
+
+/* Kreativ böyük yazı */
+/* Başlıq və aşağıdakı məlumatlar arasındakı məsafəni açırıq */
+.contact-big-title {
+    font-family: 'Gabarito', sans-serif;
+    font-weight: 900;
+    font-size: clamp(30px, 4vw, 60px);
+    line-height: 1.1;
+    letter-spacing: -2px;
+    color: #FFA500; /* Turuncu rəng */
+    text-transform: uppercase;
+    
+    /* Məsafəni buradan tənzimləyirik */
+    margin-bottom: 120px; /* 80px-dən 120px-ə qaldırdıq */
+}
+
+/* Məlumatların olduğu hissəni bir az da aşağı itələyirik */
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    padding-top: 30px; /* Əlavə daxili boşluq */
+    border-top: 1px solid rgba(255, 255, 255, 0.05); /* Zəif bir xətt əlavə edərək ayırmaq olar (istəyə bağlı) */
+}
+
+/* Kateqoriya (EMAIL, PHONE) və dəyər arasındakı məsafəni də bir az artırıq */
+.contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* EMAIL yazısı ilə info@... arasındakı məsafə */
+}
+
+/* Mobil tənzimləmə */
+@media (max-width: 768px) {
+    .contact-big-title {
+        margin-bottom: 80px; /* Mobildə ekran balaca olduğu üçün bir az azaltdıq */
+    }
+    
+    .contact-info-grid {
+        padding-top: 20px;
+        gap: 50px; /* Mobildə alt-alta düşdükləri üçün aralarındakı məsafə */
+    }
+}
+
+/* Mobil görünüşdə başlıq və məlumat arası məsafəni qoruyaq */
+@media (max-width: 768px) {
+    .contact-big-title {
+        margin-bottom: 60px;
+        font-size: 30px;
+    }
+}
+    
+    .contact-section-adjustment {
+        padding: 50px 20px !important;
+    }
+
+
+
+/* =========================================
+   LANGUAGE OVERRIDES
+   ========================================= */
+
+body.lang-az .contact-category,
+body.lang-az .contact-value {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .contact-section {
+        padding: 8px 0; /* ⬅️ mobile-da da slim */
+    }
+
+    .contact-info-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .contact-block {
+        text-align: center;
+        gap: 15px;
+    }
+
+    .contact-category {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .contact-value {
+        font-size: 16px;
+    }
+}
+
+/* =========================================
+   12. DESKTOP/WEB SOSIAL HİSSƏ (AZ DİLİ)
+   ========================================= */
+body.lang-az .menu-socials a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+}
+
+body.lang-az .menu-contact-info p,
+body.lang-az .menu-contact-info a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 13px !important;
+    letter-spacing: 1px !important;
+}
+
+/* =========================================
+   13. SCROLL REVEAL
+   ========================================= */
+.reveal-item, .chew-card {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(0) !important;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-item.active, .chew-card.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    filter: blur(0) !important;
+}
+
+
+/* =========================================
+   14. SCROLL HIDE/SHOW ANIMATION
+   ========================================= */
+.hide-on-scroll {
+    opacity: 0 !important;
+    transform: translateY(-30px) !important;
+    pointer-events: none !important;
+}
+
+.center-logo,
+.hamburger,
+.lang-selector {
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.center-logo.hide-on-scroll,
+.hamburger.hide-on-scroll,
+.lang-selector.hide-on-scroll {
+    transform: translateY(-30px);
+    opacity: 0;
+}
+
+/* =========================================
+   15. CINEMATIC FOOTER
+   ========================================= */
+.main-footer {
+    background: #050505;
+    padding: 80px 60px 40px;
+    position: relative;
+    z-index: 10;
+    border-top: none; /* Xətti ləğv etdik */
+    overflow: hidden;
+}
+
+.footer-top-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.cta-text-link {
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
+}
+
+.cta-text {
+    font-family: 'Gabarito', sans-serif;
+    font-size: clamp(24px, 4vw, 48px);
+    color: #fff;
+    -webkit-text-stroke: 0;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: -1px;
+    position: relative;
+    line-height: 1.1;
+    display: block;
+    overflow: hidden;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.cta-text span {
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    font-family: inherit;
+}
+
+.cta-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #FFA500;
+    -webkit-text-stroke: 0;
+    font-family: inherit;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+}
+
+.cta-text-link:hover .cta-text span {
+    transform: translateY(-100%);
+}
+
+.cta-text-link:hover .cta-text::after {
+    transform: translateY(-100%);
+}
+
+.cta-button {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 14px;
+    color: #000;
+    background: #FFA500;
+    padding: 15px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.cta-button:hover {
+    background: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+}
+
+.footer-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 60px;
+}
+
+.footer-wrapper {
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-label {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 12px;
+    color: #FFA500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-text {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+.mask-link {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    line-height: 1.2;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    cursor: pointer;
+}
+
+.mask-link span {
+    display: block;
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    font-family: 'Gabarito', sans-serif;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mask-link span::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    color: #FFA500;
+    font-weight: 600;
+    font-family: inherit;
+    clip-path: inset(100% 0 0 0);
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), clip-path 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mask-link:hover span {
+    transform: translateY(-100%);
+}
+
+.mask-link:hover span::after {
+    clip-path: inset(0 0 0 0);
+}
+
+.mask-link:not(:hover) span::after {
+    clip-path: inset(100% 0 0 0);
+}
+
+.social-icons {
+    display: flex;
+    gap: 20px;
+}
+
+.mask-icon {
+    display: block;
+    height: 24px;
+    overflow: hidden;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.icon-wrap {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.mask-icon i {
+    font-size: 22px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-icon {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.hover-icon {
+    color: #FFA500;
+    transform: translateY(5px);
+}
+
+.mask-icon:hover .icon-wrap {
+    transform: translateY(-29px);
+}
+
+.footer-bottom {
+    margin-top: 80px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+}
+
+.copyright {
+    font-family: 'Gabarito', sans-serif;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   16. TRANSLATION SYNC SAFEGUARD
+   ========================================= */
+.loading-state #main-title span, 
+.loading-state .subtitle, 
+.loading-state .big-statement, 
+.loading-state .desc-text,
+.loading-state .member-bio,
+.loading-state .member-name,
+.loading-state .member-role {
+    opacity: 0 !important;
+    transition: none !important;
+}
+
+.content-ready {
+    opacity: 1 !important;
+    transition: opacity 0.5s ease-in-out !important;
+}
+
+/* ============================================================
+   17. MOBILE RESPONSIVE - PERFECTLY CENTERED
+   ============================================================ */
+@media (max-width: 768px) {
+    /* ===== NAVİQASİYA ===== */
+    .lang-selector {
+        top: 33px !important;
+        right: 125px !important;
+        left: auto !important;
+        z-index: 30001;
+    }
+    
+    .lang-globe-btn {
+        padding: 8px 6px;
+        gap: 8px;
+        pointer-events: auto;
+    }
+    
+    .globe-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .globe-icon::before {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .globe-icon::after {
+        width: 16px;
+    }
+    
+    .globe-icon .globe-ellipse {
+        width: 8px;
+        height: 16px;
+    }
+    
+    .current-lang {
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+    
+    .lang-dropdown {
+        left: 0;
+        right: auto;
+        min-width: 150px;
+        transform-origin: top left;
+    }
+
+    .hamburger {
+        position: fixed !important;
+        top: 32px !important;    
+        right: 20px !important;  
+        gap: 12px;
+        padding: 8px;
+        z-index: 30002 !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .hamburger-text {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        display: block !important;
+        color: #fff !important;
+    }
+    
+    .hamburger-icon {
+        width: 28px;
+        height: 18px;
+        gap: 6px;
+    }
+    
+    .hamburger-line:nth-child(1) {
+        width: 28px;
+    }
+    
+    .hamburger-line:nth-child(2) {
+        width: 20px;
+    }
+    
+    .hamburger:hover .hamburger-line,
+    .hamburger.active .hamburger-line {
+        width: 28px;
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .hamburger.active .hamburger-line:nth-child(2) {
+        transform: translateY(-4px) rotate(-45deg);
+    }
+    
+    .hamburger-icon .hamburger-line {
+        background-color: #fff !important;
+    }
+
+    .center-logo {
+        position: fixed !important;
+        top: 15px !important;   
+        left: 20px !important;
+        z-index: 30001 !important;
+    }
+    
+    .logo-img {
+        width: 80px;
+        height: 80px;
+    }
+
+    /* ===== MOBİL MENU ===== */
+    .mobile-menu {
+        width: 100% !important;
+        padding-top: 120px !important;
+        background-color: #000 !important;
+        z-index: 30000 !important;
+    }
+
+    .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 13vw !important;
+        margin: -0.3vh 0 !important;      
+        line-height: 1.0 !important;
+        display: block !important;
+        overflow: visible !important;
+        color: #fff !important;
+    }
+    
+    body.lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+        text-shadow: 1px 0 0 #fff !important;
+        font-size: 10.5vw !important;
+        line-height: 1.2 !important;
+        margin: -0.3vh 0 !important;
+        letter-spacing: -2px !important;
+        width: 100% !important;
+        display: block !important;
+        overflow: visible !important;
+    }
+    
+    .mobile-menu.active .nav-btn:nth-child(odd) { 
+        transform: translateX(-10px) !important; 
+    }
+    .mobile-menu.active .nav-btn:nth-child(even) { 
+        transform: translateX(10px) !important; 
+    }
+
+    /* ===== ✅ ƏSAS KONTEYNER - MÜKƏMMƏLLƏŞDİRİLMİŞ MƏRKƏZLƏŞDIRMƏ ===== */
+    body {
+        overflow-x: hidden;
+    }
+
+    /* ✅ YALNIZ BU KONTEYNER PADDİNG VERİR - HƏR TƏRƏFDƏN EYNİ */
+    .content-section {
+        padding: 120px 25px 60px 25px !important;
+        width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* ===== ✅ ALT ELEMENTLƏR - ƏLAVƏ PADDİNG/MARGİN YOX ===== */
+    .chew-row, 
+    .chew-team-grid, 
+    .description-grid,
+    .footer-wrapper {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 40px !important;
+        box-sizing: border-box !important;
+    }
+    
+    .video-container {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16 / 9 !important;
+        margin: 0 0 40px 0 !important;
+        padding: 0 !important;
+    }
+    
+    .chew-img-box {
+        width: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    /* ===== ✅ MƏTN BLOKLARI TAM MƏRKƏZ ===== */
+    .text-footer-block {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    /* ===== MƏTN ELEMENTLƏR ===== */
+    .hero-rolling-text {
+        font-size: 10vw !important;
+        padding: 6px 0 !important;
+        margin: 0 auto 80px auto !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+    
+    .big-statement {
+        font-size: 25px !important;
+        line-height: 1.4 !important;
+        letter-spacing: 0.5px !important;
+        margin: 0 auto 30px auto !important;
+        padding: 0 !important;
+        text-align: center !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .description-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .desc-text {
+        font-size: 14px !important;
+        line-height: 1.7 !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+   .subtitle {
+        text-align: center !important;
+        width: 100% !important;
+        
+        /* 🔥 ƏSAS HİSSƏ: -20px yazırıq ki, aşağıdakı mətni özünə çəksin */
+        margin: 0 auto 60px auto !important; 
+        
+        padding: 0 !important;
+        display: block !important;
+        line-height: 1 !important; 
+        z-index: 5; /* Yazının digər elementlərin altında qalmaması üçün */
+        position: relative;
+    }
+
+    /* ===== SOSİAL VƏ KONTAKT ===== */
+    body.lang-az .menu-socials a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;      
+        letter-spacing: 0.5px !important; 
+        transform: none !important;
+    }
+
+    body.lang-az .menu-contact-info p, 
+    body.lang-az .menu-contact-info a {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;      
+        letter-spacing: 0.5px !important; 
+        transform: none !important;
+    }
+    
+    .menu-contact-info p,
+    .menu-contact-info p a,
+    .menu-contact-info a {
+        color: rgba(255,255,255,0.4) !important;
+        text-decoration: none !important;
+        border-bottom: none !important;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ===== ✅ KOMANDA SEKSİYASI - TAM DÜZƏLDİLMİŞ ===== */
+ .sidebar-label {
+        position: relative !important;
+        top: 0 !important;
+        display: block !important;
+        text-align: center !important;
+        width: 100% !important;
+        /* margin: Yuxarı | Sağ | Aşağı | Sol */
+        margin: 40px auto 30px auto !important; /* <--- DƏYİŞİKLİK: Sonda 80px idi, 30px etdik */
+        padding: 0 !important;
+        font-size: 14px !important;
+        letter-spacing: 3px !important;
+        color: #FFA500 !important;
+    }
+
+    /* ✅ Team grid - ƏLAVƏ PADDİNG YOX */
+    .chew-team-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 50px !important;
+        width: 100% !important;
+        margin: 100px 0 0 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* ✅ Team member - TAM MƏRKƏZ */
+    .chew-card,
+    .team-member {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        text-align: center !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Şəkil */
+.chew-card .chew-img-box,
+.team-member .chew-img-box {
+    width: 100% !important;           /* ✅ 80%-dən 100%-ə */
+    max-width: 350px !important;      /* ✅ 250px-dən 350px-ə */
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
+    border-radius: 0 !important;  /* ✅ 50% əvəzinə 0 - kvadrat */
+    margin: 0 auto 25px auto !important;
+    padding: 0 !important;
+    display: block !important;
+    background: #111;
+}
+
+    .chew-card .chew-img-box img,
+    .team-member .chew-img-box img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+
+    /* Ad */
+    .chew-card .member-name,
+    .team-member .member-name {
+        font-size: 20px !important;
+        font-weight: 700 !important;
+        color: #fff !important;
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto 5px auto !important;
+        padding: 0 !important;
+    }
+
+    /* Vəzifə */
+    .chew-card .member-position,
+    .chew-card .member-role,
+    .team-member .member-position,
+    .team-member .member-role {
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        color: #e6b32e !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto 20px auto !important;
+        padding: 0 !important;
+    }
+
+    /* ✅ BİO MƏTN - TAM MƏRKƏZLƏŞDIRMƏ */
+    .chew-card .member-bio,
+    .chew-card p,
+    .team-member .member-bio,
+    .team-member p {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 14px !important;
+        line-height: 1.7 !important;
+        color: #cccccc !important;
+        text-align: center !important;
+        text-align-last: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        display: block !important;
+    }
+
+    /* ✅ Əgər bio <div> içindədirsə */
+    .chew-card div:not(.chew-img-box),
+    .team-member div:not(.chew-img-box) {
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    /* ✅ Bütün team card elementləri */
+    .chew-team-grid .chew-card,
+    .chew-team-grid .team-member {
+        text-align: center !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    /* ===== GÖRÜNÜRLÜK ===== */
+    .reveal-item, 
+    .chew-card, 
+    .chew-team-grid .reveal-item,
+    .chew-team-grid .chew-card,
+    .mobile-ready,
+    .mobile-instant {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+        animation: none !important;
+        display: block !important;
+    }
+
+    .reveal-item.active,
+    .chew-card.active,
+    .mobile-ready.active,
+    .mobile-instant,
+    .force-visible {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+    .chew-img-box {
+        opacity: 1 !important;
+        visibility: visible !important;
+        background: #111;
+        display: block !important;
+    }
+    
+    .chew-img-box img {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
+    
+    .chew-team-grid {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: grid !important;
+    }
+    
+    .member-name,
+    .member-role {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
+    
+    #team-grid {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: grid !important;
+    }
+
+    /* ===== FOOTER MOBİL ===== */
+    .main-footer {
+        padding: 60px 15px 30px !important;
+        overflow-x: hidden;
+    }
+    
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-label {
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+    }
+    
+    .footer-content {
+        gap: 8px;
+    }
+    
+    .footer-text {
+        font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .mask-link {
+        max-width: 100%;
+        word-break: break-word;
+    }
+    
+    .mask-link span {
+        font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .social-icons {
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+    
+    .mask-icon i {
+        font-size: 24px;
+    }
+    
+    .footer-bottom {
+        margin-top: 50px;
+        padding-top: 20px;
+    }
+    
+    .copyright {
+        font-size: 11px;
+        text-align: center;
+    }
+}
+
+/* =========================================
+   18. DESKTOP PROTECTION
+   ========================================= */
+@media (min-width: 769px) {
+    body.lang-az .mobile-menu .nav-btn,
+    body.lang-az .nav-btn,
+    .lang-az .nav-btn {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+        font-size: 4.0vw !important;
+        letter-spacing: -3px !important;
+        margin: -0.5vh 0 !important;
+    }
+    
+    body.lang-az .hero-rolling-text,
+    .lang-az .hero-rolling-text,
+    body.lang-az .big-statement,
+    .lang-az .big-statement {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 900 !important;
+    }
+
+    /* Desktop üçün normal reveal animation */
+    .reveal-item {
+        opacity: 1;
+        transform: translateY(60px);
+        filter: blur(5px);
+        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-item.active {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+    
+    .mobile-instant {
+        opacity: 0;
+        transform: translateY(60px);
+        filter: blur(5px);
+    }
+    
+    .mobile-instant.active {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* =========================================
+   19. UNIVERSAL SAFEGUARD
+   ========================================= */
+.chew-card {
+    min-height: 200px;
+}
+
+.chew-img-box {
+    background-color: #111;
+}
+
+.chew-team-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px 40px;
+}
+
+/* ============================================================
+   FOOTER MOBILE FIX - ABOUT PAGE
+   Yazılar ekranın kənarına yaxın olsun
+   ============================================================ */
+
+/* Tablet və aşağı */
+@media (max-width: 1024px) {
+    .main-footer {
+        padding: 60px 30px 30px;
+    }
+    
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        max-width: 100%;
+    }
+    
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Mobile - Yazılar kenara yaxın */
+@media (max-width: 768px) {
+    .main-footer {
+        padding: 60px 15px 30px !important;
+        overflow-x: hidden;
+    }
+    
+    .footer-wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-col {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    
+    .footer-label {
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+    }
+    
+    .footer-content {
+        gap: 8px;
+    }
+    
+    .footer-text {
+        font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .mask-link {
+        max-width: 100%;
+        word-break: break-word;
+    }
+    
+    .mask-link span {
+        font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .social-icons {
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+    
+    .mask-icon i {
+        font-size: 24px;
+    }
+    
+    .footer-bottom {
+        margin-top: 50px;
+        padding-top: 20px;
+    }
+    
+    .copyright {
+        font-size: 11px;
+        text-align: center;
+    }
+}
+
+/* Çox kiçik ekranlar */
+@media (max-width: 480px) {
+    .main-footer {
+        padding: 50px 10px 25px !important;
+    }
+    
+    .footer-wrapper {
+        gap: 35px;
+    }
+    
+    .footer-label {
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+    
+    .footer-text,
+    .mask-link span {
+        font-size: 15px;
+    }
+    
+    .social-icons {
+        gap: 20px;
+    }
+    
+    .mask-icon i {
+        font-size: 22px;
+    }
+    
+    .copyright {
+        font-size: 10px;
+    }
+}

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CineChord Video Archive - Bütün filmləri, reklam videolarını və layihələri keçin.">
+    <meta name="keywords" content="video archive, film, commercial, CineChord">
+    <meta name="author" content="CineChord">
+    
+    <title>CineChord - Archive | Video Archive</title>
+    
+    <link rel="icon" type="image/png" href="../photos/CineChord.png">
+    <link rel="shortcut icon" type="image/png" href="../photos/CineChord.png">
+    <link rel="apple-touch-icon" href="../photos/CineChord.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+<link rel="stylesheet" href="archive.css?v=3"></head>
+<body>
+
+    <div class="page-transition"></div>
+    <div class="grain-overlay"></div>
+
+    <!-- LANGUAGE SELECTOR WITH GLOBE -->
+    <div class="lang-selector" id="langSelector">
+        <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+            <span class="globe-icon">
+                <span class="globe-ellipse"></span>
+            </span>
+            <span class="current-lang" id="currentLangText">EN</span>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <button class="lang-option active" data-lang="en">
+                <span class="lang-code">EN</span>
+                <span class="lang-name">English</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+            <button class="lang-option" data-lang="az">
+                <span class="lang-code">AZ</span>
+                <span class="lang-name">Azərbaycan</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         VIDEO MODAL - YENİ PLAY BUTTON İLƏ
+         ============================================================ -->
+    <div class="preview-container is-paused" id="previewContainer">
+        <button class="close-preview" id="closePreview">×</button>
+        
+        <div class="preview-info" id="previewInfo">
+            <div class="text-mask">
+                <div class="preview-title" id="previewTitle">PROJECT NAME</div>
+            </div>
+        </div>
+        
+        <div class="video-wrapper" id="videoWrapper">
+            <div class="video-loading"></div>
+            
+            <!-- ✅ YENİ MODAL PLAY BUTTON - Play + Pause ikonları -->
+            <div class="modal-play-btn-wrapper" id="modalPlayBtnContainer">
+                <div class="modal-play-btn-inner">
+                    <img src="../play-btn.png" alt="Play Video" class="modal-play-icon" id="modalPlayIcon">
+                    <img src="../pause-btn.png" alt="Pause Video" class="modal-play-icon pause-icon" id="modalPauseIcon" style="display:none;">
+                </div>
+            </div>
+            
+            <video id="previewVideo" class="preview-video" playsinline preload="auto"></video>
+            
+            <!-- Custom Controls - TOXUNULMADAN QALIR -->
+            <div class="custom-controls" id="customControls">
+                <div class="progress-bar-container" id="progressBarContainer">
+                    <div class="progress-played" id="progressPlayed"></div>
+                    <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
+                </div>
+                
+                <div class="controls-buttons">
+                    <button class="ctrl-btn skip-btn" id="rewindBtn" title="-5s">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                    
+                    <button class="ctrl-btn main-play-btn" id="playPauseBtn">
+                        <i class="fas fa-play" id="playIcon"></i>
+                        <i class="fas fa-pause" id="pauseIcon" style="display:none;"></i>
+                    </button>
+                    
+                    <button class="ctrl-btn skip-btn" id="forwardBtn" title="+5s">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                    
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span> / <span id="durationTime">0:00</span>
+                    </div>
+                    
+                    <div class="right-controls-group">
+                        <div class="volume-wrapper">
+                            <input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100">
+                        </div>
+                        <button class="ctrl-btn speed-btn" id="speedBtn">1x</button>
+                        <button class="ctrl-btn" id="fullscreenBtn">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HAMBURGER BUTTON -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span class="hamburger-text">MENU</span>
+        <span class="hamburger-icon">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </span>
+    </button>
+
+    <!-- OVERLAY -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- MOBILE MENU -->
+    <nav class="mobile-menu" id="mobileMenu">
+ <a href="../" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+    <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+    <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+    <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+    <a href="../backstage/" class="nav-btn" data-text="BACKSTAGE" data-key="backstage"><span class="nav-text">BACKSTAGE</span></a>
+    <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+    <a href="#" class="nav-btn active" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
+
+        <div class="menu-footer">
+            <div class="menu-socials">
+                <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+                <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a> 
+                <a href="#">VIMEO</a>
+            </div>
+            <div class="menu-contact-info">
+                <p>hello@cinechord.az</p>
+                <p>+994 50 123 45 67</p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LOGO -->
+    <a href="../" class="center-logo" title="Home">
+        <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
+    </a>
+
+    <main>
+        <section class="archive-section" id="archiveSection">
+            <div class="split-titles">
+                <div class="video-title" aria-hidden="true">
+                    <span class="video-word" data-key="category_film">FILM</span>
+                    <span class="video-word" data-key="category_commercial">COMMERCIAL</span>
+                    <span class="video-word" data-key="category_clip">CLIP</span>
+                </div>
+                
+            <div class="archive-title-container">
+                    <h1 class="archive-title" data-key="archive_title">ARCHIVE</h1>
+                    <p class="archive-subtitle">
+                        <span data-key="archive_subtitle_1">FULL FILM AVAILABLE ON REQUEST</span> • 
+                        <a href="../contact/" data-key="archive_subtitle_2">SHOOT A MESSAGE</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ARCHIVE SORT (CUSTOM MINIMALIST DESIGN) BURA ƏLAVƏ OLUNUR -->
+            <div class="archive-sort-wrapper">
+                <label class="archive-sort-label">SORT BY</label>
+                
+                <div class="custom-select-wrapper" id="customSelectWrapper">
+                    <div class="custom-select-trigger" id="customSelectTrigger">
+                        <span>NEWEST ADDED</span>
+                        <div class="custom-arrow"></div>
+                    </div>
+                    
+                    <div class="custom-select-options" id="customSelectOptions">
+                        <div class="custom-option selected" data-value="newest-added">NEWEST ADDED</div>
+                        <div class="custom-option" data-value="oldest-added">OLDEST ADDED</div>
+                        <div class="custom-option" data-value="name-az">NAME A–Z</div>
+                        <div class="custom-option" data-value="name-za">NAME Z–A</div>
+                        <div class="custom-option" data-value="year-newest">YEAR: NEWEST</div>
+                        <div class="custom-option" data-value="year-oldest">YEAR: OLDEST</div>
+                    </div>
+                    
+                    <select id="archiveSort" style="display: none;">
+                        <option value="newest-added">NEWEST ADDED</option>
+                        <option value="oldest-added">OLDEST ADDED</option>
+                        <option value="name-az">NAME A–Z</option>
+                        <option value="name-za">NAME Z–A</option>
+                        <option value="year-newest">YEAR: NEWEST</option>
+                        <option value="year-oldest">YEAR: OLDEST</option>
+                    </select>
+                </div>
+            </div>
+            <!-- SORT BÖLMƏSİNİN SONU -->
+
+                      <div class="archive-table-scroll">
+                <table class="archive-table" role="table" aria-label="Video archive">
+                    <thead>
+                        <tr>
+                            <th class="number-col" scope="col">#</th>
+                            <th class="client-col" scope="col" data-key="client">CLIENT</th>
+                            <th class="title-col" scope="col" data-key="title">TITLE</th>
+                            <th class="type-col" scope="col" data-key="type">TYPE</th>
+                            <th class="location-col" scope="col" data-key="location">LOCATION</th>
+                            <th class="agency-col" scope="col" data-key="agency">PRODUCTION</th>
+                            <th class="year-col" scope="col" data-key="year">YEAR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    
+
+    <script src="archive.js"></script>
+</body>
+</html>
