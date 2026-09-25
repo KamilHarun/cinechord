@@ -13,41 +13,41 @@
     --primary-hover: #7c3aed;
     --primary-light: rgba(139, 92, 246, 0.15);
     --primary-glow: rgba(139, 92, 246, 0.4);
-    
+
     /* Accent Colors */
     --accent-gold: #fbbf24;
     --accent-cyan: #22d3ee;
     --accent-pink: #ec4899;
     --accent-green: #10b981;
     --accent-red: #ef4444;
-    
+
     /* Background Colors */
     --bg-primary: #0c0a1d;
     --bg-secondary: #13112b;
     --bg-card: rgba(30, 27, 56, 0.7);
     --bg-card-hover: rgba(40, 36, 76, 0.9);
     --bg-input: rgba(20, 17, 40, 0.8);
-    
+
     /* Text Colors */
     --text-primary: #f1f5f9;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
-    
+
     /* Border Colors */
     --border-color: rgba(139, 92, 246, 0.2);
     --border-hover: rgba(139, 92, 246, 0.5);
-    
+
     /* Shadows */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
     --shadow-glow: 0 0 20px var(--primary-glow);
-    
+
     /* Transitions */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.25s ease;
     --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     /* Border Radius */
     --radius-sm: 6px;
     --radius-md: 10px;
@@ -78,7 +78,7 @@ body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background: 
+    background:
         radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 100%, rgba(34, 211, 238, 0.05) 0%, transparent 50%);
     z-index: -1;
@@ -1014,12 +1014,11 @@ body::before {
    TOGGLE SWITCH STYLING (MODAL)
    =============================================== */
 
-/* Toggle-ı biraz böyüdək ki, rahat basılsın */
 .custom-switch .form-check-input {
-    width: 3em;      /* Eni */
-    height: 1.5em;   /* Hündürlüyü */
+    width: 3em;
+    height: 1.5em;
     cursor: pointer;
-    background-color: #2a2a2a; /* Sönülü rəng (boz) */
+    background-color: #2a2a2a;
     border-color: #444;
     transition: background-color 0.3s ease;
 }
@@ -1053,7 +1052,13 @@ body::before {
     box-shadow: 0 0 10px rgba(13, 202, 240, 0.4);
 }
 
-/* Hover effektləri */
+/* 4. BACKSTAGE DƏRC - YAŞIL */
+#bsPublished:checked {
+    background-color: #198754;
+    border-color: #198754;
+    box-shadow: 0 0 10px rgba(25, 135, 84, 0.4);
+}
+
 .custom-switch:hover .form-check-input {
     filter: brightness(1.2);
 }
@@ -1375,6 +1380,13 @@ body::before {
     border-color: var(--border-color);
 }
 
+/* Switch-lər enli olmalıdır (yuxarıdakı qayda onları kvadrata çevirirdi) */
+.modal-body .form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.3em;
+    cursor: pointer;
+}
+
 .modal-body .form-check-label {
     font-size: 0.9rem;
     color: var(--text-primary);
@@ -1490,6 +1502,91 @@ input[type="file"]::file-selector-button:hover {
 }
 
 /* ===============================================
+   BACKSTAGE
+   =============================================== */
+
+.bs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bs-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border: 1px solid rgba(139, 92, 246, .25);
+    background: rgba(139, 92, 246, .05);
+    border-radius: 12px;
+    transition: border-color .2s, opacity .2s;
+}
+
+.bs-row:hover {
+    border-color: #8b5cf6;
+}
+
+.bs-row.bs-dragging {
+    opacity: .4;
+    border-style: dashed;
+}
+
+.bs-handle {
+    cursor: grab;
+    opacity: .6;
+    padding: 4px 6px;
+}
+
+.bs-handle:active {
+    cursor: grabbing;
+}
+
+.bs-thumb {
+    width: 128px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #111;
+    flex-shrink: 0;
+}
+
+.bs-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.bs-brand {
+    font-weight: 700;
+    text-transform: lowercase;
+}
+
+.bs-title {
+    font-size: .85rem;
+    opacity: .65;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bs-switch {
+    flex-shrink: 0;
+}
+
+/* works kartlarındakı flex:1 qaydası burada düymələri uzatmasın */
+.bs-row .btn-edit,
+.bs-row .btn-delete {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+}
+
+.bs-poster-preview {
+    max-height: 120px;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+/* ===============================================
    RESPONSIVE
    =============================================== */
 
@@ -1498,41 +1595,41 @@ input[type="file"]::file-selector-button:hover {
         grid-template-columns: 1fr;
         max-width: 420px;
     }
-    
+
     .login-left {
         padding: 2rem 1.5rem;
         min-height: auto;
     }
-    
+
     .sidebar {
         width: 70px;
     }
-    
+
     .brand span,
     .nav-item span:not(.badge),
     .nav-title,
     .info {
         display: none;
     }
-    
+
     .sidebar-header {
         padding: 1rem;
         justify-content: center;
     }
-    
+
     .sidebar-toggle {
         display: none;
     }
-    
+
     .nav-item {
         justify-content: center;
         padding: 0.75rem;
     }
-    
+
     .user-info {
         justify-content: center;
     }
-    
+
     .page-view {
         padding: 1.25rem;
     }
@@ -1542,29 +1639,39 @@ input[type="file"]::file-selector-button:hover {
     .page-title {
         font-size: 1.5rem;
     }
-    
+
     .page-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
     }
-    
+
     .dashboard-stats {
         grid-template-columns: 1fr 1fr;
     }
-    
+
     .works-container {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
-    
+
     .filters-bar {
         flex-direction: column;
     }
-    
+
     .search-box-inline,
     .category-select {
         width: 100%;
         min-width: unset;
+    }
+
+    .bs-thumb {
+        width: 80px;
+        height: 45px;
+    }
+
+    .bs-row {
+        gap: 10px;
+        padding: 8px 10px;
     }
 }
 
@@ -1572,24 +1679,24 @@ input[type="file"]::file-selector-button:hover {
     .page-view {
         padding: 1rem;
     }
-    
+
     .page-title {
         font-size: 1.25rem;
     }
-    
+
     .dashboard-stats {
         grid-template-columns: 1fr;
     }
-    
+
     .works-container {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 0.75rem;
     }
-    
+
     .work-body {
         padding: 0.65rem;
     }
-    
+
     .work-title {
         font-size: 0.8rem;
     }
@@ -1604,7 +1711,7 @@ input[type="file"]::file-selector-button:hover {
 .text-danger { color: var(--accent-red) !important; }
 .text-success { color: var(--accent-green) !important; }
 .text-warning { color: var(--accent-gold) !important; }
-.text-truncate { 
+.text-truncate {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

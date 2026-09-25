@@ -567,6 +567,7 @@ body.lang-az .hamburger-text {
 .mobile-menu.active .nav-btn:nth-child(4) { transition-delay: 0.6s; }
 .mobile-menu.active .nav-btn:nth-child(5) { transition-delay: 0.7s; }
 .mobile-menu.active .nav-btn:nth-child(6) { transition-delay: 0.8s; }
+.mobile-menu.active .nav-btn:nth-child(7) { transition-delay: 0.9s; }
 
 /* ✅ AZƏRBAYCAN DİLİ - DESKTOP MENU */
 html[lang="az"] .nav-btn,

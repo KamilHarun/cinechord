@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineChord Admin</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-  
+
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -30,17 +30,17 @@
                 <form id="loginForm" class="login-form">
                     <h3>Xoş Gəldiniz</h3>
                     <p class="subtitle">Davam etmək üçün giriş edin</p>
-                    
+
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> İstifadəçi adı</label>
                         <input type="text" id="loginUser" placeholder="admin" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Şifrə</label>
                         <input type="password" id="loginPass" placeholder="••••••" required>
                     </div>
-                    
+
                     <button type="submit" class="btn-login">
                         <span>Giriş et</span>
                         <i class="fas fa-arrow-right"></i>
@@ -51,7 +51,7 @@
     </div>
 
     <div class="admin-wrapper" id="admin-wrapper" style="display: none;">
-        
+
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="brand">
@@ -60,7 +60,7 @@
                 </div>
                 <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             </div>
-            
+
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-title">ƏSAS</div>
@@ -68,11 +68,14 @@
                         <i class="fas fa-chart-line"></i><span>Dashboard</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-section">
                     <div class="nav-title">İDARƏETMƏ</div>
                     <a href="#" class="nav-item" data-page="works">
                         <i class="fas fa-film"></i><span>Portfolio</span><span class="badge" id="worksCount">0</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="backstage">
+                        <i class="fas fa-video"></i><span>Backstage</span><span class="badge" id="backstageCount">0</span>
                     </a>
                     <a href="#" class="nav-item" data-page="services">
                         <i class="fas fa-magic"></i><span>Xidmətlər</span><span class="badge" id="servicesCount">0</span>
@@ -84,7 +87,7 @@
                         <i class="fas fa-info-circle"></i><span>Haqqımızda</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-section">
                     <div class="nav-title">SİSTEM</div>
                     <a href="#" class="nav-item" id="themeToggleNav">
@@ -96,7 +99,7 @@
                     </a>
                 </div>
             </nav>
-            
+
             <div class="sidebar-footer">
                 <button class="btn-logout" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i><span>Çıxış</span>
@@ -105,7 +108,8 @@
         </aside>
 
         <main class="main-content">
-            
+
+            <!-- ============ DASHBOARD ============ -->
             <div class="page-view active" id="view-dashboard">
                 <div class="page-header">
                     <div>
@@ -144,6 +148,7 @@
                 </div>
             </div>
 
+            <!-- ============ WORKS ============ -->
             <div class="page-view" id="view-works">
                 <div class="page-header">
                     <h1>Portfolio</h1>
@@ -167,6 +172,19 @@
                 <div id="pagination" class="pagination-container"></div>
             </div>
 
+            <!-- ============ BACKSTAGE (YENİ) ============ -->
+            <div class="page-view" id="view-backstage">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Backstage</h1>
+                        <p class="page-subtitle">Sıranı dəyişmək üçün sətirləri sürüşdürün</p>
+                    </div>
+                    <button class="btn-primary" onclick="openBackstageModal()"><i class="fas fa-plus"></i> Yeni Video</button>
+                </div>
+                <div class="bs-list" id="bsList"></div>
+            </div>
+
+            <!-- ============ SERVICES ============ -->
             <div class="page-view" id="view-services">
                 <div class="page-header">
                     <h1>Xidmətlər</h1>
@@ -175,11 +193,13 @@
                 <div class="services-grid" id="servicesGrid"></div>
             </div>
 
+            <!-- ============ MESSAGES ============ -->
             <div class="page-view" id="view-messages">
                 <div class="page-header"><h1>Mesajlar</h1></div>
                 <div class="messages-list" id="messagesList"></div>
             </div>
 
+            <!-- ============ ABOUT ============ -->
             <div class="page-view" id="view-about">
                 <div class="page-header">
                     <div>
@@ -217,7 +237,7 @@
                         </div>
                     </div>
 
-                    <!-- ✅ 1.5. ƏLAQƏ MƏLUMAT LARI -->
+                    <!-- 1.5. ƏLAQƏ MƏLUMATLARI -->
                     <div class="content-card mb-4">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-address-book"></i> 1.5. Əlaqə Məlumatları (Contact Info)</h3>
@@ -290,7 +310,7 @@
         </main>
     </div>
 
-    <!-- WORK MODAL - TAM ÇOX SAHƏLİ -->
+    <!-- ================= WORK MODAL ================= -->
     <div class="modal fade" id="workModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content bg-dark text-white">
@@ -301,7 +321,7 @@
                 <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                     <form id="workForm">
                         <input type="hidden" id="workId">
-                        
+
                         <!-- ƏSAS MƏLUMATLAR -->
                         <div class="mb-4">
                             <h6 class="text-warning mb-3"><i class="fas fa-info-circle"></i> Əsas Məlumatlar</h6>
@@ -343,7 +363,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        <i class="fas fa-video text-danger"></i> Ana Video (MP4/MOV) 
+                                        <i class="fas fa-video text-danger"></i> Ana Video (MP4/MOV)
                                         <small class="text-muted">(Əsas video faylı yüklə)</small>
                                     </label>
                                     <input type="file" id="wVideoFile" class="form-control bg-secondary text-white border-0" accept="video/*">
@@ -358,7 +378,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        <i class="fas fa-film text-primary"></i> Preview Video (MP4) 
+                                        <i class="fas fa-film text-primary"></i> Preview Video (MP4)
                                         <small class="text-muted">(Hover video faylı - Qısa)</small>
                                     </label>
                                     <input type="file" id="wPreview" class="form-control bg-secondary text-white border-0" accept="video/*">
@@ -370,28 +390,28 @@
                                     </label>
                                     <input type="url" id="wPreviewVideoUrl" class="form-control bg-secondary text-white border-0" placeholder="https://res.cloudinary.com/...">
                                 </div>
-                                
-                                <!-- ✅ YENİ - HOVER ŞƏKLİ (FAYL) -->
+
+                                <!-- HOVER ŞƏKLİ (FAYL) -->
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        <i class="fas fa-image text-warning"></i> Hover Şəkli 
+                                        <i class="fas fa-image text-warning"></i> Hover Şəkli
                                         <small class="text-muted">(Video keyfiyyəti pisdirsə hover üçün şəkil)</small>
                                     </label>
                                     <input type="file" id="wHoverImage" class="form-control bg-secondary text-white border-0" accept="image/*">
                                     <div id="hoverImagePreview" class="mt-2"></div>
                                 </div>
-                                
-                                <!-- ✅ YENİ - HOVER ŞƏKLİ (URL) -->
+
+                                <!-- HOVER ŞƏKLİ (URL) -->
                                 <div class="col-md-6">
                                     <label class="form-label">
                                         Hover Şəkli URL <small class="text-muted">(və ya birbaşa link)</small>
                                     </label>
                                     <input type="url" id="wHoverImageUrl" class="form-control bg-secondary text-white border-0" placeholder="https://pub-...r2.dev/images/...">
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        <i class="fas fa-image text-success"></i> Thumbnail (Poster) 
+                                        <i class="fas fa-image text-success"></i> Thumbnail (Poster)
                                         <small class="text-muted">(Şəkil faylı - JPG/PNG)</small>
                                     </label>
                                     <input type="file" id="wImage" class="form-control bg-secondary text-white border-0" accept="image/*">
@@ -469,6 +489,57 @@
         </div>
     </div>
 
+    <!-- ================= BACKSTAGE MODAL (YENİ) ================= -->
+    <div class="modal fade" id="backstageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="bsModalLabel">Yeni Backstage</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="backstageForm" onsubmit="return false;">
+                        <input type="hidden" id="bsId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Brend * <small class="text-muted">(paneldə görünən yazı: socar)</small></label>
+                                <input type="text" id="bsBrand" maxlength="150" class="form-control bg-secondary text-white border-0" placeholder="socar">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Başlıq * <small class="text-muted">(modalda görünən: SOCAR)</small></label>
+                                <input type="text" id="bsTitle" maxlength="150" class="form-control bg-secondary text-white border-0" placeholder="SOCAR">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label"><i class="fas fa-video text-danger"></i> Video (MP4) <small class="text-muted">(maks. 500 MB)</small></label>
+                                <input type="file" id="bsVideoFile" class="form-control bg-secondary text-white border-0" accept="video/mp4">
+                                <div id="bsVideoInfo" class="mt-2 text-info small"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label"><i class="fas fa-image text-success"></i> Poster <small class="text-muted">(JPG/PNG/WEBP, maks. 5 MB)</small></label>
+                                <input type="file" id="bsPosterFile" class="form-control bg-secondary text-white border-0" accept="image/jpeg,image/png,image/webp">
+                                <small class="text-warning d-block mt-1">Seçilməsə, videonun ilk kadrı avtomatik götürülür</small>
+                                <div id="bsPosterPreview" class="mt-2"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="bsPublished">
+                                    <label class="form-check-label text-success" for="bsPublished">
+                                        <i class="fas fa-check-circle"></i> Dərc et (saytda göstər)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="button" class="btn btn-primary" onclick="submitBackstage()"><i class="fas fa-save"></i> Yadda Saxla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TEAM MODAL ================= -->
     <div class="modal fade" id="teamModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content bg-dark text-white border-secondary">
@@ -531,6 +602,7 @@
         </div>
     </div>
 
+    <!-- ================= SERVICE MODAL ================= -->
     <div class="modal fade" id="serviceModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content bg-dark text-white">

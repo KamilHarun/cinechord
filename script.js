@@ -1025,6 +1025,7 @@ window.openMainVideo = function() {
         initVideoSlider();
         initVideoModal();
         initPlayButtonAutoHide();
+        safeRun(initWheelMenu);
     }
 
     if (document.readyState === 'loading') {
@@ -1032,5 +1033,97 @@ window.openMainVideo = function() {
     } else {
         init();
     }
+
+    /* ============================================================
+   WHEEL MENU — sonsuz mouse-wheel scroll naviqasiyası
+   ============================================================ */
+
+function initWheelMenu() {
+
+    const NAV_ITEMS = [
+        { href: '/', key: 'home', text: 'home' },
+        { href: 'works/', key: 'work', text: 'work' },
+        { href: 'services/', key: 'service', text: 'service' },
+        { href: 'archive/', key: 'archive', text: 'archive' },
+        { href: 'backstage/', key: 'backstage', text: 'backstage' },
+        { href: 'about/', key: 'about', text: 'about' },
+        { href: 'contact/', key: 'contact', text: 'contact' }
+    ];
+
+    const track = document.getElementById('wheelTrack');
+    const viewport = document.querySelector('.wheel-viewport');
+    if (!track || !viewport) return;
+
+    const ITEM_H = 54;
+    const REPEATS = 9;
+    const total = NAV_ITEMS.length;
+
+    let html = '';
+    for (let r = 0; r < REPEATS; r++) {
+        NAV_ITEMS.forEach((item) => {
+            html += `<a href="${item.href}" class="wheel-item nav-btn" data-key="${item.key}" data-text="${item.text}"><span class="nav-text">${item.text}</span></a>`;
+        });
+    }
+    track.innerHTML = html;
+
+    const items = Array.from(track.querySelectorAll('.wheel-item'));
+
+    let offset = -(Math.floor(REPEATS / 2) * total) * ITEM_H;
+    track.style.transform = `translateY(${offset}px)`;
+
+    function updateActiveAndFade() {
+        const viewportRect = viewport.getBoundingClientRect();
+        const viewportCenter = viewportRect.top + viewportRect.height / 2;
+
+        items.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            const itemCenter = rect.top + rect.height / 2;
+            const dist = Math.abs(itemCenter - viewportCenter);
+
+            const opacity = Math.max(0.12, 1 - dist / (ITEM_H * 3));
+            el.style.opacity = opacity;
+            el.classList.toggle('is-active', dist < ITEM_H / 2);
+        });
+    }
+
+    function wrapIfNeeded() {
+        const minAllowed = -(REPEATS - 2) * total * ITEM_H;
+        const maxAllowed = -1 * total * ITEM_H;
+
+        if (offset < minAllowed) {
+            offset += total * ITEM_H;
+            track.style.transition = 'none';
+            track.style.transform = `translateY(${offset}px)`;
+            void track.offsetWidth;
+            track.style.transition = '';
+        } else if (offset > maxAllowed) {
+            offset -= total * ITEM_H;
+            track.style.transition = 'none';
+            track.style.transform = `translateY(${offset}px)`;
+            void track.offsetWidth;
+            track.style.transition = '';
+        }
+    }
+
+    function onWheel(e) {
+        e.preventDefault();
+        offset -= e.deltaY * 0.6;
+        track.style.transform = `translateY(${offset}px)`;
+        wrapIfNeeded();
+        requestAnimationFrame(updateActiveAndFade);
+    }
+
+    viewport.addEventListener('wheel', onWheel, { passive: false });
+
+    requestAnimationFrame(updateActiveAndFade);
+
+    document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
+        setTimeout(updateActiveAndFade, 350);
+    });
+
+    window.addEventListener('resize', () => {
+        requestAnimationFrame(updateActiveAndFade);
+    });
+}
 
 })();

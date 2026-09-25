@@ -1,13 +1,14 @@
 {
   "en": {
-    "menu": "MENU",
-    "close": "CLOSE",
-    "home": "HOME",
-    "work": "WORK",
-    "service": "SERVICE",
-    "archive": "ARCHIVE",
-    "about": "ABOUT",
-    "contact": "CONTACT",
+    "menu": "menu",
+    "close": "close",
+    "home": "home",
+    "work": "work",
+    "service": "service",
+    "archive": "archive",
+    "backstage": "backstage",
+    "about": "about",
+    "contact": "contact",
     "lets_work": "LET'S WORK",
     "together": "TOGETHER",
     "send_message": "SEND MESSAGE",
@@ -43,17 +44,17 @@
     "category_social": "SOCIAL",
     "archive_subtitle_1": "EXPLORE MORE",
     "archive_subtitle_2": "CONTACT"
-    
   },
   "az": {
-    "menu": "MENYU",
-    "close": "BAĞLA",
-    "home": "ANA SƏHİFƏ",
-    "work": "İŞLƏR",
-    "service": "XİDMƏTLƏR",
-    "archive": "ARXİV",
-    "about": "HAQQIMIZDA",
-    "contact": "ƏLAQƏ",
+    "menu": "menyu",
+    "close": "bağla",
+    "home": "ana səhifə",
+    "work": "işlər",
+    "service": "xidmətlər",
+    "archive": "arxiv",
+    "backstage": "kulis",
+    "about": "haqqımızda",
+    "contact": "əlaqə",
     "lets_work": "GƏLİN BİRLİKDƏ",
     "together": "İŞLƏYƏK",
     "send_message": "MESAJ GÖNDƏR",
@@ -87,7 +88,7 @@
     "category_music_video": "MUSİQİ VİDEOSU",
     "category_documentary": "SƏNƏDLI",
     "category_social": "SOSIAL",
-   "archive_subtitle_1": "DAHA ÇOXUNU KƏŞF ET",
+    "archive_subtitle_1": "DAHA ÇOXUNU KƏŞF ET",
     "archive_subtitle_2": "ƏLAQƏ"
   }
 }

@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -24,8 +24,7 @@
         <div class="reel-gate-fill" id="reelGateFill"></div>
     </div>
 
-    <!-- FILM SPROCKET BORDERS -->
-    <div class="sprocket-strip sprocket-top"></div>
+    <!-- FILM SPROCKET BORDER (bottom only) -->
     <div class="sprocket-strip sprocket-bottom"></div>
 
     <!-- CUSTOM CURSOR -->
@@ -48,6 +47,28 @@
         <img src="../photos/CineChord.png" alt="Cine Chord Logo" class="logo-img">
     </a>
 
+    <!-- LANGUAGE SELECTOR WITH GLOBE -->
+    <div class="lang-selector" id="langSelector">
+        <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language">
+            <span class="globe-icon">
+                <span class="globe-ellipse"></span>
+            </span>
+            <span class="current-lang" id="currentLangText">EN</span>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <button class="lang-option active" data-lang="en">
+                <span class="lang-code">EN</span>
+                <span class="lang-name">English</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+            <button class="lang-option" data-lang="az">
+                <span class="lang-code">AZ</span>
+                <span class="lang-name">Azərbaycan</span>
+                <span class="lang-check"><i class="fa-solid fa-check"></i></span>
+            </button>
+        </div>
+    </div>
+
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
         <span class="hamburger-text">MENU</span>
         <span class="hamburger-icon">
@@ -58,117 +79,98 @@
 
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
     <nav class="mobile-menu" id="mobileMenu">
-        <a href="/" class="nav-btn" data-text="HOME"><span class="nav-text">HOME</span></a>
-        <a href="../works/" class="nav-btn" data-text="WORK"><span class="nav-text">WORK</span></a>
-        <a href="../services/" class="nav-btn" data-text="SERVICE"><span class="nav-text">SERVICE</span></a>
-        <a href="../archive/" class="nav-btn" data-text="ARCHIVE"><span class="nav-text">ARCHIVE</span></a>
-        <a href="./" class="nav-btn active" data-text="BACKSTAGE"><span class="nav-text">BACKSTAGE</span></a>
-        <a href="../about/" class="nav-btn" data-text="ABOUT"><span class="nav-text">ABOUT</span></a>
-        <a href="../contact/" class="nav-btn" data-text="CONTACT"><span class="nav-text">CONTACT</span></a>
+        <a href="/" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
+        <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
+        <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
+        <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
+        <a href="./" class="nav-btn active" data-text="BACKSTAGE" data-key="backstage"><span class="nav-text">BACKSTAGE</span></a>
+        <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
+        <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
+
+        <div class="menu-footer">
+            <div class="menu-socials">
+                <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+                <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a>
+                <a href="#">VIMEO</a>
+            </div>
+            <div class="menu-contact-info">
+                <p>info@cinechord.com</p>
+                <p>++994 50 233 04 54</p>
+            </div>
+        </div>
     </nav>
 
-    <!-- HERO -->
-    <section class="bts-hero">
-        <canvas class="hero-grain" id="heroGrain" aria-hidden="true"></canvas>
-        <div class="light-leak" aria-hidden="true"></div>
-        <div class="hero-stamp hero-stamp-left" aria-hidden="true">16MM</div>
-        <div class="hero-stamp hero-stamp-right" aria-hidden="true">24 FPS</div>
+  <!-- CINE STAGE: video-panel elementləri artıq statik deyil.
+       script.js səhifə yüklənəndə backend-dən (/api/backstage)
+       nə qədər "published" item gəlirsə, o qədər .video-panel
+       burada DİNAMİK yaradılıb əlavə edir. Əl ilə panel əlavə/silmə
+       etmə — admin paneldən idarə olunur. -->
+  <section class="cine-stage" id="cineStage">
+    <canvas class="hero-grain" id="heroGrain" aria-hidden="true"></canvas>
 
+    <div class="stage-text" id="stageText">
         <div class="bts-hero-inner">
-            <div class="bts-eyebrow">
-                <span class="rec-dot"></span> RAW &amp; UNFILTERED
-            </div>
             <h1 class="bts-title" id="btsTitle">
                 <span class="line" data-text="BEHIND"><span class="line-inner">BEHIND</span></span>
-                <span class="line accent" data-text="THE SCENES"><span class="line-inner">THE SCENES</span></span>
+                <span class="line accent" data-text="THE SCENE"><span class="line-inner">THE SCENE</span></span>
             </h1>
-            <p class="bts-subtitle">Setdən kadr arxası anlar — hazırlıq, xaos, gülüş və prosesin özü.</p>
         </div>
         <div class="scroll-cue">
-            <span>SCROLL</span>
+            <span data-key="scroll">SCROLL</span>
             <div class="scroll-line"><i></i></div>
         </div>
-    </section>
 
-    <!-- CREDITS MARQUEE -->
-    <div class="credits-marquee" aria-hidden="true">
-        <div class="marquee-track" id="marqueeTrack"></div>
+        <!-- WORKS SƏHİFƏSİNƏ KEÇİD -->
+        <a href="../works/" class="hero-next-link" aria-label="Görün — Works səhifəsi">
+            <span class="hero-next-mask"><span data-text="VIEW OUR WORKS">VIEW OUR WORKS</span></span>
+            <i class="fa-solid fa-arrow-right hero-next-arrow" aria-hidden="true"></i>
+        </a>
     </div>
 
-    <!-- FILTERS -->
-    <div class="bts-filters-row">
-        <div class="bts-eq" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <div class="bts-filters" id="btsFilters">
-            <button class="filter-chip active" data-filter="all">ALL</button>
-            <button class="filter-chip" data-filter="abb">ABB</button>
-            <button class="filter-chip" data-filter="bakcell">BAKCELL</button>
-            <button class="filter-chip" data-filter="showreel">SHOWREEL</button>
-        </div>
-    </div>
+    <!-- .video-panel elementləri JS tərəfindən buraya inject olunur -->
+  </section>
 
-    <!-- REEL — horizontal scrubbing filmstrip -->
-    <section class="reel-section" id="reelSection">
-        <div class="reel-pin" id="reelPin">
-            <div class="reel-meta-row">
-                <span class="reel-counter" id="reelCounter">0000 FT</span>
-                <span class="reel-hint" id="reelHint">SCROLL TO ADVANCE THE REEL</span>
-                <span class="reel-count-label" id="reelCountLabel">CLIP 00 / 00</span>
-            </div>
-            <div class="reel-track-wrap">
-                <div class="reel-track" id="reelTrack">
-                    <!-- frame cards injected by JS from BTS_CLIPS -->
-                </div>
-                <div class="reel-playhead" id="reelPlayhead"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- TAIL LEADER / OUTRO -->
-    <section class="tail-leader">
-        <div class="tail-stripes" aria-hidden="true"></div>
-        <p class="tail-text">REEL SONU <span class="tail-dot">●</span> DAHA ÇOX İŞ ÜÇÜN <a href="../works/">İŞLƏRİMİZƏ BAXIN</a></p>
-    </section>
-
-    <!-- VIDEO MODAL (same pattern as home, now with iris wipe) -->
-    <div class="preview-container is-paused" id="previewContainer">
-        <div class="iris-flash" id="irisFlash" aria-hidden="true"></div>
-        <button class="close-preview" id="closePreview">×</button>
-        <div class="preview-info">
-            <div class="preview-tag" id="previewTag">CLIP 00</div>
+<!-- VIDEO PREVIEW MODAL (home ilə eyni) -->
+<div class="preview-container is-paused" id="previewContainer">
+    <button class="close-preview" id="closePreview">×</button>
+    <div class="preview-info" id="previewInfo">
+        <div class="text-mask">
             <div class="preview-title" id="previewTitle"></div>
         </div>
-        <div class="video-wrapper" id="videoWrapper">
-            <div class="video-loading"></div>
-            <div class="modal-play-btn-wrapper" id="modalPlayBtnContainer">
-                <div class="modal-play-btn-inner">
-                    <i class="fa-solid fa-play modal-play-icon" id="modalPlayIcon"></i>
-                    <i class="fa-solid fa-pause modal-play-icon pause-icon" id="modalPauseIcon" style="display:none;"></i>
-                </div>
+    </div>
+    <div class="video-wrapper" id="videoWrapper">
+        <div class="video-loading"></div>
+
+        <div class="modal-play-btn-wrapper is-paused" id="modalPlayBtnContainer">
+            <div class="modal-play-btn-inner">
+                <img src="../play-btn.png" alt="Play Video" class="modal-play-icon" id="modalPlayIcon">
+                <img src="../pause-btn.png" alt="Pause Video" class="modal-play-icon pause-icon" id="modalPauseIcon" style="display:none;">
             </div>
-            <video id="previewVideo" class="preview-video" playsinline preload="metadata"></video>
-            <div class="custom-controls" id="customControls">
-                <div class="progress-bar-container" id="progressBarContainer">
-                    <div class="progress-played" id="progressPlayed"></div>
-                    <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
-                </div>
-                <div class="controls-buttons">
-                    <button class="ctrl-btn" id="rewindBtn"><i class="fa-solid fa-rotate-left"></i></button>
-                    <button class="ctrl-btn main-play-btn" id="playPauseBtn">
-                        <i class="fa-solid fa-play" id="playIcon"></i>
-                        <i class="fa-solid fa-pause" id="pauseIcon" style="display:none;"></i>
-                    </button>
-                    <button class="ctrl-btn" id="forwardBtn"><i class="fa-solid fa-rotate-right"></i></button>
-                    <div class="time-display"><span id="currentTime">0:00</span> / <span id="durationTime">0:00</span></div>
-                    <div class="right-controls-group">
-                        <div class="volume-wrapper"><input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100"></div>
-                        <button class="ctrl-btn" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
-                    </div>
+        </div>
+
+        <video id="previewVideo" class="preview-video" playsinline preload="metadata"></video>
+
+        <div class="custom-controls" id="customControls">
+            <div class="progress-bar-container" id="progressBarContainer">
+                <div class="progress-played" id="progressPlayed"></div>
+                <input type="range" class="progress-slider" id="progressSlider" value="0" min="0" max="100" step="0.1">
+            </div>
+            <div class="controls-buttons">
+                <button class="ctrl-btn skip-btn" id="rewindBtn"><i class="fa-solid fa-rotate-left"></i></button>
+                <button class="ctrl-btn main-play-btn" id="playPauseBtn">
+                    <i class="fa-solid fa-play" id="playIcon"></i>
+                    <i class="fa-solid fa-pause" id="pauseIcon" style="display:none;"></i>
+                </button>
+                <button class="ctrl-btn skip-btn" id="forwardBtn"><i class="fa-solid fa-rotate-right"></i></button>
+                <div class="time-display"><span id="currentTime">0:00</span> / <span id="durationTime">0:00</span></div>
+                <div class="right-controls-group">
+                    <div class="volume-wrapper"><input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100"></div>
+                    <button class="ctrl-btn" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
