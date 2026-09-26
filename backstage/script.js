@@ -460,23 +460,16 @@ const BOUNDARY_EPS = 1;
 
 
 // ============================================================
-// AUTO PLAY — backstage videos only
-// Hero-a heç vaxt geri qayıtmır
+// AUTO PLAY — automatically switch backstage videos
 // ============================================================
 
 let autoPlayTimer = null;
 
 const AUTO_PLAY_DELAY = 5000;
 
-let autoPlayIndex = 0;
-
 function startAutoPlay() {
 
     clearInterval(autoPlayTimer);
-
-    // İlk olaraq HERO vəziyyətindəyik.
-    // Ona görə ilk auto keçid VIDEO 1-ə olacaq.
-    autoPlayIndex = 0;
 
     autoPlayTimer = setInterval(() => {
 
@@ -493,42 +486,31 @@ function startAutoPlay() {
         const perPanel = getScrollPerPanel();
         const progress = getCurrentProgress();
 
-        // ====================================================
-        // NÖVBƏTİ VIDEO
-        // ====================================================
-
-        autoPlayIndex++;
-
-        // Son videodan sonra yenidən VIDEO 1
-        // HERO-A QAYITMIRIQ
-        if (autoPlayIndex >= panels.length) {
-            autoPlayIndex = 0;
-        }
-
-        const targetProgress =
-            (autoPlayIndex + 1) * perPanel;
+        // Son REAL panelin progress-i
+        const lastPanelProgress =
+            Math.max(0, (panels.length - 1) * perPanel);
 
         // ====================================================
-        // ƏGƏR VIDEO 1-Ə QAYIDIŞDIR
+        // LAST PANEL → FIRST PANEL
         // ====================================================
 
-        if (autoPlayIndex === 0) {
+        if (progress >= lastPanelProgress - BOUNDARY_EPS) {
 
-            // Video 1 = perPanel
-            const target = perPanel;
-
-            animateScrollBy(target - progress);
+            animateScrollBy(-progress);
 
             return;
         }
 
         // ====================================================
-        // NORMAL NÖVBƏTİ VIDEO
+        // NEXT PANEL
         // ====================================================
 
-        animateScrollBy(
-            targetProgress - progress
+        const target = getNextBoundaryDown(
+            progress,
+            perPanel
         );
+
+        animateScrollBy(target - progress);
 
     }, AUTO_PLAY_DELAY);
 }

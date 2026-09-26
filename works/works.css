@@ -21,7 +21,7 @@ body {
 
 body {
     font-family: 'Gabarito', sans-serif;
-    background: #050505;
+    background: #0B0B0B;
     color: #fff;
     font-weight: 400;
     line-height: 1.5;
@@ -941,7 +941,7 @@ body.lang-az .menu-contact-info a {
     left: 0;
     width: 100%;
     height: 12%;
-    background: #050505;
+    background: #0B0B0B;
     z-index: 2;
 }
 
@@ -949,7 +949,7 @@ body.lang-az .menu-contact-info a {
    13. CATEGORIES & GRID
    ========================================= */
 .category-section {
-    background-color: #050505;
+    background: #0B0B0B;
     padding: 60px 0px 40px;
     position: relative;
     width: 100%;
@@ -1001,7 +1001,7 @@ body.lang-az .category-btn {
 }
 
 .works-section {
-    background: #050505;
+    background: #0B0B0B;
     padding: 40px 0 120px;
 }
 
@@ -1563,7 +1563,7 @@ body.lang-az .category-btn {
    16. CINEMATIC FOOTER
    ========================================= */
 .main-footer {
-    background: #050505;
+    background: #0B0B0B;
     padding: 80px 60px 40px;
     position: relative;
     z-index: 10;
