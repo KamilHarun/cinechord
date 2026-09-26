@@ -555,87 +555,88 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
 
         window.addEventListener('wheel', handleWheel, { passive: false });
         // ============================================================
-// MOBILE TOUCH SCROLL — snap to next / previous video
+// MOBILE TOUCH SNAP
+// Uses the same snap/animation system as desktop
 // ============================================================
 
-if (window.matchMedia('(pointer: coarse)').matches) {
+let touchStartY = 0;
+let touchStartTime = 0;
 
-    let touchStartY = 0;
-    let touchStartProgress = 0;
+window.addEventListener('touchstart', (e) => {
 
-    window.addEventListener('touchstart', (e) => {
+    if (!e.touches.length) return;
 
-        if (!e.touches.length) return;
+    const rect = wrapper.getBoundingClientRect();
 
-        const rect = wrapper.getBoundingClientRect();
+    const inRange =
+        rect.top <= 1 &&
+        rect.top >= -(totalScrollNeeded) - 1;
 
-        const inRange =
-            rect.top <= 1 &&
-            rect.top >= -(totalScrollNeeded) - 1;
+    if (!inRange) return;
 
-        if (!inRange) return;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = performance.now();
 
-        touchStartY = e.touches[0].clientY;
-        touchStartProgress = getCurrentProgress();
-
-    }, { passive: true });
+}, { passive: true });
 
 
-    window.addEventListener('touchend', (e) => {
+window.addEventListener('touchend', (e) => {
 
-        if (isAnimating) return;
-        if (!e.changedTouches.length) return;
+    if (isAnimating) return;
+    if (!e.changedTouches.length) return;
 
-        const rect = wrapper.getBoundingClientRect();
+    const rect = wrapper.getBoundingClientRect();
 
-        const inRange =
-            rect.top <= 1 &&
-            rect.top >= -(totalScrollNeeded) - 1;
+    const inRange =
+        rect.top <= 1 &&
+        rect.top >= -(totalScrollNeeded) - 1;
 
-        if (!inRange) return;
+    if (!inRange) return;
 
-        const touchEndY = e.changedTouches[0].clientY;
-        const deltaY = touchStartY - touchEndY;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchStartY - touchEndY;
+    const duration = performance.now() - touchStartTime;
 
-        // Kiçik toxunuşları scroll kimi qəbul etmə
-        if (Math.abs(deltaY) < 30) return;
+    // Ignore tiny movements
+    if (Math.abs(deltaY) < 40) return;
 
-        const perPanel = getScrollPerPanel();
-        const currentProgress = getCurrentProgress();
+    // Ignore extremely slow / accidental movements
+    if (duration > 1000) return;
 
-        // Swipe UP → növbəti video
-        if (deltaY > 0) {
+    const perPanel = getScrollPerPanel();
+    const progress = getCurrentProgress();
 
-            if (currentProgress >= totalScrollNeeded - BOUNDARY_EPS) {
-                return;
-            }
+    // Swipe UP → next video
+    if (deltaY > 0) {
 
-            const target = getNextBoundaryDown(
-                currentProgress,
-                perPanel
-            );
-
-            animateScrollBy(target - currentProgress);
-
+        if (progress >= totalScrollNeeded - BOUNDARY_EPS) {
+            return;
         }
 
-        // Swipe DOWN → əvvəlki video
-        else {
+        const target = getNextBoundaryDown(
+            progress,
+            perPanel
+        );
 
-            if (currentProgress <= BOUNDARY_EPS) {
-                return;
-            }
+        animateScrollBy(target - progress, 1300);
+    }
 
-            const target = getNextBoundaryUp(
-                currentProgress,
-                perPanel
-            );
+    // Swipe DOWN → previous video
+    else {
 
-            animateScrollBy(target - currentProgress);
+        if (progress <= BOUNDARY_EPS) {
+            return;
         }
 
-    }, { passive: true });
-}
+        const target = getNextBoundaryUp(
+            progress,
+            perPanel
+        );
+
+        animateScrollBy(target - progress, 1300);
+    }
+
+}, { passive: true });
         
     }
 
