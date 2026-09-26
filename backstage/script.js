@@ -1256,7 +1256,6 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
         /* --- Düymələr --- */
         video.addEventListener('click', toggle);
         playBtn.addEventListener('click', toggle);
-        modalBtn.addEventListener('click', toggle);
         rewindBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime -= 5; });
         forwardBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime += 5; });
         closeBtn.addEventListener('click', closeModal);
@@ -1308,5 +1307,7 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
         initBackstageModal();
     }
 })();
+
+
 
 })();

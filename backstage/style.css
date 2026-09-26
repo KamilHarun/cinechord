@@ -22,6 +22,8 @@
        yuxarı/aşağıdan bir az daha kəsilir. Azaltsanız əksinə —
        daha az kəsilmə, daha geniş blur kənar. 1.0 = heç böyütmə
        yoxdur (əvvəlki, tam görünən amma kiçik hal). */
+    --safe-top: env(safe-area-inset-top, 0px);
+
     --fg-video-zoom: 1.65;
 }
 
@@ -1005,7 +1007,6 @@ body.lang-az .menu-contact-info a {
     color: rgba(255,255,255,0.4) !important;
 }
 
-
 /* ================================================================
    MOBILE
    ================================================================ */
@@ -1020,12 +1021,12 @@ body.lang-az .menu-contact-info a {
 
 @media (max-width: 768px) {
 
-    .hamburger {
-        top: 32px;
-        right: 20px;
-        gap: 12px;
-        padding: 8px;
-    }
+.hamburger {
+    top: calc(27px + var(--safe-top));   /* 40px → 48px */
+    right: 20px;
+    gap: 12px;
+    padding: 10px;
+}
 
     .hamburger-text {
         font-size: 11px;
@@ -1060,11 +1061,11 @@ body.lang-az .menu-contact-info a {
     }
 
     .lang-selector {
-        top: 32px !important;
-        right: 125px !important;
-        left: auto !important;
-        z-index: 30001;
-    }
+    top: calc(28px + var(--safe-top)) !important;   /* 40px → 48px */
+    right: 130px !important;
+    left: auto !important;
+    z-index: 30001;
+}
 
     .lang-globe-btn {
         padding: 8px 6px;
@@ -1440,45 +1441,38 @@ body.lang-az .menu-contact-info a {
     transform: translateX(6px);
 }
 
-@media (max-width: 768px) {
-    .hero-next-link {
-        left: 50%;
-        bottom: 96px;
-        transform: translateX(-50%);
-        font-size: 10px;
+@media (max-width: 768px) { 
+    .hero-next-link { 
+        left: 50%; 
+        bottom: 125px; 
+        transform: translateX(-50%); 
+        font-size: 10px; 
+    } 
+ 
+    .hero-next-link:hover { 
+        transform: translateX(-50%); 
     }
 
-    .hero-next-link:hover {
-        transform: translateX(-50%);
+    .scroll-cue {
+        bottom: 35px;
     }
 }
 
 
-.scroll-cue {
-    position: absolute;
-
-    bottom: 44px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 10px;
-
-    font-size: 10px;
-
-    letter-spacing: 3px;
-
-    color: rgba(0,0,0,.55);
-
-    opacity: 0;
-
-    z-index: 2;
+.scroll-cue { 
+    position: absolute; 
+    bottom: 44px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 10px; 
+    font-size: 10px; 
+    letter-spacing: 3px; 
+    color: rgba(0,0,0,.55); 
+    opacity: 0; 
+    z-index: 2; 
 }
 
 .scroll-line {
@@ -2464,11 +2458,6 @@ body.lang-az .menu-contact-info a {
 
 @media (max-width: 768px) {
 
-    .hamburger {
-        top: 20px;
-        right: 20px;
-    }
-
     .reel-pin {
         height: auto;
 
@@ -2485,7 +2474,7 @@ body.lang-az .menu-contact-info a {
     }
 
     .preview-info {
-        top: 22px;
+        top: 42px;
         left: 22px;
     }
 
@@ -2612,72 +2601,22 @@ html, body {
 
     z-index: 0;
 }
-
 /* ============================================================
    FOREGROUND VIDEO
-   4 tərəfdən təxminən 10% boşluq / blur saxlayır.
+   Həm desktop, həm mobil eyni: tam ekran, cover.
    ============================================================ */
 
 .stage-video-fg {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
     object-fit: cover;
+}
 
-    filter:
-        grayscale(.15)
-        contrast(1.05);
-
-    transform: none;
-    transform-origin: center center;
-
-    z-index: 1;
+@media (max-width: 768px) {
+    .stage-video-fg {
+        object-fit: cover;
+        object-position: center center;
+    }
 }
 /* ================================================================
-   POSTER CAPTION — aşağı sol künc (Gabarito fontu)
-   Şəkildəki kimi: üst sətir dolğun, alt sətir nazik, yapışıq
-   ================================================================ */
-
-.poster-caption {
-    position: absolute;
-    left: 48px;
-    bottom: 44px;
-    z-index: 10;
-
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-
-    font-family: 'Gabarito', sans-serif;
-    color: #fff;
-
-    text-shadow:
-        0 2px 16px rgba(0,0,0,.8),
-        0 0 40px rgba(0,0,0,.55);
-
-    pointer-events: none;
-    user-select: none;
-}
-
-/* Üst sətir — brend adı (dolğun, böyük) */
-.poster-brand {
-    font-size: clamp(30px, 3.0vw, 65px);   /* əvvəl 4.4vw idi */
-    font-weight: 600;
-    letter-spacing: -1.2px;
-    line-height: 1;
-    margin-bottom: 15px;                    /* əvvəl 8px idi: sətirlər arası boşluq */
-}
-
-.poster-sub {
-    font-size: clamp(12px, 1.7vw, 26px);   /* əvvəl 1.9vw idi */
-    font-weight: 400;
-    letter-spacing: 0.4px;
-    line-height: 1;
-}/* ================================================================
    POSTER CAPTION: sol aşağı yazı + işıq effekti
    ================================================================ */
 
@@ -2690,7 +2629,7 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;                                /* socar ilə cinechord arası (əvvəl 22px idi) */
+    gap: 4px;
 
     font-family: 'Gabarito', sans-serif;
     color: #fff;
@@ -2711,14 +2650,14 @@ html, body {
 
 /* Brend adı: socar / kapital bank */
 .poster-brand {
-    font-size: clamp(18px, 3.5vw, 55px);     /* əvvəlki ölçü */
+    font-size: clamp(18px, 3.5vw, 55px);
     font-weight: 600;
     letter-spacing: 6px;
 }
 
 /* Alt sətir: cinechord */
 .poster-sub {
-    font-size: clamp(8.0px, 1.2vw, 20px);     /* əvvəlki ölçü */
+    font-size: clamp(8.0px, 1.2vw, 20px);
     font-weight: 400;
     letter-spacing: 5px;
 }
@@ -2779,7 +2718,7 @@ html, body {
     z-index: 11;
 
     display: inline-block;
-    padding-left: 6px;                       /* letter-spacing-ə görə mərkəzləmə düzəlişi */
+    padding-left: 6px;
     font-family: 'Gabarito', sans-serif;
     font-size: clamp(18px, 2.2vw, 36px);
     font-weight: 600;
@@ -2803,7 +2742,7 @@ html, body {
 .poster-play::after {
     content: attr(data-text);
     position: absolute;
-    left: 6px;                               /* padding-left ilə üst-üstə düşsün */
+    left: 6px;
     top: 0;
     white-space: nowrap;
 
