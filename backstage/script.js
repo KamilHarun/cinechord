@@ -554,15 +554,18 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
         }
 
         window.addEventListener('wheel', handleWheel, { passive: false });
-        // ============================================================
+
+
+
+// ============================================================
 // MOBILE TOUCH SNAP
-// Uses the same snap/animation system as desktop
+// Native scrolling disabled while CineStage is active
 // ============================================================
 
 let touchStartY = 0;
-let touchStartTime = 0;
+let touchActive = false;
 
-window.addEventListener('touchstart', (e) => {
+stage.addEventListener('touchstart', (e) => {
 
     if (!e.touches.length) return;
 
@@ -572,18 +575,42 @@ window.addEventListener('touchstart', (e) => {
         rect.top <= 1 &&
         rect.top >= -(totalScrollNeeded) - 1;
 
-    if (!inRange) return;
+    if (!inRange) {
+        touchActive = false;
+        return;
+    }
 
+    touchActive = true;
     touchStartY = e.touches[0].clientY;
-    touchStartTime = performance.now();
 
 }, { passive: true });
 
 
-window.addEventListener('touchend', (e) => {
+stage.addEventListener('touchmove', (e) => {
+
+    if (!touchActive) return;
+
+    // IMPORTANT:
+    // Prevent the phone's native scroll completely.
+    e.preventDefault();
+
+}, { passive: false });
+
+
+stage.addEventListener('touchend', (e) => {
+
+    if (!touchActive) return;
+
+    touchActive = false;
 
     if (isAnimating) return;
     if (!e.changedTouches.length) return;
+
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchStartY - touchEndY;
+
+    // Ignore tiny movements
+    if (Math.abs(deltaY) < 40) return;
 
     const rect = wrapper.getBoundingClientRect();
 
@@ -593,20 +620,13 @@ window.addEventListener('touchend', (e) => {
 
     if (!inRange) return;
 
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = touchStartY - touchEndY;
-    const duration = performance.now() - touchStartTime;
-
-    // Ignore tiny movements
-    if (Math.abs(deltaY) < 40) return;
-
-    // Ignore extremely slow / accidental movements
-    if (duration > 1000) return;
-
     const perPanel = getScrollPerPanel();
     const progress = getCurrentProgress();
 
-    // Swipe UP → next video
+    // ========================================================
+    // SWIPE UP → NEXT PANEL
+    // ========================================================
+
     if (deltaY > 0) {
 
         if (progress >= totalScrollNeeded - BOUNDARY_EPS) {
@@ -618,10 +638,13 @@ window.addEventListener('touchend', (e) => {
             perPanel
         );
 
-        animateScrollBy(target - progress, 1300);
+        animateScrollBy(target - progress);
     }
 
-    // Swipe DOWN → previous video
+    // ========================================================
+    // SWIPE DOWN → PREVIOUS PANEL
+    // ========================================================
+
     else {
 
         if (progress <= BOUNDARY_EPS) {
@@ -633,10 +656,11 @@ window.addEventListener('touchend', (e) => {
             perPanel
         );
 
-        animateScrollBy(target - progress, 1300);
+        animateScrollBy(target - progress);
     }
 
 }, { passive: true });
+        
         
     }
 

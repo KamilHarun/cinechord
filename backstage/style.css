@@ -2512,6 +2512,7 @@ html, body {
     height: 100dvh;
     overflow: hidden;
     background: var(--accent);
+    touch-action: none;
 }
 
 .hero-grain {
