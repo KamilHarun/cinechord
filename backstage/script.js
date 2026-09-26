@@ -453,10 +453,85 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
 
         update();
 
-        let isAnimating = false;
-        let animFrame = null;
+let isAnimating = false;
+let animFrame = null;
 
-        const BOUNDARY_EPS = 1;
+const BOUNDARY_EPS = 1;
+
+
+// ============================================================
+// AUTO PLAY — backstage videos only
+// Hero-a heç vaxt geri qayıtmır
+// ============================================================
+
+let autoPlayTimer = null;
+
+const AUTO_PLAY_DELAY = 5000;
+
+let autoPlayIndex = 0;
+
+function startAutoPlay() {
+
+    clearInterval(autoPlayTimer);
+
+    // İlk olaraq HERO vəziyyətindəyik.
+    // Ona görə ilk auto keçid VIDEO 1-ə olacaq.
+    autoPlayIndex = 0;
+
+    autoPlayTimer = setInterval(() => {
+
+        const rect = wrapper.getBoundingClientRect();
+
+        const inRange =
+            rect.top <= 1 &&
+            rect.top >= -(totalScrollNeeded) - 1;
+
+        if (!inRange) return;
+
+        if (isAnimating) return;
+
+        const perPanel = getScrollPerPanel();
+        const progress = getCurrentProgress();
+
+        // ====================================================
+        // NÖVBƏTİ VIDEO
+        // ====================================================
+
+        autoPlayIndex++;
+
+        // Son videodan sonra yenidən VIDEO 1
+        // HERO-A QAYITMIRIQ
+        if (autoPlayIndex >= panels.length) {
+            autoPlayIndex = 0;
+        }
+
+        const targetProgress =
+            (autoPlayIndex + 1) * perPanel;
+
+        // ====================================================
+        // ƏGƏR VIDEO 1-Ə QAYIDIŞDIR
+        // ====================================================
+
+        if (autoPlayIndex === 0) {
+
+            // Video 1 = perPanel
+            const target = perPanel;
+
+            animateScrollBy(target - progress);
+
+            return;
+        }
+
+        // ====================================================
+        // NORMAL NÖVBƏTİ VIDEO
+        // ====================================================
+
+        animateScrollBy(
+            targetProgress - progress
+        );
+
+    }, AUTO_PLAY_DELAY);
+}
 
         function getNextBoundaryDown(progress, perPanel) {
             const index = Math.floor((progress + BOUNDARY_EPS) / perPanel) + 1;
@@ -508,6 +583,9 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
 
             animFrame = requestAnimationFrame(step);
         }
+
+
+        startAutoPlay();
 
         function handleWheel(e) {
 
