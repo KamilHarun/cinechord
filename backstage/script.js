@@ -554,6 +554,89 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
         }
 
         window.addEventListener('wheel', handleWheel, { passive: false });
+        // ============================================================
+// MOBILE TOUCH SCROLL — snap to next / previous video
+// ============================================================
+
+if (window.matchMedia('(pointer: coarse)').matches) {
+
+    let touchStartY = 0;
+    let touchStartProgress = 0;
+
+    window.addEventListener('touchstart', (e) => {
+
+        if (!e.touches.length) return;
+
+        const rect = wrapper.getBoundingClientRect();
+
+        const inRange =
+            rect.top <= 1 &&
+            rect.top >= -(totalScrollNeeded) - 1;
+
+        if (!inRange) return;
+
+        touchStartY = e.touches[0].clientY;
+        touchStartProgress = getCurrentProgress();
+
+    }, { passive: true });
+
+
+    window.addEventListener('touchend', (e) => {
+
+        if (isAnimating) return;
+        if (!e.changedTouches.length) return;
+
+        const rect = wrapper.getBoundingClientRect();
+
+        const inRange =
+            rect.top <= 1 &&
+            rect.top >= -(totalScrollNeeded) - 1;
+
+        if (!inRange) return;
+
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaY = touchStartY - touchEndY;
+
+        // Kiçik toxunuşları scroll kimi qəbul etmə
+        if (Math.abs(deltaY) < 30) return;
+
+        const perPanel = getScrollPerPanel();
+        const currentProgress = getCurrentProgress();
+
+        // Swipe UP → növbəti video
+        if (deltaY > 0) {
+
+            if (currentProgress >= totalScrollNeeded - BOUNDARY_EPS) {
+                return;
+            }
+
+            const target = getNextBoundaryDown(
+                currentProgress,
+                perPanel
+            );
+
+            animateScrollBy(target - currentProgress);
+
+        }
+
+        // Swipe DOWN → əvvəlki video
+        else {
+
+            if (currentProgress <= BOUNDARY_EPS) {
+                return;
+            }
+
+            const target = getNextBoundaryUp(
+                currentProgress,
+                perPanel
+            );
+
+            animateScrollBy(target - currentProgress);
+        }
+
+    }, { passive: true });
+}
+        
     }
 
 
