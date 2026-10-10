@@ -1821,7 +1821,7 @@ body.lang-az .contact-value {
     .team-member .member-role {
         font-size: 13px !important;
         font-weight: 500 !important;
-        color: #e6b32e !important;
+        color: #FFA500 !important;
         text-transform: uppercase !important;
         letter-spacing: 1px !important;
         text-align: center !important;
@@ -2175,7 +2175,6 @@ body.lang-az .contact-value {
 }
 /* ============================================================
    20. TEAM DETAIL STAGE — MOBILE
-   (kept after the general mobile reset above so these win)
    ============================================================ */
 @media (max-width: 768px) {
 
@@ -2188,14 +2187,19 @@ body.lang-az .contact-value {
         gap: 24px !important;
     }
 
+    /* yuxarıda bağlama düyməsi üçün yer, sağda artıq boşluq yoxdur */
     .team-detail.active .team-detail-inner {
-        padding: 60px 44px 10px 0 !important;
+        padding: 90px 0 10px 0 !important;
     }
 
-   .team-detail-photo {
-    position: sticky;
-    top: 100px;
-}
+    /* sticky silindi: foto yuxarıda, mətn onun ALTINDA axır */
+    .team-detail-photo {
+        position: static !important;
+        top: auto !important;
+        width: 100%;
+        max-width: 360px;
+        margin: 0 auto;
+    }
 
     .team-detail-name,
     .team-detail-role {
