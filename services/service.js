@@ -229,25 +229,6 @@
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        // Hamburger Menu Text
-        const hamburgerTextEl = document.querySelector('.hamburger-text');
-        if (hamburgerTextEl) {
-            const hamburger = document.getElementById('hamburgerBtn');
-            const isMenuOpen = hamburger && hamburger.classList.contains('active');
-            hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
-        }
-
-        // Navigation Buttons
-        const navButtons = document.querySelectorAll('.nav-btn');
-        navButtons.forEach(btn => {
-            const navText = btn.querySelector('.nav-text');
-            const key = btn.getAttribute('data-key');
-            
-            if (key && t[key]) {
-                if (navText) navText.textContent = t[key];
-                btn.setAttribute('data-text', t[key]);
-            }
-        });
 
         // Services Title
         const servicesTitle = document.querySelector('.services-title');
@@ -739,7 +720,6 @@ function renderServices(services, lang = 'en') {
         
         initPageTransition();
         initLanguageSelector();
-        initMobileMenu();
         initVideoAutoplay(); // Video autoplay'i başlat
         setupNavButtons(); 
         

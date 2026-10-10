@@ -51,9 +51,6 @@
         messageInput: document.getElementById('message'),
         newsletterCheckbox: document.getElementById('newsletter'),
         textareas: document.querySelectorAll('.textarea-mode'),
-        hamburger: document.getElementById('hamburgerBtn'),
-        mobileMenu: document.getElementById('mobileMenu'),
-        overlay: document.getElementById('mobileMenuOverlay'),
     };
 
     /* ============================================================
@@ -194,70 +191,6 @@
     }
 
     /* ============================================================
-        6. MOBILE MENU
-       ============================================================ */
-
-    function initMobileMenu() {
-        const { hamburger, mobileMenu, overlay } = elements;
-        
-        if (!hamburger || !mobileMenu) return;
-
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            if (overlay) overlay.classList.toggle('active');
-            
-            // ✅ FIX: Hamburger text-i dinamik seç
-            const hamburgerText = document.querySelector('.hamburger-text');
-            if (hamburgerText && window.translations && window.translations[window.currentLang]) {
-                const t = window.translations[window.currentLang];
-                hamburgerText.textContent = isActive ? t.menu : t.close;
-            } else if (hamburgerText) {
-                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
-            }
-            
-            if (!isActive) {
-                document.body.style.overflow = 'hidden';
-                document.body.style.paddingRight = scrollbarWidth + 'px';
-            } else {
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-            }
-        }
-
-        hamburger.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        });
-
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleMenu();
-            });
-        }
-        
-        const navLinks = mobileMenu.querySelectorAll('.nav-btn');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (!href || href === '#' || this.classList.contains('active')) {
-                    e.preventDefault();
-                    if (href !== '#') toggleMenu();
-                    return;
-                }
-                e.preventDefault(); 
-                toggleMenu();
-                setTimeout(() => navigateWithTransition(href), 100); 
-            });
-        });
-    }
-
-    /* ============================================================
        7. TRANSLATION SYSTEM
        ============================================================ */
 
@@ -334,35 +267,20 @@ async function loadTranslations() {
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        // ✅ FIX 1: Hamburger text-i dinamik seç
-        const hamburgerText = document.querySelector('.hamburger-text');
-        const hamburger = document.getElementById('hamburgerBtn');
-        
-        if (hamburgerText && hamburger) {
-            const isMenuOpen = hamburger.classList.contains('active');
-            hamburgerText.textContent = isMenuOpen ? t.close : t.menu;
-        }
-
-        // ✅ FIX 2: Bütün data-key elementlərini tərcümə et
+        // Bütün data-key elementlərini tərcümə et (menyu istisna, onu menu.js idarə edir)
         document.querySelectorAll('[data-key]').forEach(el => {
+            if (el.closest('#mobileMenu')) return;
+
             const key = el.getAttribute('data-key');
             if (t[key]) {
-                // ✅ HERO LINE (LET'S WORK)
+                // HERO LINE (LET'S WORK)
                 if (el.classList.contains('hero-line')) {
                     el.textContent = t[key];
                 }
-                // ✅ HERO ROLLING TEXT (TOGETHER)
+                // HERO ROLLING TEXT (TOGETHER)
                 else if (el.classList.contains('hero-rolling-text')) {
                     const span = el.querySelector('span');
                     if (span) span.textContent = t[key];
-                    el.setAttribute('data-text', t[key]);
-                }
-                // NAV BUTTON
-                else if (el.classList.contains('nav-btn')) {
-                    const navTextSpan = el.querySelector('.nav-text');
-                    if (navTextSpan) {
-                        navTextSpan.textContent = t[key];
-                    }
                     el.setAttribute('data-text', t[key]);
                 }
                 // LABEL
@@ -609,7 +527,6 @@ async function loadTranslations() {
         await loadTranslations();
         initPageTransition();
         initLanguageSelector();
-        initMobileMenu();
         initScrollReveal();
         initTextareaResize();
         initFormSubmission();

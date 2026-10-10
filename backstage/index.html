@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=3">
+    <!-- Ortaq menyu: səhifənin CSS-indən SONRA -->
+    <link rel="stylesheet" href="../menu.css">
 </head>
 <body>
 
@@ -57,6 +59,7 @@
         </div>
     </div>
 
+    <!-- HAMBURGER BUTTON (menyunun özünü ../menu.js yaradır) -->
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
         <span class="hamburger-text">MENU</span>
         <span class="hamburger-icon">
@@ -65,30 +68,7 @@
         </span>
     </button>
 
-    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-    <nav class="mobile-menu" id="mobileMenu">
-        <a href="/" class="nav-btn" data-text="HOME" data-key="home"><span class="nav-text">HOME</span></a>
-        <a href="../works/" class="nav-btn" data-text="WORK" data-key="work"><span class="nav-text">WORK</span></a>
-        <a href="../services/" class="nav-btn" data-text="SERVICE" data-key="service"><span class="nav-text">SERVICE</span></a>
-        <a href="../archive/" class="nav-btn" data-text="ARCHIVE" data-key="archive"><span class="nav-text">ARCHIVE</span></a>
-        <a href="./" class="nav-btn active" data-text="BACKSTAGE" data-key="backstage"><span class="nav-text">BACKSTAGE</span></a>
-        <a href="../about/" class="nav-btn" data-text="ABOUT" data-key="about"><span class="nav-text">ABOUT</span></a>
-        <a href="../contact/" class="nav-btn" data-text="CONTACT" data-key="contact"><span class="nav-text">CONTACT</span></a>
-
-        <div class="menu-footer">
-            <div class="menu-socials">
-                <a href="https://www.instagram.com/cine.chord/?hl=en" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
-                <a href="https://www.youtube.com/@cinechordpro" target="_blank" rel="noopener noreferrer">YOUTUBE</a>
-                <a href="#">VIMEO</a>
-            </div>
-            <div class="menu-contact-info">
-                <p>info@cinechord.az</p>
-                <p>++994 50 233 04 54</p>
-            </div>
-        </div>
-    </nav>
-
-  <!-- CINE STAGE: video-panel elementləri artıq statik deyil.
+  <!-- CINE STAGE: video-panel elementləri statik deyil.
        script.js səhifə yüklənəndə backend-dən (/api/backstage)
        nə qədər "published" item gəlirsə, o qədər .video-panel
        burada DİNAMİK yaradılıb əlavə edir. Əl ilə panel əlavə/silmə
@@ -162,6 +142,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Ortaq menyu: səhifənin JS-indən ƏVVƏL -->
+    <script src="../menu.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

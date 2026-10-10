@@ -147,46 +147,33 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
         }
     };
 
-    function applyTranslations(lang) {
+function applyTranslations(lang) {
 
-        const t = BTS_TRANSLATIONS[lang];
-        if (!t) return;
+    const t = BTS_TRANSLATIONS[lang];
+    if (!t) return;
 
-        window.currentLang = lang;
+    window.currentLang = lang;
 
-        // Hamburger mətni (menu açıq/bağlı vəziyyətinə görə)
-        const hamburger = document.getElementById('hamburgerBtn');
-        const hamburgerText = document.querySelector('.hamburger-text');
+    // [data-key] olan elementlər (menyu istisna, onu menu.js idarə edir)
+    document.querySelectorAll('[data-key]').forEach((el) => {
 
-        if (hamburgerText && hamburger) {
-            const isMenuOpen = hamburger.classList.contains('active');
-            hamburgerText.textContent = isMenuOpen ? t.close : t.menu;
-        }
+        if (el.closest('#mobileMenu')) return;
 
-        // [data-key] olan bütün elementlər
-        document.querySelectorAll('[data-key]').forEach((el) => {
+        const key = el.getAttribute('data-key');
+        if (!t[key]) return;
 
-            const key = el.getAttribute('data-key');
-            if (!t[key]) return;
+        el.textContent = t[key];
+    });
 
-            if (el.classList.contains('nav-btn')) {
-                const navTextSpan = el.querySelector('.nav-text');
-                if (navTextSpan) navTextSpan.textContent = t[key];
-                el.setAttribute('data-text', t[key]);
-            } else {
-                el.textContent = t[key];
-            }
-        });
-
-        // <html lang="..">  və AZ font class-ı
-        if (lang === 'az') {
-            document.body.classList.add('lang-az');
-            document.documentElement.setAttribute('lang', 'az');
-        } else {
-            document.body.classList.remove('lang-az');
-            document.documentElement.setAttribute('lang', 'en');
-        }
+    // <html lang="..">  və AZ font class-ı
+    if (lang === 'az') {
+        document.body.classList.add('lang-az');
+        document.documentElement.setAttribute('lang', 'az');
+    } else {
+        document.body.classList.remove('lang-az');
+        document.documentElement.setAttribute('lang', 'en');
     }
+}
 
     function initLanguageSelector() {
 
@@ -473,6 +460,8 @@ function startAutoPlay() {
 
     autoPlayTimer = setInterval(() => {
 
+        if (document.body.classList.contains('menu-is-open')) return; 
+
         const rect = wrapper.getBoundingClientRect();
 
         const inRange =
@@ -569,7 +558,10 @@ function startAutoPlay() {
 
         startAutoPlay();
 
-        function handleWheel(e) {
+            function handleWheel(e) {
+
+            // Menyu açıqdırsa hero scroll etməsin (təkəri menu.js idarə edir)
+            if (document.body.classList.contains('menu-is-open')) return;
 
             const rect = wrapper.getBoundingClientRect();
 
@@ -1157,100 +1149,6 @@ stage.addEventListener('touchend', (e) => {
     }
 
 
-    /* ============================================================
-       MOBILE MENU
-       ============================================================ */
-
-    function initMenu() {
-
-        const hamburger = document.getElementById('hamburgerBtn');
-        const menu = document.getElementById('mobileMenu');
-        const overlay = document.getElementById('mobileMenuOverlay');
-        const pageTransition = document.querySelector('.page-transition');
-
-        if (!hamburger || !menu) return;
-
-        function toggleMenu() {
-
-            const isOpen = hamburger.classList.contains('active');
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-
-            hamburger.classList.toggle('active', !isOpen);
-            menu.classList.toggle('active', !isOpen);
-
-            if (overlay) overlay.classList.toggle('active', !isOpen);
-
-            const menuText = hamburger.querySelector('.hamburger-text');
-            const t = BTS_TRANSLATIONS[window.currentLang] || BTS_TRANSLATIONS.en;
-            if (menuText) menuText.textContent = !isOpen ? t.close : t.menu;
-
-            if (!isOpen) {
-                document.body.style.overflow = 'hidden';
-                if (scrollbarWidth > 0) {
-                    document.body.style.paddingRight = scrollbarWidth + 'px';
-                }
-            } else {
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-            }
-        }
-
-        hamburger.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        });
-
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleMenu();
-            });
-        }
-
-        const navButtons = menu.querySelectorAll('.nav-btn');
-
-        navButtons.forEach((btn) => {
-            btn.addEventListener('click', (e) => {
-
-                const href = btn.getAttribute('href');
-
-                if (!href || href === '#') {
-                    e.preventDefault();
-                    return;
-                }
-
-                if (btn.classList.contains('active')) {
-                    e.preventDefault();
-                    toggleMenu();
-                    return;
-                }
-
-                e.preventDefault();
-
-                if (hamburger.classList.contains('active')) {
-                    toggleMenu();
-                }
-
-                setTimeout(() => {
-                    if (pageTransition) {
-                        pageTransition.classList.remove('page-loaded');
-                    }
-
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 500);
-                }, 100);
-            });
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && menu.classList.contains('active')) {
-                toggleMenu();
-            }
-        });
-    }
-
 
     /* ============================================================
        SAFE RUN
@@ -1288,7 +1186,6 @@ stage.addEventListener('touchend', (e) => {
         safeRun(buildGallery);
         safeRun(initFilters);
         safeRun(initModal);
-        safeRun(initMenu);
         safeRun(initCursor);
         safeRun(initHorizontalScroll);
         safeRun(initProgressBar);

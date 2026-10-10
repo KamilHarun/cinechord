@@ -40,12 +40,7 @@
         pageTransition: document.querySelector('.page-transition'),
         progressBarTop: document.querySelector('.progress-bar-top'),
         centerLogo: document.querySelector('.center-logo'),
-        
-        hamburger: document.getElementById('hamburgerBtn'),
-        mobileMenu: document.getElementById('mobileMenu'),
-        overlay: document.getElementById('mobileMenuOverlay'),
-        navBtns: document.querySelectorAll('.nav-btn'),
-        
+                
         langSelector: document.getElementById('langSelector'),
         langGlobeBtn: document.getElementById('langGlobeBtn'),
         langOptions: document.querySelectorAll('.lang-option'),
@@ -116,6 +111,50 @@
     }
 
     /* ============================================================
+       3.5 TEXT HELPERS — word-by-word mask reveal markup
+       ============================================================
+       Wraps each word of a bio in a small mask (overflow hidden)
+       with an inner span that CSS animates on open/close
+       (.member-bio .word / .word-inner in about.css). Each word
+       gets a staggered transition-delay so the text reads like it
+       is rising into place line by line instead of just fading.
+       ============================================================ */
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+  function wrapWordsForReveal(text) {
+    if (!text) return '';
+
+    const clean = String(text).replace(/\r\n/g, '\n');
+    const total = clean.split(/\s+/).filter(Boolean).length;
+
+    // bütün sözlər ən çox 1.2 saniyəyə paylanır, amma qısa mətndə də
+    // söz arası 0.04s-dən çox olmur (çox yavaş görünməsin)
+    const step = Math.min(0.04, 1.2 / Math.max(total, 1));
+
+    let i = 0;
+
+    const html = clean
+        .split('\n')
+        .map(line =>
+            line
+                .split(/\s+/)
+                .filter(Boolean)
+                .map(word => `<span class="word"><span class="word-inner" style="--i:${i++}">${escapeHtml(word)}</span></span>`)
+                .join(' ')
+        )
+        .join('<br>');
+
+    // step-i konteynerə ötürmək üçün gizli marker
+    return `<span class="bio-steps" style="--step:${step.toFixed(4)}s">${html}</span>`;
+}
+
+    /* ============================================================
        4. PAGE TRANSITION SYSTEM
        ============================================================ */
     
@@ -145,70 +184,6 @@
         }, CONFIG.FALLBACK_DELAY);
     }
 
-    /* ============================================================
-       5. MENU SYSTEM
-       ============================================================ */
-    
-    function initMenuSystem() {
-        if (!elements.hamburger || !elements.mobileMenu) return;
-
-        const hamburgerText = elements.hamburger.querySelector('.hamburger-text');
-
-        function toggleMenu() {
-            const isActive = elements.hamburger.classList.contains('active');
-            
-            elements.hamburger.classList.toggle('active');
-            elements.mobileMenu.classList.toggle('active');
-            if (elements.overlay) elements.overlay.classList.toggle('active');
-            
-            if (hamburgerText && window.translations && window.translations[window.currentLang]) {
-                const t = window.translations[window.currentLang];
-                hamburgerText.textContent = isActive ? t.menu : t.close;
-            } else if (hamburgerText) {
-                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
-            }
-            
-            document.body.style.overflow = isActive ? '' : 'hidden';
-        }
-
-        elements.hamburger.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        };
-
-        if (elements.overlay) {
-            elements.overlay.onclick = function(e) {
-                e.preventDefault();
-                toggleMenu();
-            };
-        }
-
-        elements.navBtns.forEach(link => {
-            link.onclick = function(e) {
-                const href = this.getAttribute('href');
-                
-                if (!href || href === '#' || this.classList.contains('active')) {
-                    e.preventDefault();
-                    if(href !== '#') toggleMenu();
-                    return;
-                }
-
-                e.preventDefault();
-                toggleMenu();
-                
-                setTimeout(() => {
-                    navigateWithTransition(href);
-                }, 100);
-            };
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && elements.hamburger.classList.contains('active')) {
-                toggleMenu();
-            }
-        });
-    }
 
     /* ============================================================
        6. LOGO ANIMATION
@@ -266,21 +241,6 @@
     const t = window.translations[lang];
     window.currentLang = lang;
 
-    const hamburgerTextEl = document.querySelector('.hamburger-text');
-    if (hamburgerTextEl) {
-        const isMenuOpen = elements.hamburger && elements.hamburger.classList.contains('active');
-        hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
-    }
-
-    const navButtons = document.querySelectorAll('.nav-btn');
-    navButtons.forEach(btn => {
-        const navText = btn.querySelector('.nav-text');
-        const key = btn.getAttribute('data-key');
-        if (key && t[key]) {
-            if (navText) navText.textContent = t[key];
-            btn.setAttribute('data-text', t[key]);
-        }
-    });
 
     const blockTitles = document.querySelectorAll('.sidebar-label');
     blockTitles.forEach(title => {
@@ -348,9 +308,12 @@
                 
                 if (elements.currentLangText) elements.currentLangText.textContent = lang.toUpperCase();
                 
-                localStorage.setItem('selectedLang', lang);
+                               localStorage.setItem('selectedLang', lang);
                 applyTranslations(lang);
                 loadDynamicContent(lang);
+
+                // Menyunun (menu.js) mətnlərini yeniləmək üçün
+                document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
                 
                 setTimeout(() => {
                     elements.langSelector.classList.remove('active');
@@ -700,6 +663,16 @@ function populateContent(content) {
         }
     }
 
+/* ============================================================
+   TEAM MEMBERS — simple grid, click scrolls to a detail stage
+   ============================================================
+   Each card is just a masked photo + name + role. Clicking any
+   card fills a single .team-detail panel (appended after the
+   grid) with that person's photo/name/role/bio, marks the card
+   as .is-active, and smooth-scrolls the page down to the panel
+   — the card itself never grows in place.
+   ============================================================ */
+
 function populateTeamMembers(teamMembers) {
     console.log('🔍 populateTeamMembers called');
     
@@ -717,44 +690,143 @@ function populateTeamMembers(teamMembers) {
         return;
     }
 
-    const teamHTML = teamMembers
-        .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-        .map((member) => {
-            // MOBİL SIĞORTA: Mobildə birbaşa 'active' klassı veririk ki, gizli qalmasın
-            const cardClass = isMobile ? 'chew-card active force-visible' : 'chew-card reveal-item';
-            
-            const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
-            const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
-            const bio = currentLang === 'az' ? (member.bioAz || member.bio) : (member.bio || "");
+    const sorted = teamMembers.slice().sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
-            return `
-                <div class="${cardClass}" data-member="${name}">
-                    <div class="chew-img-box">
-                        <img src="${(member.imageUrl || '').replace('http://', 'https://')}" 
-                             alt="${name}" 
-                             loading="lazy">
-                    </div>
-                    <div class="member-name">${name}</div>
-                    <div class="member-role">${role}</div>
-                    ${bio ? `<div class="member-bio" style="${isMobile ? 'opacity:1 !important; visibility:visible !important;' : ''}">${bio}</div>` : ''}
+    const teamHTML = sorted.map((member, index) => {
+        // MOBİL SIĞORTA: Mobildə birbaşa 'active' klassı veririk ki, gizli qalmasın
+        const cardClass = isMobile ? 'chew-card active force-visible' : 'chew-card reveal-item';
+
+        const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
+        const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
+
+        return `
+            <div class="${cardClass}" data-index="${index}" role="button" tabindex="0" aria-label="${escapeHtml(name)}">
+                <div class="chew-img-box">
+                    <img src="${(member.imageUrl || '').replace('http://', 'https://')}"
+                         alt="${escapeHtml(name)}"
+                         loading="lazy">
+                    <span class="view-hint" aria-hidden="true"></span>
                 </div>
-            `;
-        }).join('');
+                <div class="chew-card-head">
+                    <div class="member-name">${escapeHtml(name)}</div>
+                    <div class="member-role">${escapeHtml(role)}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
 
-    elements.teamGrid.innerHTML = teamHTML;
+    // shared detail stage, appended once after the cards
+    const detailHTML = `
+        <div class="team-detail" id="team-detail-stage">
+            <div class="team-detail-inner">
+                <button type="button" class="team-detail-close" aria-label="Close">&times;</button>
+                <div class="team-detail-photo"><img alt=""></div>
+                <div class="team-detail-text">
+                    <div class="team-detail-name"></div>
+                    <div class="team-detail-role"></div>
+                    <p class="team-detail-bio"></p>
+                </div>
+            </div>
+        </div>
+    `;
 
-    // Aktivasiya məntiqi
+    elements.teamGrid.innerHTML = teamHTML + detailHTML;
+
+    const detailStage = elements.teamGrid.querySelector('#team-detail-stage');
+    const detailInner = detailStage.querySelector('.team-detail-inner');
+    const detailPhoto = detailStage.querySelector('.team-detail-photo img');
+    const detailName = detailStage.querySelector('.team-detail-name');
+    const detailRole = detailStage.querySelector('.team-detail-role');
+    const detailBio = detailStage.querySelector('.team-detail-bio');
+    const detailClose = detailStage.querySelector('.team-detail-close');
+
+    let lastOpenedCard = null;
+
+    function fillDetail(member) {
+        const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
+        const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
+        const bio = currentLang === 'az' ? (member.bioAz || member.bio) : (member.bio || "");
+
+        detailPhoto.src = (member.imageUrl || '').replace('http://', 'https://');
+        detailPhoto.alt = name;
+        detailName.textContent = name;
+        detailRole.textContent = role;
+        detailBio.innerHTML = wrapWordsForReveal(bio);
+    }
+
+    function closeDetail() {
+        const returnTo = lastOpenedCard;
+
+        detailStage.classList.remove('active');
+        elements.teamGrid.querySelectorAll('.chew-card.is-active').forEach(c => c.classList.remove('is-active'));
+        lastOpenedCard = null;
+
+        // scroll back to whichever card opened the panel, so closing never
+        // leaves the page sitting at the bottom where the panel used to be
+        if (returnTo) {
+            returnTo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function openDetail(member, cardEl) {
+        const wasOpen = detailStage.classList.contains('active');
+        const isSameCard = cardEl && cardEl.classList.contains('is-active');
+
+        elements.teamGrid.querySelectorAll('.chew-card.is-active').forEach(c => c.classList.remove('is-active'));
+        if (cardEl) cardEl.classList.add('is-active');
+        lastOpenedCard = cardEl || lastOpenedCard;
+
+        if (wasOpen && !isSameCard) {
+            // panel is already open for someone else — cross-fade the
+            // content instead of collapsing and reopening the whole stage
+            detailInner.style.transition = 'opacity .3s ease';
+            detailInner.style.opacity = '0';
+            setTimeout(() => {
+                fillDetail(member);
+                detailInner.style.opacity = '1';
+                setTimeout(() => { detailInner.style.transition = ''; }, 320);
+            }, 260);
+            return;
+        }
+
+        fillDetail(member);
+        requestAnimationFrame(() => {
+            detailStage.classList.add('active');
+            detailStage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+
+    if (detailClose) {
+        detailClose.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeDetail();
+        });
+    }
+
+    elements.teamGrid.querySelectorAll('.chew-card').forEach(card => {
+        const idx = parseInt(card.getAttribute('data-index'), 10);
+        const member = sorted[idx];
+        if (!member) return;
+
+        card.addEventListener('click', () => openDetail(member, card));
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openDetail(member, card);
+            }
+        });
+    });
+
+    // Aktivasiya məntiqi (scroll-reveal on page load, unrelated to the click behavior above)
     if (isMobile) {
-        // Mobildə heç bir gecikmə olmadan hər şeyi dərhal göstər
         const cards = elements.teamGrid.querySelectorAll('.chew-card');
         cards.forEach(card => {
             card.style.opacity = '1';
             card.style.visibility = 'visible';
             card.style.transform = 'none';
-            card.style.filter = 'none'; // Blur-u mobildə JS ilə də silirik
+            card.style.filter = 'none';
         });
     } else {
-        // Desktopda skroll animasiyasını saxla
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -857,7 +929,6 @@ async function init() {
     
     initPageTransition();
     initLanguageSelector(); 
-    initMenuSystem();       
     initLogoAnimation();
     setupNavLinks();
 

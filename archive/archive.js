@@ -302,18 +302,6 @@ function sortArchiveData(sortType) {
             hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
         }
 
-        // Navigation Buttons
-        const navButtons = document.querySelectorAll('.nav-btn');
-        navButtons.forEach(btn => {
-            const navText = btn.querySelector('.nav-text');
-            const key = btn.getAttribute('data-key');
-            
-            if (key && t[key]) {
-                if (navText) navText.textContent = t[key];
-                btn.setAttribute('data-text', t[key]);
-            }
-        });
-
         // Archive Title
         const archiveTitle = document.querySelector('.archive-title');
         if (archiveTitle) {
@@ -474,114 +462,20 @@ function sortArchiveData(sortType) {
     }
 
     /* ============================================================
-       8. MOBILE MENU
+       8. ESCAPE İLƏ VİDEO MODALI BAĞLAMA
+       (menyunun Escape-ini menu.js özü idarə edir)
        ============================================================ */
 
-    function initMobileMenu() {
-        const hamburger = document.getElementById('hamburgerBtn');
-        const hamburgerText = hamburger?.querySelector('.hamburger-text');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const overlay = document.getElementById('mobileMenuOverlay');
-        const centerLogo = document.querySelector('.center-logo');
-
-        if (!hamburger || !mobileMenu) {
-            console.error('Menu elementləri tapılmadı!');
-            return;
-        }
-
-        function toggleMenu() {
-            const isActive = hamburger.classList.contains('active');
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            if (overlay) overlay.classList.toggle('active');
-            
-            if (hamburgerText) {
-                if (window.translations && window.translations[window.currentLang]) {
-                    const t = window.translations[window.currentLang];
-                    hamburgerText.textContent = isActive ? t.menu : t.close;
-                } else {
-                    hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
-                }
-            }
-            
-            if (!isActive) {
-                document.body.style.overflow = 'hidden';
-                document.body.style.paddingRight = scrollbarWidth + 'px';
-                if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
-                if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
-            } else {
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-                if (hamburger) hamburger.style.paddingRight = '';
-                if (centerLogo) centerLogo.style.paddingRight = '';
-            }
-        }
-
-        function handleHamburgerClick(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        }
-
-        hamburger.addEventListener('click', handleHamburgerClick);
-        
-        hamburger.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        }, { passive: false });
-
-        document.addEventListener('click', function(e) {
-            if (e.target.id === 'hamburgerBtn' || e.target.closest('#hamburgerBtn')) {
-                if (!e.defaultPrevented) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleMenu();
-                }
-            }
-        }, true);
-
-        if (overlay) {
-            overlay.addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleMenu();
-            });
-        }
-
-        const navLinks = mobileMenu.querySelectorAll('.nav-btn');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const href = this.getAttribute('href');
-                
-                if (!href || href === '#' || this.classList.contains('active')) {
-                    toggleMenu();
-                    return;
-                }
-
-                toggleMenu();
-                
-                setTimeout(() => {
-                    navigateWithTransition(href);
-                }, 200);
-            });
-        });
-
+    function initEscapeClose() {
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (elements.previewContainer && elements.previewContainer.classList.contains('active')) {
-                    closeVideoPreview();
-                    return;
-                }
-                if (hamburger.classList.contains('active')) {
-                    toggleMenu();
-                }
+            if (e.key === 'Escape' &&
+                elements.previewContainer &&
+                elements.previewContainer.classList.contains('active')) {
+                closeVideoPreview();
             }
         });
     }
+
 
     /* ============================================================
        9. SCROLL REVEAL
@@ -1115,7 +1009,6 @@ sortArchiveData(currentSort);
         initPageTransition();
         initLogoClick();
         initLanguageSelector();
-        initMobileMenu();
         initScrollReveal();
         initVideoModal();
         loadArchiveData();

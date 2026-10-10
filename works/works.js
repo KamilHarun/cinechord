@@ -20,11 +20,6 @@ let currentCategory = 'all';    const loadingScreen = document.querySelector('.l
     const pageTransition = document.querySelector('.page-transition');
     
     // Menu Elementlər
-    const hamburger = document.getElementById('hamburgerBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const overlay = document.getElementById('mobileMenuOverlay');
-    const hamburgerText = document.querySelector('.hamburger-text');
-    const navBtns = document.querySelectorAll('.nav-btn');
     const centerLogo = document.querySelector('.center-logo');
 
     // Kateqoriyalar
@@ -186,20 +181,6 @@ let currentCategory = 'all';    const loadingScreen = document.querySelector('.l
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        if (hamburgerText) {
-            const isMenuOpen = hamburger && hamburger.classList.contains('active');
-            hamburgerText.textContent = isMenuOpen ? t.close : t.menu;
-        }
-
-        navBtns.forEach(btn => {
-            const navText = btn.querySelector('.nav-text');
-            const key = btn.getAttribute('data-key');
-            
-            if (key && t[key]) {
-                if (navText) navText.textContent = t[key];
-                btn.setAttribute('data-text', t[key]);
-            }
-        });
 
         const worksTitle = document.querySelector('.title-main');
         if (worksTitle) {
@@ -351,99 +332,15 @@ let currentCategory = 'all';    const loadingScreen = document.querySelector('.l
             }
         });
         
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && langSelector.classList.contains('active')) {
-                langSelector.classList.remove('active');
-            }
-        });
+      document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && previewContainer && previewContainer.classList.contains('active')) {
+        closeVideoPreview();
+    }
+});
         
         console.log('Language selector initialized successfully');
     }
 
-    // ============================================================
-    // 5. MENU SİSTEMİ
-    // ============================================================
-
-    function toggleMenu() {
-        if (!hamburger || !mobileMenu) return;
-
-        const isActive = hamburger.classList.contains('active');
-        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-        
-        hamburger.classList.toggle('active');
-        mobileMenu.classList.toggle('active');
-        if (overlay) overlay.classList.toggle('active');
-        
-        if (hamburgerText) {
-            if (window.translations && window.translations[window.currentLang]) {
-                const t = window.translations[window.currentLang];
-                hamburgerText.textContent = isActive ? t.menu : t.close;
-            } else {
-                hamburgerText.textContent = isActive ? 'MENU' : 'CLOSE';
-            }
-        }
-        
-        if (!isActive) {
-            document.body.style.overflow = 'hidden';
-            document.body.style.paddingRight = scrollbarWidth + 'px';
-            if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
-            if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
-        } else {
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-            if (hamburger) hamburger.style.paddingRight = '';
-            if (centerLogo) centerLogo.style.paddingRight = '';
-        }
-    }
-
-    if (hamburger) {
-        hamburger.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        });
-    }
-
-    if (overlay) {
-        overlay.addEventListener('click', () => {
-            toggleMenu();
-        });
-    }
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            if (previewContainer && previewContainer.classList.contains('active')) {
-                closeVideoPreview();
-                return;
-            }
-            if (hamburger && hamburger.classList.contains('active')) {
-                toggleMenu();
-            }
-        }
-    });
-
-    navBtns.forEach(link => {
-        link.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            
-            if (!href || href === '#' || this.classList.contains('active')) {
-                e.preventDefault();
-                if (href !== '#') toggleMenu();
-                return;
-            }
-
-            e.preventDefault();
-            toggleMenu(); 
-
-            if (pageTransition) {
-                pageTransition.classList.remove('page-loaded');
-            }
-
-            setTimeout(() => {
-                window.location.href = href;
-            }, 600);
-        });
-    });
 
     // ============================================================
     // 6. WORKS API & GRID

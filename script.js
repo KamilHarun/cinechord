@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord Index - Main JavaScript
-   Version: 5.4 - PLAY BUTTON AUTO-HIDE FIX + LOQO FIX + PLAY/PAUSE ICON + RESPONSIVE
+   Version: 5.5 - WHEEL MENU REWRITE (a11y + perf + motion + fixes)
    ============================================================ */
 
 const SHOWREEL_VIDEO_URL = "https://res.cloudinary.com/dwybvusv6/video/upload/f_auto,q_auto,vc_auto/CineChord_Showreel_1_1_o3bvnx";
@@ -30,10 +30,10 @@ window.openMainVideo = function() {
 
     if (previewContainer && previewVideo) {
         if (videoLoading) videoLoading.style.display = 'block';
-        
+
         previewVideo.src = window.CONFIG.videos[window.currentIndex];
         if (previewTitle) previewTitle.textContent = window.CONFIG.titles[window.currentIndex];
-        
+
         previewContainer.classList.remove('is-paused');
         previewContainer.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -55,7 +55,7 @@ window.openMainVideo = function() {
     /* ============================================================
        1. CONFIGURATION & CONSTANTS
        ============================================================ */
-    
+
     const CONFIG = {
         PAGE_LOAD_DELAY: 100,
         NAVIGATION_DELAY: 600,
@@ -64,10 +64,12 @@ window.openMainVideo = function() {
         INACTIVITY_DELAY: 3000 // 3 saniyə
     };
 
+    const REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     /* ============================================================
        2. DOM ELEMENT REFERENCES
        ============================================================ */
-    
+
     const elements = {
         pageTransition: document.querySelector('.page-transition'),
         loadingScreen: document.querySelector('.loading-screen'),
@@ -77,7 +79,7 @@ window.openMainVideo = function() {
         loaderLogo: document.querySelector('.loader-logo'),
         loaderAuthor: document.querySelector('.loader-author'),
         centerLogo: document.querySelector('.center-logo'),
-        videoContainer: document.getElementById('videoContainer'), 
+        videoContainer: document.getElementById('videoContainer'),
         projectCounter: document.getElementById('projectCounter'),
         projectName: document.getElementById('projectName'),
         prevBtn: document.getElementById('prevVideoBtn'),
@@ -99,20 +101,12 @@ window.openMainVideo = function() {
         fullscreenBtn: document.getElementById('fullscreenBtn')
     };
 
-    // Menu Elements
-    const hamburger = document.getElementById('hamburgerBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const overlay = document.getElementById('mobileMenuOverlay');
-    const hamburgerText = document.querySelector('.hamburger-text');
-    const navBtns = document.querySelectorAll('.nav-btn');
-    const centerLogo = document.querySelector('.center-logo');
-
     // UI_ELEMENTS - LOQO DA DAXİL
     const UI_ELEMENTS = [
         ".center-logo",
-        ".play-button-container", 
-        ".right-floating-nav", 
-        ".bottom-right-socials", 
+        ".play-button-container",
+        ".right-floating-nav",
+        ".bottom-right-socials",
         ".bottom-left-explore",
         ".lang-selector"
     ];
@@ -120,7 +114,7 @@ window.openMainVideo = function() {
     /* ============================================================
        3. STATE VARIABLES
        ============================================================ */
-    
+
     let isAnimating = false;
     let activityTimeout = null;
     let currentVideoEl = null;
@@ -129,7 +123,7 @@ window.openMainVideo = function() {
     /* ============================================================
        4. UTILITY FUNCTIONS
        ============================================================ */
-    
+
     function formatTime(seconds) {
         if (isNaN(seconds)) return '0:00';
         const mins = Math.floor(seconds / 60);
@@ -141,43 +135,58 @@ window.openMainVideo = function() {
        5. TRANSLATION SYSTEM
        ============================================================ */
 
+    // Həm fallback, həm də home.json-da çatışmayan açarları doldurmaq üçün
+    const DEFAULT_TRANSLATIONS = {
+        en: {
+            menu: "MENU",
+            close: "CLOSE",
+            home: "HOME",
+            work: "WORK",
+            service: "SERVICE",
+            archive: "ARCHIVE",
+            backstage: "BACKSTAGE",
+            about: "ABOUT",
+            contact: "CONTACT",
+            play: "PLAY",
+            explore: "EXPLORE OUR WORKS",
+            designed_by: "Designed By Harunov"
+        },
+        az: {
+            menu: "MENYU",
+            close: "BAĞLA",
+            home: "ANA SƏHİFƏ",
+            work: "İŞLƏR",
+            service: "XİDMƏTLƏR",
+            archive: "ARXİV",
+            backstage: "KULİS",
+            about: "HAQQIMIZDA",
+            contact: "ƏLAQƏ",
+            play: "BAŞLAT",
+            explore: "İŞLƏRİMİZİ KƏŞF EDİN",
+            designed_by: "Dizayn: Harunov"
+        }
+    };
+
+    function mergeDefaults(loaded) {
+        Object.keys(DEFAULT_TRANSLATIONS).forEach(lang => {
+            if (!loaded[lang]) loaded[lang] = {};
+            Object.keys(DEFAULT_TRANSLATIONS[lang]).forEach(key => {
+                if (!(key in loaded[lang])) loaded[lang][key] = DEFAULT_TRANSLATIONS[lang][key];
+            });
+        });
+        return loaded;
+    }
+
     async function loadTranslations() {
         try {
             const response = await fetch('lang/home.json');
             if (!response.ok) throw new Error('Translation file not found');
-            window.translations = await response.json();
+            window.translations = mergeDefaults(await response.json());
             console.log('Translations loaded:', window.translations);
             return window.translations;
         } catch (error) {
             console.error('Error loading translations:', error);
-            window.translations = {
-                "en": {
-                    "menu": "MENU",
-                    "close": "CLOSE",
-                    "home": "HOME",
-                    "work": "WORK",
-                    "service": "SERVICE",
-                    "archive": "ARCHIVE",
-                    "about": "ABOUT",
-                    "contact": "CONTACT",
-                    "play": "PLAY",
-                    "explore": "EXPLORE OUR WORKS",
-                    "designed_by": "Designed By Harunov"
-                },
-                "az": {
-                    "menu": "MENYU",
-                    "close": "BAĞLA",
-                    "home": "ANA SƏHİFƏ",
-                    "work": "İŞLƏR",
-                    "service": "XİDMƏTLƏR",
-                    "archive": "ARXİV",
-                    "about": "HAQQIMIZDA",
-                    "contact": "ƏLAQƏ",
-                    "play": "BAŞLAT",
-                    "explore": "İŞLƏRİMİZİ KƏŞF EDİN",
-                    "designed_by": "Dizayn: Harunov"
-                }
-            };
+            window.translations = mergeDefaults({});
             return window.translations;
         }
     }
@@ -191,21 +200,16 @@ window.openMainVideo = function() {
         const t = window.translations[lang];
         window.currentLang = lang;
 
-        const hamburgerTextEl = document.querySelector('.hamburger-text');
-        if (hamburgerTextEl) {
-            const isMenuOpen = hamburger && hamburger.classList.contains('active');
-            hamburgerTextEl.textContent = isMenuOpen ? t.close : t.menu;
-        }
-
-        const navButtons = document.querySelectorAll('.nav-btn');
-        navButtons.forEach(btn => {
-            const navText = btn.querySelector('.nav-text');
-            const key = btn.getAttribute('data-key');
-            
-            if (key && t[key]) {
-                if (navText) navText.textContent = t[key];
-                btn.setAttribute('data-text', t[key]);
-            }
+        // Tam ekran menyu linkləri buradan tərcümə olunur ([data-key] ilə)
+        document.querySelectorAll('.fm-link[data-key]').forEach(link => {
+            const key = link.getAttribute('data-key');
+            if (!key || !t[key]) return;
+          const txt = link.querySelector('.fm-text');
+if (txt) {
+    txt.textContent = t[key];
+    txt.setAttribute('data-text', t[key]);
+}
+            link.setAttribute('aria-label', t[key]);
         });
 
         const playTexts = document.querySelectorAll('.play-text');
@@ -224,6 +228,8 @@ window.openMainVideo = function() {
             loaderAuthorSpan.textContent = t.designed_by;
         }
 
+        if (mobileMenu) mobileMenu.setAttribute('aria-label', t.menu);
+
         if (lang === 'az') {
             document.body.classList.add('lang-az');
             document.documentElement.setAttribute('lang', 'az');
@@ -232,16 +238,17 @@ window.openMainVideo = function() {
             document.documentElement.setAttribute('lang', 'en');
         }
 
+        document.dispatchEvent(new CustomEvent('translationsApplied'));
         console.log('Translations applied for:', lang);
     }
 
     /* ============================================================
        6. PAGE TRANSITION SYSTEM
        ============================================================ */
-    
+
     function initPageTransition() {
         if (!elements.pageTransition) return;
-        
+
         setTimeout(() => {
             elements.pageTransition.classList.add('page-loaded');
         }, CONFIG.PAGE_LOAD_DELAY);
@@ -249,7 +256,7 @@ window.openMainVideo = function() {
 
     function navigateWithTransition(href) {
         if (!href) return;
-        
+
         if (href.startsWith('mailto') || href.startsWith('tel')) {
             window.location.href = href;
             return;
@@ -258,13 +265,13 @@ window.openMainVideo = function() {
         if (elements.pageTransition) {
             elements.pageTransition.classList.remove('page-loaded');
         }
-        
+
         document.querySelectorAll('video').forEach(v => v.pause());
-        
+
         setTimeout(() => {
             window.location.href = href;
         }, CONFIG.NAVIGATION_DELAY);
-        
+
         setTimeout(() => {
             if (!document.hidden) {
                 window.location.href = href;
@@ -282,14 +289,14 @@ window.openMainVideo = function() {
         const langDropdown = document.getElementById('langDropdown');
         const langOptions = document.querySelectorAll('.lang-option');
         const currentLangText = document.getElementById('currentLangText');
-        
+
         if (!langSelector || !langGlobeBtn) return;
-        
+
         const savedLang = localStorage.getItem('selectedLang') || 'en';
         window.currentLang = savedLang;
-        
+
         applyTranslations(savedLang);
-        
+
         langOptions.forEach(option => {
             if (option.dataset.lang === savedLang) {
                 option.classList.add('active');
@@ -300,54 +307,54 @@ window.openMainVideo = function() {
                 option.classList.remove('active');
             }
         });
-        
+
         langGlobeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             langSelector.classList.toggle('active');
         });
-        
+
         langOptions.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const lang = option.dataset.lang;
-                
+
                 if (option.classList.contains('active')) {
                     langSelector.classList.remove('active');
                     return;
                 }
-                
+
                 langOptions.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
-                
+
                 if (currentLangText) {
                     currentLangText.textContent = lang.toUpperCase();
                 }
-                
+
                 localStorage.setItem('selectedLang', lang);
-                
+
                 applyTranslations(lang);
-                
+
                 setTimeout(() => {
                     langSelector.classList.remove('active');
                 }, 200);
-                
-                document.dispatchEvent(new CustomEvent('languageChanged', { 
-                    detail: { language: lang } 
+
+                document.dispatchEvent(new CustomEvent('languageChanged', {
+                    detail: { language: lang }
                 }));
-                
+
                 console.log('Language changed to:', lang);
             });
         });
-        
+
         document.addEventListener('click', (e) => {
             if (!langSelector.contains(e.target)) {
                 langSelector.classList.remove('active');
             }
         });
-        
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && langSelector.classList.contains('active')) {
                 langSelector.classList.remove('active');
@@ -356,102 +363,17 @@ window.openMainVideo = function() {
     }
 
     /* ============================================================
-       8. MOBILE MENU
-       ============================================================ */
-
-    function toggleMenu() {
-        if (!hamburger || !mobileMenu) return;
-
-        const isActive = hamburger.classList.contains('active');
-        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-        
-        const langSelector = document.getElementById('langSelector');
-        if (langSelector) langSelector.classList.remove('active');
-        
-        hamburger.classList.toggle('active');
-        mobileMenu.classList.toggle('active');
-        if (overlay) overlay.classList.toggle('active');
-        
-        if (hamburgerText && window.translations && window.translations[window.currentLang]) {
-            const t = window.translations[window.currentLang];
-            hamburgerText.textContent = isActive ? t.menu : t.close;
-        }
-        
-        if (!isActive) {
-            document.body.style.overflow = 'hidden';
-            document.body.style.paddingRight = scrollbarWidth + 'px';
-            if (hamburger) hamburger.style.paddingRight = scrollbarWidth + 'px';
-            if (centerLogo) centerLogo.style.paddingRight = scrollbarWidth + 'px';
-        } else {
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-            if (hamburger) hamburger.style.paddingRight = '';
-            if (centerLogo) centerLogo.style.paddingRight = '';
-        }
-    }
-
-    function initMobileMenu() {
-        if (!hamburger || !mobileMenu) {
-            console.error('Menu elementləri tapılmadı!');
-            return;
-        }
-
-        hamburger.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        });
-
-        if (overlay) {
-            overlay.addEventListener('click', () => {
-                toggleMenu();
-            });
-        }
-
-        navBtns.forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                
-                if (!href || href === '#' || this.classList.contains('active')) {
-                    e.preventDefault();
-                    if (href !== '#') toggleMenu();
-                    return;
-                }
-
-                e.preventDefault();
-                toggleMenu();
-
-                setTimeout(() => {
-                    navigateWithTransition(href);
-                }, 200);
-            });
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (elements.previewContainer && elements.previewContainer.classList.contains('active')) {
-                    closeVideoPreview();
-                    return;
-                }
-                if (hamburger.classList.contains('active')) {
-                    toggleMenu();
-                }
-            }
-        });
-    }
-
-    /* ============================================================
        9. GSAP ANIMATIONS
        ============================================================ */
-    
+
     function initGSAP() {
         if (typeof gsap === 'undefined') return;
-        
+
         gsap.set(".hero-section", { autoAlpha: 1 });
-        
-        gsap.set(UI_ELEMENTS, { 
-            y: 50, 
-            autoAlpha: 0 
+
+        gsap.set(UI_ELEMENTS, {
+            y: 50,
+            autoAlpha: 0
         });
     }
 
@@ -479,8 +401,8 @@ window.openMainVideo = function() {
                     ease: "power4.inOut",
                     onComplete: () => {
                         if (elements.loadingScreen) elements.loadingScreen.style.display = "none";
-                        videoShouldPlay = true; 
-                        revealSite(); 
+                        videoShouldPlay = true;
+                        revealSite();
                     }
                 });
             }
@@ -489,7 +411,7 @@ window.openMainVideo = function() {
 
     function revealSite(isPageTransition = false) {
         if (typeof gsap === 'undefined') return;
-        
+
         const mainTl = gsap.timeline({
             onStart: () => {
                 if (window.startHeroVideo) {
@@ -497,7 +419,7 @@ window.openMainVideo = function() {
                 }
             }
         });
-        
+
         if (isPageTransition && elements.loadingScreen) {
             mainTl.to(elements.loadingScreen, {
                 y: "100%",
@@ -505,7 +427,7 @@ window.openMainVideo = function() {
                 ease: "expo.inOut"
             }, 0);
         }
-        
+
         const startDelay = isPageTransition ? "-=0.7" : 0;
 
         mainTl.to(".center-logo", { y: 0, autoAlpha: 1, duration: 0.9, ease: "power2.out" }, startDelay);
@@ -519,12 +441,12 @@ window.openMainVideo = function() {
     /* ============================================================
        10. VIDEO AUTOPLAY - MOBİL OVERLAY FİX
        ============================================================ */
-    
+
     function initVideoAutoplay() {
         if (!currentVideoEl) return;
-        
+
         const video = currentVideoEl;
-        
+
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
@@ -534,43 +456,43 @@ window.openMainVideo = function() {
         video.setAttribute('playsinline', 'true');
         video.setAttribute('webkit-playsinline', 'true');
         video.setAttribute('preload', 'auto');
-        
+
         video.removeAttribute('controls');
         video.controls = false;
-        
+
         video.style.pointerEvents = 'none';
-        
+
         function attemptPlay() {
             if (!videoShouldPlay) return;
-            
+
             const playPromise = video.play();
-            
+
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     console.log('Video started successfully');
                 }).catch(error => {
                     console.warn("Autoplay failed:", error);
-                    
+
                     const playOnInteraction = () => {
                         video.play().then(() => {
                             console.log('Video started after interaction');
                         });
                     };
-                    
-                    ['click', 'touchstart', 'touchend', 'keydown'].forEach(ev => 
+
+                    ['click', 'touchstart', 'touchend', 'keydown'].forEach(ev =>
                         document.addEventListener(ev, playOnInteraction, { once: true, passive: true })
                     );
                 });
             }
         }
-        
+
         window.startHeroVideo = attemptPlay;
-        
+
         video.addEventListener('loadedmetadata', () => {
             console.log('Video metadata loaded');
             attemptPlay();
         }, { once: true });
-        
+
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && video.paused && videoShouldPlay) {
                 attemptPlay();
@@ -587,7 +509,7 @@ window.openMainVideo = function() {
     /* ============================================================
        11. LOADING SCREEN LOGIC
        ============================================================ */
-    
+
     function initLoadingScreen() {
         const hasIntroShown = sessionStorage.getItem('introShown');
 
@@ -616,19 +538,19 @@ window.openMainVideo = function() {
     /* ============================================================
        12. NAVIGATION
        ============================================================ */
-    
+
     function setupNavButtons() {
         const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([target="_blank"])');
-        
+
         internalLinks.forEach(link => {
             if (link.closest('.mobile-menu')) return;
 
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
-                
+
                 if (!href || href === '#') return;
                 if (href.startsWith('mailto') || href.startsWith('tel')) return;
-                
+
                 e.preventDefault();
                 navigateWithTransition(href);
             });
@@ -642,16 +564,16 @@ window.openMainVideo = function() {
     /* ============================================================
        13. VIDEO SLIDER - MOBİL AUTOPLAY FİX
        ============================================================ */
-    
+
     function initVideoSlider() {
         if (!elements.videoContainer) return;
-        
+
         elements.videoContainer.querySelectorAll('video.hero-bg').forEach(v => v.remove());
 
         const firstVideo = document.createElement('video');
         firstVideo.id = 'heroBgVideo';
         firstVideo.className = 'hero-bg';
-        
+
         firstVideo.muted = true;
         firstVideo.loop = true;
         firstVideo.playsInline = true;
@@ -661,35 +583,35 @@ window.openMainVideo = function() {
         firstVideo.setAttribute('playsinline', 'true');
         firstVideo.setAttribute('webkit-playsinline', 'true');
         firstVideo.setAttribute('preload', 'auto');
-        
+
         firstVideo.style.pointerEvents = 'none';
-        
+
         firstVideo.src = window.CONFIG.videos[window.currentIndex];
-        
-        const overlay = document.querySelector('.hero-overlay');
-        if (overlay) {
-            elements.videoContainer.insertBefore(firstVideo, overlay);
+
+        const heroOverlay = document.querySelector('.hero-overlay');
+        if (heroOverlay) {
+            elements.videoContainer.insertBefore(firstVideo, heroOverlay);
         } else {
             elements.videoContainer.appendChild(firstVideo);
         }
-        
+
         currentVideoEl = firstVideo;
 
         function forcePlayEl(el) {
             const playPromise = el.play();
-            
+
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
                     console.warn('Autoplay blocked, waiting for interaction:', err);
-                    
+
                     const startOnTouch = () => {
                         el.play();
-                        ['click', 'touchstart', 'touchend'].forEach(ev => 
+                        ['click', 'touchstart', 'touchend'].forEach(ev =>
                             document.removeEventListener(ev, startOnTouch)
                         );
                     };
-                    
-                    ['click', 'touchstart', 'touchend'].forEach(ev => 
+
+                    ['click', 'touchstart', 'touchend'].forEach(ev =>
                         document.addEventListener(ev, startOnTouch, { once: true, passive: true })
                     );
                 });
@@ -702,7 +624,7 @@ window.openMainVideo = function() {
         firstVideo.addEventListener('loadeddata', forcePlay);
         firstVideo.addEventListener('canplay', forcePlay);
         firstVideo.addEventListener('canplaythrough', forcePlay);
-        
+
         setTimeout(forcePlay, 1000);
         setTimeout(forcePlay, 2000);
 
@@ -722,12 +644,12 @@ window.openMainVideo = function() {
     /* ============================================================
        14. VIDEO MODAL
        ============================================================ */
-    
+
     function handleUserActivity() {
         if (!elements.previewContainer) return;
         elements.previewContainer.classList.remove('user-inactive');
         clearTimeout(activityTimeout);
-        
+
         if (elements.previewVideo && !elements.previewVideo.paused) {
             activityTimeout = setTimeout(() => {
                 elements.previewContainer.classList.add('user-inactive');
@@ -737,14 +659,14 @@ window.openMainVideo = function() {
 
     function updatePlayButtonUI() {
         const modalBtn = document.getElementById('modalPlayBtnContainer');
-        
+
         if (elements.previewVideo.paused) {
             if (elements.playIcon) elements.playIcon.style.display = 'block';
             if (elements.pauseIcon) elements.pauseIcon.style.display = 'none';
             elements.previewContainer.classList.add('is-paused');
             elements.previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
-            
+
             if (modalBtn) {
                 modalBtn.classList.remove('is-playing');
                 modalBtn.classList.add('is-paused');
@@ -754,7 +676,7 @@ window.openMainVideo = function() {
             if (elements.pauseIcon) elements.pauseIcon.style.display = 'block';
             elements.previewContainer.classList.remove('is-paused');
             handleUserActivity();
-            
+
             if (modalBtn) {
                 modalBtn.classList.remove('is-paused');
                 modalBtn.classList.add('is-playing');
@@ -770,17 +692,17 @@ window.openMainVideo = function() {
 
     function closeVideoPreview() {
         if (!elements.previewContainer) return;
-        
+
         elements.previewContainer.classList.remove('active');
         elements.previewContainer.classList.add('is-paused');
         elements.previewContainer.classList.remove('user-inactive');
-        
+
         if (!document.getElementById('mobileMenu')?.classList.contains('active')) {
             document.body.classList.remove('menu-open');
         } else {
             document.body.style.overflow = '';
         }
-        
+
         setTimeout(() => {
             elements.previewVideo.pause();
             elements.previewVideo.currentTime = 0;
@@ -793,14 +715,14 @@ window.openMainVideo = function() {
     function toggleModalPlay() {
         const previewVideo = document.getElementById('previewVideo');
         const modalBtn = document.getElementById('modalPlayBtnContainer');
-        
+
         if (!previewVideo) return;
-        
+
         if (elements.previewContainer) {
             elements.previewContainer.classList.remove('user-inactive');
             clearTimeout(activityTimeout);
         }
-        
+
         if (previewVideo.paused) {
             previewVideo.play();
             if (modalBtn) {
@@ -819,28 +741,28 @@ window.openMainVideo = function() {
     function initPlayPauseIcons() {
         const previewVideo = document.getElementById('previewVideo');
         if (!previewVideo) return;
-        
+
         previewVideo.addEventListener('play', function() {
             const modalBtn = document.getElementById('modalPlayBtnContainer');
             if (modalBtn) {
                 modalBtn.classList.remove('is-paused');
                 modalBtn.classList.add('is-playing');
             }
-            
+
             const mainBtn = document.getElementById('mainPlayBtnContainer');
             if (mainBtn) {
                 mainBtn.classList.remove('is-paused');
                 mainBtn.classList.add('is-playing');
             }
         });
-        
+
         previewVideo.addEventListener('pause', function() {
             const modalBtn = document.getElementById('modalPlayBtnContainer');
             if (modalBtn) {
                 modalBtn.classList.remove('is-playing');
                 modalBtn.classList.add('is-paused');
             }
-            
+
             const mainBtn = document.getElementById('mainPlayBtnContainer');
             if (mainBtn) {
                 mainBtn.classList.remove('is-playing');
@@ -881,7 +803,7 @@ window.openMainVideo = function() {
             elements.previewContainer.classList.remove('user-inactive');
             updatePlayButtonUI();
         });
-        
+
         elements.previewVideo.addEventListener('pause', function() {
             elements.previewContainer.classList.add('is-paused');
             updatePlayButtonUI();
@@ -972,7 +894,7 @@ window.openMainVideo = function() {
             });
         }
 
-        heroSection.addEventListener('touchstart', function(e) {
+        heroSection.addEventListener('touchstart', function() {
             showPlayBtn();
         }, { passive: true });
 
@@ -1011,21 +933,26 @@ window.openMainVideo = function() {
     /* ============================================================
        16. INITIALIZATION
        ============================================================ */
-    
+
     async function init() {
         await loadTranslations();
-        
+
         initGSAP();
         initPageTransition();
         initLanguageSelector();
-        initMobileMenu();
         initLoadingScreen();
         initVideoAutoplay();
         initNavigation();
         initVideoSlider();
         initVideoModal();
         initPlayButtonAutoHide();
-        safeRun(initWheelMenu);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && elements.previewContainer?.classList.contains('active')) {
+        closeVideoPreview();
+    }
+});
+
     }
 
     if (document.readyState === 'loading') {
@@ -1034,96 +961,16 @@ window.openMainVideo = function() {
         init();
     }
 
-    /* ============================================================
-   WHEEL MENU — sonsuz mouse-wheel scroll naviqasiyası
-   ============================================================ */
-
-function initWheelMenu() {
-
-    const NAV_ITEMS = [
-        { href: '/', key: 'home', text: 'home' },
-        { href: 'works/', key: 'work', text: 'work' },
-        { href: 'services/', key: 'service', text: 'service' },
-        { href: 'archive/', key: 'archive', text: 'archive' },
-        { href: 'backstage/', key: 'backstage', text: 'backstage' },
-        { href: 'about/', key: 'about', text: 'about' },
-        { href: 'contact/', key: 'contact', text: 'contact' }
-    ];
-
-    const track = document.getElementById('wheelTrack');
-    const viewport = document.querySelector('.wheel-viewport');
-    if (!track || !viewport) return;
-
-    const ITEM_H = 54;
-    const REPEATS = 9;
-    const total = NAV_ITEMS.length;
-
-    let html = '';
-    for (let r = 0; r < REPEATS; r++) {
-        NAV_ITEMS.forEach((item) => {
-            html += `<a href="${item.href}" class="wheel-item nav-btn" data-key="${item.key}" data-text="${item.text}"><span class="nav-text">${item.text}</span></a>`;
-        });
-    }
-    track.innerHTML = html;
-
-    const items = Array.from(track.querySelectorAll('.wheel-item'));
-
-    let offset = -(Math.floor(REPEATS / 2) * total) * ITEM_H;
-    track.style.transform = `translateY(${offset}px)`;
-
-    function updateActiveAndFade() {
-        const viewportRect = viewport.getBoundingClientRect();
-        const viewportCenter = viewportRect.top + viewportRect.height / 2;
-
-        items.forEach((el) => {
-            const rect = el.getBoundingClientRect();
-            const itemCenter = rect.top + rect.height / 2;
-            const dist = Math.abs(itemCenter - viewportCenter);
-
-            const opacity = Math.max(0.12, 1 - dist / (ITEM_H * 3));
-            el.style.opacity = opacity;
-            el.classList.toggle('is-active', dist < ITEM_H / 2);
-        });
-    }
-
-    function wrapIfNeeded() {
-        const minAllowed = -(REPEATS - 2) * total * ITEM_H;
-        const maxAllowed = -1 * total * ITEM_H;
-
-        if (offset < minAllowed) {
-            offset += total * ITEM_H;
-            track.style.transition = 'none';
-            track.style.transform = `translateY(${offset}px)`;
-            void track.offsetWidth;
-            track.style.transition = '';
-        } else if (offset > maxAllowed) {
-            offset -= total * ITEM_H;
-            track.style.transition = 'none';
-            track.style.transform = `translateY(${offset}px)`;
-            void track.offsetWidth;
-            track.style.transition = '';
+    function safeRun(fn) {
+        try {
+            fn();
+        } catch (err) {
+            console.error('[CineChord]', fn.name, err);
         }
     }
-
-    function onWheel(e) {
-        e.preventDefault();
-        offset -= e.deltaY * 0.6;
-        track.style.transform = `translateY(${offset}px)`;
-        wrapIfNeeded();
-        requestAnimationFrame(updateActiveAndFade);
-    }
-
-    viewport.addEventListener('wheel', onWheel, { passive: false });
-
-    requestAnimationFrame(updateActiveAndFade);
-
-    document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
-        setTimeout(updateActiveAndFade, 350);
-    });
-
-    window.addEventListener('resize', () => {
-        requestAnimationFrame(updateActiveAndFade);
-    });
-}
+    /* ============================================================
+    /* ============================================================
+       17. FULL MENU — 30% şüşə panel + scroll wheel + mask hover
+       ============================================================ */
 
 })();
