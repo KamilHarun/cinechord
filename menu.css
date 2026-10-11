@@ -41,6 +41,13 @@ body.menu-is-open .hamburger {
     pointer-events: auto !important;
 }
 
+/* menyu açıqkən səhifənin öz loqosu gizlənir (menyunun öz loqosu var, ikiqat görünməsin) */
+body.menu-is-open .center-logo {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 body.menu-is-open .lang-selector {
     opacity: 0 !important;
     visibility: hidden !important;
@@ -479,4 +486,29 @@ body.menu-is-open .lang-selector {
     }
 
     .fm-link { filter: none; }
+}
+
+
+/* ============================================================
+   BÜTÜN SƏHİFƏLƏRDƏ EYNİ BLUR-LU FON
+   (səhifənin öz CSS-i üstələməsin deyə !important və yüksək spesifiklik)
+   ============================================================ */
+html body .mobile-menu {
+    background: rgba(16, 16, 18, 0.8) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+    backdrop-filter: blur(12px) saturate(140%) !important;
+}
+
+@media (min-width: 769px) {
+    html body .mobile-menu {
+        -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+        backdrop-filter: blur(16px) saturate(140%) !important;
+    }
+}
+
+/* blur dəstəkləməyən brauzerdə fon qatı qalsın */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    html body .mobile-menu {
+        background: rgba(16, 16, 18, 0.96) !important;
+    }
 }

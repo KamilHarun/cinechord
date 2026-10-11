@@ -119,6 +119,11 @@
             document.body.insertBefore(overlay, mobileMenu);
         }
 
+        // səhifənin öz wrapper-i (transform / filter / overflow) backdrop-filter-i pozmasın deyə
+        // menyunu və overlay-i birbaşa <body>-yə köçürürük
+        if (mobileMenu.parentNode !== document.body) document.body.appendChild(mobileMenu);
+        if (overlay.parentNode !== document.body) document.body.insertBefore(overlay, mobileMenu);
+
         const hamburgerText = hamburger.querySelector('.hamburger-text');
 
         const socials = mobileMenu.querySelector('.menu-socials') || buildSocials();

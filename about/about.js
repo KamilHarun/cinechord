@@ -1,6 +1,6 @@
 /* ============================================================
    CineChord About - Main JavaScript
-   Version: 10.0 - MOBILE TEAM LOADING FIXED
+   Version: 10.1 - SLOWER TEAM DETAIL + SMOOTH SCROLL
    ============================================================ */
 
 (function() {
@@ -22,8 +22,8 @@
         // STATIC_VIDEO: '../videos/Showreel.mp4',
         
         PAGE_LOAD_DELAY: 100,
-        NAVIGATION_DELAY: 600,
-        FALLBACK_DELAY: 1600,
+        NAVIGATION_DELAY: 900,
+        FALLBACK_DELAY: 2000,
         LOGO_ENTRY_DELAY: 500,
         
         SCROLL_THROTTLE: 16,
@@ -110,6 +110,55 @@
         throw lastError;
     }
 
+    /* ---------- yumşaq scroll (panelin açılış sürətinə uyğun) ---------- */
+    let autoScrollRaf = 0;
+    let autoScrollPrev = '';
+
+    function cancelAutoScroll() {
+        if (!autoScrollRaf) return;
+        cancelAnimationFrame(autoScrollRaf);
+        autoScrollRaf = 0;
+        document.documentElement.style.scrollBehavior = autoScrollPrev;
+    }
+
+    // istifadəçi özü scroll edəndə animasiya dayansın
+    ['wheel', 'touchstart', 'keydown'].forEach(ev =>
+        window.addEventListener(ev, cancelAutoScroll, { passive: true })
+    );
+
+    function smoothScrollToY(targetY, duration) {
+        cancelAutoScroll();
+
+        const root = document.documentElement;
+        const startY = window.scrollY;
+        const dist = targetY - startY;
+        if (Math.abs(dist) < 2) return;
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            window.scrollTo(0, targetY);
+            return;
+        }
+
+        // CSS-dəki "scroll-behavior: smooth" kadr-kadr scrollla toqquşmasın
+        autoScrollPrev = root.style.scrollBehavior;
+        root.style.scrollBehavior = 'auto';
+
+        const t0 = performance.now();
+        const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        function step(now) {
+            const p = Math.min(1, (now - t0) / duration);
+            window.scrollTo(0, startY + dist * ease(p));
+            if (p < 1) {
+                autoScrollRaf = requestAnimationFrame(step);
+            } else {
+                autoScrollRaf = 0;
+                root.style.scrollBehavior = autoScrollPrev;
+            }
+        }
+        autoScrollRaf = requestAnimationFrame(step);
+    }
+
     /* ============================================================
        3.5 TEXT HELPERS — word-by-word mask reveal markup
        ============================================================
@@ -127,32 +176,32 @@
             .replace(/>/g, '&gt;');
     }
 
-  function wrapWordsForReveal(text) {
-    if (!text) return '';
+    function wrapWordsForReveal(text) {
+        if (!text) return '';
 
-    const clean = String(text).replace(/\r\n/g, '\n');
-    const total = clean.split(/\s+/).filter(Boolean).length;
+        const clean = String(text).replace(/\r\n/g, '\n');
+        const total = clean.split(/\s+/).filter(Boolean).length;
 
-    // bütün sözlər ən çox 1.2 saniyəyə paylanır, amma qısa mətndə də
-    // söz arası 0.04s-dən çox olmur (çox yavaş görünməsin)
-    const step = Math.min(0.04, 1.2 / Math.max(total, 1));
+        // bütün sözlər ən çox 1.2 saniyəyə paylanır, amma qısa mətndə də
+        // söz arası 0.04s-dən çox olmur (çox yavaş görünməsin)
+        const step = Math.min(0.04, 1.2 / Math.max(total, 1));
 
-    let i = 0;
+        let i = 0;
 
-    const html = clean
-        .split('\n')
-        .map(line =>
-            line
-                .split(/\s+/)
-                .filter(Boolean)
-                .map(word => `<span class="word"><span class="word-inner" style="--i:${i++}">${escapeHtml(word)}</span></span>`)
-                .join(' ')
-        )
-        .join('<br>');
+        const html = clean
+            .split('\n')
+            .map(line =>
+                line
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .map(word => `<span class="word"><span class="word-inner" style="--i:${i++}">${escapeHtml(word)}</span></span>`)
+                    .join(' ')
+            )
+            .join('<br>');
 
-    // step-i konteynerə ötürmək üçün gizli marker
-    return `<span class="bio-steps" style="--step:${step.toFixed(4)}s">${html}</span>`;
-}
+        // step-i konteynerə ötürmək üçün gizli marker
+        return `<span class="bio-steps" style="--step:${step.toFixed(4)}s">${html}</span>`;
+    }
 
     /* ============================================================
        4. PAGE TRANSITION SYSTEM
@@ -235,35 +284,36 @@
         return window.translations;
     }
 
-   function applyTranslations(lang) {
-    if (!window.translations || !window.translations[lang]) return;
+    function applyTranslations(lang) {
+        if (!window.translations || !window.translations[lang]) return;
 
-    const t = window.translations[lang];
-    window.currentLang = lang;
+        const t = window.translations[lang];
+        window.currentLang = lang;
 
 
-    const blockTitles = document.querySelectorAll('.sidebar-label');
-    blockTitles.forEach(title => {
-        const key = title.getAttribute('data-key');
-        if (key && t[key]) {
-            title.textContent = t[key];
+        const blockTitles = document.querySelectorAll('.sidebar-label');
+        blockTitles.forEach(title => {
+            const key = title.getAttribute('data-key');
+            if (key && t[key]) {
+                title.textContent = t[key];
+            }
+        });
+
+        // contact_headline tərcüməsi
+        const contactHeadline = document.querySelector('[data-key="contact_headline"]');
+        if (contactHeadline && t.contact_headline) {
+            contactHeadline.textContent = t.contact_headline;
         }
-    });
 
-    // contact_headline tərcüməsi
-    const contactHeadline = document.querySelector('[data-key="contact_headline"]');
-    if (contactHeadline && t.contact_headline) {
-        contactHeadline.textContent = t.contact_headline;
+        if (lang === 'az') {
+            document.body.classList.add('lang-az');
+            document.documentElement.setAttribute('lang', 'az');
+        } else {
+            document.body.classList.remove('lang-az');
+            document.documentElement.setAttribute('lang', 'en');
+        }
     }
 
-    if (lang === 'az') {
-        document.body.classList.add('lang-az');
-        document.documentElement.setAttribute('lang', 'az');
-    } else {
-        document.body.classList.remove('lang-az');
-        document.documentElement.setAttribute('lang', 'en');
-    }
-}
     /* ============================================================
        8. GLOBE LANGUAGE SELECTOR
        ============================================================ */
@@ -308,7 +358,7 @@
                 
                 if (elements.currentLangText) elements.currentLangText.textContent = lang.toUpperCase();
                 
-                               localStorage.setItem('selectedLang', lang);
+                localStorage.setItem('selectedLang', lang);
                 applyTranslations(lang);
                 loadDynamicContent(lang);
 
@@ -398,181 +448,180 @@
     
     let cachedApiData = null;
 
-   async function loadDynamicContent(lang = 'en') {
-    // BURADAN SİLDİK! (Titrəməni yaradan budur)
-    try {
-        const langParam = lang === 'az' ? 'az' : 'en';
-        const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
-        
-        const response = await retryFetch(() => 
-            fetchWithTimeout(url, { method: 'GET' })
-        );
-        
-        const apiData = await response.json();
-        processApiData(apiData, lang);
-        
-    } catch (error) {
-        console.error('❌ API error:', error);
-        showFallbackContent(lang); // Yalnız xəta olanda köhnə sözləri göstər
-    }
-}
-
- function processApiData(data, lang = 'en') {
-    console.log('🔧 processApiData called');
-    console.log('📦 API data received:', data);
-    
-    function formatText(text) {
-        if (!text) return '';
-        return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
-    }
-
-    // ⭐ YENİ: Cloudinary optimizasiyalı HTTPS çevirici
-// ⭐ YENİ: Cloudinary optimizasiyalı HTTPS çevirici (FIXED)
-const ensureHttps = (url) => {
-    if (!url) return null;
-    
-    // HTTP -> HTTPS
-    url = url.replace('http://', 'https://');
-    
-    // Cloudinary video optimizasiyası
-    if (
-        url.includes('cloudinary.com') &&
-        url.includes('/video/upload/') &&
-        !url.includes('/f_auto,q_auto,vc_auto/') &&
-        !url.includes('/f_auto,q_auto/')
-    ) {
-        const uploadIndex = url.indexOf('/video/upload/');
-        const before = url.substring(0, uploadIndex + '/video/upload/'.length);
-        const after = url.substring(uploadIndex + '/video/upload/'.length);
-        
-        return `${before}f_auto,q_auto,vc_auto/${after}`;
-    }
-    
-    return url;
-};
-
-    
-    const content = {
-        mainTitle: data.mainTitle || (lang === 'az' ? "HAQQIMIZDA" : "ABOUT US"),
-        subTitle: data.subTitle || "",
-        whoWeAreText: formatText(data.whoWeAreText || ''),
-        ourMissionText: formatText(data.ourMissionText || ''),
-        ourApproachText: formatText(data.ourApproachText || ''),
-        email: data.email || "hello@cinechord.com",
-        phone: data.phone || "+994 50 123 45 67",
-        address: data.address || (lang === 'az' ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"),
-        
-        // ✅ Avtomatik optimize olunur
-        videoUrl: ensureHttps(data.videoUrl),
-        
-        // Why CineChord
-        whyTitle: data.whyTitle || (lang === 'az' ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES"),
-        whyDescription: data.whyDescription || "",
-        whyMediaUrl: ensureHttps(data.whyMediaUrl), // ✅ Bu da optimize olunur
-        whyMediaType: data.whyMediaType || 'video',
-        
-        // Team
-        teamMembers: data.teamMembers || []
-    };
-    
-    console.log('👥 Team members in content:', content.teamMembers.length);
-    
-    populateContent(content);
-}
-
-function populateContent(content) {
-    console.log('🎨 populateContent called');
-    console.log('👥 Team members to populate:', content.teamMembers?.length || 0);
-    
-    const safeUpdate = (el, val, isHTML = false) => {
-        if (el) {
-            if (isHTML) el.innerHTML = val;
-            else el.textContent = val;
-        }
-    };
-
-    // 1. Main Title
-    if (elements.mainTitle) {
-        const span = elements.mainTitle.querySelector('span');
-        if (span) {
-            span.textContent = content.mainTitle;
-        } else {
-            elements.mainTitle.innerHTML = `<span>${content.mainTitle}</span>`;
-        }
-        elements.mainTitle.setAttribute('data-text', content.mainTitle);
-    }
-    
-    // 2. Text Content
-    safeUpdate(elements.subtitle, content.subTitle);
-    safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
-    safeUpdate(elements.ourMission, content.ourMissionText, true);
-    safeUpdate(elements.ourApproach, content.ourApproachText, true);
-    safeUpdate(elements.address, content.address);
-
-    // 3. Email & Phone (footer elements)
-    if (elements.emailLink) {
-        elements.emailLink.href = `mailto:${content.email}`;
-        const eSpan = elements.emailLink.querySelector('span');
-        if(eSpan) {
-            eSpan.textContent = content.email;
-            eSpan.setAttribute('data-text', content.email);
+    async function loadDynamicContent(lang = 'en') {
+        // BURADAN SİLDİK! (Titrəməni yaradan budur)
+        try {
+            const langParam = lang === 'az' ? 'az' : 'en';
+            const url = `${CONFIG.BACKEND_URL}${CONFIG.ENDPOINTS.ABOUT}?lang=${langParam}`;
+            
+            const response = await retryFetch(() => 
+                fetchWithTimeout(url, { method: 'GET' })
+            );
+            
+            const apiData = await response.json();
+            processApiData(apiData, lang);
+            
+        } catch (error) {
+            console.error('❌ API error:', error);
+            showFallbackContent(lang); // Yalnız xəta olanda köhnə sözləri göstər
         }
     }
 
-    if (elements.phoneLink) {
-        elements.phoneLink.href = `tel:${content.phone.replace(/\s/g, '')}`;
-        const pSpan = elements.phoneLink.querySelector('span');
-        if(pSpan) {
-            pSpan.textContent = content.phone;
-            pSpan.setAttribute('data-text', content.phone);
+    function processApiData(data, lang = 'en') {
+        console.log('🔧 processApiData called');
+        console.log('📦 API data received:', data);
+        
+        function formatText(text) {
+            if (!text) return '';
+            return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
         }
-    }
-    
-    // ✅ 3.5 Contact Section (ayrıca bölmə - YENİ!)
-    const contactEmail = document.getElementById('contact-email');
-    const contactPhone = document.getElementById('contact-phone');
-    const contactAddress = document.getElementById('contact-address');
 
-    if (contactEmail) {
-        const span = contactEmail.querySelector('span');
-        if (span) {
-            span.textContent = content.email;
-            contactEmail.setAttribute('data-text', content.email);
+        // Cloudinary optimizasiyalı HTTPS çevirici
+        const ensureHttps = (url) => {
+            if (!url) return null;
+            
+            // HTTP -> HTTPS
+            url = url.replace('http://', 'https://');
+            
+            // Cloudinary video optimizasiyası
+            if (
+                url.includes('cloudinary.com') &&
+                url.includes('/video/upload/') &&
+                !url.includes('/f_auto,q_auto,vc_auto/') &&
+                !url.includes('/f_auto,q_auto/')
+            ) {
+                const uploadIndex = url.indexOf('/video/upload/');
+                const before = url.substring(0, uploadIndex + '/video/upload/'.length);
+                const after = url.substring(uploadIndex + '/video/upload/'.length);
+                
+                return `${before}f_auto,q_auto,vc_auto/${after}`;
+            }
+            
+            return url;
+        };
+
+        
+        const content = {
+            mainTitle: data.mainTitle || (lang === 'az' ? "HAQQIMIZDA" : "ABOUT US"),
+            subTitle: data.subTitle || "",
+            whoWeAreText: formatText(data.whoWeAreText || ''),
+            ourMissionText: formatText(data.ourMissionText || ''),
+            ourApproachText: formatText(data.ourApproachText || ''),
+            email: data.email || "hello@cinechord.com",
+            phone: data.phone || "+994 50 123 45 67",
+            address: data.address || (lang === 'az' ? "BAKI, AZƏRBAYCAN" : "BAKU, AZERBAIJAN"),
+            
+            // ✅ Avtomatik optimize olunur
+            videoUrl: ensureHttps(data.videoUrl),
+            
+            // Why CineChord
+            whyTitle: data.whyTitle || (lang === 'az' ? "VİZUAL HEKAYƏLƏRİ YARADIRIZ" : "WE CRAFT VISUAL STORIES"),
+            whyDescription: data.whyDescription || "",
+            whyMediaUrl: ensureHttps(data.whyMediaUrl),
+            whyMediaType: data.whyMediaType || 'video',
+            
+            // Team
+            teamMembers: data.teamMembers || []
+        };
+        
+        console.log('👥 Team members in content:', content.teamMembers.length);
+        
+        populateContent(content);
+    }
+
+    function populateContent(content) {
+        console.log('🎨 populateContent called');
+        console.log('👥 Team members to populate:', content.teamMembers?.length || 0);
+        
+        const safeUpdate = (el, val, isHTML = false) => {
+            if (el) {
+                if (isHTML) el.innerHTML = val;
+                else el.textContent = val;
+            }
+        };
+
+        // 1. Main Title
+        if (elements.mainTitle) {
+            const span = elements.mainTitle.querySelector('span');
+            if (span) {
+                span.textContent = content.mainTitle;
+            } else {
+                elements.mainTitle.innerHTML = `<span>${content.mainTitle}</span>`;
+            }
+            elements.mainTitle.setAttribute('data-text', content.mainTitle);
         }
-        contactEmail.href = `mailto:${content.email}`;
-    }
+        
+        // 2. Text Content
+        safeUpdate(elements.subtitle, content.subTitle);
+        safeUpdate(elements.whoWeAre, content.whoWeAreText, true);
+        safeUpdate(elements.ourMission, content.ourMissionText, true);
+        safeUpdate(elements.ourApproach, content.ourApproachText, true);
+        safeUpdate(elements.address, content.address);
 
-    if (contactPhone) {
-        const span = contactPhone.querySelector('span');
-        if (span) {
-            span.textContent = content.phone;
-            contactPhone.setAttribute('data-text', content.phone);
+        // 3. Email & Phone (footer elements)
+        if (elements.emailLink) {
+            elements.emailLink.href = `mailto:${content.email}`;
+            const eSpan = elements.emailLink.querySelector('span');
+            if(eSpan) {
+                eSpan.textContent = content.email;
+                eSpan.setAttribute('data-text', content.email);
+            }
         }
-        contactPhone.href = `tel:${content.phone.replace(/\s/g, '')}`;
-    }
 
-    if (contactAddress) {
-        contactAddress.textContent = content.address;
+        if (elements.phoneLink) {
+            elements.phoneLink.href = `tel:${content.phone.replace(/\s/g, '')}`;
+            const pSpan = elements.phoneLink.querySelector('span');
+            if(pSpan) {
+                pSpan.textContent = content.phone;
+                pSpan.setAttribute('data-text', content.phone);
+            }
+        }
+        
+        // 3.5 Contact Section (ayrıca bölmə)
+        const contactEmail = document.getElementById('contact-email');
+        const contactPhone = document.getElementById('contact-phone');
+        const contactAddress = document.getElementById('contact-address');
+
+        if (contactEmail) {
+            const span = contactEmail.querySelector('span');
+            if (span) {
+                span.textContent = content.email;
+                contactEmail.setAttribute('data-text', content.email);
+            }
+            contactEmail.href = `mailto:${content.email}`;
+        }
+
+        if (contactPhone) {
+            const span = contactPhone.querySelector('span');
+            if (span) {
+                span.textContent = content.phone;
+                contactPhone.setAttribute('data-text', content.phone);
+            }
+            contactPhone.href = `tel:${content.phone.replace(/\s/g, '')}`;
+        }
+
+        if (contactAddress) {
+            contactAddress.textContent = content.address;
+        }
+        
+        // 4. Hero Video Handling (Secure)
+        if (content.videoUrl && elements.aboutVideo) {
+            elements.aboutVideo.src = content.videoUrl;
+            elements.aboutVideo.load();
+            elements.aboutVideo.addEventListener('loadeddata', function() {
+                if (typeof forceVideoPlay === 'function') forceVideoPlay();
+            }, { once: true });
+        } else if (elements.aboutVideo) {
+            if (typeof loadStaticVideo === 'function') loadStaticVideo();
+        }
+        
+        // 5. Why Section & Team
+        populateWhySection(content);
+        
+        // CRITICAL: Ensure team members are populated
+        console.log('🚀 Calling populateTeamMembers with', content.teamMembers?.length || 0, 'members');
+        populateTeamMembers(content.teamMembers || []);
     }
-    
-    // 4. Hero Video Handling (Secure)
-    if (content.videoUrl && elements.aboutVideo) {
-        elements.aboutVideo.src = content.videoUrl;
-        elements.aboutVideo.load();
-        elements.aboutVideo.addEventListener('loadeddata', function() {
-            if (typeof forceVideoPlay === 'function') forceVideoPlay();
-        }, { once: true });
-    } else if (elements.aboutVideo) {
-        if (typeof loadStaticVideo === 'function') loadStaticVideo();
-    }
-    
-    // 5. Why Section & Team
-    populateWhySection(content);
-    
-    // CRITICAL: Ensure team members are populated
-    console.log('🚀 Calling populateTeamMembers with', content.teamMembers?.length || 0, 'members');
-    populateTeamMembers(content.teamMembers || []);
-}
 
     function populateWhySection(content) {
         // 1. Başlıq
@@ -663,208 +712,212 @@ function populateContent(content) {
         }
     }
 
-/* ============================================================
-   TEAM MEMBERS — simple grid, click scrolls to a detail stage
-   ============================================================
-   Each card is just a masked photo + name + role. Clicking any
-   card fills a single .team-detail panel (appended after the
-   grid) with that person's photo/name/role/bio, marks the card
-   as .is-active, and smooth-scrolls the page down to the panel
-   — the card itself never grows in place.
-   ============================================================ */
+    /* ============================================================
+       TEAM MEMBERS — simple grid, click scrolls to a detail stage
+       ============================================================
+       Each card is just a masked photo + name + role. Clicking any
+       card fills a single .team-detail panel (appended after the
+       grid) with that person's photo/name/role/bio, marks the card
+       as .is-active, and smooth-scrolls the page down to the panel
+       — the card itself never grows in place.
+       ============================================================ */
 
-function populateTeamMembers(teamMembers) {
-    console.log('🔍 populateTeamMembers called');
-    
-    if (!elements.teamGrid) {
-        console.error('❌ Team grid element NOT FOUND!');
-        return;
-    }
-
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const currentLang = localStorage.getItem('selectedLang') || 'en';
-
-    if (!teamMembers || !teamMembers.length) {
-        console.warn('⚠️ No team members data available');
-        elements.teamGrid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">No team members available.</p>';
-        return;
-    }
-
-    const sorted = teamMembers.slice().sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-
-    const teamHTML = sorted.map((member, index) => {
-        // MOBİL SIĞORTA: Mobildə birbaşa 'active' klassı veririk ki, gizli qalmasın
-        const cardClass = isMobile ? 'chew-card active force-visible' : 'chew-card reveal-item';
-
-        const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
-        const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
-
-        return `
-            <div class="${cardClass}" data-index="${index}" role="button" tabindex="0" aria-label="${escapeHtml(name)}">
-                <div class="chew-img-box">
-                    <img src="${(member.imageUrl || '').replace('http://', 'https://')}"
-                         alt="${escapeHtml(name)}"
-                         loading="lazy">
-                    <span class="view-hint" aria-hidden="true"></span>
-                </div>
-                <div class="chew-card-head">
-                    <div class="member-name">${escapeHtml(name)}</div>
-                    <div class="member-role">${escapeHtml(role)}</div>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // shared detail stage, appended once after the cards
-    const detailHTML = `
-        <div class="team-detail" id="team-detail-stage">
-            <div class="team-detail-inner">
-                <button type="button" class="team-detail-close" aria-label="Close">&times;</button>
-                <div class="team-detail-photo"><img alt=""></div>
-                <div class="team-detail-text">
-                    <div class="team-detail-name"></div>
-                    <div class="team-detail-role"></div>
-                    <p class="team-detail-bio"></p>
-                </div>
-            </div>
-        </div>
-    `;
-
-    elements.teamGrid.innerHTML = teamHTML + detailHTML;
-
-    const detailStage = elements.teamGrid.querySelector('#team-detail-stage');
-    const detailInner = detailStage.querySelector('.team-detail-inner');
-    const detailPhoto = detailStage.querySelector('.team-detail-photo img');
-    const detailName = detailStage.querySelector('.team-detail-name');
-    const detailRole = detailStage.querySelector('.team-detail-role');
-    const detailBio = detailStage.querySelector('.team-detail-bio');
-    const detailClose = detailStage.querySelector('.team-detail-close');
-
-    let lastOpenedCard = null;
-
-    function fillDetail(member) {
-        const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
-        const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
-        const bio = currentLang === 'az' ? (member.bioAz || member.bio) : (member.bio || "");
-
-        detailPhoto.src = (member.imageUrl || '').replace('http://', 'https://');
-        detailPhoto.alt = name;
-        detailName.textContent = name;
-        detailRole.textContent = role;
-        detailBio.innerHTML = wrapWordsForReveal(bio);
-    }
-
-    function closeDetail() {
-        const returnTo = lastOpenedCard;
-
-        detailStage.classList.remove('active');
-        elements.teamGrid.querySelectorAll('.chew-card.is-active').forEach(c => c.classList.remove('is-active'));
-        lastOpenedCard = null;
-
-        // scroll back to whichever card opened the panel, so closing never
-        // leaves the page sitting at the bottom where the panel used to be
-        if (returnTo) {
-            returnTo.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
-
-    function openDetail(member, cardEl) {
-        const wasOpen = detailStage.classList.contains('active');
-        const isSameCard = cardEl && cardEl.classList.contains('is-active');
-
-        elements.teamGrid.querySelectorAll('.chew-card.is-active').forEach(c => c.classList.remove('is-active'));
-        if (cardEl) cardEl.classList.add('is-active');
-        lastOpenedCard = cardEl || lastOpenedCard;
-
-        if (wasOpen && !isSameCard) {
-            // panel is already open for someone else — cross-fade the
-            // content instead of collapsing and reopening the whole stage
-            detailInner.style.transition = 'opacity .3s ease';
-            detailInner.style.opacity = '0';
-            setTimeout(() => {
-                fillDetail(member);
-                detailInner.style.opacity = '1';
-                setTimeout(() => { detailInner.style.transition = ''; }, 320);
-            }, 260);
+    function populateTeamMembers(teamMembers) {
+        console.log('🔍 populateTeamMembers called');
+        
+        if (!elements.teamGrid) {
+            console.error('❌ Team grid element NOT FOUND!');
             return;
         }
 
-        fillDetail(member);
-        requestAnimationFrame(() => {
-            detailStage.classList.add('active');
-            detailStage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    }
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const currentLang = localStorage.getItem('selectedLang') || 'en';
 
-    if (detailClose) {
-        detailClose.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeDetail();
-        });
-    }
+        if (!teamMembers || !teamMembers.length) {
+            console.warn('⚠️ No team members data available');
+            elements.teamGrid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">No team members available.</p>';
+            return;
+        }
 
-    elements.teamGrid.querySelectorAll('.chew-card').forEach(card => {
-        const idx = parseInt(card.getAttribute('data-index'), 10);
-        const member = sorted[idx];
-        if (!member) return;
+        const sorted = teamMembers.slice().sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
-        card.addEventListener('click', () => openDetail(member, card));
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                openDetail(member, card);
+        const teamHTML = sorted.map((member, index) => {
+            // MOBİL SIĞORTA: Mobildə birbaşa 'active' klassı veririk ki, gizli qalmasın
+            const cardClass = isMobile ? 'chew-card active force-visible' : 'chew-card reveal-item';
+
+            const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
+            const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
+
+            return `
+                <div class="${cardClass}" data-index="${index}" role="button" tabindex="0" aria-label="${escapeHtml(name)}">
+                    <div class="chew-img-box">
+                        <img src="${(member.imageUrl || '').replace('http://', 'https://')}"
+                             alt="${escapeHtml(name)}"
+                             loading="lazy">
+                        <span class="view-hint" aria-hidden="true"></span>
+                    </div>
+                    <div class="chew-card-head">
+                        <div class="member-name">${escapeHtml(name)}</div>
+                        <div class="member-role">${escapeHtml(role)}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // shared detail stage, appended once after the cards
+        const detailHTML = `
+            <div class="team-detail" id="team-detail-stage">
+                <div class="team-detail-inner">
+                    <button type="button" class="team-detail-close" aria-label="Close">&times;</button>
+                    <div class="team-detail-photo"><img alt=""></div>
+                    <div class="team-detail-text">
+                        <div class="team-detail-name"></div>
+                        <div class="team-detail-role"></div>
+                        <p class="team-detail-bio"></p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        elements.teamGrid.innerHTML = teamHTML + detailHTML;
+
+        const detailStage = elements.teamGrid.querySelector('#team-detail-stage');
+        const detailInner = detailStage.querySelector('.team-detail-inner');
+        const detailPhoto = detailStage.querySelector('.team-detail-photo img');
+        const detailName = detailStage.querySelector('.team-detail-name');
+        const detailRole = detailStage.querySelector('.team-detail-role');
+        const detailBio = detailStage.querySelector('.team-detail-bio');
+        const detailClose = detailStage.querySelector('.team-detail-close');
+
+        let lastOpenedCard = null;
+
+        function fillDetail(member) {
+            const name = currentLang === 'az' ? (member.nameAz || member.name) : (member.name || "");
+            const role = currentLang === 'az' ? (member.roleAz || member.role) : (member.role || "");
+            const bio = currentLang === 'az' ? (member.bioAz || member.bio) : (member.bio || "");
+
+            detailPhoto.src = (member.imageUrl || '').replace('http://', 'https://');
+            detailPhoto.alt = name;
+            detailName.textContent = name;
+            detailRole.textContent = role;
+            detailBio.innerHTML = wrapWordsForReveal(bio);
+        }
+
+        function closeDetail() {
+            const returnTo = lastOpenedCard;
+
+            detailStage.classList.remove('active');
+            elements.teamGrid.querySelectorAll('.chew-card.is-active').forEach(c => c.classList.remove('is-active'));
+            lastOpenedCard = null;
+
+            // scroll back to whichever card opened the panel, so closing never
+            // leaves the page sitting at the bottom where the panel used to be
+            if (returnTo) {
+                const r = returnTo.getBoundingClientRect();
+                const y = r.top + window.scrollY - (window.innerHeight - r.height) / 2;
+                smoothScrollToY(y, isMobile ? 1300 : 1100);
             }
-        });
-    });
+        }
 
-    // Aktivasiya məntiqi (scroll-reveal on page load, unrelated to the click behavior above)
-    if (isMobile) {
-        const cards = elements.teamGrid.querySelectorAll('.chew-card');
-        cards.forEach(card => {
-            card.style.opacity = '1';
-            card.style.visibility = 'visible';
-            card.style.transform = 'none';
-            card.style.filter = 'none';
-        });
-    } else {
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
+        function openDetail(member, cardEl) {
+            const wasOpen = detailStage.classList.contains('active');
+            const isSameCard = cardEl && cardEl.classList.contains('is-active');
+
+            elements.teamGrid.querySelectorAll('.chew-card.is-active').forEach(c => c.classList.remove('is-active'));
+            if (cardEl) cardEl.classList.add('is-active');
+            lastOpenedCard = cardEl || lastOpenedCard;
+
+            if (wasOpen && !isSameCard) {
+                // panel is already open for someone else — cross-fade the
+                // content instead of collapsing and reopening the whole stage
+                detailInner.style.transition = 'opacity .65s ease';
+                detailInner.style.opacity = '0';
+                setTimeout(() => {
+                    fillDetail(member);
+                    detailInner.style.opacity = '1';
+                    setTimeout(() => { detailInner.style.transition = ''; }, 670);
+                }, 560);
+                return;
+            }
+
+            fillDetail(member);
+            requestAnimationFrame(() => {
+                detailStage.classList.add('active');
+                const y = detailStage.getBoundingClientRect().top + window.scrollY;
+                smoothScrollToY(y, isMobile ? 1800 : 1500);
+            });
+        }
+
+        if (detailClose) {
+            detailClose.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeDetail();
+            });
+        }
+
+        elements.teamGrid.querySelectorAll('.chew-card').forEach(card => {
+            const idx = parseInt(card.getAttribute('data-index'), 10);
+            const member = sorted[idx];
+            if (!member) return;
+
+            card.addEventListener('click', () => openDetail(member, card));
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openDetail(member, card);
                 }
             });
-        }, { threshold: 0.1, rootMargin: '100px' });
+        });
 
-        elements.teamGrid.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
+        // Aktivasiya məntiqi (scroll-reveal on page load, unrelated to the click behavior above)
+        if (isMobile) {
+            const cards = elements.teamGrid.querySelectorAll('.chew-card');
+            cards.forEach(card => {
+                card.style.opacity = '1';
+                card.style.visibility = 'visible';
+                card.style.transform = 'none';
+                card.style.filter = 'none';
+            });
+        } else {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '100px' });
+
+            elements.teamGrid.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
+        }
     }
-}
+
     /* ============================================================
        11. SCROLL LOGIC
        ============================================================ */
     
-  function initScrollLogic() {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                // Element görünən kimi 'active' klassını veririk
-                entry.target.classList.add('active');
-                
-                // Məcburi: Əgər blur hələ də getmirsə, inline olaraq silirik
-                entry.target.style.filter = "blur(0)";
-                entry.target.style.opacity = "1";
-                
-                observer.unobserve(entry.target);
-            }
+    function initScrollLogic() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    // Element görünən kimi 'active' klassını veririk
+                    entry.target.classList.add('active');
+                    
+                    // Məcburi: Əgər blur hələ də getmirsə, inline olaraq silirik
+                    entry.target.style.filter = "blur(0)";
+                    entry.target.style.opacity = "1";
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { 
+            threshold: 0.1, // Elementin 10%-i görünən kimi animasiya başlasın
+            rootMargin: '0px 0px -50px 0px' 
         });
-    }, { 
-        threshold: 0.1, // Elementin 10%-i görünən kimi animasiya başlasın
-        rootMargin: '0px 0px -50px 0px' 
-    });
 
-    // Statik və dinamik gələn bütün elementləri müşahidə et
-    document.querySelectorAll('.reveal-item, .chew-card').forEach(el => observer.observe(el));
-}
+        // Statik və dinamik gələn bütün elementləri müşahidə et
+        document.querySelectorAll('.reveal-item, .chew-card').forEach(el => observer.observe(el));
+    }
 
     /* ============================================================
        12. GLOBAL NAVIGATION LINKS
@@ -909,59 +962,60 @@ function populateTeamMembers(teamMembers) {
         }
     }
 
-/* ============================================================
-   14. INITIALIZATION (THE FINAL & SECURE FIX)
-   ============================================================ */
-async function init() {
-    console.log('🚀 Initializing About page...');
-    const currentLang = localStorage.getItem('selectedLang') || 'en';
-    
-    // Səhifəni gizli saxlayırıq
-    document.body.classList.add('loading-state');
+    /* ============================================================
+       14. INITIALIZATION (THE FINAL & SECURE FIX)
+       ============================================================ */
+    async function init() {
+        console.log('🚀 Initializing About page...');
+        const currentLang = localStorage.getItem('selectedLang') || 'en';
+        
+        // Səhifəni gizli saxlayırıq
+        document.body.classList.add('loading-state');
 
-    await loadTranslations();
-    
-    // ƏSAS: Datanı bazadan çəkirik
-    await loadDynamicContent(currentLang);
-    
-    // Statik hissələri (menyu və s.) tərcümə edirik
-    applyTranslations(currentLang);
-    
-    initPageTransition();
-    initLanguageSelector(); 
-    initLogoAnimation();
-    setupNavLinks();
+        await loadTranslations();
+        
+        // ƏSAS: Datanı bazadan çəkirik
+        await loadDynamicContent(currentLang);
+        
+        // Statik hissələri (menyu və s.) tərcümə edirik
+        applyTranslations(currentLang);
+        
+        initPageTransition();
+        initLanguageSelector(); 
+        initLogoAnimation();
+        setupNavLinks();
 
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (!isMobile) { initScrollLogic(); }
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) { initScrollLogic(); }
 
-    // Hər şey hazır olandan sonra pərdəni açırıq
-    setTimeout(() => {
-        document.body.classList.remove('loading-state');
-        document.querySelectorAll('.reveal-item, .chew-card, #main-title span, .subtitle, .big-statement, .desc-text, .member-bio')
-            .forEach(el => {
-                el.classList.add('active', 'content-ready');
-            });
-    }, 400);
-}
-
-/* ============================================================
-   15. EXECUTION & PERSISTENCE
-   ============================================================ */
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
-
-// Geri qayıdanda datanın itməməsi üçün tək bir sığorta
-window.onpageshow = function(event) {
-    if (event.persisted) {
-        // Keşdən gələndə səhifəni təzələyib təmiz data çəkirik
-        window.location.reload();
+        // Hər şey hazır olandan sonra pərdəni açırıq
+        setTimeout(() => {
+            document.body.classList.remove('loading-state');
+            document.querySelectorAll('.reveal-item, .chew-card, #main-title span, .subtitle, .big-statement, .desc-text, .member-bio')
+                .forEach(el => {
+                    el.classList.add('active', 'content-ready');
+                });
+        }, 400);
     }
-};
+
+    /* ============================================================
+       15. EXECUTION & PERSISTENCE
+       ============================================================ */
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    // Geri qayıdanda datanın itməməsi üçün tək bir sığorta
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            // Keşdən gələndə səhifəni təzələyib təmiz data çəkirik
+            window.location.reload();
+        }
+    };
+
     /* ============================================================
        16. SCROLL HIDE/SHOW ADDON
        ============================================================ */
