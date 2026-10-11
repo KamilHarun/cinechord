@@ -2509,3 +2509,19 @@ html, body {
 @media (max-width: 480px) {
     .poster-caption { left: 20px; bottom: 26px; }
 }
+
+/* AZ dili: Gabarito-da Ə yoxdur, hər şey Montserrat-a keçir (about səhifəsi ilə eyni) */
+body.lang-az :not(i):not(.fa):not(.fas):not(.fab):not(.far) {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Font Awesome ikonlarını qoruyuruq */
+body.lang-az .fa-solid,
+body.lang-az .fa-brands,
+body.lang-az [class^="fa-"],
+body.lang-az [class*=" fa-"],
+body.lang-az .ctrl-btn i,
+body.lang-az .lang-check i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+}
+
