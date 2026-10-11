@@ -2,18 +2,14 @@
    CineChord — BEHIND THE SCENES / "REEL ARCHIVE"
    ================================================================
    DİNAMİK VERSİYA:
-   - window.BTS_CLIPS artıq hardcoded deyil — backend-dəki
-     /api/backstage (public, yalnız published=true item-lər)
-     endpoint-indən fetch olunur.
-   - Hero (#cineStage) daxilindəki .video-panel elementləri də
-     statik HTML-də deyil, backend-dən gələn siyahıya görə JS
-     tərəfindən dinamik yaradılır (buildStagePanels).
-   - Bütün digər davranış (scroll-driven hero keçidi, film-strip
-     qalereya, video modal, dil seçimi, mobil menyu) DƏYİŞMƏYİB.
+   - window.BTS_CLIPS backend-dəki /api/backstage (public, yalnız
+     published=true item-lər) endpoint-indən fetch olunur.
+   - Hero (#cineStage) daxilindəki .video-panel elementləri backend-dən
+     gələn siyahıya görə JS tərəfindən dinamik yaradılır (buildStagePanels).
+   - AUTO PLAY: videolar arasında hər 3 saniyədən bir avtomatik keçid.
+     "BEHIND THE SCENE" yazısına heç vaxt qayıtmır.
    ================================================================ */
 
-// Public backend endpoint — yalnız published=true backstage item-ləri qaytarır.
-// Admin panelin BASE_URL-i ilə eynidir, sadəcə fərqli (açıq) path.
 const BACKSTAGE_API_BASE = "https://cinechord-admin-production.up.railway.app";
 const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
 
@@ -29,33 +25,57 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
        BACKEND-DƏN BACKSTAGE MƏLUMATLARINI YÜKLƏMƏK
        ============================================================ */
 
-    async function fetchBackstageItems() {
-        try {
-            const res = await fetch(BACKSTAGE_API);
-            if (!res.ok) {
-                console.error('[CineChord] Backstage API xətası:', res.status);
-                return [];
-            }
-            const items = await res.json();
-            if (!Array.isArray(items)) return [];
+    const BTS_CACHE_KEY = 'btsItemsCache';
 
-            // sortOrder-ə görə sırala (backend artıq sıralı qaytarsa belə, ehtiyat üçün)
-            return items.slice().sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    function readCache() {
+        try {
+            const raw = localStorage.getItem(BTS_CACHE_KEY);
+            const arr = raw ? JSON.parse(raw) : null;
+            return Array.isArray(arr) && arr.length ? arr : null;
         } catch (e) {
-            console.error('[CineChord] Backstage fetch xətası:', e);
-            return [];
+            return null;
         }
     }
 
-    // Hero (#cineStage) daxilindəki .video-panel elementlərini backend
-    // datasına görə dinamik qurur. Statik SOCAR/KAPITAL BANK panelləri
-    // artıq HTML-də yoxdur — hamısı buradan yaranır.
+    async function fetchFresh() {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 10000);
+        try {
+            const res = await fetch(BACKSTAGE_API, { signal: ctrl.signal });
+            if (!res.ok) {
+                console.error('[CineChord] Backstage API xətası:', res.status);
+                return null;
+            }
+            const items = await res.json();
+            if (!Array.isArray(items)) return null;
+
+            const sorted = items.slice().sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+
+            try { localStorage.setItem(BTS_CACHE_KEY, JSON.stringify(sorted)); } catch (e) {}
+
+            return sorted;
+        } catch (e) {
+            console.error('[CineChord] Backstage fetch xətası:', e);
+            return null;
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    // Cache varsa dərhal onu qaytarır (səhifə gözləmir), eyni zamanda
+    // arxa planda təzə data yüklənib cache-i yeniləyir (növbəti girişdə görünür).
+    async function fetchBackstageItems() {
+        const cached = readCache();
+        const fresh = fetchFresh();
+        if (cached) return cached;
+        return (await fresh) || [];
+    }
+
     function buildStagePanels(items) {
 
         const stage = document.getElementById('cineStage');
         if (!stage) return;
 
-        // Ehtiyatən — əgər hardcoded panel qalıbsa təmizlə
         stage.querySelectorAll('.video-panel').forEach(p => p.remove());
 
         if (!items.length) return;
@@ -102,8 +122,6 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
         });
     }
 
-    // Backend item-lərini film-strip qalereyanın gözlədiyi formata çevirir
-    // və window.BTS_CLIPS-i doldurur (buildGallery bunu oxuyur).
     function buildClipsFromItems(items) {
         window.BTS_CLIPS = items.map((item) => ({
             title: item.title || '',
@@ -147,33 +165,31 @@ const BACKSTAGE_API = `${BACKSTAGE_API_BASE}/api/backstage`;
         }
     };
 
-function applyTranslations(lang) {
+    function applyTranslations(lang) {
 
-    const t = BTS_TRANSLATIONS[lang];
-    if (!t) return;
+        const t = BTS_TRANSLATIONS[lang];
+        if (!t) return;
 
-    window.currentLang = lang;
+        window.currentLang = lang;
 
-    // [data-key] olan elementlər (menyu istisna, onu menu.js idarə edir)
-    document.querySelectorAll('[data-key]').forEach((el) => {
+        document.querySelectorAll('[data-key]').forEach((el) => {
 
-        if (el.closest('#mobileMenu')) return;
+            if (el.closest('#mobileMenu')) return;
 
-        const key = el.getAttribute('data-key');
-        if (!t[key]) return;
+            const key = el.getAttribute('data-key');
+            if (!t[key]) return;
 
-        el.textContent = t[key];
-    });
+            el.textContent = t[key];
+        });
 
-    // <html lang="..">  və AZ font class-ı
-    if (lang === 'az') {
-        document.body.classList.add('lang-az');
-        document.documentElement.setAttribute('lang', 'az');
-    } else {
-        document.body.classList.remove('lang-az');
-        document.documentElement.setAttribute('lang', 'en');
+        if (lang === 'az') {
+            document.body.classList.add('lang-az');
+            document.documentElement.setAttribute('lang', 'az');
+        } else {
+            document.body.classList.remove('lang-az');
+            document.documentElement.setAttribute('lang', 'en');
+        }
     }
-}
 
     function initLanguageSelector() {
 
@@ -340,12 +356,12 @@ function applyTranslations(lang) {
 
 
     /* ============================================================
-       CINE STAGE — HERO VIDEO KEÇİDİ (sadə, qırılmaz sürüşmə effekti)
+       CINE STAGE — HERO VIDEO KEÇİDİ
        ============================================================
        DİQQƏT: Bu funksiya çağırılanda #cineStage daxilindəki
-       .video-panel elementləri artıq DOM-da olmalıdır — ona görə
-       init() içində buildStagePanels(items) HƏMİŞƏ initCineStage()-
-       dən ƏVVƏL işə düşür (aşağıdakı init-ə bax).
+       .video-panel elementləri artıq DOM-da olmalıdır — init()
+       içində buildStagePanels(items) həmişə initCineStage()-dən
+       əvvəl işə düşür.
        ============================================================ */
 
     function initCineStage() {
@@ -440,69 +456,10 @@ function applyTranslations(lang) {
 
         update();
 
-let isAnimating = false;
-let animFrame = null;
+        let isAnimating = false;
+        let animFrame = null;
 
-const BOUNDARY_EPS = 1;
-
-
-// ============================================================
-// AUTO PLAY — automatically switch backstage videos
-// ============================================================
-
-let autoPlayTimer = null;
-
-const AUTO_PLAY_DELAY = 5000;
-
-function startAutoPlay() {
-
-    clearInterval(autoPlayTimer);
-
-    autoPlayTimer = setInterval(() => {
-
-        if (document.body.classList.contains('menu-is-open')) return; 
-
-        const rect = wrapper.getBoundingClientRect();
-
-        const inRange =
-            rect.top <= 1 &&
-            rect.top >= -(totalScrollNeeded) - 1;
-
-        if (!inRange) return;
-
-        if (isAnimating) return;
-
-        const perPanel = getScrollPerPanel();
-        const progress = getCurrentProgress();
-
-        // Son REAL panelin progress-i
-        const lastPanelProgress =
-            Math.max(0, (panels.length - 1) * perPanel);
-
-        // ====================================================
-        // LAST PANEL → FIRST PANEL
-        // ====================================================
-
-        if (progress >= lastPanelProgress - BOUNDARY_EPS) {
-
-            animateScrollBy(-progress);
-
-            return;
-        }
-
-        // ====================================================
-        // NEXT PANEL
-        // ====================================================
-
-        const target = getNextBoundaryDown(
-            progress,
-            perPanel
-        );
-
-        animateScrollBy(target - progress);
-
-    }, AUTO_PLAY_DELAY);
-}
+        const BOUNDARY_EPS = 1;
 
         function getNextBoundaryDown(progress, perPanel) {
             const index = Math.floor((progress + BOUNDARY_EPS) / perPanel) + 1;
@@ -520,10 +477,11 @@ function startAutoPlay() {
                 : 1 - Math.pow(-2 * t + 2, 3) / 2;
         }
 
-        function animateScrollBy(deltaProgress, duration = 1300) {
+        function animateScrollBy(deltaProgress, duration = 1100, onDone) {
 
             if (Math.abs(deltaProgress) < 0.5) {
                 isAnimating = false;
+                if (onDone) onDone();
                 return;
             }
 
@@ -537,18 +495,15 @@ function startAutoPlay() {
             cancelAnimationFrame(animFrame);
 
             function step(now) {
-
-                const elapsed = now - startTime;
-                const t = Math.min(1, elapsed / duration);
-                const eased = easeInOutCubic(t);
-
-                window.scrollTo(0, startY + distance * eased);
+                const t = Math.min(1, (now - startTime) / duration);
+                window.scrollTo(0, startY + distance * easeInOutCubic(t));
 
                 if (t < 1) {
                     animFrame = requestAnimationFrame(step);
                 } else {
                     window.scrollTo(0, targetY);
                     isAnimating = false;
+                    if (onDone) onDone();
                 }
             }
 
@@ -556,9 +511,63 @@ function startAutoPlay() {
         }
 
 
-        startAutoPlay();
+        // ============================================================
+        // AUTO PLAY — yalnız videolar arasında (title-a qayıtmır)
+        // Panel k tam görünəndə progress = (k+1) * perPanel
+        //   0            → BEHIND THE SCENE yazısı
+        //   perPanel     → 1-ci video
+        //   2*perPanel   → 2-ci video ...
+        // Sonuncudan sonra 1-ci videoya qayıdır (0-a yox!)
+        // ============================================================
 
-            function handleWheel(e) {
+        const AUTO_PLAY_HOLD = 3000;   // videonun ekranda qalma müddəti (ms)
+        let autoPlayTimer = null;
+
+        function stageInRange() {
+            const rect = wrapper.getBoundingClientRect();
+            return rect.top <= 1 && rect.top >= -totalScrollNeeded - 1;
+        }
+
+        function scheduleAutoPlay() {
+            clearTimeout(autoPlayTimer);
+            autoPlayTimer = setTimeout(autoPlayStep, AUTO_PLAY_HOLD);
+        }
+
+        function autoPlayStep() {
+
+            const modal = document.getElementById('previewContainer');
+
+            if (
+                document.hidden ||
+                isAnimating ||
+                !stageInRange() ||
+                document.body.classList.contains('menu-is-open') ||
+                (modal && modal.classList.contains('active'))
+            ) {
+                scheduleAutoPlay();
+                return;
+            }
+
+            const perPanel = getScrollPerPanel();
+            const progress = getCurrentProgress();
+
+            // hazırda hansı panel (0 = title, 1..N = videolar)
+            const current = Math.round(progress / perPanel);
+
+            const nextIndex = current >= panels.length ? 1 : current + 1;
+            const target = nextIndex * perPanel;
+
+            animateScrollBy(target - progress, 1100, scheduleAutoPlay);
+        }
+
+        // İstifadəçi əl ilə scroll/swipe edəndə sayğac sıfırlansın
+        window.addEventListener('wheel', scheduleAutoPlay, { passive: true });
+        stage.addEventListener('touchstart', scheduleAutoPlay, { passive: true });
+
+        scheduleAutoPlay();
+
+
+        function handleWheel(e) {
 
             // Menyu açıqdırsa hero scroll etməsin (təkəri menu.js idarə edir)
             if (document.body.classList.contains('menu-is-open')) return;
@@ -608,112 +617,94 @@ function startAutoPlay() {
         window.addEventListener('wheel', handleWheel, { passive: false });
 
 
+        // ============================================================
+        // MOBILE TOUCH SNAP
+        // Native scrolling disabled while CineStage is active
+        // ============================================================
 
-// ============================================================
-// MOBILE TOUCH SNAP
-// Native scrolling disabled while CineStage is active
-// ============================================================
+        let touchStartY = 0;
+        let touchActive = false;
 
-let touchStartY = 0;
-let touchActive = false;
+        stage.addEventListener('touchstart', (e) => {
 
-stage.addEventListener('touchstart', (e) => {
+            if (!e.touches.length) return;
 
-    if (!e.touches.length) return;
+            const rect = wrapper.getBoundingClientRect();
 
-    const rect = wrapper.getBoundingClientRect();
+            const inRange =
+                rect.top <= 1 &&
+                rect.top >= -(totalScrollNeeded) - 1;
 
-    const inRange =
-        rect.top <= 1 &&
-        rect.top >= -(totalScrollNeeded) - 1;
+            if (!inRange) {
+                touchActive = false;
+                return;
+            }
 
-    if (!inRange) {
-        touchActive = false;
-        return;
-    }
+            touchActive = true;
+            touchStartY = e.touches[0].clientY;
 
-    touchActive = true;
-    touchStartY = e.touches[0].clientY;
-
-}, { passive: true });
-
-
-stage.addEventListener('touchmove', (e) => {
-
-    if (!touchActive) return;
-
-    // IMPORTANT:
-    // Prevent the phone's native scroll completely.
-    e.preventDefault();
-
-}, { passive: false });
+        }, { passive: true });
 
 
-stage.addEventListener('touchend', (e) => {
+        stage.addEventListener('touchmove', (e) => {
 
-    if (!touchActive) return;
+            if (!touchActive) return;
 
-    touchActive = false;
+            // Telefonun native scroll-unu tam blokla
+            e.preventDefault();
 
-    if (isAnimating) return;
-    if (!e.changedTouches.length) return;
+        }, { passive: false });
 
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = touchStartY - touchEndY;
 
-    // Ignore tiny movements
-    if (Math.abs(deltaY) < 40) return;
+        stage.addEventListener('touchend', (e) => {
 
-    const rect = wrapper.getBoundingClientRect();
+            if (!touchActive) return;
 
-    const inRange =
-        rect.top <= 1 &&
-        rect.top >= -(totalScrollNeeded) - 1;
+            touchActive = false;
 
-    if (!inRange) return;
+            if (isAnimating) return;
+            if (!e.changedTouches.length) return;
 
-    const perPanel = getScrollPerPanel();
-    const progress = getCurrentProgress();
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaY = touchStartY - touchEndY;
 
-    // ========================================================
-    // SWIPE UP → NEXT PANEL
-    // ========================================================
+            // Kiçik hərəkətləri ignore et
+            if (Math.abs(deltaY) < 40) return;
 
-    if (deltaY > 0) {
+            const rect = wrapper.getBoundingClientRect();
 
-        if (progress >= totalScrollNeeded - BOUNDARY_EPS) {
-            return;
-        }
+            const inRange =
+                rect.top <= 1 &&
+                rect.top >= -(totalScrollNeeded) - 1;
 
-        const target = getNextBoundaryDown(
-            progress,
-            perPanel
-        );
+            if (!inRange) return;
 
-        animateScrollBy(target - progress);
-    }
+            const perPanel = getScrollPerPanel();
+            const progress = getCurrentProgress();
 
-    // ========================================================
-    // SWIPE DOWN → PREVIOUS PANEL
-    // ========================================================
+            if (deltaY > 0) {
 
-    else {
+                // SWIPE UP → NEXT PANEL
+                if (progress >= totalScrollNeeded - BOUNDARY_EPS) {
+                    return;
+                }
 
-        if (progress <= BOUNDARY_EPS) {
-            return;
-        }
+                const target = getNextBoundaryDown(progress, perPanel);
+                animateScrollBy(target - progress);
 
-        const target = getNextBoundaryUp(
-            progress,
-            perPanel
-        );
+            } else {
 
-        animateScrollBy(target - progress);
-    }
+                // SWIPE DOWN → PREVIOUS PANEL
+                if (progress <= BOUNDARY_EPS) {
+                    return;
+                }
 
-}, { passive: true });
-        
-        
+                const target = getNextBoundaryUp(progress, perPanel);
+                animateScrollBy(target - progress);
+            }
+
+        }, { passive: true });
+
     }
 
 
@@ -1149,7 +1140,6 @@ stage.addEventListener('touchend', (e) => {
     }
 
 
-
     /* ============================================================
        SAFE RUN
        ============================================================ */
@@ -1166,23 +1156,24 @@ stage.addEventListener('touchend', (e) => {
     /* ============================================================
        INIT
        ============================================================
-       DİQQƏT: init() indi ASYNC-dir. Əvvəlcə backend-dən backstage
-       item-ləri yüklənir, hero panelləri (#cineStage) və
-       window.BTS_CLIPS bu data ilə qurulur — YALNIZ ONDAN SONRA
-       digər bütün modullar (qalereya, cine-stage scroll s.) işə
-       düşür. Bu sıra vacibdir: initCineStage() panel sayına görə
-       scroll hesablaması aparır, buildGallery() isə BTS_CLIPS-i
-       oxuyur — hər ikisi data hazır olanda çağrılmalıdır.
+       init() ASYNC-dir: əvvəlcə backend-dən item-lər yüklənir,
+       hero panelləri və window.BTS_CLIPS qurulur, YALNIZ ONDAN SONRA
+       digər modullar işə düşür.
        ============================================================ */
+
+    // Fetch skript yüklənən kimi başlayır (DOMContentLoaded-i gözləmir)
+    const itemsPromise = fetchBackstageItems();
 
     async function init() {
 
-        const items = await fetchBackstageItems();
+        // Dil seçimi backend-dən asılı deyil, dərhal qurulur
+        safeRun(initLanguageSelector);
+
+        const items = await itemsPromise;
 
         buildStagePanels(items);
         buildClipsFromItems(items);
 
-        safeRun(initLanguageSelector);
         safeRun(buildGallery);
         safeRun(initFilters);
         safeRun(initModal);
@@ -1191,6 +1182,7 @@ stage.addEventListener('touchend', (e) => {
         safeRun(initProgressBar);
         safeRun(initCineStage);
 
+        // Açılış animasiyası əvvəlki kimi, hər şey hazır olandan sonra başlayır
         runCountdown();
     }
 
@@ -1200,179 +1192,178 @@ stage.addEventListener('touchend', (e) => {
         init();
     }
 
-/* ============================================================
-   BACKSTAGE: video modal (home ilə eyni davranış)
-   ============================================================ */
-(function () {
-    'use strict';
 
-    const INACTIVITY_DELAY = 3000;
+    /* ============================================================
+       BACKSTAGE: video modal (home ilə eyni davranış)
+       ============================================================ */
+    (function () {
+        'use strict';
 
-    function initBackstageModal() {
-        const oldBox = document.getElementById('previewContainer');
-        if (!oldBox) return;
+        const INACTIVITY_DELAY = 3000;
 
-        // Faylda köhnə modal kodu varsa, listener-lər təkrarlanmasın deyə modalı klonlayırıq
-        const box = oldBox.cloneNode(true);
-        oldBox.parentNode.replaceChild(box, oldBox);
+        function initBackstageModal() {
+            const oldBox = document.getElementById('previewContainer');
+            if (!oldBox) return;
 
-        const $ = (id) => box.querySelector('#' + id);
-        const video      = $('previewVideo');
-        const titleEl    = $('previewTitle');
-        const loading    = box.querySelector('.video-loading');
-        const modalBtn   = $('modalPlayBtnContainer');
-        const playBtn    = $('playPauseBtn');
-        const playIcon   = $('playIcon');
-        const pauseIcon  = $('pauseIcon');
-        const rewindBtn  = $('rewindBtn');
-        const forwardBtn = $('forwardBtn');
-        const slider     = $('progressSlider');
-        const played     = $('progressPlayed');
-        const curTime    = $('currentTime');
-        const durTime    = $('durationTime');
-        const volume     = $('volumeSlider');
-        const fsBtn      = $('fullscreenBtn');
-        const closeBtn   = $('closePreview');
+            // Köhnə modal kodunun listener-ləri təkrarlanmasın deyə modalı klonlayırıq
+            const box = oldBox.cloneNode(true);
+            oldBox.parentNode.replaceChild(box, oldBox);
 
-        let activityTimer = null;
+            const $ = (id) => box.querySelector('#' + id);
+            const video      = $('previewVideo');
+            const titleEl    = $('previewTitle');
+            const loading    = box.querySelector('.video-loading');
+            const modalBtn   = $('modalPlayBtnContainer');
+            const playBtn    = $('playPauseBtn');
+            const playIcon   = $('playIcon');
+            const pauseIcon  = $('pauseIcon');
+            const rewindBtn  = $('rewindBtn');
+            const forwardBtn = $('forwardBtn');
+            const slider     = $('progressSlider');
+            const played     = $('progressPlayed');
+            const curTime    = $('currentTime');
+            const durTime    = $('durationTime');
+            const volume     = $('volumeSlider');
+            const fsBtn      = $('fullscreenBtn');
+            const closeBtn   = $('closePreview');
 
-        const fmt = (s) => {
-            if (isNaN(s)) return '0:00';
-            const m = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
-            return m + ':' + (sec < 10 ? '0' : '') + sec;
-        };
+            let activityTimer = null;
 
-        function activity() {
-            box.classList.remove('user-inactive');
-            clearTimeout(activityTimer);
-            if (!video.paused) {
-                activityTimer = setTimeout(() => box.classList.add('user-inactive'), INACTIVITY_DELAY);
-            }
-        }
+            const fmt = (s) => {
+                if (isNaN(s)) return '0:00';
+                const m = Math.floor(s / 60);
+                const sec = Math.floor(s % 60);
+                return m + ':' + (sec < 10 ? '0' : '') + sec;
+            };
 
-        function syncUI() {
-            const paused = video.paused;
-            playIcon.style.display  = paused ? 'block' : 'none';
-            pauseIcon.style.display = paused ? 'none' : 'block';
-            box.classList.toggle('is-paused', paused);
-            modalBtn.classList.toggle('is-paused', paused);
-            modalBtn.classList.toggle('is-playing', !paused);
-
-            if (paused) {
+            function activity() {
                 box.classList.remove('user-inactive');
                 clearTimeout(activityTimer);
-            } else {
-                activity();
+                if (!video.paused) {
+                    activityTimer = setTimeout(() => box.classList.add('user-inactive'), INACTIVITY_DELAY);
+                }
             }
-        }
 
-        function toggle(e) {
-            if (e) e.stopPropagation();
-            if (video.paused) {
+            function syncUI() {
+                const paused = video.paused;
+                playIcon.style.display  = paused ? 'block' : 'none';
+                pauseIcon.style.display = paused ? 'none' : 'block';
+                box.classList.toggle('is-paused', paused);
+                modalBtn.classList.toggle('is-paused', paused);
+                modalBtn.classList.toggle('is-playing', !paused);
+
+                if (paused) {
+                    box.classList.remove('user-inactive');
+                    clearTimeout(activityTimer);
+                } else {
+                    activity();
+                }
+            }
+
+            function toggle(e) {
+                if (e) e.stopPropagation();
+                if (video.paused) {
+                    const p = video.play();
+                    if (p && p.catch) p.catch(() => {});
+                } else {
+                    video.pause();
+                }
+            }
+
+            function openModal(src, name) {
+                if (!src) return;
+                loading.style.display = 'block';
+                video.src = src;
+                titleEl.textContent = name || '';
+                box.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
                 const p = video.play();
-                if (p && p.catch) p.catch(() => {});
-            } else {
-                video.pause();
+                if (p && p.catch) p.catch(() => { loading.style.display = 'none'; });
             }
+
+            function closeModal() {
+                box.classList.remove('active', 'user-inactive');
+                box.classList.add('is-paused');
+                clearTimeout(activityTimer);
+                if (document.fullscreenElement) document.exitFullscreen();
+
+                setTimeout(() => {
+                    video.pause();
+                    video.currentTime = 0;
+                    video.removeAttribute('src');
+                    video.load();
+                    document.body.style.overflow = '';
+                }, 500);
+            }
+
+            /* --- Video hadisələri --- */
+            video.addEventListener('play', syncUI);
+            video.addEventListener('pause', syncUI);
+            video.addEventListener('playing', () => { loading.style.display = 'none'; });
+            video.addEventListener('waiting', () => { loading.style.display = 'block'; });
+            video.addEventListener('loadeddata', () => { loading.style.display = 'none'; });
+            video.addEventListener('loadedmetadata', () => { durTime.textContent = fmt(video.duration); });
+            video.addEventListener('timeupdate', () => {
+                const percent = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+                played.style.width = percent + '%';
+                slider.value = percent;
+                curTime.textContent = fmt(video.currentTime);
+            });
+
+            /* --- Düymələr --- */
+            video.addEventListener('click', toggle);
+            playBtn.addEventListener('click', toggle);
+            rewindBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime -= 5; });
+            forwardBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime += 5; });
+            closeBtn.addEventListener('click', closeModal);
+
+            slider.addEventListener('input', function (e) {
+                e.stopPropagation();
+                if (video.duration) video.currentTime = (this.value / 100) * video.duration;
+            });
+
+            volume.addEventListener('input', function (e) {
+                e.stopPropagation();
+                video.volume = this.value / 100;
+            });
+
+            fsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (document.fullscreenElement) document.exitFullscreen();
+                else if (video.requestFullscreen) video.requestFullscreen();
+            });
+
+            /* --- 3 saniyə toxunulmasa panel gizlənir --- */
+            box.addEventListener('mousemove', activity);
+            box.addEventListener('click', activity);
+            box.addEventListener('touchstart', activity, { passive: true });
+
+            /* --- Klaviatura --- */
+            document.addEventListener('keydown', (e) => {
+                if (!box.classList.contains('active')) return;
+                if (e.key === 'Escape') closeModal();
+                if (e.key === ' ') { e.preventDefault(); toggle(); }
+                if (e.key === 'ArrowLeft') video.currentTime -= 5;
+                if (e.key === 'ArrowRight') video.currentTime += 5;
+            });
+
+            /* --- play yazısına klik → modal açılır --- */
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('.poster-play[data-video]');
+                if (!link) return;
+                e.preventDefault();
+                openModal(link.dataset.video, link.dataset.title);
+            });
+
+            syncUI();
         }
 
-        function openModal(src, name) {
-            if (!src) return;
-            loading.style.display = 'block';
-            video.src = src;
-            titleEl.textContent = name || '';
-            box.classList.add('active');
-            document.body.style.overflow = 'hidden';
-
-            const p = video.play();
-            if (p && p.catch) p.catch(() => { loading.style.display = 'none'; });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initBackstageModal);
+        } else {
+            initBackstageModal();
         }
-
-        function closeModal() {
-            box.classList.remove('active', 'user-inactive');
-            box.classList.add('is-paused');
-            clearTimeout(activityTimer);
-            if (document.fullscreenElement) document.exitFullscreen();
-
-            setTimeout(() => {
-                video.pause();
-                video.currentTime = 0;
-                video.removeAttribute('src');
-                video.load();
-                document.body.style.overflow = '';
-            }, 500);
-        }
-
-        /* --- Video hadisələri --- */
-        video.addEventListener('play', syncUI);
-        video.addEventListener('pause', syncUI);
-        video.addEventListener('playing', () => { loading.style.display = 'none'; });
-        video.addEventListener('waiting', () => { loading.style.display = 'block'; });
-        video.addEventListener('loadeddata', () => { loading.style.display = 'none'; });
-        video.addEventListener('loadedmetadata', () => { durTime.textContent = fmt(video.duration); });
-        video.addEventListener('timeupdate', () => {
-            const percent = video.duration ? (video.currentTime / video.duration) * 100 : 0;
-            played.style.width = percent + '%';
-            slider.value = percent;
-            curTime.textContent = fmt(video.currentTime);
-        });
-
-        /* --- Düymələr --- */
-        video.addEventListener('click', toggle);
-        playBtn.addEventListener('click', toggle);
-        rewindBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime -= 5; });
-        forwardBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime += 5; });
-        closeBtn.addEventListener('click', closeModal);
-
-        slider.addEventListener('input', function (e) {
-            e.stopPropagation();
-            if (video.duration) video.currentTime = (this.value / 100) * video.duration;
-        });
-
-        volume.addEventListener('input', function (e) {
-            e.stopPropagation();
-            video.volume = this.value / 100;
-        });
-
-        fsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (document.fullscreenElement) document.exitFullscreen();
-            else if (video.requestFullscreen) video.requestFullscreen();
-        });
-
-        /* --- 3 saniyə toxunulmasa panel gizlənir --- */
-        box.addEventListener('mousemove', activity);
-        box.addEventListener('click', activity);
-        box.addEventListener('touchstart', activity, { passive: true });
-
-        /* --- Klaviatura --- */
-        document.addEventListener('keydown', (e) => {
-            if (!box.classList.contains('active')) return;
-            if (e.key === 'Escape') closeModal();
-            if (e.key === ' ') { e.preventDefault(); toggle(); }
-            if (e.key === 'ArrowLeft') video.currentTime -= 5;
-            if (e.key === 'ArrowRight') video.currentTime += 5;
-        });
-
-        /* --- play yazısına klik → modal açılır --- */
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('.poster-play[data-video]');
-            if (!link) return;
-            e.preventDefault();
-            openModal(link.dataset.video, link.dataset.title);
-        });
-
-        syncUI();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initBackstageModal);
-    } else {
-        initBackstageModal();
-    }
-})();
-
-
+    })();
 
 })();
