@@ -350,11 +350,18 @@
             }
         }
 
-        function measure() {
-            rowH = items[0].offsetHeight;
-            H = list.clientHeight;
-            render();
-        }
+       function measure() {
+    rowH = items[0].offsetHeight;
+    H = list.clientHeight;
+
+    // logonu hamburger / CLOSE düyməsinin şaquli ortasına uyğunlaşdır
+    const hb = hamburger.getBoundingClientRect();
+    if (hb.height) {
+        fm.style.setProperty('--hb-cy', (hb.top + hb.height / 2).toFixed(1) + 'px');
+    }
+
+    render();
+}
 
         function tick(now) {
             const dt = Math.min(0.05, (now - last) / 1000 || 0.016);

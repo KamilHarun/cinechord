@@ -453,8 +453,14 @@ body.menu-is-open .lang-selector {
         grid-template-rows: auto minmax(0, 1fr);
         padding: 18px 20px 22px;
     }
-    .fm-left { height: 56px; padding-right: 0; }
-    .fm-logo { max-width: 120px; }
+.fm-left { height: 56px; padding-right: 0; position: static; }
+.fm-logo {
+    max-width: 120px;
+    position: absolute;
+    left: 20px;                    /* .fm-in yan padding-i ilə eyni */
+    top: var(--hb-cy, 50px);       /* hamburgerin ortası */
+    translate: 0 -50%;             /* ortalama (transform animasiyası ilə toqquşmasın deyə translate) */
+}
     .fm-main { padding-top: 8px; }
     .fm-text { font-size: min(calc(var(--row-h) * 0.6), 11vw); }
     .fm-count { top: 38%; }
